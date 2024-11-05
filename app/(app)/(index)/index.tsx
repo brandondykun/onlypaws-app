@@ -1,0 +1,115 @@
+import { FlashList } from "@shopify/flash-list";
+import { router } from "expo-router";
+import { View, ActivityIndicator, Dimensions, RefreshControl } from "react-native";
+
+import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
+import Post from "@/components/Post/Post";
+import Text from "@/components/Text/Text";
+import { COLORS } from "@/constants/Colors";
+import { useFeedPostsContext } from "@/context/FeedPostsContext";
+import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
+import { PostLike, PostCommentDetailed } from "@/types";
+
+const FeedScreen = () => {
+  const feed = useFeedPostsContext();
+  const profile = useProfileDetailsContext(); // selected profile in this stack
+
+  const screenWidth = Dimensions.get("window").width;
+  const estimatedItemSize = screenWidth + 180;
+
+  const handleProfilePress = (profileId: number | string) => {
+    profile.setProfileId(Number(profileId));
+    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId } });
+  };
+
+  const onLike = (newPostLike: PostLike) => {
+    // update feed posts
+    feed.onLike(newPostLike);
+    // update selected profile posts in ProfileDetailsContextProvider for this stack
+    profile.posts.onLike(newPostLike);
+  };
+
+  const onUnlike = (postId: number) => {
+    // update feed posts
+    feed.onUnlike(postId);
+    // update selected profile posts in ProfileDetailsContextProvider for this stack
+    profile.posts.onUnlike(postId);
+  };
+
+  const onComment = (comment: PostCommentDetailed, postId: number) => {
+    // update feed posts
+    feed.onComment(comment, postId);
+    // update selected profile posts in ProfileDetailsContextProvider for this stack
+    profile.posts.onComment(comment, postId);
+  };
+
+  let content = (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
+      <Text>Loading Posts...</Text>
+      <ActivityIndicator color={COLORS.zinc[500]} size="large" />
+    </View>
+  );
+
+  const emptyComponent = (
+    <View style={{ flex: 1, justifyContent: "center", paddingTop: "50%" }}>
+      <Text
+        style={{
+          fontSize: 20,
+          textAlign: "center",
+          paddingHorizontal: 36,
+          fontWeight: "300",
+        }}
+        darkColor={COLORS.zinc[400]}
+        lightColor={COLORS.zinc[600]}
+      >
+        Oh no! Your feed is empty. Follow some users to see their posts here!
+      </Text>
+    </View>
+  );
+
+  if (feed.initialFetchComplete) {
+    content = (
+      <FlashList
+        data={feed.data}
+        showsVerticalScrollIndicator={false}
+        refreshing={feed.refreshing}
+        refreshControl={
+          <RefreshControl
+            refreshing={feed.refreshing}
+            onRefresh={feed.refresh}
+            tintColor={COLORS.zinc[400]}
+            colors={[COLORS.zinc[400]]}
+          />
+        }
+        renderItem={({ item }) => (
+          <Post
+            post={item}
+            onProfilePress={handleProfilePress}
+            setPosts={feed.setData}
+            onLike={onLike}
+            onUnlike={onUnlike}
+            onComment={onComment}
+          />
+        )}
+        keyExtractor={(item) => item.id.toString()}
+        onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
+        onEndReached={
+          !feed.fetchNextLoading && !feed.hasFetchNextError && !feed.hasInitialFetchError
+            ? () => feed.fetchNext()
+            : null
+        }
+        ListFooterComponent={
+          feed.data.length > 0 ? (
+            <FlatListLoadingFooter nextUrl={feed.fetchNextUrl} fetchNextLoading={feed.fetchNextLoading} />
+          ) : null
+        }
+        ListEmptyComponent={emptyComponent}
+        estimatedItemSize={estimatedItemSize}
+      />
+    );
+  }
+
+  return <View style={{ flex: 1 }}>{content}</View>;
+};
+
+export default FeedScreen;

@@ -1,37 +1,43 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import { useColorScheme } from "react-native";
+import Toast from "react-native-toast-message";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { toastConfig } from "@/config/ToastConfig";
+import { COLORS } from "@/constants/Colors";
+import AuthProfileContextProvider from "@/context/AuthProfileContext";
+import AuthUserContextProvider from "@/context/AuthUserContext";
+import ColorModeContextProvider from "@/context/ColorModeContext";
+import AuthInterceptor from "@/interceptors/AuthInterceptor";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
+const RootLayout = () => {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  const isDarkMode = colorScheme === "dark";
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <AuthUserContextProvider>
+      <AuthProfileContextProvider>
+        <ColorModeContextProvider>
+          <AuthInterceptor>
+            <Stack
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                },
+                headerShadowVisible: false, // applied here
+                contentStyle: {
+                  backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                },
+              }}
+            >
+              <Stack.Screen name="auth" options={{ title: "", headerShown: false }} />
+              <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false }} />
+            </Stack>
+            <Toast config={toastConfig} />
+          </AuthInterceptor>
+        </ColorModeContextProvider>
+      </AuthProfileContextProvider>
+    </AuthUserContextProvider>
   );
-}
+};
+
+export default RootLayout;

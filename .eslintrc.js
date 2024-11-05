@@ -1,0 +1,24 @@
+// https://docs.expo.dev/guides/using-eslint/
+module.exports = {
+  extends: ["expo", "prettier"],
+  plugins: ["prettier", "import"],
+  rules: {
+    "prettier/prettier": "error",
+    "import/no-unresolved": 2, // Ensures that all imports can be resolved
+    // "import/named": 2, // Ensures that named imports exist in the module
+    "import/default": 2, // Ensures that default imports exist in the module
+    "import/namespace": 2, // Ensures that namespace imports exist in the module
+    "import/no-extraneous-dependencies": [2, { devDependencies: true }], // Prevents importing modules that aren't listed in package.json
+    "import/order": [
+      "error",
+      {
+        groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always",
+        alphabetize: {
+          order: "asc",
+          caseInsensitive: true,
+        },
+      },
+    ], // Enforces a consistent order of imports
+  },
+};
