@@ -48,3 +48,22 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+## Running tests
+
+### Creating ios build
+```bash
+npx expo prebuild --platform ios
+npx expo run:ios
+```
+
+### Running tests
+```bash
+maestro test maestro/
+```
+
+### Help writing tests with maestro studio
+```bash
+maestro studio 
+```

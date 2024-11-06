@@ -84,6 +84,7 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
             buttonStyle={{ paddingHorizontal: 6, height: 28, width: 60, borderRadius: 6 }}
             variant="outline"
             onPress={() => handleUnfollowPress(profile.id)}
+            testID={`${profile.username}-unfollow`}
           />
         ) : (
           <Button
@@ -91,6 +92,7 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
             textStyle={{ fontSize: 12 }}
             buttonStyle={{ paddingHorizontal: 6, height: 28, width: 60, borderRadius: 6 }}
             onPress={() => handleFollowPress(profile)}
+            testID={`${profile.username}-follow`}
           />
         )}
       </View>

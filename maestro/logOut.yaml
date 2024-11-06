@@ -1,0 +1,14 @@
+# logOut.yaml
+
+# Test logging out of the app
+
+appId: com.bdykun.onlypawsapp
+name: Log Out Flow
+
+---
+- launchApp:
+    clearState: true
+
+- tapOn: "Profile, tab, 5 of 5"
+- tapOn: "Log Out"
+- assertVisible: "Create an Account"

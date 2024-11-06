@@ -112,10 +112,11 @@ const LoginScreen = () => {
             icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
             autoCapitalize="none"
             secureTextEntry
+            testID="login-password"
           />
         </View>
 
-        <Button text="Log In" onPress={handleLogin} loading={loginLoading} />
+        <Button text="Log In" onPress={handleLogin} loading={loginLoading} testID="login-button" />
 
         <View style={s.helperTextContainer}>
           <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
