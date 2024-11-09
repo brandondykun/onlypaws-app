@@ -1,0 +1,22 @@
+# login.yaml
+
+# Test logging into the app
+
+appId: com.bdykun.onlypawsapp
+name: Log In Flow
+
+---
+- launchApp:
+    clearState: true
+- tapOn: "Log in"
+- tapOn: "Log In"
+
+- assertVisible: "Please enter your email."
+- assertVisible: "Please enter your password."
+- tapOn: "youremail@email.com"
+- inputText: "admin@email.com"
+- tapOn:
+    id: "login-password"
+- inputText: "password"
+- tapOn: "Log In"
+- assertVisible: "Feed"

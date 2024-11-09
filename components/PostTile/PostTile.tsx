@@ -22,7 +22,11 @@ const PostTile = ({ post, index, onPress }: Props) => {
           <MaterialCommunityIcons name="card-multiple" size={16} color={COLORS.zinc[50]} />
         </View>
       ) : null}
-      <Pressable style={({ pressed }) => [pressed && { opacity: 0.7 }]} onPress={() => onPress(index)}>
+      <Pressable
+        style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+        onPress={() => onPress(index)}
+        testID="post-tile-pressable"
+      >
         <Image
           source={{ uri: post.images[0].image }}
           style={{ height: screenWidth / 3 - 1, width: isCenterRow ? screenWidth / 3 : screenWidth / 3 - 1 }}

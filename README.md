@@ -60,7 +60,7 @@ npx expo run:ios
 
 ### Running tests
 ```bash
-maestro test maestro/
+maestro test e2e/
 ```
 
 ### Help writing tests with maestro studio

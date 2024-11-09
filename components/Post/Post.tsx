@@ -123,6 +123,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
               onPress={() => handleHeartPress(post.id, liked)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
               disabled={post.profile.id === authProfile.id || likeLoading}
+              testID="post-like-button"
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                 <AntDesign
@@ -136,6 +137,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
             <Pressable
               onPress={() => setCommentsModalVisible(true)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+              testID="post-comment-button"
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                 <FontAwesome name="comment-o" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]} />

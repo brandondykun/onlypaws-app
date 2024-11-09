@@ -1,0 +1,10 @@
+# config.yaml
+executionOrder:
+    continueOnFailure: false # default is true
+    flowsOrder:
+        - Log In Flow
+        - Search and Follow Profile Flow
+        - Explore Follow Profile Flow
+        - Search Profile And View Page Flow
+        - Add Post Comment Flow
+        - Log Out Flow

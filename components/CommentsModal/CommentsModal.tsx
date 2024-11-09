@@ -227,7 +227,11 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
             ]}
           >
             <View style={{ position: "absolute", right: 12, top: 12, zIndex: 4 }}>
-              <Pressable onPress={onClose} style={({ pressed }) => [pressed && { opacity: 0.7 }]}>
+              <Pressable
+                onPress={onClose}
+                style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+                testID="comments-modal-close-button"
+              >
                 <AntDesign name="close" size={24} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700]} />
               </Pressable>
             </View>
@@ -251,7 +255,12 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
                   inputStyle={{ borderRadius: 25, paddingHorizontal: 16 }}
                 />
               </View>
-              <Pressable style={{ paddingTop: 6 }} onPress={handleAddComment} disabled={addCommentLoading}>
+              <Pressable
+                style={{ paddingTop: 6 }}
+                onPress={handleAddComment}
+                disabled={addCommentLoading}
+                testID="add-comment-button"
+              >
                 <View style={s.addCommentButton}>
                   <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
                 </View>
