@@ -9,6 +9,7 @@ import {
   TextStyle,
   useColorScheme,
   ColorSchemeName,
+  GestureResponderEvent,
 } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -24,6 +25,7 @@ type Props = {
   text: string;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
+  onPress: (event: GestureResponderEvent) => void;
 } & PressableProps;
 
 const Button = ({
@@ -33,6 +35,7 @@ const Button = ({
   buttonStyle,
   textStyle,
   icon,
+  onPress,
   iconPosition = "left",
   variant = "primary",
   ...rest
@@ -43,6 +46,8 @@ const Button = ({
   return (
     <Pressable
       style={({ pressed }) => [pressed && !loading && { opacity: 0.6 }, (disabled || loading) && { opacity: 0.6 }]}
+      onPress={disabled || loading ? null : onPress}
+      testID="button-pressable"
       {...rest}
     >
       <View style={[styles.root, buttonStyle]}>
@@ -53,7 +58,7 @@ const Button = ({
             {icon && iconPosition === "right" ? icon : null}
           </>
         ) : (
-          <ActivityIndicator size="small" color={COLORS.zinc[300]} />
+          <ActivityIndicator size="small" color={COLORS.zinc[300]} testID="button-loading-spinner" />
         )}
       </View>
     </Pressable>
