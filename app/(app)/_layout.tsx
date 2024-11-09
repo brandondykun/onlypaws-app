@@ -5,8 +5,9 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { Tabs, Redirect } from "expo-router";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
 import React from "react";
-import { View, Text } from "react-native";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 
+import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -19,8 +20,11 @@ const TabLayout = () => {
 
   if (authLoading) {
     return (
-      <View>
-        <Text>Loading</Text>
+      <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100] }]}>
+        <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={s.loadingViewText}>
+          Loading
+        </Text>
+        <ActivityIndicator size="small" />
       </View>
     );
   }
@@ -89,3 +93,17 @@ const TabLayout = () => {
 };
 
 export default TabLayout;
+
+const s = StyleSheet.create({
+  loadingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  loadingViewText: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "300",
+  },
+});
