@@ -2,7 +2,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { CameraCapturedPicture } from "expo-camera";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
@@ -10,6 +9,7 @@ import * as SecureStore from "expo-secure-store";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { View, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { addProfileImage, editProfileImage, updateAboutText } from "@/api/profile";
 import Button from "@/components/Button/Button";
@@ -21,6 +21,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
   const { user, logOut, profileOptions, setActiveProfileId } = useAuthUserContext();
@@ -29,7 +30,7 @@ const ProfileScreen = () => {
   const { isDarkMode } = useColorMode();
 
   const [showCamera, setShowCamera] = useState(false);
-  const [image, setImage] = useState<(CameraCapturedPicture | ImagePickerAsset)[]>([]);
+  const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
   const [changeProfileModalVisible, setChangeProfileModalVisible] = useState(false);
 
@@ -71,7 +72,7 @@ const ProfileScreen = () => {
     formData.append("profileId", authProfile.id.toString());
 
     formData.append("image", {
-      uri: image[0].uri,
+      uri: getImageUri(image[0]),
       name: `profile_image.jpeg`,
       type: "image/jpeg",
       mimeType: "multipart/form-data",

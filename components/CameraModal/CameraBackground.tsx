@@ -6,12 +6,12 @@ const CameraBackground = () => {
   const screenWidth = Dimensions.get("window").width;
 
   return (
-    <View style={s.root}>
+    <View style={s.root} pointerEvents="none">
       {/* Top */}
       <View style={s.top}></View>
 
       {/* Camera Square */}
-      <View style={[s.middle, { height: screenWidth, width: screenWidth }]} />
+      <View style={[s.middle, { height: screenWidth, width: screenWidth }]} pointerEvents="none" />
 
       {/* Bottom */}
       <View style={s.bottom}></View>
@@ -29,11 +29,11 @@ const s = StyleSheet.create({
     bottom: 0,
     left: 0,
     justifyContent: "center",
+    zIndex: 1,
   },
   top: {
     flex: 1,
     backgroundColor: COLORS.zinc[950],
-    opacity: 0.9,
   },
   middle: {
     borderWidth: 1,
@@ -42,7 +42,6 @@ const s = StyleSheet.create({
   bottom: {
     flex: 1,
     backgroundColor: COLORS.zinc[950],
-    opacity: 0.9,
     justifyContent: "center",
   },
 });

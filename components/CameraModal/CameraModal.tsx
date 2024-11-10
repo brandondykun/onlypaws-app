@@ -1,23 +1,25 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useRef, useState, useMemo, useCallback } from "react";
-import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform } from "react-native";
+import { useRef, useState, useCallback } from "react";
+import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable } from "react-native";
 import DraggableFlatList from "react-native-draggable-flatlist";
+import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-reanimated";
 import {
-  GestureHandlerRootView,
-  GestureDetector,
-  Gesture,
-  GestureUpdateEvent,
-  PinchGestureHandlerEventPayload,
-  GestureStateChangeEvent,
-} from "react-native-gesture-handler";
+  Camera,
+  PhotoFile,
+  useCameraDevice,
+  useCameraPermission,
+  useCameraFormat,
+  Point,
+} from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
+import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
@@ -25,37 +27,46 @@ import Text from "../Text/Text";
 
 import CameraBackground from "./CameraBackground";
 import DeleteImageModal from "./DeleteImageModal";
+import FocusIcon from "./FocusIcon";
 import ImagePreviewModal from "./ImagePreviewModal";
 
 type Props = {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  images: (CameraCapturedPicture | ImagePickerAsset)[];
-  setImages: React.Dispatch<React.SetStateAction<(CameraCapturedPicture | ImagePickerAsset)[]>>;
+  images: (PhotoFile | ImagePickerAsset)[];
+  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
   maxImages?: number;
   onSavePress?: () => void;
 };
 
 const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSavePress }: Props) => {
-  const [facing, setFacing] = useState<CameraType>("back");
-  const [permission, requestPermission] = useCameraPermissions();
-
+  const [facing, setFacing] = useState<"back" | "front">("back");
+  const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [initialPreviewIndex, setInitialPreviewIndex] = useState<number | null>(null);
-  const [zoom, setZoom] = useState(0.7);
-  const [lastZoom, setLastZoom] = useState(0.7);
+  const [flash, setFlash] = useState<"on" | "off">("off");
 
-  const cameraRef = useRef<CameraView>(null!);
+  const cameraRef = useRef<Camera>(null!);
+  const device = useCameraDevice(facing);
+  const format = useCameraFormat(device, [
+    { photoAspectRatio: 1 },
+    { photoResolution: "max" },
+    { videoAspectRatio: 1 },
+  ]);
+  const { hasPermission, requestPermission } = useCameraPermission();
 
   const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   const takePicture = async () => {
     if (cameraRef?.current) {
       if (!maxImages || images.length < maxImages) {
-        const new_image = await cameraRef.current.takePictureAsync();
-        if (new_image) {
-          setImages((prev) => [new_image, ...prev]);
+        const newImage = await cameraRef.current.takePhoto({
+          flash: flash,
+        });
+        if (newImage) {
+          setImages((prev) => [newImage, ...prev]);
         }
       }
     }
@@ -75,251 +86,223 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
     }
   };
 
-  const onPinch = useCallback(
-    (event: GestureUpdateEvent<PinchGestureHandlerEventPayload>) => {
-      let velocity = event.velocity / 50;
-      if (event.velocity < 0) velocity = event.velocity / 20;
-      const outFactor = lastZoom * (Platform.OS === "ios" ? 40 : 15);
+  // focus camera on point
+  const focus = useCallback((point: Point) => {
+    const c = cameraRef.current;
+    if (c == null) return;
+    setFocusPoint({ x: point.x, y: point.y });
+    c.focus(point)
+      .catch(() => {
+        // this is to avoid development error if focus is called multiple times quickly
+      })
+      .finally(() => {
+        setFocusPoint(null);
+      });
+  }, []);
 
-      let newZoom =
-        velocity > 0
-          ? zoom + event.scale * velocity * (Platform.OS === "ios" ? 0.01 : 25)
-          : zoom - event.scale * (outFactor || 1) * Math.abs(velocity) * (Platform.OS === "ios" ? 0.02 : 50);
-
-      if (newZoom < 0) newZoom = 0;
-      else if (newZoom > 0.7) newZoom = 0.7;
-
-      setZoom(newZoom);
-    },
-    [zoom, setZoom, lastZoom],
-  );
-
-  const onPinchEnd = useCallback(
-    (event: GestureStateChangeEvent<PinchGestureHandlerEventPayload>) => {
-      setLastZoom(zoom);
-    },
-    [zoom, setLastZoom],
-  );
-
-  const pinchGesture = useMemo(() => Gesture.Pinch().onUpdate(onPinch).onEnd(onPinchEnd), [onPinch, onPinchEnd]);
+  // handle tap to focus
+  const gesture = Gesture.Tap().onEnd(({ x, y }) => {
+    runOnJS(focus)({ x, y });
+  });
 
   let content = (
     <View>
       <Text>Loading...</Text>
     </View>
   );
-
-  if (!permission) {
-    // Camera permissions are still loading.
-    return content;
+  if (device == null) {
+    content = (
+      <View style={{ alignItems: "center" }}>
+        <Text style={{ fontSize: 18, fontWeight: 300 }}>No Camera Device Found</Text>
+      </View>
+    );
   }
 
-  if (!permission.granted) {
+  if (!hasPermission) {
     // Camera permissions are not granted yet.
     content = (
-      <View style={styles.requestPermissionsContainer}>
-        <Text style={styles.message}>Uh oh! We need your permission to access the camera.</Text>
+      <View style={s.requestPermissionsContainer}>
+        <Text style={s.message}>Uh oh! We need your permission to access the camera.</Text>
         <Button onPress={requestPermission} text="Grant Permission" variant="secondary" />
       </View>
     );
   }
 
   const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
+    setFacing((prev) => (prev === "back" ? "front" : "back"));
   };
 
-  if (permission.granted) {
+  const toggleFlash = () => {
+    setFlash((prev) => (prev === "on" ? "off" : "on"));
+  };
+
+  if (device && hasPermission) {
     content = (
       <GestureHandlerRootView>
-        <GestureDetector gesture={pinchGesture}>
-          <CameraView
-            style={styles.camera}
-            facing={facing}
-            ref={cameraRef}
-            ratio="1:1"
-            pictureSize="1920x1080"
-            zoom={zoom}
+        <View style={{ flex: 1, position: "relative" }}>
+          <CameraBackground />
+
+          {/* Top */}
+          <View
+            style={[
+              s.topContainer,
+              {
+                height: (screenHeight - screenWidth) / 2,
+              },
+            ]}
           >
-            <CameraBackground />
-            <View style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, justifyContent: "center" }}>
-              {/* Top */}
-              <View style={{ flex: 1 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginTop: 70,
-                    paddingHorizontal: 16,
-                  }}
-                >
-                  <TouchableOpacity onPress={() => setVisible(false)}>
-                    <Ionicons name="chevron-back-outline" size={30} color={COLORS.zinc[100]} />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={toggleCameraFacing}>
-                    <MaterialIcons name="flip-camera-ios" size={30} color={COLORS.zinc[100]} />
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flex: 1, paddingBottom: 4, justifyContent: "flex-end" }}>
-                  <Text
-                    style={{
-                      color: COLORS.zinc[500],
-                      paddingLeft: 4,
-                      paddingBottom: 2,
-                      fontStyle: "italic",
-                      fontSize: 14,
-                    }}
-                  >
-                    {images.length > 1 ? "Press and hold then drag to reorder images" : ""}
-                  </Text>
-                  {images.length ? (
-                    <DraggableFlatList
-                      horizontal={true}
-                      data={images}
-                      contentContainerStyle={{ flexGrow: 1, alignItems: "flex-end" }}
-                      showsHorizontalScrollIndicator={false}
-                      onDragBegin={() => Haptics.impactAsync()}
-                      renderItem={({ item, drag, isActive }) => {
-                        return (
-                          <Pressable
-                            onLongPress={drag}
-                            onPress={() => {
-                              const index = images.findIndex((image) => image.uri === item.uri);
-                              setInitialPreviewIndex(index);
-                              setPreviewModalVisible(true);
-                            }}
-                            style={[
-                              { borderRadius: 4 },
-
-                              isActive && {
-                                shadowColor: COLORS.zinc[950],
-                                shadowOffset: {
-                                  width: 0,
-                                  height: 12,
-                                },
-                                shadowOpacity: 0.58,
-                                shadowRadius: 16.0,
-
-                                elevation: 24,
-                              },
-                            ]}
-                          >
-                            <Image
-                              source={{ uri: item.uri }}
-                              style={[
-                                item.uri === selectedImageUri
-                                  ? { borderWidth: 1, borderColor: COLORS.red[600] }
-                                  : undefined,
-                                {
-                                  borderRadius: 4,
-                                  marginHorizontal: 2,
-                                  height: 100,
-                                  width: 100,
-                                },
-                              ]}
-                            />
-                          </Pressable>
-                        );
-                      }}
-                      keyExtractor={(item) => item.uri}
-                      onDragEnd={({ data }) => setImages(data)}
-                    />
-                  ) : (
-                    <View style={{ flexDirection: "row", gap: 2 }}>
-                      <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                      <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                      <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                      <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                    </View>
-                  )}
-                  {/* {images.length
-                  ? images.map((image) => {
-                      return (
-                        <TouchableOpacity
-                          onLongPress={() => {
-                            Haptics.impactAsync();
-                            setSelectedImageUri(image.uri);
-                          }}
-                          onPress={() => {
-                            Haptics.selectionAsync();
-                            setPreviewModalVisible(true);
-                          }}
-                          key={image.uri}
-                        >
-                          <Image
-                            source={{ uri: image.uri }}
-                            height={100}
-                            width={100}
-                            style={[
-                              image.uri === selectedImageUri
-                                ? { borderWidth: 1, borderColor: COLORS.red[600] }
-                                : undefined,
-                              { borderRadius: 4 },
-                            ]}
-                          />
-                        </TouchableOpacity>
-                      );
-                    })
-                  : Array(5)
-                      .fill(0)
-                      .map((item, i) => {
-                        return (
-                          <View
-                            style={{
-                              height: 100,
-                              width: 100,
-                              backgroundColor: COLORS.zinc[800],
-                              borderRadius: 4,
-                              opacity: 0.9,
-                            }}
-                            key={i}
-                          ></View>
-                        );
-                      })} */}
-                  {/* </ScrollView> */}
-                </View>
-              </View>
-
-              {/* Camera Square */}
-              <View style={{ height: screenWidth, width: screenWidth }} />
-
-              {/* Bottom */}
-              <View style={{ flex: 1, justifyContent: "center", flexDirection: "row" }}>
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                  <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={pickImage}>
-                    <MaterialIcons name="camera-roll" size={36} color={COLORS.zinc[300]} />
-                  </Pressable>
-                </View>
-                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                  <TouchableOpacity
-                    onPress={takePicture}
-                    disabled={maxImages && maxImages === images.length ? true : false}
-                  >
-                    <View style={styles.takeImageButtonRing}>
-                      <View style={styles.takeImageButton}>
-                        <Ionicons name="paw" size={24} color={COLORS.zinc[400]} />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                  {onSavePress && images.length ? (
-                    <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
-                      <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[600]} />
-                      <Text style={{ color: COLORS.zinc[300], textAlign: "center" }}>Save</Text>
-                    </Pressable>
-                  ) : null}
-                </View>
+            <View style={s.topIconContainer}>
+              <TouchableOpacity onPress={() => setVisible(false)}>
+                <Ionicons name="chevron-back-outline" size={30} color={COLORS.zinc[100]} />
+              </TouchableOpacity>
+              <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+                <TouchableOpacity onPress={toggleFlash} hitSlop={10}>
+                  <Ionicons name={flash === "on" ? "flash" : "flash-off"} size={24} color={COLORS.zinc[100]} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleCameraFacing} hitSlop={10}>
+                  <MaterialIcons name="flip-camera-ios" size={30} color={COLORS.zinc[100]} />
+                </TouchableOpacity>
               </View>
             </View>
-          </CameraView>
-        </GestureDetector>
+            <View style={{ flex: 1, paddingBottom: 4, justifyContent: "flex-end" }}>
+              <Text
+                style={{
+                  color: COLORS.zinc[500],
+                  paddingLeft: 8,
+                  paddingBottom: 2,
+                  fontStyle: "italic",
+                  fontSize: 14,
+                }}
+              >
+                {images.length > 1 ? "Press, hold, drag to reorder images." : ""}
+              </Text>
+              {images.length ? (
+                <DraggableFlatList
+                  horizontal={true}
+                  data={images}
+                  contentContainerStyle={{ flexGrow: 1, alignItems: "flex-end" }}
+                  showsHorizontalScrollIndicator={false}
+                  onDragBegin={() => Haptics.impactAsync()}
+                  renderItem={({ item, drag, isActive }) => {
+                    return (
+                      <Pressable
+                        onLongPress={drag}
+                        onPress={() => {
+                          const index = images.findIndex((image) => getImageUri(image) === getImageUri(item));
+                          setInitialPreviewIndex(index);
+                          setPreviewModalVisible(true);
+                        }}
+                        style={[
+                          { borderRadius: 4 },
+
+                          isActive && {
+                            shadowColor: COLORS.zinc[950],
+                            shadowOffset: {
+                              width: 0,
+                              height: 12,
+                            },
+                            shadowOpacity: 0.58,
+                            shadowRadius: 16.0,
+
+                            elevation: 24,
+                          },
+                        ]}
+                      >
+                        <Image
+                          source={{ uri: getImageUri(item) }}
+                          style={[
+                            getImageUri(item) === selectedImageUri
+                              ? { borderWidth: 1, borderColor: COLORS.red[600] }
+                              : undefined,
+                            {
+                              borderRadius: 4,
+                              marginHorizontal: 2,
+                              height: 100,
+                              width: 100,
+                            },
+                          ]}
+                        />
+                      </Pressable>
+                    );
+                  }}
+                  keyExtractor={(item) => getImageUri(item)}
+                  onDragEnd={({ data }) => setImages(data)}
+                />
+              ) : (
+                <View style={{ flexDirection: "row", gap: 2 }}>
+                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
+                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
+                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
+                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Camera Square */}
+          {/* <View style={{ height: screenWidth, width: screenWidth, backgroundColor: "blue" }} /> */}
+
+          {/* Bottom */}
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              flexDirection: "row",
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              left: 0,
+              height: (screenHeight - screenWidth) / 2,
+              zIndex: 1,
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={pickImage}>
+                <MaterialIcons name="camera-roll" size={36} color={COLORS.zinc[300]} />
+              </Pressable>
+            </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TouchableOpacity
+                onPress={takePicture}
+                disabled={maxImages && maxImages === images.length ? true : false}
+              >
+                <View style={s.takeImageButtonRing}>
+                  <View style={s.takeImageButton}>
+                    <Ionicons name="paw" size={24} color={COLORS.zinc[400]} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              {onSavePress && images.length ? (
+                <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
+                  <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[600]} />
+                  <Text style={{ color: COLORS.zinc[300], textAlign: "center" }}>Save</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+          {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
+          <GestureDetector gesture={gesture}>
+            <Camera
+              style={s.camera}
+              ref={cameraRef}
+              device={device}
+              isActive
+              photo={true}
+              enableZoomGesture={true}
+              format={format}
+              resizeMode="contain"
+            />
+          </GestureDetector>
+        </View>
       </GestureHandlerRootView>
     );
   }
 
   return (
     <Modal withScroll={false} visible={visible} onRequestClose={() => setVisible(false)}>
-      <View style={styles.contentContainer}>{visible ? content : null}</View>
+      <View style={s.contentContainer}>{visible ? content : null}</View>
       <ImagePreviewModal
         images={images}
         setImages={setImages}
@@ -340,7 +323,21 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
 
 export default CameraModal;
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
+  topContainer: {
+    flex: 1,
+    zIndex: 3,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    left: 0,
+  },
+  topIconContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 60,
+    paddingHorizontal: 16,
+  },
   requestPermissionsContainer: {
     flex: 1,
     justifyContent: "center",
@@ -362,29 +359,10 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
   },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    backgroundColor: "transparent",
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    paddingBottom: 48,
-    paddingTop: 64,
-    paddingHorizontal: 18,
-  },
   takeImageButtonRing: {
     backgroundColor: COLORS.zinc[500],
     padding: 6,
     borderRadius: 50,
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: COLORS.zinc[100],
   },
   takeImageButton: {
     height: 80,

@@ -1,16 +1,17 @@
-import { CameraCapturedPicture } from "expo-camera";
 import { ImagePickerAsset } from "expo-image-picker";
 import { Pressable, View, Text } from "react-native";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
+import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
 
 type Props = {
   visible: boolean;
-  images: (CameraCapturedPicture | ImagePickerAsset)[];
-  setImages: React.Dispatch<React.SetStateAction<(CameraCapturedPicture | ImagePickerAsset)[]>>;
+  images: (PhotoFile | ImagePickerAsset)[];
+  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
   selectedImageUri: string | null;
   setSelectedImageUri: React.Dispatch<React.SetStateAction<string | null>>;
 };
@@ -19,7 +20,7 @@ const DeleteImageModal = ({ visible, images, setImages, selectedImageUri, setSel
   const handleDelete = () => {
     setImages((prev) => {
       return prev.filter((image) => {
-        return image.uri !== selectedImageUri;
+        return getImageUri(image) !== selectedImageUri;
       });
     });
     setSelectedImageUri(null);

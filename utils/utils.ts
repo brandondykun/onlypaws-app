@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { ImagePickerAsset } from "expo-image-picker";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { PostCommentDetailed, PostDetailed, PostLike } from "@/types";
 
@@ -74,4 +76,19 @@ export const abbreviateNumber = (num: number) => {
     const rounded = Math.floor(decimal * 10) / 10;
     return `${rounded}B`;
   }
+};
+
+export const isPhotoFile = (image: PhotoFile | ImagePickerAsset): image is PhotoFile => {
+  // Determine if image is a PhotoFile
+  // PhotoFile has a path key, where ImagePickerAsset has a uri key
+  return image.hasOwnProperty("path");
+};
+
+export const getImageUri = (image: PhotoFile | ImagePickerAsset) => {
+  // Return an image uri from a PhotoFile or ImagePickerAsset
+  // PhotoFile does not have a uri, it has a path that does not start with file://
+  if (isPhotoFile(image)) {
+    return `file://${image.path}`;
+  }
+  return image.uri;
 };

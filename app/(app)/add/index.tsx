@@ -1,5 +1,4 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { CameraCapturedPicture } from "expo-camera";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -7,6 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { ScrollView, View, Pressable } from "react-native";
 import Toast from "react-native-toast-message";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { createPost } from "@/api/post";
 import Button from "@/components/Button/Button";
@@ -17,6 +17,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostsContext } from "@/context/PostsContext";
+import { getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const AddPostScreen = () => {
 
   const [caption, setCaption] = useState("");
   const [captionError, setCaptionError] = useState("");
-  const [images, setImages] = useState<(CameraCapturedPicture | ImagePickerAsset)[]>([]);
+  const [images, setImages] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
   const [cameraVisible, setCameraVisible] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -56,7 +57,7 @@ const AddPostScreen = () => {
 
     images.forEach((image, i) => {
       formData.append("images", {
-        uri: image.uri,
+        uri: getImageUri(image),
         name: `image_${i}.jpeg`,
         type: "image/jpeg",
         mimeType: "multipart/form-data",
@@ -135,13 +136,8 @@ const AddPostScreen = () => {
             </>
           ) : (
             images.map((image) => {
-              return (
-                <Image
-                  source={{ uri: image.uri }}
-                  style={{ borderRadius: 8, height: 200, width: 200 }}
-                  key={image.uri}
-                />
-              );
+              const uri = getImageUri(image);
+              return <Image source={{ uri: uri }} style={{ borderRadius: 8, height: 200, width: 200 }} key={uri} />;
             })
           )}
         </ScrollView>
