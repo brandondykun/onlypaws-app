@@ -28,6 +28,7 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
         onPageSelected={(e) => {
           setCurrentPage(e.nativeEvent.position);
         }}
+        style={imageStyle}
       >
         {images.map((image, i) => {
           return (
