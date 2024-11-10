@@ -166,6 +166,7 @@ const AddPostScreen = () => {
           error={captionError}
           showCharCount
           maxLength={128}
+          textAlignVertical="top"
         />
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
           <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
