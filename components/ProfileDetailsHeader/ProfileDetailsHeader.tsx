@@ -40,7 +40,7 @@ const ProfileDetailsHeader = ({
           buttonStyle={{
             paddingHorizontal: 6,
             height: 30,
-            width: 60,
+            width: "auto",
             borderColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[600],
             borderRadius: 4,
           }}
