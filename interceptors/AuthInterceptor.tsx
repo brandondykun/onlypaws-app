@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
@@ -13,6 +14,7 @@ type Props = {
 
 const AuthInterceptor = ({ children }: Props) => {
   const { isAuthenticated, logOut } = useAuthUserContext();
+  const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -37,21 +39,18 @@ const AuthInterceptor = ({ children }: Props) => {
               const now = Date.now();
               if (decodedToken?.exp && decodedToken.exp * 1000 < now) {
                 // if refresh token is expired, log user out
-                console.log("decodedToken?.exp: ", decodedToken?.exp * 1000);
-                console.log("now: ", now);
                 console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR 1");
-
                 logOut();
-              }
-              const { error, data } = await refreshToken(storedRefreshToken);
-              if (data && !error) {
-                const newAccessToken = data.access;
-                await SecureStore.setItemAsync("ACCESS_TOKEN", newAccessToken);
-                config.headers.Authorization = `Bearer ${newAccessToken}`;
               } else {
-                console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR 2");
-
-                logOut();
+                const { error, data } = await refreshToken(storedRefreshToken);
+                if (data && !error) {
+                  const newAccessToken = data.access;
+                  await SecureStore.setItemAsync("ACCESS_TOKEN", newAccessToken);
+                  config.headers.Authorization = `Bearer ${newAccessToken}`;
+                } else {
+                  console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR 2");
+                  logOut();
+                }
               }
             }
             return axiosInstance(config);
@@ -65,7 +64,7 @@ const AuthInterceptor = ({ children }: Props) => {
         axiosInstance.interceptors.request.eject(authInterceptor);
       };
     }
-  }, [isAuthenticated, logOut]);
+  }, [isAuthenticated, logOut, router]);
 
   useEffect(() => {
     const requestInterceptor = axiosInstance.interceptors.request.use(
