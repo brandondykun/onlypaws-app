@@ -16,6 +16,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import Text from "../Text/Text";
 
 type Props = {
+  value: string;
   label?: string;
   error?: string;
   inputStyle?: StyleProp<TextStyle>;
@@ -28,11 +29,10 @@ type Props = {
 
 const TextInput = forwardRef(
   (
-    { label, error, inputStyle, icon, showCharCount, maxLength, onChangeText, secureTextEntry, ...rest }: Props,
+    { value, label, error, inputStyle, icon, showCharCount, maxLength, onChangeText, secureTextEntry, ...rest }: Props,
     ref: LegacyRef<RNTextInput> | undefined,
   ) => {
     const [focused, setFocused] = useState(false);
-    const [charCount, setCharCount] = useState(0);
     const [textHidden, setTextHidden] = useState(secureTextEntry ? true : false);
 
     const { isDarkMode } = useColorMode();
@@ -41,7 +41,6 @@ const TextInput = forwardRef(
 
     const handleChangeText = (text: string) => {
       if (onChangeText) {
-        setCharCount(text.length);
         if (maxLength) {
           if (text.length <= maxLength) {
             onChangeText(text);
@@ -73,6 +72,7 @@ const TextInput = forwardRef(
           {icon ? <View style={s.icon}>{icon}</View> : null}
           <RNTextInput
             ref={ref}
+            value={value}
             placeholderTextColor={isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400]}
             {...rest}
             onFocus={() => setFocused(true)}
@@ -115,14 +115,14 @@ const TextInput = forwardRef(
             <Text
               style={{
                 color:
-                  maxLength && charCount >= maxLength
+                  maxLength && value.length >= maxLength
                     ? COLORS.red[500]
                     : isDarkMode
                       ? COLORS.zinc[300]
                       : COLORS.zinc[800],
               }}
             >
-              {charCount}/{maxLength}
+              {value.length}/{maxLength}
             </Text>
           ) : null}
         </View>
