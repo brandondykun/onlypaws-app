@@ -46,6 +46,7 @@ const TabLayout = () => {
           },
           headerShadowVisible: false, // applied here
         }}
+        sceneContainerStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}
       >
         <Tabs.Screen
           name="(index)"
