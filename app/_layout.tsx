@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import * as SystemUI from "expo-system-ui";
 import { useColorScheme } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -12,6 +13,9 @@ import AuthInterceptor from "@/interceptors/AuthInterceptor";
 const RootLayout = () => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
+  // set system background color to prevent random light screen flashes in dark mode
+  // flashes occur when navigating back screens or underneath the keyboard when it is opening
+  SystemUI.setBackgroundColorAsync(isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50]);
 
   return (
     <AuthUserContextProvider>
