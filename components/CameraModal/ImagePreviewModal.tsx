@@ -1,11 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { CameraCapturedPicture } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState, useRef, useEffect } from "react";
 import { Dimensions, View, Pressable, TouchableOpacity, FlatList } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
 
@@ -75,19 +73,15 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
                   }}
                 >
                   <View style={{ overflow: "hidden", backgroundColor: COLORS.zinc[900] }}>
-                    <GestureHandlerRootView>
-                      <Zoomable>
-                        <ImageLoader
-                          uri={item.uri}
-                          width={screenWidth}
-                          height={screenWidth}
-                          style={[
-                            item.uri === selectedImageUri ? { borderColor: "red" } : { borderColor: "transparent" },
-                            { borderWidth: 1 },
-                          ]}
-                        />
-                      </Zoomable>
-                    </GestureHandlerRootView>
+                    <ImageLoader
+                      uri={item.uri}
+                      width={screenWidth}
+                      height={screenWidth}
+                      style={[
+                        item.uri === selectedImageUri ? { borderColor: "red" } : { borderColor: "transparent" },
+                        { borderWidth: 1 },
+                      ]}
+                    />
                   </View>
                 </Pressable>
               </View>
