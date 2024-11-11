@@ -19,6 +19,7 @@ import {
 } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
@@ -55,6 +56,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
     { videoAspectRatio: 1 },
   ]);
   const { hasPermission, requestPermission } = useCameraPermission();
+  const { setLightOrDark } = useColorMode();
 
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
@@ -153,14 +155,26 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
           >
             <View style={s.topIconContainer}>
               <TouchableOpacity onPress={() => setVisible(false)}>
-                <Ionicons name="chevron-back-outline" size={30} color={COLORS.zinc[100]} />
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+                />
               </TouchableOpacity>
               <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
                 <TouchableOpacity onPress={toggleFlash} hitSlop={10}>
-                  <Ionicons name={flash === "on" ? "flash" : "flash-off"} size={24} color={COLORS.zinc[100]} />
+                  <Ionicons
+                    name={flash === "on" ? "flash" : "flash-off"}
+                    size={24}
+                    color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={toggleCameraFacing} hitSlop={10}>
-                  <MaterialIcons name="flip-camera-ios" size={30} color={COLORS.zinc[100]} />
+                  <MaterialIcons
+                    name="flip-camera-ios"
+                    size={30}
+                    color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -258,7 +272,11 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
           >
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={pickImage}>
-                <MaterialIcons name="camera-roll" size={36} color={COLORS.zinc[300]} />
+                <MaterialIcons
+                  name="camera-roll"
+                  size={36}
+                  color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])}
+                />
               </Pressable>
             </View>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -266,9 +284,22 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                 onPress={takePicture}
                 disabled={maxImages && maxImages === images.length ? true : false}
               >
-                <View style={s.takeImageButtonRing}>
-                  <View style={s.takeImageButton}>
-                    <Ionicons name="paw" size={24} color={COLORS.zinc[400]} />
+                <View
+                  style={[
+                    s.takeImageButtonRing,
+                    { backgroundColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]) },
+                  ]}
+                >
+                  <View
+                    style={[
+                      s.takeImageButton,
+                      {
+                        backgroundColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+                        borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                      },
+                    ]}
+                  >
+                    <Ionicons name="paw" size={36} color={COLORS.zinc[400]} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -276,8 +307,10 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               {onSavePress && images.length ? (
                 <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
-                  <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[600]} />
-                  <Text style={{ color: COLORS.zinc[300], textAlign: "center" }}>Save</Text>
+                  <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[500]} />
+                  <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ textAlign: "center" }}>
+                    Save
+                  </Text>
                 </Pressable>
               ) : null}
             </View>
@@ -336,7 +369,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 60,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
   },
   requestPermissionsContainer: {
     flex: 1,
@@ -360,17 +393,15 @@ const s = StyleSheet.create({
     flex: 1,
   },
   takeImageButtonRing: {
-    backgroundColor: COLORS.zinc[500],
-    padding: 6,
+    padding: 4,
     borderRadius: 50,
   },
   takeImageButton: {
-    height: 80,
-    width: 80,
+    height: 90,
+    width: 90,
     borderRadius: 100,
-    backgroundColor: COLORS.zinc[200],
-    borderWidth: 3,
-    borderColor: COLORS.zinc[950],
+    borderWidth: 2,
+
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 1,

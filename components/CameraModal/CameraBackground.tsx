@@ -1,20 +1,28 @@
 import { StyleSheet, View, Dimensions } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
 
 const CameraBackground = () => {
+  const { setLightOrDark } = useColorMode();
   const screenWidth = Dimensions.get("window").width;
 
   return (
     <View style={s.root} pointerEvents="none">
       {/* Top */}
-      <View style={s.top}></View>
+      <View style={[s.top, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }]} />
 
       {/* Camera Square */}
-      <View style={[s.middle, { height: screenWidth, width: screenWidth }]} pointerEvents="none" />
+      <View
+        style={[
+          s.middle,
+          { height: screenWidth, width: screenWidth, borderColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[800]) },
+        ]}
+        pointerEvents="none"
+      />
 
       {/* Bottom */}
-      <View style={s.bottom}></View>
+      <View style={[s.bottom, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }]} />
     </View>
   );
 };
@@ -33,15 +41,13 @@ const s = StyleSheet.create({
   },
   top: {
     flex: 1,
-    backgroundColor: COLORS.zinc[950],
   },
   middle: {
-    borderWidth: 1,
-    borderColor: COLORS.zinc[950],
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   bottom: {
     flex: 1,
-    backgroundColor: COLORS.zinc[950],
     justifyContent: "center",
   },
 });
