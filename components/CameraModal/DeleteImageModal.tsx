@@ -1,12 +1,14 @@
 import { ImagePickerAsset } from "expo-image-picker";
-import { Pressable, View, Text } from "react-native";
+import { Pressable, View } from "react-native";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
+import Text from "../Text/Text";
 
 type Props = {
   visible: boolean;
@@ -17,6 +19,8 @@ type Props = {
 };
 
 const DeleteImageModal = ({ visible, images, setImages, selectedImageUri, setSelectedImageUri }: Props) => {
+  const { isDarkMode } = useColorMode();
+
   const handleDelete = () => {
     setImages((prev) => {
       return prev.filter((image) => {
@@ -45,24 +49,18 @@ const DeleteImageModal = ({ visible, images, setImages, selectedImageUri, setSel
             paddingBottom: 64,
             paddingTop: 32,
             paddingHorizontal: 24,
-            backgroundColor: "#171717",
+            backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200],
             borderTopRightRadius: 25,
             borderTopLeftRadius: 25,
           }}
         >
-          <Text style={{ fontSize: 18, marginBottom: 32, color: COLORS.zinc[200] }}>
-            Are you sure you want to delete this photo?
-          </Text>
-          <View style={{ flexDirection: "row", gap: 6 }}>
+          <Text style={{ fontSize: 18, marginBottom: 32 }}>Are you sure you want to delete this photo?</Text>
+          <View style={{ flexDirection: "row", gap: 24 }}>
             <View style={{ flex: 1 }}>
-              <Button onPress={handleDelete} buttonStyle={{ backgroundColor: COLORS.lime[600] }} text="Yes" />
+              <Button onPress={handleDelete} buttonStyle={{ backgroundColor: COLORS.red[600] }} text="Delete" />
             </View>
             <View style={{ flex: 1 }}>
-              <Button
-                onPress={() => setSelectedImageUri(null)}
-                buttonStyle={{ backgroundColor: COLORS.red[700] }}
-                text="Cancel"
-              />
+              <Button onPress={() => setSelectedImageUri(null)} text="Cancel" variant="outline" />
             </View>
           </View>
         </View>
