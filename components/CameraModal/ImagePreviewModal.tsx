@@ -6,6 +6,7 @@ import { Dimensions, View, Pressable, TouchableOpacity, FlatList, StyleSheet } f
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 import ImageLoader from "../ImageLoader/ImageLoader";
@@ -26,6 +27,7 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
   const screenWidth = Dimensions.get("window").width;
   const flatListRef = useRef<FlatList<PhotoFile | ImagePickerAsset>>(null);
 
+  const { isDarkMode } = useColorMode();
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,11 +42,16 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
   }, [initialIndex, visible]);
 
   return (
-    <Modal visible={visible} onRequestClose={() => setVisible(false)} withScroll={false}>
+    <Modal
+      visible={visible}
+      onRequestClose={() => setVisible(false)}
+      withScroll={false}
+      backgroundColor={isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50]}
+    >
       <View style={{ flex: 1, paddingTop: 60 }}>
         <View style={s.header}>
           <TouchableOpacity onPress={() => setVisible(false)} hitSlop={10}>
-            <Ionicons name="chevron-back-outline" size={30} color="#fff" />
+            <Ionicons name="chevron-back-outline" size={30} color={isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]} />
           </TouchableOpacity>
           <Text style={{ opacity: 0.8, fontSize: 18 }}>Long press to delete image.</Text>
         </View>
@@ -99,7 +106,8 @@ export default ImagePreviewModal;
 
 const s = StyleSheet.create({
   header: {
-    paddingHorizontal: 16,
+    paddingLeft: 8,
+    paddingRight: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
