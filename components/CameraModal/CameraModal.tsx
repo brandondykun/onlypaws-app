@@ -89,18 +89,26 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   };
 
   // focus camera on point
-  const focus = useCallback((point: Point) => {
-    const c = cameraRef.current;
-    if (c == null) return;
-    setFocusPoint({ x: point.x, y: point.y });
-    c.focus(point)
-      .catch(() => {
-        // this is to avoid development error if focus is called multiple times quickly
-      })
-      .finally(() => {
-        setFocusPoint(null);
-      });
-  }, []);
+  const focus = useCallback(
+    (point: Point) => {
+      const c = cameraRef.current;
+      if (c == null) return;
+      // prevent tap on screen outside of image from triggering focus
+      const topLimit = (screenHeight - screenWidth) / 2;
+      const bottomLimit = (screenHeight - screenWidth) / 2 + screenWidth;
+      if (point.y < topLimit || point.y > bottomLimit) return;
+
+      setFocusPoint({ x: point.x, y: point.y });
+      c.focus(point)
+        .catch(() => {
+          // this is to avoid development error if focus is called multiple times quickly
+        })
+        .finally(() => {
+          setFocusPoint(null);
+        });
+    },
+    [screenHeight, screenWidth],
+  );
 
   // handle tap to focus
   const gesture = Gesture.Tap().onEnd(({ x, y }) => {
