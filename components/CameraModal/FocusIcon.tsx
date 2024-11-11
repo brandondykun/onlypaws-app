@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { useRef, useEffect } from "react";
+import { View, Animated } from "react-native";
 import { Point } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
@@ -12,18 +13,31 @@ const CROSS_HAIR_SIZE = 6;
 const COLOR = COLORS.amber[400];
 
 const FocusIcon = ({ focusPoint }: Props) => {
+  const scaleValue = useRef(new Animated.Value(1.5)).current;
+
+  useEffect(() => {
+    Animated.timing(scaleValue, {
+      toValue: 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [scaleValue]);
+
   return (
-    <View
-      style={{
-        zIndex: 3,
-        height: SIZE,
-        width: SIZE,
-        borderColor: COLOR,
-        borderWidth: 1,
-        position: "absolute",
-        top: focusPoint.y - SIZE / 2,
-        left: focusPoint.x - SIZE / 2,
-      }}
+    <Animated.View
+      style={[
+        {
+          zIndex: 3,
+          height: SIZE,
+          width: SIZE,
+          borderColor: COLOR,
+          borderWidth: 1,
+          position: "absolute",
+          top: focusPoint.y - SIZE / 2,
+          left: focusPoint.x - SIZE / 2,
+          transform: [{ scale: scaleValue }],
+        },
+      ]}
     >
       <View style={{ position: "relative", flex: 1 }}>
         <View
@@ -67,7 +81,7 @@ const FocusIcon = ({ focusPoint }: Props) => {
           }}
         />
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
