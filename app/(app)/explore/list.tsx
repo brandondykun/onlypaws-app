@@ -1,6 +1,6 @@
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList } from "react-native";
 
 import { axiosInstance } from "@/api/config";
 import { getSimilarPosts } from "@/api/post";
@@ -59,7 +59,7 @@ const ExplorePostsListScreen = () => {
   }, [setSimilarPosts, nextUrl]);
 
   return (
-    <FlatList
+    <FlashList
       data={similarPosts}
       ListHeaderComponent={
         <Post
@@ -85,6 +85,7 @@ const ExplorePostsListScreen = () => {
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? getNextPage : null}
       showsVerticalScrollIndicator={false}
+      estimatedItemSize={570}
       ListFooterComponent={() => (
         <FlatListLoadingFooter
           nextUrl={nextUrl}
