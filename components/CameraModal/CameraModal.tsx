@@ -251,18 +251,25 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                   onDragEnd={({ data }) => setImages(data)}
                 />
               ) : (
-                <View style={{ flexDirection: "row", gap: 2 }}>
-                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
-                  <View style={{ borderRadius: 4, height: 100, width: 100, backgroundColor: COLORS.zinc[900] }} />
+                <View style={{ flexDirection: "row", gap: 2, paddingLeft: 4 }}>
+                  <View
+                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
+                  />
+                  <View
+                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
+                  />
+                  <View
+                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
+                  />
+                  <View
+                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
+                  />
                 </View>
               )}
             </View>
           </View>
 
           {/* Camera Square */}
-          {/* <View style={{ height: screenWidth, width: screenWidth, backgroundColor: "blue" }} /> */}
 
           {/* Bottom */}
           <View
@@ -409,9 +416,13 @@ const s = StyleSheet.create({
     width: 90,
     borderRadius: 100,
     borderWidth: 2,
-
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 1,
+  },
+  placeholder: {
+    borderRadius: 4,
+    height: 100,
+    width: 100,
   },
 });
