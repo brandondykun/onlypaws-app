@@ -18,6 +18,8 @@ import ImageSwiper from "../ImageSwiper/ImageSwiper";
 import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";
 
+import PostCaption from "./PostCaption";
+
 type Props = {
   post: PostDetailed;
   setPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
@@ -73,84 +75,79 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   };
 
   return (
-    <>
-      <View key={post.id} style={{ marginBottom: 36 }}>
-        <View style={{ padding: 8 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <ProfileImage image={post.profile.image} size={35} />
-            <Pressable
-              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-              onPress={() => onProfilePress(post.profile.id!)}
-            >
-              <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
-                {post.profile.username}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-        <GestureHandlerRootView>
-          <TapGestureHandler
-            numberOfTaps={2}
-            onActivated={
-              post.profile.id === authProfile.id || likeLoading ? undefined : () => handleHeartPress(post.id, liked)
-            }
+    <View key={post.id} style={{ marginBottom: 36, minHeight: 570 }}>
+      <View style={{ padding: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <ProfileImage image={post.profile.image} size={35} />
+          <Pressable
+            style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+            onPress={() => onProfilePress(post.profile.id!)}
           >
-            <View
-              style={{
-                minHeight: screenWidth,
-                width: screenWidth,
-              }}
-            >
-              <ImageSwiper
-                images={post.images}
-                imageHeight={screenWidth}
-                imageWidth={screenWidth}
-                imageStyle={{ height: screenWidth, width: screenWidth }}
-              />
-            </View>
-          </TapGestureHandler>
-        </GestureHandlerRootView>
-        <View>
+            <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
+              {post.profile.username}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+      <GestureHandlerRootView>
+        <TapGestureHandler
+          numberOfTaps={2}
+          onActivated={
+            post.profile.id === authProfile.id || likeLoading ? undefined : () => handleHeartPress(post.id, liked)
+          }
+        >
           <View
             style={{
-              flexDirection: "row",
-              gap: 16,
-              paddingHorizontal: 16,
-              paddingTop: post.images.length === 1 ? 16 : 0,
+              minHeight: screenWidth,
+              width: screenWidth,
             }}
           >
-            <Pressable
-              onPress={() => handleHeartPress(post.id, liked)}
-              style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-              disabled={post.profile.id === authProfile.id || likeLoading}
-              testID="post-like-button"
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <AntDesign
-                  name={liked ? "heart" : "hearto"}
-                  size={20}
-                  color={liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
-                />
-                <Text style={{ fontSize: 18 }}>{post.likes.length}</Text>
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={() => setCommentsModalVisible(true)}
-              style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-              testID="post-comment-button"
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <FontAwesome name="comment-o" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]} />
-                <Text style={{ fontSize: 18 }}>{post.comments_count}</Text>
-              </View>
-            </Pressable>
+            <ImageSwiper
+              images={post.images}
+              imageHeight={screenWidth}
+              imageWidth={screenWidth}
+              imageStyle={{ height: screenWidth, width: screenWidth }}
+            />
           </View>
-          <View style={{ padding: 16, paddingBottom: 8 }}>
-            <Text>{post.caption}</Text>
-          </View>
-          <View style={{ paddingLeft: 16 }}>
-            <Text darkColor={COLORS.zinc[500]}>{getTimeSince(post.created_at)}</Text>
-          </View>
+        </TapGestureHandler>
+      </GestureHandlerRootView>
+      <View>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 16,
+            paddingHorizontal: 16,
+          }}
+        >
+          <Pressable
+            onPress={() => handleHeartPress(post.id, liked)}
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+            disabled={post.profile.id === authProfile.id || likeLoading}
+            testID="post-like-button"
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <AntDesign
+                name={liked ? "heart" : "hearto"}
+                size={20}
+                color={liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
+              />
+              <Text style={{ fontSize: 18 }}>{post.likes.length}</Text>
+            </View>
+          </Pressable>
+          <Pressable
+            onPress={() => setCommentsModalVisible(true)}
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+            testID="post-comment-button"
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <FontAwesome name="comment-o" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]} />
+              <Text style={{ fontSize: 18 }}>{post.comments_count}</Text>
+            </View>
+          </Pressable>
+        </View>
+        <PostCaption caption={post.caption} />
+        <View style={{ paddingLeft: 16 }}>
+          <Text darkColor={COLORS.zinc[500]}>{getTimeSince(post.created_at)}</Text>
         </View>
       </View>
       <CommentsModal
@@ -159,7 +156,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         postId={post.id}
         addCommentToPost={addComment}
       />
-    </>
+    </View>
   );
 };
 

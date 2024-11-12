@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Text as RNText, StyleProp, TextStyle, TextProps } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -9,7 +10,7 @@ type Props = {
   style?: StyleProp<TextStyle>;
 } & TextProps;
 
-const Text = ({ darkColor, lightColor, style, children, ...rest }: Props) => {
+const Text = forwardRef<RNText, Props>(({ darkColor, lightColor, style, children, ...rest }, ref) => {
   const { isDarkMode } = useColorMode();
 
   const styles: StyleProp<TextStyle> = {
@@ -17,10 +18,11 @@ const Text = ({ darkColor, lightColor, style, children, ...rest }: Props) => {
   };
 
   return (
-    <RNText style={[styles, style]} {...rest}>
+    <RNText style={[styles, style]} {...rest} ref={ref}>
       {children}
     </RNText>
   );
-};
+});
 
+Text.displayName = "Text";
 export default Text;

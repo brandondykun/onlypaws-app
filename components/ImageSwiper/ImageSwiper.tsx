@@ -40,31 +40,34 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
           );
         })}
       </PagerView>
-      {imageCount > 1 ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            gap: 6,
-            paddingTop: 12,
-          }}
-        >
-          {images.map((image, i) => {
-            return (
-              <View
-                style={{
-                  height: 8,
-                  width: 8,
-                  backgroundColor: i === currentPage ? COLORS.sky[500] : COLORS.zinc[500],
-                  opacity: i === currentPage ? 1 : 0.8,
-                  borderRadius: 25,
-                }}
-                key={i}
-              />
-            );
-          })}
-        </View>
-      ) : null}
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 6,
+          paddingTop: 4,
+          height: 18,
+        }}
+      >
+        {imageCount > 1
+          ? images.map((image, i) => {
+              return (
+                <View
+                  style={{
+                    height: 8,
+                    width: 8,
+                    backgroundColor: i === currentPage ? COLORS.sky[500] : COLORS.zinc[500],
+                    opacity: i === currentPage ? 1 : 0.8,
+                    borderRadius: 25,
+                  }}
+                  key={i}
+                />
+              );
+            })
+          : null}
+      </View>
     </View>
   );
 };

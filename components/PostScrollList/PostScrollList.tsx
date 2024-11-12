@@ -1,6 +1,5 @@
-import { useIsFocused } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Dimensions } from "react-native";
 
 import { PostDetailed } from "@/types";
@@ -21,22 +20,8 @@ type Props = {
 const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike, onUnlike, onComment }: Props) => {
   const flatListRef = useRef<FlashList<PostDetailed>>(null);
 
-  const isFocused = useIsFocused();
   const screenWidth = Dimensions.get("window").width;
-  const estimatedItemSize = screenWidth + 180;
-
-  useEffect(() => {
-    if (initialIndex) {
-      setTimeout(() => {
-        if (flatListRef?.current) {
-          flatListRef.current.scrollToIndex({
-            index: initialIndex,
-            animated: true,
-          });
-        }
-      }, 700);
-    }
-  }, [initialIndex, flatListRef, isFocused]);
+  const estimatedItemSize = screenWidth + 195; // add in space for header and footer of post, and post margin bottom
 
   return (
     <FlashList
