@@ -22,7 +22,7 @@ import { getImageUri } from "@/utils/utils";
 const AddPostScreen = () => {
   const router = useRouter();
   const { addPost } = usePostsContext();
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, updatePostsCount } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
 
   const [caption, setCaption] = useState("");
@@ -70,6 +70,7 @@ const AddPostScreen = () => {
       const { error, data } = await createPost(formData, accessToken);
       if (data && !error) {
         addPost(data);
+        updatePostsCount("add", 1);
         setCaption("");
         setImages([]);
         router.replace("/(app)/posts");
