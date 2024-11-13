@@ -22,6 +22,7 @@ const screenWidth = Dimensions.get("window").width;
 const ExploreScreen = () => {
   const router = useRouter();
   const navigation = useNavigation();
+  const screenWidth = Dimensions.get("window").width;
 
   const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
@@ -38,18 +39,20 @@ const ExploreScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <Button
-          buttonStyle={[
-            s.headerSearchButton,
-            {
-              backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-              borderColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[400],
-            },
-          ]}
-          textStyle={s.headerSearchButtonFont}
-          onPress={() => router.push("/(app)/explore/profileSearch")}
-          text="Search profiles..."
-        />
+        <View style={{ width: screenWidth, marginLeft: -16, alignItems: "center" }}>
+          <Button
+            buttonStyle={[
+              s.headerSearchButton,
+              {
+                backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                borderColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[400],
+              },
+            ]}
+            textStyle={s.headerSearchButtonFont}
+            onPress={() => router.push("/(app)/explore/profileSearch")}
+            text="Search profiles..."
+          />
+        </View>
       ),
     });
   });

@@ -1,6 +1,6 @@
 import { useNavigation } from "expo-router";
 import { useLayoutEffect } from "react";
-import { StyleSheet, View, FlatList, ActivityIndicator } from "react-native";
+import { StyleSheet, View, FlatList, ActivityIndicator, Dimensions } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
@@ -16,14 +16,15 @@ const ProfileSearchScreen = () => {
   const navigation = useNavigation();
   const search = useProfileSearchContext();
   const { authProfile } = useAuthProfileContext();
+  const screenWidth = Dimensions.get("window").width;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerBackTitleVisible: false,
       headerTitle: () => (
-        <View style={{ flex: 1, paddingRight: 75 }}>
+        <View style={{ flex: 1 }}>
           <TextInput
-            inputStyle={s.modalSearchInput}
+            inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
             returnKeyType="search"
             value={search.searchText}
             onChangeText={search.setSearchText}
@@ -136,9 +137,10 @@ export default ProfileSearchScreen;
 const s = StyleSheet.create({
   modalSearchInput: {
     borderRadius: 100,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     fontSize: 16,
     height: 35,
+    marginTop: 4,
   },
 });
