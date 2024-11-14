@@ -5,9 +5,10 @@ import {
   PaginatedPostCommentsResponse,
   PaginatedProfilePostsResponse,
   PostDetailed,
+  PostCommentDetailed,
 } from "../types";
 
-import { axiosFetch, axiosInstance } from "./config";
+import { axiosFetch, axiosPost, axiosInstance } from "./config";
 
 export const getProfilePosts = async (profileId: string | number) => {
   const url = `/v1/profile/${profileId}/posts/`;
@@ -51,14 +52,8 @@ export const removeLike = async (postId: number, profileId: number) => {
 };
 
 export const addComment = async (post: number, text: string, profileId: number) => {
-  // TODO: type this return type
-  try {
-    const res = await axiosInstance.post(`/v1/post/${post}/comment/`, { text, profileId });
-    return { data: res.data, error: null };
-  } catch (err) {
-    const error = err as AxiosError;
-    return { data: null, error: error.message };
-  }
+  const url = `/v1/post/${post}/comment/`;
+  return await axiosPost<PostCommentDetailed>(url, { text, profileId });
 };
 
 export const getPostComments = async (postId: number) => {

@@ -14,3 +14,13 @@ export const axiosFetch = async <T>(url: string) => {
     return { data: null, error: error.message };
   }
 };
+
+export const axiosPost = async <T>(url: string, data: any) => {
+  try {
+    const res = await axiosInstance.post<T>(url, data);
+    return { data: res.data, error: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message };
+  }
+};
