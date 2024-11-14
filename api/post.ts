@@ -1,14 +1,13 @@
-import { AxiosError } from "axios";
-
 import {
   PaginatedExploreResponse,
   PaginatedPostCommentsResponse,
   PaginatedProfilePostsResponse,
   PostDetailed,
   PostCommentDetailed,
+  PostLike,
 } from "../types";
 
-import { axiosFetch, axiosPost, axiosInstance } from "./config";
+import { axiosFetch, axiosPost, axiosDelete } from "./config";
 
 export const getProfilePosts = async (profileId: string | number) => {
   const url = `/v1/profile/${profileId}/posts/`;
@@ -16,39 +15,25 @@ export const getProfilePosts = async (profileId: string | number) => {
 };
 
 export const createPost = async (postData: FormData, accessToken: string) => {
-  try {
-    const res = await axiosInstance.post<PostDetailed>("/v1/post/", postData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return { data: res.data, error: null };
-  } catch (err) {
-    const error = err as AxiosError;
-    return { data: null, error: error.message };
-  }
+  const config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
+  const url = "/v1/post/";
+  return await axiosPost<PostDetailed>(url, postData, config);
 };
 
 export const addLike = async (postId: number, profileId: number) => {
-  try {
-    const res = await axiosInstance.post(`/v1/post/${postId}/like/`, { profileId });
-    return { data: res.data, error: null };
-  } catch (err) {
-    const error = err as AxiosError;
-    return { data: null, error: error.message };
-  }
+  const url = `/v1/post/${postId}/like/`;
+  return await axiosPost<PostLike>(url, { profileId });
 };
 
 // profile id is the profile requesting the delete
 export const removeLike = async (postId: number, profileId: number) => {
-  try {
-    const res = await axiosInstance.delete(`/v1/post/${postId}/like/${profileId}`);
-    return { data: res.data, error: null };
-  } catch (err) {
-    const error = err as AxiosError;
-    return { data: null, error: error.message };
-  }
+  const url = `/v1/post/${postId}/like/${profileId}`;
+  return await axiosDelete(url);
 };
 
 export const addComment = async (post: number, text: string, profileId: number) => {
