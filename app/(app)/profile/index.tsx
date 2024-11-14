@@ -7,7 +7,15 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { View, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -24,11 +32,18 @@ import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
-  const { user, logOut, profileOptions, setActiveProfileId } = useAuthUserContext();
+  const {
+    user,
+    logOut,
+    profileOptions,
+    setActiveProfileId,
+    selectedProfileId: authUserSelectedProfileId,
+  } = useAuthUserContext();
   const {
     updateAboutText: updateAbout,
     updateProfileImage,
     authProfile,
+    loading: authProfileLoading,
     updateName: updateAuthProfileName,
   } = useAuthProfileContext();
 
@@ -61,7 +76,6 @@ const ProfileScreen = () => {
         <Button
           onPress={() => setChangeProfileModalVisible(true)}
           variant="text"
-          // onPress={() => router.push("/(app)/explore/profileSearch")}
           text="Change"
           icon={
             <MaterialCommunityIcons
@@ -359,7 +373,7 @@ const ProfileScreen = () => {
           onPress={() => setChangeProfileModalVisible(false)}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
+            <Pressable onPress={(e) => e.stopPropagation()} android_disableSound={true}>
               <View
                 style={{
                   backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
@@ -376,11 +390,12 @@ const ProfileScreen = () => {
                 </View>
                 {profileOptions?.map((profile) => {
                   const isSelected = profile.id === authProfile.id;
+                  const isSelectedButLoading = authUserSelectedProfileId === profile.id && authProfileLoading;
                   return (
                     <Pressable
                       key={profile.id}
                       style={({ pressed }) => [pressed && !isSelected && { opacity: 0.7 }]}
-                      disabled={isSelected}
+                      disabled={isSelected || authProfileLoading}
                       onPress={() => setActiveProfileId(profile.id)}
                     >
                       <View
@@ -403,6 +418,7 @@ const ProfileScreen = () => {
                         {isSelected ? (
                           <Ionicons name="checkmark-circle-sharp" size={24} color={COLORS.lime[500]} />
                         ) : null}
+                        {isSelectedButLoading ? <ActivityIndicator size="small" color={COLORS.lime[500]} /> : null}
                       </View>
                     </Pressable>
                   );
@@ -418,6 +434,7 @@ const ProfileScreen = () => {
                     router.push("/(app)/profile/add");
                   }}
                   style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+                  disabled={authProfileLoading}
                 >
                   <View
                     style={[

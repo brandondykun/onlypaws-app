@@ -7,6 +7,7 @@ import { useAuthUserContext } from "./AuthUserContext";
 
 type AuthProfileContextType = {
   authProfile: ProfileDetailsType;
+  loading: boolean;
   updateProfileImage: (image: ProfileImage) => void;
   updateAboutText: (aboutText: string) => void;
   removeFollowing: (profileId: number) => void;
@@ -29,6 +30,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
     followers_count: 0,
     following_count: 0,
   },
+  loading: false,
   updateProfileImage: (image: ProfileImage) => {},
   updateAboutText: (aboutText: string) => {},
   removeFollowing: (profileId: number) => {},
@@ -57,17 +59,20 @@ const defaultProfile = {
 
 const AuthProfileContextProvider = ({ children }: Props) => {
   const [authProfile, setAuthProfile] = useState<ProfileDetailsType>(defaultProfile);
+  const [loading, setLoading] = useState(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
 
   useEffect(() => {
     const fetchProfileDetails = async () => {
       if (selectedProfileId && !authLoading) {
+        setLoading(true);
         // the second argument is only necessary so the backend doesn't throw an error
         const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
         if (!error && data) {
           setAuthProfile(data);
         }
+        setLoading(false);
       }
     };
     fetchProfileDetails();
@@ -135,6 +140,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 
   const value = {
     authProfile,
+    loading,
     updateProfileImage,
     updateAboutText,
     removeFollowing,
@@ -151,6 +157,7 @@ export default AuthProfileContextProvider;
 export const useAuthProfileContext = () => {
   const {
     authProfile,
+    loading,
     updateProfileImage,
     updateAboutText,
     removeFollowing,
@@ -160,6 +167,7 @@ export const useAuthProfileContext = () => {
   } = useContext(AuthProfileContext);
   return {
     authProfile,
+    loading,
     updateProfileImage,
     updateAboutText,
     removeFollowing,
