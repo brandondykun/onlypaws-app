@@ -1,6 +1,7 @@
+import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
 import { useLayoutEffect } from "react";
-import { StyleSheet, View, FlatList, ActivityIndicator, Dimensions } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Dimensions } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
@@ -102,10 +103,11 @@ const ProfileSearchScreen = () => {
 
   if (search.initialFetchComplete) {
     content = (
-      <FlatList
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+      <FlashList
+        contentContainerStyle={{ paddingBottom: 24 }}
         data={search.data}
         keyExtractor={(item) => item.id.toString()}
+        estimatedItemSize={61}
         ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         renderItem={({ item: profile, index }) => (
