@@ -11,7 +11,11 @@ type Props = {
 const Comment = ({ comment }: Props) => {
   return (
     <View key={comment.id} style={{ padding: 12 }}>
-      <Text style={{ fontWeight: "600", marginBottom: 4, color: COLORS.zinc[500], fontSize: 12 }}>
+      <Text
+        darkColor={COLORS.zinc[400]}
+        lightColor={COLORS.zinc[500]}
+        style={{ fontWeight: "600", marginBottom: 4, fontSize: 12 }}
+      >
         {comment.profile.username}
       </Text>
       <Text style={{ fontSize: 16 }}>{comment.text}</Text>

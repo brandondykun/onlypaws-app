@@ -57,7 +57,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
   useEffect(() => {
     if (visible) {
       Animated.timing(fadeAnim, {
-        toValue: 0.8,
+        toValue: 0.5,
         duration: 400, // Adjust duration as needed
         useNativeDriver: true,
         delay: isDarkMode ? 100 : 200,
@@ -149,10 +149,10 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 36,
-        backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100],
+        backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[100],
       }}
     >
-      <ActivityIndicator size="large" />
+      <ActivityIndicator size="large" color={COLORS.zinc[500]} />
     </View>
   );
 
@@ -165,7 +165,9 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
     </View>
   ) : !refreshing ? (
     <View style={{ padding: 48, flex: 1, justifyContent: "center", gap: 16 }}>
-      <Text style={{ color: COLORS.zinc[900], textAlign: "center", fontSize: 28 }}>No comments yet</Text>
+      <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]} style={{ textAlign: "center", fontSize: 20 }}>
+        No comments yet.
+      </Text>
       <Text style={{ color: COLORS.zinc[500], textAlign: "center", fontSize: 18, fontWeight: "300" }}>
         Add a comment to start the conversation!
       </Text>
@@ -222,7 +224,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
             style={[
               s.modalContent,
               {
-                backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100],
+                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[100],
               },
             ]}
           >
@@ -239,7 +241,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
               style={[
                 s.header,
                 {
-                  borderBottomColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+                  borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200],
                 },
               ]}
             >
@@ -253,6 +255,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
                   value={commentText}
                   onChangeText={setCommentText}
                   inputStyle={{ borderRadius: 25, paddingHorizontal: 16 }}
+                  placeholderTextColor={COLORS.zinc[500]}
                 />
               </View>
               <Pressable
