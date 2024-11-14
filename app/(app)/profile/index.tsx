@@ -362,16 +362,18 @@ const ProfileScreen = () => {
             <Pressable onPress={(e) => e.stopPropagation()}>
               <View
                 style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
+                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
                   paddingBottom: 48,
-                  paddingTop: 32,
+                  paddingTop: 18,
                   borderTopRightRadius: 25,
                   borderTopLeftRadius: 25,
                   paddingHorizontal: 24,
-                  // height: 400,
                   gap: 12,
                 }}
               >
+                <View style={{ paddingBottom: 12 }}>
+                  <Text style={{ textAlign: "center", fontWeight: "bold", fontSize: 16 }}>Change Profile</Text>
+                </View>
                 {profileOptions?.map((profile) => {
                   const isSelected = profile.id === authProfile.id;
                   return (
@@ -385,7 +387,7 @@ const ProfileScreen = () => {
                         style={[
                           s.profileOption,
                           {
-                            backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+                            backgroundColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[50],
                             borderColor:
                               isSelected && isDarkMode
                                 ? COLORS.lime[600]
@@ -405,8 +407,10 @@ const ProfileScreen = () => {
                     </Pressable>
                   );
                 })}
-                <View style={{ paddingTop: 12, paddingLeft: 8 }}>
-                  <Text darkColor={COLORS.zinc[300]}>Have another pet?</Text>
+                <View style={{ paddingTop: 16, paddingLeft: 8 }}>
+                  <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 16, fontStyle: "italic" }}>
+                    Have another pet?
+                  </Text>
                 </View>
                 <Pressable
                   onPress={() => {
@@ -419,12 +423,12 @@ const ProfileScreen = () => {
                     style={[
                       s.profileOption,
                       {
-                        backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+                        backgroundColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[50],
                         borderColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
                       },
                     ]}
                   >
-                    <Text style={[s.profileOptionText, { color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700] }]}>
+                    <Text style={[s.profileOptionText, { color: isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700] }]}>
                       Add Another Profile
                     </Text>
                     <AntDesign name="pluscircle" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700]} />
