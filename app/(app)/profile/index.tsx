@@ -11,7 +11,7 @@ import { View, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { addProfileImage, editProfileImage, updateAboutText } from "@/api/profile";
+import { addProfileImage, editProfileImage, updateAboutText, updateName } from "@/api/profile";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import Modal from "@/components/Modal/Modal";
@@ -25,17 +25,25 @@ import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
   const { user, logOut, profileOptions, setActiveProfileId } = useAuthUserContext();
-  const { updateAboutText: updateAbout, updateProfileImage, authProfile } = useAuthProfileContext();
+  const {
+    updateAboutText: updateAbout,
+    updateProfileImage,
+    authProfile,
+    updateName: updateAuthProfileName,
+  } = useAuthProfileContext();
 
   const { isDarkMode } = useColorMode();
 
   const [showCamera, setShowCamera] = useState(false);
   const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [updateNameModalVisible, setUpdateNameModalVisible] = useState(false);
   const [changeProfileModalVisible, setChangeProfileModalVisible] = useState(false);
 
   const [aboutText, setAboutText] = useState(authProfile.about ? authProfile.about : "");
   const [aboutTextLoading, setAboutTextLoading] = useState(false);
+  const [profileName, setProfileName] = useState(authProfile.name ? authProfile.name : "");
+  const [updateNameLoading, setUpdateNameLoading] = useState(false);
 
   const navigation = useNavigation();
   const router = useRouter();
@@ -138,6 +146,24 @@ const ProfileScreen = () => {
     }
   };
 
+  const handleUpdateNameSubmit = async () => {
+    if (profileName && authProfile?.id) {
+      setUpdateNameLoading(true);
+      const { error, data } = await updateName(profileName, authProfile.id);
+      if (!error && data) {
+        updateAuthProfileName(data.name!);
+        setUpdateNameModalVisible(false);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "There was an error updating your name",
+        });
+      }
+      setUpdateNameLoading(false);
+    }
+  };
+
   return (
     <>
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
@@ -189,7 +215,17 @@ const ProfileScreen = () => {
             <Text style={{ fontSize: 20 }}>{authProfile.username}</Text>
           </View>
           <View style={{ padding: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>NAME</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>
+                NAME
+              </Text>
+              <Pressable
+                style={({ pressed }) => [pressed && { opacity: 0.2 }, { padding: 8 }]}
+                onPress={() => setUpdateNameModalVisible(true)}
+              >
+                <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+              </Pressable>
+            </View>
             <Text
               style={{
                 fontSize: 20,
@@ -274,6 +310,41 @@ const ProfileScreen = () => {
           </KeyboardAvoidingView>
         </Pressable>
       </Modal>
+
+      <Modal
+        visible={updateNameModalVisible}
+        onRequestClose={() => setUpdateNameModalVisible(false)}
+        animationType="slide"
+        raw
+        transparent={true}
+        withScroll={false}
+        style={{ flex: 1, alignItems: "flex-end" }}
+      >
+        <Pressable
+          style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
+          onPress={() => setUpdateNameModalVisible(false)}
+        >
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <Pressable onPress={(e) => e.stopPropagation()}>
+              <View
+                style={{
+                  backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
+                  paddingBottom: 48,
+                  paddingTop: 32,
+                  borderTopRightRadius: 25,
+                  borderTopLeftRadius: 25,
+                  paddingHorizontal: 24,
+                }}
+              >
+                <Text>Name</Text>
+                <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} />
+                <Button text="Submit" onPress={handleUpdateNameSubmit} loading={updateNameLoading} />
+              </View>
+            </Pressable>
+          </KeyboardAvoidingView>
+        </Pressable>
+      </Modal>
+
       <Modal
         visible={changeProfileModalVisible}
         onRequestClose={() => setChangeProfileModalVisible(false)}

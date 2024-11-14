@@ -12,6 +12,7 @@ type AuthProfileContextType = {
   removeFollowing: (profileId: number) => void;
   addFollowing: (profile: Profile) => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
+  updateName: (name: string) => void;
 };
 
 const AuthProfileContext = createContext<AuthProfileContextType>({
@@ -23,7 +24,6 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
     image: null,
     followers: [],
     following: [],
-    // posts: [],
     is_following: false,
     posts_count: 0,
     followers_count: 0,
@@ -34,6 +34,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   removeFollowing: (profileId: number) => {},
   addFollowing: (profile: Profile) => {},
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
+  updateName: (name: string) => {},
 });
 
 type Props = {
@@ -90,6 +91,12 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     });
   };
 
+  const updateName = (name: string) => {
+    setAuthProfile((prev) => {
+      return { ...prev, name: name };
+    });
+  };
+
   const removeFollowing = (profileId: number) => {
     setAuthProfile((prev) => {
       return {
@@ -126,7 +133,15 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     });
   };
 
-  const value = { authProfile, updateProfileImage, updateAboutText, removeFollowing, addFollowing, updatePostsCount };
+  const value = {
+    authProfile,
+    updateProfileImage,
+    updateAboutText,
+    removeFollowing,
+    addFollowing,
+    updatePostsCount,
+    updateName,
+  };
 
   return <AuthProfileContext.Provider value={value}>{children}</AuthProfileContext.Provider>;
 };
@@ -134,7 +149,22 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 export default AuthProfileContextProvider;
 
 export const useAuthProfileContext = () => {
-  const { authProfile, updateProfileImage, updateAboutText, removeFollowing, addFollowing, updatePostsCount } =
-    useContext(AuthProfileContext);
-  return { authProfile, updateProfileImage, updateAboutText, removeFollowing, addFollowing, updatePostsCount };
+  const {
+    authProfile,
+    updateProfileImage,
+    updateAboutText,
+    removeFollowing,
+    addFollowing,
+    updatePostsCount,
+    updateName,
+  } = useContext(AuthProfileContext);
+  return {
+    authProfile,
+    updateProfileImage,
+    updateAboutText,
+    removeFollowing,
+    addFollowing,
+    updatePostsCount,
+    updateName,
+  };
 };

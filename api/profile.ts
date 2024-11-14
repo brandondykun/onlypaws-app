@@ -104,6 +104,16 @@ export const updateAboutText = async (text: string, profileId: number) => {
   }
 };
 
+export const updateName = async (text: string, profileId: number) => {
+  try {
+    const res = await axiosInstance.patch<Profile>(`/v1/auth/profile/${profileId}/`, { name: text });
+    return { data: res.data, error: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message };
+  }
+};
+
 export const createProfile = async (username: string, about: string, name: string) => {
   try {
     const res = await axiosInstance.post<CreateProfileResponse>("/v1/auth/profile/", { username, about, name });
