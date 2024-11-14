@@ -24,7 +24,7 @@ const TabLayout = () => {
         <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={s.loadingViewText}>
           Loading
         </Text>
-        <ActivityIndicator size="small" />
+        <ActivityIndicator size="small" color={COLORS.zinc[500]} />
       </View>
     );
   }

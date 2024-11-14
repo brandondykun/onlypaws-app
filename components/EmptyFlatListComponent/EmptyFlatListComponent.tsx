@@ -31,7 +31,7 @@ const EmptyFlatListComponent = ({
           paddingHorizontal: 36,
         }}
       >
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
       </View>
     );
   } else if (hasInitialFetchError) {

@@ -34,7 +34,7 @@ const ImageLoader = ({ uri, width, height, style }: Props) => {
             left: 0,
           }}
         >
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]} />
         </View>
       ) : null}
 
