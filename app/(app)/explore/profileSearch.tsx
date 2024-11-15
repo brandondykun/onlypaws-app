@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
 import { useLayoutEffect } from "react";
-import { StyleSheet, View, ActivityIndicator, Dimensions } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Dimensions, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
@@ -12,6 +12,8 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
+
+const platform = Platform.OS;
 
 const ProfileSearchScreen = () => {
   const navigation = useNavigation();
@@ -143,6 +145,6 @@ const s = StyleSheet.create({
     paddingVertical: 7,
     fontSize: 16,
     height: 35,
-    marginTop: 4,
+    marginTop: platform === "android" ? 4 : 0,
   },
 });
