@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
-import { View, ActivityIndicator, Dimensions, RefreshControl } from "react-native";
+import { View, ActivityIndicator, RefreshControl } from "react-native";
 
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
@@ -13,9 +13,6 @@ import { PostLike, PostCommentDetailed } from "@/types";
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
   const profile = useProfileDetailsContext(); // selected profile in this stack
-
-  const screenWidth = Dimensions.get("window").width;
-  const estimatedItemSize = screenWidth + 180;
 
   const handleProfilePress = (profileId: number | string) => {
     profile.setProfileId(Number(profileId));
@@ -104,7 +101,7 @@ const FeedScreen = () => {
           ) : null
         }
         ListEmptyComponent={emptyComponent}
-        estimatedItemSize={estimatedItemSize}
+        estimatedItemSize={600}
       />
     );
   }

@@ -1,6 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRef } from "react";
-import { Dimensions } from "react-native";
 
 import { PostDetailed } from "@/types";
 import { PostLike, PostCommentDetailed } from "@/types";
@@ -20,9 +19,6 @@ type Props = {
 const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike, onUnlike, onComment }: Props) => {
   const flatListRef = useRef<FlashList<PostDetailed>>(null);
 
-  const screenWidth = Dimensions.get("window").width;
-  const estimatedItemSize = screenWidth + 195; // add in space for header and footer of post, and post margin bottom
-
   return (
     <FlashList
       ref={flatListRef}
@@ -39,7 +35,7 @@ const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike,
       )}
       keyExtractor={(item) => item.id.toString()}
       initialScrollIndex={initialIndex}
-      estimatedItemSize={estimatedItemSize}
+      estimatedItemSize={600}
     />
   );
 };

@@ -85,7 +85,7 @@ const ExplorePostsListScreen = () => {
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? getNextPage : null}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={570}
+      estimatedItemSize={600}
       ListFooterComponent={() => (
         <FlatListLoadingFooter
           nextUrl={nextUrl}

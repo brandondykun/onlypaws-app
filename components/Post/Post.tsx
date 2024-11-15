@@ -75,7 +75,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   };
 
   return (
-    <View key={post.id} style={{ marginBottom: 36, minHeight: 570 }}>
+    <View key={post.id} style={{ marginBottom: 40, minHeight: 560 }}>
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <ProfileImage image={post.profile.image} size={35} />
@@ -89,36 +89,33 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           </Pressable>
         </View>
       </View>
-      <GestureHandlerRootView>
-        <TapGestureHandler
-          numberOfTaps={2}
-          onActivated={
-            post.profile.id === authProfile.id || likeLoading ? undefined : () => handleHeartPress(post.id, liked)
-          }
-        >
-          <View
-            style={{
-              minHeight: screenWidth,
-              width: screenWidth,
-            }}
-          >
-            <ImageSwiper
-              images={post.images}
-              imageHeight={screenWidth}
-              imageWidth={screenWidth}
-              imageStyle={{ height: screenWidth, width: screenWidth }}
-            />
-          </View>
-        </TapGestureHandler>
-      </GestureHandlerRootView>
       <View>
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 16,
-            paddingHorizontal: 16,
-          }}
-        >
+        <GestureHandlerRootView>
+          <TapGestureHandler
+            numberOfTaps={2}
+            onActivated={
+              post.profile.id === authProfile.id || likeLoading ? undefined : () => handleHeartPress(post.id, liked)
+            }
+          >
+            <View
+              style={{
+                minHeight: screenWidth,
+                width: screenWidth,
+              }}
+            >
+              <ImageSwiper
+                images={post.images}
+                imageHeight={screenWidth}
+                imageWidth={screenWidth}
+                imageStyle={{ height: screenWidth, width: screenWidth }}
+              />
+            </View>
+          </TapGestureHandler>
+        </GestureHandlerRootView>
+      </View>
+
+      <View>
+        <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8 }}>
           <Pressable
             onPress={() => handleHeartPress(post.id, liked)}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
@@ -146,8 +143,10 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           </Pressable>
         </View>
         <PostCaption caption={post.caption} />
-        <View style={{ paddingLeft: 16 }}>
-          <Text darkColor={COLORS.zinc[500]}>{getTimeSince(post.created_at)}</Text>
+        <View style={{ paddingLeft: 8, paddingTop: 6 }}>
+          <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 13 }}>
+            {getTimeSince(post.created_at)}
+          </Text>
         </View>
       </View>
       <CommentsModal
