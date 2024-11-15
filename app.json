@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bdykun.onlypawsapp"
+      "bundleIdentifier": "com.bdykun.onlypawsapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "OnlyPaws needs access to your Camera.",
+        "NSMicrophoneUsageDescription": "OnlyPaws needs access to your Microphone."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +39,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(OnlyPaws) to access your camera roll."
+          "photosPermission": "Allow OnlyPaws to access your camera roll."
         }
       ],
       [
@@ -49,6 +53,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2eb94b50-5f7d-4666-8ff6-f75a12007113"
+      }
     }
   }
 }
