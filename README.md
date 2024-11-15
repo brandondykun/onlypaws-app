@@ -50,12 +50,21 @@ Join our community of developers creating universal apps.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
 
-## Running tests
-
 ### Creating ios build
 ```bash
 npx expo prebuild --platform ios
 npx expo run:ios
+```
+
+### Creating android build
+```bash
+npx expo prebuild --platform android
+npx expo run:android --device
+```
+
+### Run dev client
+```bash
+npx expo start --dev-client  
 ```
 
 ### Running tests
