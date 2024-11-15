@@ -5,18 +5,12 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef, useState, useCallback } from "react";
-import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform } from "react-native";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
-import {
-  Camera,
-  PhotoFile,
-  useCameraDevice,
-  useCameraPermission,
-  useCameraFormat,
-  Point,
-} from "react-native-vision-camera";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Camera, PhotoFile, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -48,13 +42,9 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   const [initialPreviewIndex, setInitialPreviewIndex] = useState<number | null>(null);
   const [flash, setFlash] = useState<"on" | "off">("off");
 
+  const insets = useSafeAreaInsets();
   const cameraRef = useRef<Camera>(null!);
   const device = useCameraDevice(facing);
-  const format = useCameraFormat(device, [
-    { photoAspectRatio: 1 },
-    { photoResolution: "max" },
-    { videoAspectRatio: 1 },
-  ]);
   const { hasPermission, requestPermission } = useCameraPermission();
   const { setLightOrDark } = useColorMode();
 
@@ -161,7 +151,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
               },
             ]}
           >
-            <View style={s.topIconContainer}>
+            <View style={[s.topIconContainer, { marginTop: Platform.OS === "ios" ? insets.top : 12 }]}>
               <TouchableOpacity onPress={() => setVisible(false)}>
                 <Ionicons
                   name="chevron-back-outline"
@@ -339,7 +329,6 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
               isActive
               photo={true}
               enableZoomGesture={true}
-              format={format}
               resizeMode="contain"
             />
           </GestureDetector>
@@ -383,7 +372,6 @@ const s = StyleSheet.create({
   topIconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 60,
     paddingHorizontal: 8,
   },
   requestPermissionsContainer: {
