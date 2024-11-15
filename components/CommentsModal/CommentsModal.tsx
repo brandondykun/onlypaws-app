@@ -259,13 +259,19 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
                 />
               </View>
               <Pressable
-                style={{ paddingTop: 6 }}
+                style={({ pressed }) => [
+                  { paddingTop: 6, opacity: pressed || addCommentLoading || !commentText ? 0.5 : 1 },
+                ]}
                 onPress={handleAddComment}
                 disabled={addCommentLoading}
                 testID="add-comment-button"
               >
                 <View style={s.addCommentButton}>
-                  <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
+                  {!addCommentLoading ? (
+                    <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
+                  ) : (
+                    <ActivityIndicator size="small" color={COLORS.zinc[200]} />
+                  )}
                 </View>
               </Pressable>
             </View>
@@ -311,8 +317,8 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.sky[600],
-    width: 40,
-    height: 40,
-    borderRadius: 30,
+    width: 45,
+    height: 45,
+    borderRadius: 45,
   },
 });
