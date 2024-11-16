@@ -20,6 +20,8 @@ import Text from "../Text/Text";
 
 import PostCaption from "./PostCaption";
 
+export const POST_HEIGHT = Dimensions.get("window").width + 200;
+
 type Props = {
   post: PostDetailed;
   setPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
@@ -75,7 +77,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   };
 
   return (
-    <View key={post.id} style={{ marginBottom: 40, minHeight: 560 }}>
+    <View key={post.id} style={{ minHeight: POST_HEIGHT }}>
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <ProfileImage image={post.profile.image} size={35} />

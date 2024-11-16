@@ -5,6 +5,7 @@ import { PostDetailed } from "@/types";
 import { PostLike, PostCommentDetailed } from "@/types";
 
 import Post from "../Post/Post";
+import { POST_HEIGHT } from "../Post/Post";
 
 type Props = {
   posts: PostDetailed[];
@@ -35,7 +36,7 @@ const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike,
       )}
       keyExtractor={(item) => item.id.toString()}
       initialScrollIndex={initialIndex}
-      estimatedItemSize={600}
+      estimatedItemSize={POST_HEIGHT}
     />
   );
 };

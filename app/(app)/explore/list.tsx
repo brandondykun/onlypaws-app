@@ -6,6 +6,7 @@ import { axiosInstance } from "@/api/config";
 import { getSimilarPosts } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
+import { POST_HEIGHT } from "@/components/Post/Post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { PaginatedExploreResponse } from "@/types";
@@ -85,7 +86,7 @@ const ExplorePostsListScreen = () => {
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? getNextPage : null}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={600}
+      estimatedItemSize={POST_HEIGHT}
       ListFooterComponent={() => (
         <FlatListLoadingFooter
           nextUrl={nextUrl}

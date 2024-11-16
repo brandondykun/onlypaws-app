@@ -4,6 +4,7 @@ import { View, ActivityIndicator, RefreshControl } from "react-native";
 
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
+import { POST_HEIGHT } from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
@@ -101,7 +102,7 @@ const FeedScreen = () => {
           ) : null
         }
         ListEmptyComponent={emptyComponent}
-        estimatedItemSize={600}
+        estimatedItemSize={POST_HEIGHT}
       />
     );
   }
