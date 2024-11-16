@@ -222,61 +222,71 @@ const ProfileScreen = () => {
               </View>
             </Pressable>
           </View>
-          <View style={{ padding: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>
-              USERNAME
-            </Text>
-            <Text style={{ fontSize: 20 }}>{authProfile.username}</Text>
-          </View>
-          <View style={{ padding: 16 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>
-                NAME
-              </Text>
-              <Pressable
-                style={({ pressed }) => [pressed && { opacity: 0.2 }, { padding: 8 }]}
-                onPress={() => setUpdateNameModalVisible(true)}
-              >
-                <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
-              </Pressable>
+          <View
+            style={{
+              backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
+              borderRadius: 8,
+              marginBottom: 24,
+              padding: 6,
+            }}
+          >
+            <View style={{ padding: 16 }}>
+              <Text style={s.label}>EMAIL</Text>
+              <Text style={{ fontSize: 20 }}>{user.email}</Text>
             </View>
-            <Text
-              style={{
-                fontSize: 20,
-                color: authProfile.name ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
-                fontStyle: authProfile.name ? "normal" : "italic",
-              }}
-            >
-              {authProfile.name ? authProfile.name : "No name"}
-            </Text>
           </View>
-          <View style={{ padding: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>EMAIL</Text>
-            <Text style={{ fontSize: 20 }}>{user.email}</Text>
-          </View>
-          <View style={{ padding: 16 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.zinc[500], letterSpacing: 0.5 }}>
-                ABOUT
-              </Text>
-              <Pressable
-                style={({ pressed }) => [pressed && { opacity: 0.2 }, { padding: 8 }]}
-                onPress={() => setAboutModalVisible(true)}
-              >
-                <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
-              </Pressable>
+          <View
+            style={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200], borderRadius: 8, padding: 6 }}
+          >
+            <View style={{ padding: 16 }}>
+              <Text style={s.label}>USERNAME</Text>
+              <Text style={{ fontSize: 20 }}>{authProfile.username}</Text>
             </View>
-            {authProfile.about ? (
-              <Text style={{ fontSize: 20 }}>{authProfile.about}</Text>
-            ) : (
+            <View style={{ padding: 16 }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text style={s.label}>NAME</Text>
+                <Pressable
+                  style={({ pressed }) => [pressed && { opacity: 0.2 }]}
+                  onPress={() => setUpdateNameModalVisible(true)}
+                  hitSlop={10}
+                >
+                  <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+                </Pressable>
+              </View>
               <Text
-                darkColor={COLORS.zinc[600]}
-                lightColor={COLORS.zinc[400]}
-                style={{ fontSize: 16, fontStyle: "italic", paddingTop: 4 }}
+                style={{
+                  fontSize: 20,
+                  color: authProfile.name ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
+                  fontStyle: authProfile.name ? "normal" : "italic",
+                }}
               >
-                No About Text
+                {authProfile.name ? authProfile.name : "No name"}
               </Text>
-            )}
+            </View>
+
+            <View style={{ padding: 16 }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text style={s.label}>ABOUT</Text>
+                <Pressable
+                  style={({ pressed }) => [pressed && { opacity: 0.2 }]}
+                  onPress={() => setAboutModalVisible(true)}
+                  hitSlop={10}
+                >
+                  <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+                </Pressable>
+              </View>
+              {authProfile.about ? (
+                <Text style={{ fontSize: 20 }}>{authProfile.about}</Text>
+              ) : (
+                <Text
+                  darkColor={COLORS.zinc[600]}
+                  lightColor={COLORS.zinc[400]}
+                  style={{ fontSize: 16, fontStyle: "italic", paddingTop: 4 }}
+                >
+                  No About Text
+                </Text>
+              )}
+            </View>
           </View>
         </View>
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -475,5 +485,12 @@ const s = StyleSheet.create({
   },
   profileOptionText: {
     fontSize: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: COLORS.zinc[500],
+    letterSpacing: 0.5,
+    paddingBottom: 6,
   },
 });
