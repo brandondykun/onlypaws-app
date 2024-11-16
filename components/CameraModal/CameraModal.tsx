@@ -154,8 +154,8 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
             <View style={[s.topIconContainer, { marginTop: Platform.OS === "ios" ? insets.top : 12 }]}>
               <TouchableOpacity onPress={() => setVisible(false)}>
                 <Ionicons
-                  name="chevron-back-outline"
-                  size={30}
+                  name={Platform.OS === "ios" ? "chevron-back-outline" : "arrow-back-sharp"}
+                  size={Platform.OS === "ios" ? 30 : 25}
                   color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
                 />
               </TouchableOpacity>
@@ -372,7 +372,7 @@ const s = StyleSheet.create({
   topIconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
   },
   requestPermissionsContainer: {
     flex: 1,
