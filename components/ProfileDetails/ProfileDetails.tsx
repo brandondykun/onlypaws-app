@@ -8,7 +8,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { ProfileDetails as ProfileDetailsType, PostDetailed, SearchedProfile } from "@/types";
+import { ProfileDetails as ProfileDetailsType, PostDetailed } from "@/types";
 
 import Button from "../Button/Button";
 import PostTile from "../PostTile/PostTile";
@@ -30,7 +30,7 @@ type Props = {
   nextUrl: string | null;
   fetchNextLoading: boolean;
   hasFetchNextError: boolean;
-  onFollow?: (searchedProfile: SearchedProfile) => void;
+  onFollow?: (profileId: number) => void;
   onUnfollow?: (profileId: number) => void;
 };
 
@@ -56,7 +56,7 @@ const ProfileDetails = ({
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
 
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, addFollowing, removeFollowing } = useAuthProfileContext();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -78,6 +78,7 @@ const ProfileDetails = ({
           }
           return prev;
         });
+        removeFollowing();
         onUnfollow && onUnfollow(profileId);
       } else {
         Toast.show({
@@ -99,14 +100,8 @@ const ProfileDetails = ({
           }
           return prev;
         });
-        onFollow &&
-          onFollow({
-            id: profile.id,
-            username: profile.username,
-            about: profile.about ? profile.about : "",
-            image: profile.image,
-            is_following: true,
-          } as SearchedProfile);
+        addFollowing();
+        onFollow && onFollow(profile.id);
       } else {
         Toast.show({
           type: "error",

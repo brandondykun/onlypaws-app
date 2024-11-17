@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { getProfileDetails } from "@/api/profile";
-import { Profile, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
 
 import { useAuthUserContext } from "./AuthUserContext";
 
@@ -10,8 +10,8 @@ type AuthProfileContextType = {
   loading: boolean;
   updateProfileImage: (image: ProfileImage) => void;
   updateAboutText: (aboutText: string) => void;
-  removeFollowing: (profileId: number) => void;
-  addFollowing: (profile: Profile) => void;
+  removeFollowing: () => void;
+  addFollowing: () => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
 };
@@ -23,8 +23,6 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
     name: "",
     about: null,
     image: null,
-    followers: [],
-    following: [],
     is_following: false,
     posts_count: 0,
     followers_count: 0,
@@ -33,8 +31,8 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   loading: false,
   updateProfileImage: (image: ProfileImage) => {},
   updateAboutText: (aboutText: string) => {},
-  removeFollowing: (profileId: number) => {},
-  addFollowing: (profile: Profile) => {},
+  removeFollowing: () => {},
+  addFollowing: () => {},
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
   updateName: (name: string) => {},
 });
@@ -49,8 +47,6 @@ const defaultProfile = {
   name: "",
   about: "",
   image: null,
-  followers: [],
-  following: [],
   is_following: false,
   posts_count: 0,
   followers_count: 0,
@@ -102,21 +98,19 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     });
   };
 
-  const removeFollowing = (profileId: number) => {
+  const removeFollowing = () => {
     setAuthProfile((prev) => {
       return {
         ...prev,
-        following: prev?.following.filter((profile) => profile.id !== profileId),
         following_count: prev.following_count - 1,
       };
     });
   };
 
-  const addFollowing = (profile: Profile) => {
+  const addFollowing = () => {
     setAuthProfile((prev) => {
       return {
         ...prev,
-        following: [...prev?.following, profile],
         following_count: prev.following_count + 1,
       };
     });

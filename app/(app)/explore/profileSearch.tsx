@@ -18,7 +18,7 @@ const platform = Platform.OS;
 const ProfileSearchScreen = () => {
   const navigation = useNavigation();
   const search = useProfileSearchContext();
-  const { authProfile } = useAuthProfileContext();
+  const { addFollowing, removeFollowing, authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
 
   useLayoutEffect(() => {
@@ -46,6 +46,7 @@ const ProfileSearchScreen = () => {
     const { error } = await unfollowProfile(profileId, authProfile.id);
     if (!error) {
       search.onUnfollow(profileId);
+      removeFollowing();
     } else {
       Toast.show({
         type: "error",
@@ -58,7 +59,8 @@ const ProfileSearchScreen = () => {
   const handleFollowPress = async (searchedProfile: SearchedProfile) => {
     const { error, data } = await followProfile(searchedProfile.id, authProfile.id);
     if (!error && data) {
-      search.onFollow(searchedProfile);
+      search.onFollow(searchedProfile.id);
+      addFollowing();
     } else {
       Toast.show({
         type: "error",

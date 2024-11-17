@@ -115,9 +115,6 @@ export type ProfileDetails = {
   username: string;
   name: string;
   about: string | null;
-  followers: Profile[];
-  following: Profile[];
-  // posts: Post[];
   image: ProfileImage | null;
   is_following: boolean;
   posts_count: number;

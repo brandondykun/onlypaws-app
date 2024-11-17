@@ -22,7 +22,7 @@ type ProfileSearchContextType = {
   hasFetchNextError: boolean;
   refresh: () => Promise<void>;
   refreshing: boolean;
-  onFollow: (searchedProfile: SearchedProfile) => void;
+  onFollow: (profileId: number) => void;
   onUnfollow: (profileId: number) => void;
 };
 
@@ -41,7 +41,7 @@ const ProfileSearchContext = createContext<ProfileSearchContextType>({
   hasFetchNextError: false,
   refresh: () => Promise.resolve(),
   refreshing: false,
-  onFollow: (searchedProfile: SearchedProfile) => {},
+  onFollow: (profileId: number) => {},
   onUnfollow: (profileId: number) => {},
 });
 
@@ -60,7 +60,7 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
-  const { addFollowing, removeFollowing, authProfile } = useAuthProfileContext();
+  const { authProfile } = useAuthProfileContext();
 
   const handleSearch = useCallback(async () => {
     if (searchText) {
@@ -102,7 +102,6 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
   }, [fetchNextUrl]);
 
   const onUnfollow = async (profileId: number) => {
-    removeFollowing(profileId);
     setData((prev) => {
       if (prev) {
         return prev.map((profile) => {
@@ -116,12 +115,11 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
     });
   };
 
-  const onFollow = (searchedProfile: SearchedProfile) => {
-    addFollowing(searchedProfile);
+  const onFollow = (profileId: number) => {
     setData((prev) => {
       if (prev) {
         return prev.map((profile) => {
-          if (profile.id === searchedProfile.id) {
+          if (profile.id === profileId) {
             return { ...profile, is_following: true };
           }
           return profile;
