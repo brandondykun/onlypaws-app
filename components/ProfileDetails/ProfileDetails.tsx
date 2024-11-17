@@ -1,6 +1,6 @@
 import { router, useNavigation } from "expo-router";
 import { useLayoutEffect } from "react";
-import { View, FlatList, ActivityIndicator } from "react-native";
+import { View, FlatList, ActivityIndicator, RefreshControl } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { unfollowProfile, followProfile } from "@/api/profile";
@@ -19,15 +19,16 @@ type Props = {
   onPostPreviewPress: (index: number) => void;
   profileData: ProfileDetailsType | null;
   profileLoading: boolean;
-  profileRefresh?: () => Promise<void>;
-  profileRefreshing?: boolean;
+  profileRefresh: () => Promise<void>;
+  profileRefreshing: boolean;
   profileError: string;
   postsLoading: boolean;
   postsError: boolean;
   postsData: PostDetailed[] | null;
   setProfileData?: React.Dispatch<React.SetStateAction<ProfileDetailsType | null>>;
+  postsRefresh: () => Promise<void>;
+  postsRefreshing: boolean;
   fetchNext: () => Promise<void>;
-  nextUrl: string | null;
   fetchNextLoading: boolean;
   hasFetchNextError: boolean;
   onFollow?: (profileId: number) => void;
@@ -46,8 +47,9 @@ const ProfileDetails = ({
   postsError,
   postsData,
   setProfileData,
+  postsRefresh,
+  postsRefreshing,
   fetchNext,
-  nextUrl,
   fetchNextLoading,
   hasFetchNextError,
   onFollow,
@@ -126,24 +128,34 @@ const ProfileDetails = ({
     }
   };
 
-  const emptyComponent = (
-    <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
-      <Text
-        style={{
-          fontSize: 18,
-          textAlign: "center",
-          paddingHorizontal: 36,
-          fontWeight: "300",
-        }}
-        darkColor={COLORS.zinc[400]}
-        lightColor={COLORS.zinc[600]}
-      >
-        {authProfile.id === profileId
-          ? "You don't have any posts yet! Add a post to see it here."
-          : "No posts to see yet."}
-      </Text>
-    </View>
-  );
+  const handleRefresh = () => {
+    profileRefresh();
+    postsRefresh();
+  };
+
+  const emptyComponent =
+    postsLoading || postsRefreshing ? (
+      <View style={{ justifyContent: "center", alignItems: "center", marginTop: 48 }}>
+        <ActivityIndicator color={COLORS.zinc[500]} size="small" />
+      </View>
+    ) : (
+      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
+        <Text
+          style={{
+            fontSize: 18,
+            textAlign: "center",
+            paddingHorizontal: 36,
+            fontWeight: "300",
+          }}
+          darkColor={COLORS.zinc[400]}
+          lightColor={COLORS.zinc[600]}
+        >
+          {authProfile.id === profileId
+            ? "You don't have any posts yet! Add a post to see it here."
+            : "No posts to see yet."}
+        </Text>
+      </View>
+    );
 
   // content to be displayed in the footer
   const footerComponent = fetchNextLoading ? (
@@ -162,7 +174,7 @@ const ProfileDetails = ({
   return (
     <FlatList
       showsVerticalScrollIndicator={false}
-      data={postsData}
+      data={postsLoading || postsRefreshing ? [] : postsData}
       numColumns={3}
       columnWrapperStyle={{ gap: 2 }}
       ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
@@ -191,6 +203,14 @@ const ProfileDetails = ({
       renderItem={({ item, index }) => {
         return <PostTile post={item} index={index} onPress={() => handlePostPreviewPress(index)} />;
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={profileRefreshing || postsRefreshing}
+          onRefresh={handleRefresh}
+          tintColor={COLORS.zinc[400]}
+          colors={[COLORS.zinc[400]]}
+        />
+      }
     />
   );
 };

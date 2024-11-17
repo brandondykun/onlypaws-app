@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
@@ -13,6 +14,7 @@ type PostContextType = {
   deletePost: (id: number) => void;
   error: string;
   refetch: () => Promise<void>;
+  refreshing: boolean;
   setData: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   fetchNext: () => Promise<void>;
   fetchNextUrl: string | null;
@@ -29,6 +31,7 @@ const PostsContext = createContext<PostContextType>({
   deletePost: (id: number) => {},
   error: "",
   refetch: () => Promise.resolve(),
+  refreshing: false,
   setData: () => {},
   fetchNext: () => Promise.resolve(),
   fetchNextUrl: null,
@@ -52,6 +55,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     if (authProfile?.id) {
@@ -75,8 +79,16 @@ const PostsContextProvider = ({ children }: Props) => {
     fetchPosts();
   }, [authProfile, fetchPosts]);
 
+  // refresh posts if user swipes down
+  const refreshPosts = async () => {
+    setRefreshing(true);
+    Haptics.impactAsync();
+    await fetchPosts();
+    setRefreshing(false);
+  };
+
   const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
+    if (fetchNextUrl && !refreshing) {
       setFetchNextLoading(true);
       setHasFetchNextError(false);
       const { error, data } = await axiosFetch<PaginatedProfilePostsResponse>(fetchNextUrl);
@@ -88,7 +100,7 @@ const PostsContextProvider = ({ children }: Props) => {
       }
       setFetchNextLoading(false);
     }
-  }, [fetchNextUrl]);
+  }, [fetchNextUrl, refreshing]);
 
   const addPost = (data: PostDetailed) => {
     setData((prev) => [data, ...prev]);
@@ -108,7 +120,8 @@ const PostsContextProvider = ({ children }: Props) => {
     addPost,
     deletePost,
     error,
-    refetch: fetchPosts,
+    refetch: refreshPosts,
+    refreshing,
     setData,
     fetchNext,
     fetchNextUrl,
@@ -131,6 +144,7 @@ export const usePostsContext = () => {
     deletePost,
     error,
     refetch,
+    refreshing,
     setData,
     fetchNext,
     fetchNextUrl,
@@ -146,6 +160,7 @@ export const usePostsContext = () => {
     deletePost,
     error,
     refetch,
+    refreshing,
     setData,
     fetchNext,
     fetchNextUrl,

@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import * as Haptics from "expo-haptics";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { getProfileDetails } from "@/api/profile";
 import { ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
@@ -14,6 +15,8 @@ type AuthProfileContextType = {
   addFollowing: () => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
+  refetch: () => Promise<void>;
+  refreshing: boolean;
 };
 
 const AuthProfileContext = createContext<AuthProfileContextType>({
@@ -35,6 +38,8 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   addFollowing: () => {},
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
   updateName: (name: string) => {},
+  refetch: () => Promise.resolve(),
+  refreshing: false,
 });
 
 type Props = {
@@ -56,29 +61,39 @@ const defaultProfile = {
 const AuthProfileContextProvider = ({ children }: Props) => {
   const [authProfile, setAuthProfile] = useState<ProfileDetailsType>(defaultProfile);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
 
-  useEffect(() => {
-    const fetchProfileDetails = async () => {
-      if (selectedProfileId && !authLoading) {
-        setLoading(true);
-        // the second argument is only necessary so the backend doesn't throw an error
-        const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
-        if (!error && data) {
-          setAuthProfile(data);
-        }
-        setLoading(false);
+  const fetchProfileDetails = useCallback(async () => {
+    if (selectedProfileId && !authLoading) {
+      setLoading(true);
+      // the second argument is only necessary so the backend doesn't throw an error
+      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
+      if (!error && data) {
+        setAuthProfile(data);
       }
-    };
+      setLoading(false);
+    }
+  }, [authLoading, selectedProfileId]);
+
+  useEffect(() => {
     fetchProfileDetails();
-  }, [selectedProfileId, authLoading]);
+  }, [fetchProfileDetails]);
 
   useEffect(() => {
     if (!selectedProfileId) {
       setAuthProfile(defaultProfile);
     }
   }, [selectedProfileId]);
+
+  // refresh profile if user swipes down
+  const refreshProfile = async () => {
+    setRefreshing(true);
+    Haptics.impactAsync();
+    await fetchProfileDetails();
+    setRefreshing(false);
+  };
 
   const updateProfileImage = (image: ProfileImage) => {
     setAuthProfile((prev) => {
@@ -141,6 +156,8 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     addFollowing,
     updatePostsCount,
     updateName,
+    refetch: refreshProfile,
+    refreshing,
   };
 
   return <AuthProfileContext.Provider value={value}>{children}</AuthProfileContext.Provider>;
@@ -158,6 +175,8 @@ export const useAuthProfileContext = () => {
     addFollowing,
     updatePostsCount,
     updateName,
+    refetch,
+    refreshing,
   } = useContext(AuthProfileContext);
   return {
     authProfile,
@@ -168,5 +187,7 @@ export const useAuthProfileContext = () => {
     addFollowing,
     updatePostsCount,
     updateName,
+    refetch,
+    refreshing,
   };
 };

@@ -27,10 +27,11 @@ const ProfileDetailsScreen = () => {
       postsLoading={!posts.initialFetchComplete}
       postsError={posts.hasInitialFetchError}
       postsData={posts.data}
+      postsRefresh={posts.refetch}
+      postsRefreshing={posts.refreshing}
       setProfileData={profile.setData}
       fetchNext={posts.fetchNext}
-      nextUrl={posts.fetchNextUrl}
-      fetchNextLoading={posts.fetchNextLoading}
+      fetchNextLoading={posts.initialFetchComplete && posts.fetchNextLoading}
       hasFetchNextError={posts.hasFetchNextError}
     />
   );

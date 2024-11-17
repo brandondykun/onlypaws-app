@@ -6,7 +6,7 @@ import { usePostsContext } from "@/context/PostsContext";
 
 const PostsScreen = () => {
   const posts = usePostsContext();
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, refetch, refreshing, loading } = useAuthProfileContext();
   const router = useRouter();
 
   const handlePostPreviewPress = (index: number) => {
@@ -18,14 +18,17 @@ const PostsScreen = () => {
       profileId={authProfile.id}
       onPostPreviewPress={handlePostPreviewPress}
       profileData={authProfile}
-      profileLoading={false}
+      profileLoading={refreshing || loading}
+      profileRefresh={refetch}
+      profileRefreshing={refreshing}
       profileError={""}
       postsLoading={false}
       postsError={false}
       postsData={posts.data}
+      postsRefresh={posts.refetch}
+      postsRefreshing={posts.refreshing}
       setProfileData={undefined}
       fetchNext={posts.fetchNext}
-      nextUrl={posts.fetchNextUrl}
       fetchNextLoading={posts.fetchNextLoading}
       hasFetchNextError={posts.hasFetchNextError}
     />

@@ -44,8 +44,11 @@ const usePosts = (profileId: number | string | null) => {
   };
 
   useEffect(() => {
+    setInitialFetchComplete(false);
+    setFetchNextLoading(false);
+    setFetchNextUrl(null);
     fetchPosts();
-  }, [profileId, fetchPosts]);
+  }, [fetchPosts, profileId]);
 
   const fetchNext = useCallback(async () => {
     if (fetchNextUrl) {

@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useCallback, useEffect } from "react";
 
@@ -24,6 +25,7 @@ const ExploreProfileScreen = () => {
   const [profilePostsNextUrl, setProfilePostsNextUrl] = useState<string | null>(null);
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/explore/profileList", params: { initialIndex: index } });
@@ -47,6 +49,14 @@ const ExploreProfileScreen = () => {
   useEffect(() => {
     fetchPosts();
   }, [profileId, fetchPosts]);
+
+  // refresh posts if user swipes down
+  const refreshPosts = async () => {
+    setRefreshing(true);
+    Haptics.impactAsync();
+    await fetchPosts();
+    setRefreshing(false);
+  };
 
   const fetchNext = useCallback(async () => {
     if (profilePostsNextUrl) {
@@ -75,9 +85,10 @@ const ExploreProfileScreen = () => {
       postsLoading={initialFetchLoading}
       postsError={!!initialFetchError}
       postsData={selectedProfilePosts}
+      postsRefresh={refreshPosts}
+      postsRefreshing={refreshing}
       setProfileData={profile.setData}
       fetchNext={fetchNext}
-      nextUrl={profilePostsNextUrl}
       fetchNextLoading={fetchNextLoading}
       hasFetchNextError={hasFetchNextError}
       onFollow={search.onFollow}
