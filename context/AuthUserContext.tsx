@@ -1,4 +1,4 @@
-import { Redirect } from "expo-router";
+// import { Redirect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
@@ -73,7 +73,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
         } else {
           console.log("CALLING LOGOUT FROM AUTH USER CONTEXT PROVIDER");
           logOut();
-          return <Redirect href="/auth/" />;
+          // return <Redirect href="/auth/" />;
         }
       }
       setAuthLoading(false);
