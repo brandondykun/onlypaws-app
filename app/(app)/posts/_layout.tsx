@@ -23,8 +23,8 @@ const PostsStack = () => {
       >
         <Stack.Screen name="index" options={{ title: "Posts" }} />
         <Stack.Screen name="list" options={{ title: "Posts" }} />
-        <Stack.Screen name="followers" options={{ title: "Followers" }} />
-        <Stack.Screen name="following" options={{ title: "Following" }} />
+        <Stack.Screen name="followers" options={{ title: "Followers", headerBackTitleVisible: false }} />
+        <Stack.Screen name="following" options={{ title: "Following", headerBackTitleVisible: false }} />
       </Stack>
     </ProfileDetailsContextProvider>
   );

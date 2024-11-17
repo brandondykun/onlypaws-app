@@ -6,6 +6,7 @@ import {
   PaginatedFeedResponse,
   Follow,
   CreateProfileResponse,
+  PaginatedProfileResponse,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch } from "./config";
@@ -70,4 +71,14 @@ export const updateName = async (text: string, profileId: number) => {
 export const createProfile = async (username: string, about: string, name: string) => {
   const url = "/v1/auth/profile/";
   return await axiosPost<CreateProfileResponse>(url, { username, about, name });
+};
+
+export const getFollowers = async (profileId: number) => {
+  const url = `/v1/profile/${profileId}/followers/`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
+};
+
+export const getFollowing = async (profileId: number) => {
+  const url = `/v1/profile/${profileId}/following/`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
 };

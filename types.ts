@@ -160,6 +160,21 @@ export type PaginatedFeedResponse = {
   results: PostDetailed[];
 };
 
+export type FollowProfile = {
+  id: number;
+  username: string;
+  about: string;
+  image: null | ProfileImage;
+  name: string;
+};
+
+export type PaginatedProfileResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: FollowProfile[];
+};
+
 export type Follow = {
   created_at: string;
   followed: number;
