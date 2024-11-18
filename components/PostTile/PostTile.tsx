@@ -11,9 +11,13 @@ type Props = {
   onPress: (index: number) => void;
 };
 
+const NUM_COLUMNS = 3;
+const GAP_SIZE = 3;
+
 const PostTile = ({ post, index, onPress }: Props) => {
   const screenWidth = Dimensions.get("window").width;
-  const isCenterRow = (index + 2) % 3 === 0;
+  const availableSpace = screenWidth - (NUM_COLUMNS - 1) * GAP_SIZE;
+  const itemSize = availableSpace / NUM_COLUMNS;
 
   return (
     <View style={{ position: "relative" }} key={post.id}>
@@ -27,10 +31,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
         onPress={() => onPress(index)}
         testID="post-tile-pressable"
       >
-        <Image
-          source={{ uri: post.images[0].image }}
-          style={{ height: screenWidth / 3 - 1, width: isCenterRow ? screenWidth / 3 : screenWidth / 3 - 1 }}
-        />
+        <Image source={{ uri: post.images[0].image }} style={{ height: itemSize, width: itemSize }} />
       </Pressable>
     </View>
   );

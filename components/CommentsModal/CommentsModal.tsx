@@ -1,4 +1,5 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  FlatList,
   RefreshControl,
   Animated,
   GestureResponderEvent,
@@ -191,15 +191,15 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
   // once initial fetch is complete, show the flat list
   if (initialFetchComplete) {
     content = (
-      <FlatList
+      <FlashList
         data={comments}
         keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.1} // Trigger when 10% from the bottom
+        onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
         onEndReached={!fetchNextLoading ? () => fetchNext() : null}
         ListEmptyComponent={emptyComponent}
-        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         refreshing={refreshing}
+        estimatedItemSize={60}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

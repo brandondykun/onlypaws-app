@@ -1,13 +1,13 @@
+import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
 import { useState, useLayoutEffect, useCallback, useEffect } from "react";
-import { View, Dimensions, RefreshControl, StyleSheet, FlatList } from "react-native";
+import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { ActivityIndicator } from "react-native";
 
 import { axiosFetch } from "@/api/config";
 import { getExplorePosts } from "@/api/post";
 import Button from "@/components/Button/Button";
-// import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import EmptyFlatListComponent from "@/components/EmptyFlatListComponent/EmptyFlatListComponent";
 import PostTile from "@/components/PostTile/PostTile";
 import Text from "@/components/Text/Text";
@@ -119,12 +119,11 @@ const ExploreScreen = () => {
 
   return (
     <View style={{ flex: 1, paddingTop: 8 }}>
-      <FlatList
+      <FlashList
         showsVerticalScrollIndicator={false}
         data={explorePosts}
-        contentContainerStyle={{ flexGrow: 1 }}
         numColumns={3}
-        columnWrapperStyle={{ gap: 2 }}
+        estimatedItemSize={screenWidth / 3}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}

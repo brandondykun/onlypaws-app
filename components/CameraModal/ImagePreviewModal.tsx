@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState, useRef, useEffect } from "react";
-import { Dimensions, View, Pressable, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { Dimensions, View, Pressable, TouchableOpacity, StyleSheet } from "react-native";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
@@ -25,7 +26,7 @@ type Props = {
 
 const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialIndex }: Props) => {
   const screenWidth = Dimensions.get("window").width;
-  const flatListRef = useRef<FlatList<PhotoFile | ImagePickerAsset>>(null);
+  const flatListRef = useRef<FlashList<PhotoFile | ImagePickerAsset>>(null);
 
   const { isDarkMode } = useColorMode();
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
@@ -55,10 +56,11 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
           </TouchableOpacity>
           <Text style={{ opacity: 0.8, fontSize: 18 }}>Long press to delete image.</Text>
         </View>
-        <FlatList
+        <FlashList
           ref={flatListRef}
-          contentContainerStyle={{ paddingBottom: 24, gap: 24 }}
+          contentContainerStyle={{ paddingBottom: 36 }}
           data={images}
+          estimatedItemSize={screenWidth + 30}
           keyExtractor={(item) => getImageUri(item)}
           renderItem={({ item, index }) => {
             return (

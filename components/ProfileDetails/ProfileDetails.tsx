@@ -1,6 +1,7 @@
+import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
 import { useLayoutEffect, useState } from "react";
-import { View, FlatList, ActivityIndicator, RefreshControl } from "react-native";
+import { View, ActivityIndicator, RefreshControl, Dimensions } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { unfollowProfile, followProfile } from "@/api/profile";
@@ -57,6 +58,7 @@ const ProfileDetails = ({
 }: Props) => {
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
+  const screenWidth = Dimensions.get("window").width;
 
   const { authProfile, addFollowing, removeFollowing } = useAuthProfileContext();
   const [followLoading, setFollowLoading] = useState(false);
@@ -177,17 +179,16 @@ const ProfileDetails = ({
   ) : null;
 
   return (
-    <FlatList
+    <FlashList
       showsVerticalScrollIndicator={false}
       data={postsLoading || postsRefreshing ? [] : postsData}
       numColumns={3}
-      columnWrapperStyle={{ gap: 2 }}
       ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.1} // Trigger when 10% from the bottom
       onEndReached={!fetchNextLoading ? () => fetchNext() : null}
       ListEmptyComponent={emptyComponent}
-      contentContainerStyle={{ flexGrow: 1 }}
+      estimatedItemSize={screenWidth / 3}
       ListHeaderComponentStyle={{
         borderBottomWidth: 1,
         borderBottomColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
