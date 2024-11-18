@@ -82,3 +82,13 @@ export const getFollowing = async (profileId: number) => {
   const url = `/v1/profile/${profileId}/following/`;
   return await axiosFetch<PaginatedProfileResponse>(url);
 };
+
+export const searchFollowers = async (profileId: number, username: string) => {
+  const url = `/v1/profile/${profileId}/followers/?username=${username}`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
+};
+
+export const searchFollowing = async (profileId: number, username: string) => {
+  const url = `/v1/profile/${profileId}/following/?username=${username}`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
+};
