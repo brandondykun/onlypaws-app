@@ -1,5 +1,5 @@
 import { router, useNavigation } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { View, FlatList, ActivityIndicator, RefreshControl } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -59,6 +59,7 @@ const ProfileDetails = ({
   const { isDarkMode } = useColorMode();
 
   const { authProfile, addFollowing, removeFollowing } = useAuthProfileContext();
+  const [followLoading, setFollowLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -72,6 +73,7 @@ const ProfileDetails = ({
 
   const handleUnfollowPress = async (profileId: number) => {
     if (setProfileData) {
+      setFollowLoading(true);
       const { error } = await unfollowProfile(profileId, authProfile.id);
       if (!error) {
         setProfileData((prev) => {
@@ -89,11 +91,13 @@ const ProfileDetails = ({
           text2: "There was an error unfollowing that account.",
         });
       }
+      setFollowLoading(false);
     }
   };
 
   const handleFollowPress = async (profile: ProfileDetailsType) => {
     if (setProfileData) {
+      setFollowLoading(true);
       const { error, data } = await followProfile(profile.id, authProfile.id);
       if (!error && data) {
         setProfileData((prev) => {
@@ -111,6 +115,7 @@ const ProfileDetails = ({
           text2: "There was an error following that account.",
         });
       }
+      setFollowLoading(false);
     }
   };
 
@@ -198,6 +203,7 @@ const ProfileDetails = ({
           handleUnfollowPress={handleUnfollowPress}
           handleFollowPress={handleFollowPress}
           profileLoading={profileLoading}
+          followLoading={followLoading}
         />
       }
       renderItem={({ item, index }) => {

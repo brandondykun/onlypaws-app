@@ -18,6 +18,7 @@ type Props = {
   handleFollowPress: (profile: ProfileDetails) => void;
   handleUnfollowPress: (profileId: number) => void;
   profileLoading: boolean;
+  followLoading?: boolean;
 };
 const ProfileDetailsHeader = ({
   profileData,
@@ -27,6 +28,7 @@ const ProfileDetailsHeader = ({
   handleUnfollowPress,
   handleFollowPress,
   profileLoading,
+  followLoading,
 }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
@@ -40,12 +42,15 @@ const ProfileDetailsHeader = ({
           buttonStyle={{
             paddingHorizontal: 6,
             height: 30,
-            width: "auto",
+            width: 70,
             borderColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[600],
             borderRadius: 4,
           }}
           variant="outline"
           onPress={() => handleUnfollowPress(profileData.id)}
+          loading={followLoading}
+          loadingIconSize={12}
+          loadingIconScale={0.7}
         />
       ) : profileData ? (
         <Button
@@ -54,11 +59,14 @@ const ProfileDetailsHeader = ({
           buttonStyle={{
             paddingHorizontal: 6,
             height: 30,
-            width: 60,
+            width: 70,
             backgroundColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[500],
             borderRadius: 4,
           }}
           onPress={() => handleFollowPress(profileData)}
+          loading={followLoading}
+          loadingIconSize={12}
+          loadingIconScale={0.7}
         />
       ) : null}
     </>

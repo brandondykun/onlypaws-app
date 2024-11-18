@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { View, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -21,6 +22,19 @@ const ICON_SIZE = 42;
 const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPress }: Props) => {
   const router = useRouter();
   const { isDarkMode } = useColorMode();
+  const [followLoading, setFollowLoading] = useState(false);
+
+  const handleFollow = async (searchedProfile: SearchedProfile) => {
+    setFollowLoading(true);
+    await handleFollowPress(searchedProfile);
+    setFollowLoading(false);
+  };
+
+  const handleUnfollow = async (profileId: number) => {
+    setFollowLoading(true);
+    await handleUnfollowPress(profileId);
+    setFollowLoading(false);
+  };
 
   return (
     <View
@@ -81,18 +95,24 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
           <Button
             text="unfollow"
             textStyle={{ fontSize: 12 }}
-            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 60, borderRadius: 6 }}
+            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
             variant="outline"
-            onPress={() => handleUnfollowPress(profile.id)}
+            onPress={() => handleUnfollow(profile.id)}
             testID={`${profile.username}-unfollow`}
+            loading={followLoading}
+            loadingIconSize={12}
+            loadingIconScale={0.7}
           />
         ) : (
           <Button
             text="follow"
             textStyle={{ fontSize: 12 }}
-            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 60, borderRadius: 6 }}
-            onPress={() => handleFollowPress(profile)}
+            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+            onPress={() => handleFollow(profile)}
             testID={`${profile.username}-follow`}
+            loading={followLoading}
+            loadingIconSize={12}
+            loadingIconScale={0.7}
           />
         )}
       </View>
