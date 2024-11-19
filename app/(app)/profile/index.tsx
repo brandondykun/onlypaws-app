@@ -71,6 +71,16 @@ const ProfileScreen = () => {
     }
   }, [authProfile]);
 
+  const handleAboutModalClose = () => {
+    setAboutText(authProfile.about ? authProfile.about : "");
+    setAboutModalVisible(false);
+  };
+
+  const handleNameModalClose = () => {
+    setProfileName(authProfile.name ? authProfile.name : "");
+    setUpdateNameModalVisible(false);
+  };
+
   // add search button to header
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -149,7 +159,6 @@ const ProfileScreen = () => {
       const { error, data } = await updateAboutText(aboutText, authProfile.id);
       if (!error && data) {
         updateAbout(data.about!);
-        // updateProfileDetailsAboutText(data.about!);
         setAboutModalVisible(false);
       } else {
         Toast.show({
@@ -309,7 +318,7 @@ const ProfileScreen = () => {
       />
       <Modal
         visible={aboutModalVisible}
-        onRequestClose={() => setAboutModalVisible(false)}
+        onRequestClose={handleAboutModalClose}
         animationType="slide"
         raw
         transparent={true}
@@ -318,7 +327,7 @@ const ProfileScreen = () => {
       >
         <Pressable
           style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={() => setAboutModalVisible(false)}
+          onPress={handleAboutModalClose}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <Pressable onPress={(e) => e.stopPropagation()}>
@@ -343,7 +352,7 @@ const ProfileScreen = () => {
 
       <Modal
         visible={updateNameModalVisible}
-        onRequestClose={() => setUpdateNameModalVisible(false)}
+        onRequestClose={handleNameModalClose}
         animationType="slide"
         raw
         transparent={true}
@@ -352,7 +361,7 @@ const ProfileScreen = () => {
       >
         <Pressable
           style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={() => setUpdateNameModalVisible(false)}
+          onPress={handleNameModalClose}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <Pressable onPress={(e) => e.stopPropagation()}>
