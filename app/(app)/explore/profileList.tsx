@@ -10,7 +10,7 @@ const ExploreProfilePostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number) => {
+  const onProfilePress = () => {
     router.back();
   };
 

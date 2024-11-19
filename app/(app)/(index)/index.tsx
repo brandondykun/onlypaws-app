@@ -9,7 +9,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
 import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
-import { PostLike, PostCommentDetailed } from "@/types";
+import { PostCommentDetailed } from "@/types";
 
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
@@ -20,11 +20,11 @@ const FeedScreen = () => {
     router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId } });
   };
 
-  const onLike = (newPostLike: PostLike) => {
+  const onLike = (postId: number) => {
     // update feed posts
-    feed.onLike(newPostLike);
+    feed.onLike(postId);
     // update selected profile posts in ProfileDetailsContextProvider for this stack
-    profile.posts.onLike(newPostLike);
+    profile.posts.onLike(postId);
   };
 
   const onUnlike = (postId: number) => {

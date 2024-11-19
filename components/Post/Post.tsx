@@ -10,7 +10,6 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostCommentDetailed, PostDetailed } from "@/types";
-import { PostLike } from "@/types";
 import { getTimeSince } from "@/utils/utils";
 
 import CommentsModal from "../CommentsModal/CommentsModal";
@@ -26,7 +25,7 @@ type Props = {
   post: PostDetailed;
   setPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   onProfilePress: (profileId: number) => void;
-  onLike?: (newPostLike: PostLike) => void;
+  onLike?: (postId: number) => void;
   onUnlike?: (postId: number) => void;
   onComment?: (comment: PostCommentDetailed, postId: number) => void;
 };
@@ -38,18 +37,12 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
 
-  const likedIds = post.likes.map((like) => {
-    return like.profile;
-  });
-
-  const liked = likedIds.includes(authProfile.id!);
-
   const handleHeartPress = async (postId: number, liked: boolean) => {
     setLikeLoading(true);
     if (!liked) {
       const { error, data } = await addLike(postId, authProfile.id);
       if (data && !error) {
-        onLike && onLike(data);
+        onLike && onLike(postId);
       } else {
         Toast.show({
           type: "error",
@@ -96,7 +89,9 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           <TapGestureHandler
             numberOfTaps={2}
             onActivated={
-              post.profile.id === authProfile.id || likeLoading ? undefined : () => handleHeartPress(post.id, liked)
+              post.profile.id === authProfile.id || likeLoading
+                ? undefined
+                : () => handleHeartPress(post.id, post.liked)
             }
           >
             <View
@@ -119,18 +114,18 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
       <View>
         <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8 }}>
           <Pressable
-            onPress={() => handleHeartPress(post.id, liked)}
+            onPress={() => handleHeartPress(post.id, post.liked)}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
             disabled={post.profile.id === authProfile.id || likeLoading}
             testID="post-like-button"
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               <AntDesign
-                name={liked ? "heart" : "hearto"}
+                name={post.liked ? "heart" : "hearto"}
                 size={20}
-                color={liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
+                color={post.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
               />
-              <Text style={{ fontSize: 18 }}>{post.likes.length}</Text>
+              <Text style={{ fontSize: 18 }}>{post.likes_count}</Text>
             </View>
           </Pressable>
           <Pressable

@@ -1,10 +1,8 @@
 import { createContext, useContext, useState } from "react";
 
-import { PostDetailed, PostLike } from "@/types";
+import { PostDetailed } from "@/types";
 import { PostCommentDetailed } from "@/types";
 import { likePostInState, unlikePostInState, addCommentInState } from "@/utils/utils";
-
-import { useAuthProfileContext } from "./AuthProfileContext";
 
 type ExplorePostsContextType = {
   explorePosts: PostDetailed[];
@@ -13,7 +11,7 @@ type ExplorePostsContextType = {
   setSimilarPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   selectedIndex: number | null;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  likePost: (newPostLike: PostLike) => void;
+  likePost: (postId: number) => void;
   unlikePost: (postId: number) => void;
   addComment: (comment: PostCommentDetailed, postId: number) => void;
   setSelectedProfilePosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
@@ -27,7 +25,7 @@ const ExplorePostsContext = createContext<ExplorePostsContextType>({
   setSimilarPosts: () => {},
   selectedIndex: null,
   setSelectedIndex: () => {},
-  likePost: (newPostLike: PostLike) => {},
+  likePost: (postId: number) => {},
   unlikePost: (postId: number) => {},
   addComment: (comment: PostCommentDetailed, postId: number) => {},
   setSelectedProfilePosts: () => {},
@@ -39,8 +37,6 @@ type Props = {
 };
 
 const ExplorePostsContextProvider = ({ children }: Props) => {
-  const { authProfile } = useAuthProfileContext();
-
   const [explorePosts, setExplorePosts] = useState<PostDetailed[]>([]);
   const [similarPosts, setSimilarPosts] = useState<PostDetailed[]>([]);
   const [selectedProfilePosts, setSelectedProfilePosts] = useState<PostDetailed[]>([]);
@@ -48,17 +44,17 @@ const ExplorePostsContextProvider = ({ children }: Props) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // like post wherever it is displayed in the explore tab
-  const likePost = (newPostLike: PostLike) => {
-    likePostInState(setExplorePosts, newPostLike);
-    likePostInState(setSimilarPosts, newPostLike);
-    likePostInState(setSelectedProfilePosts, newPostLike);
+  const likePost = (postId: number) => {
+    likePostInState(setExplorePosts, postId);
+    likePostInState(setSimilarPosts, postId);
+    likePostInState(setSelectedProfilePosts, postId);
   };
 
   // unlike post wherever it is displayed in the explore tab
   const unlikePost = (postId: number) => {
-    unlikePostInState(setExplorePosts, postId, authProfile.id!);
-    unlikePostInState(setSimilarPosts, postId, authProfile.id!);
-    unlikePostInState(setSelectedProfilePosts, postId, authProfile.id!);
+    unlikePostInState(setExplorePosts, postId);
+    unlikePostInState(setSimilarPosts, postId);
+    unlikePostInState(setSelectedProfilePosts, postId);
   };
 
   // add comment wherever it is displayed in the explore tab

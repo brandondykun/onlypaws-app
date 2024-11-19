@@ -3,7 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { ImagePickerAsset } from "expo-image-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostCommentDetailed, PostDetailed, PostLike } from "@/types";
+import { PostCommentDetailed, PostDetailed } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -12,14 +12,11 @@ export const getTimeSince = (pastDate: string) => {
   return `${output} ago`;
 };
 
-export const likePostInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  newPostLike: PostLike,
-) => {
+export const likePostInState = (stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>, postId: number) => {
   stateSetter((prev) => {
     return prev.map((post) => {
-      if (post.id === newPostLike.post) {
-        return { ...post, likes: [...post.likes, newPostLike] };
+      if (post.id === postId) {
+        return { ...post, likes_count: post.likes_count + 1, liked: true };
       }
       return post;
     });
@@ -29,12 +26,15 @@ export const likePostInState = (
 export const unlikePostInState = (
   stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
   postId: number,
-  authProfileId: number,
 ) => {
   stateSetter((prev) => {
     return prev.map((prevPost) => {
       if (prevPost.id === postId) {
-        return { ...prevPost, likes: prevPost.likes.filter((like) => like.profile !== authProfileId) };
+        return {
+          ...prevPost,
+          likes_count: prevPost.likes_count - 1,
+          liked: false,
+        };
       }
       return prevPost;
     });

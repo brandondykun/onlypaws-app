@@ -3,8 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
 import { getProfilePosts } from "@/api/post";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { PaginatedProfilePostsResponse, PostDetailed, PostLike, PostCommentDetailed } from "@/types";
+import { PaginatedProfilePostsResponse, PostDetailed, PostCommentDetailed } from "@/types";
 import { likePostInState, unlikePostInState, addCommentInState } from "@/utils/utils";
 
 const usePosts = (profileId: number | string | null) => {
@@ -16,8 +15,6 @@ const usePosts = (profileId: number | string | null) => {
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
-
-  const { authProfile } = useAuthProfileContext();
 
   const fetchPosts = useCallback(async () => {
     if (profileId) {
@@ -65,12 +62,12 @@ const usePosts = (profileId: number | string | null) => {
     }
   }, [fetchNextUrl]);
 
-  const addLike = (postId: number, data: PostLike) => {
+  const addLike = (postId: number) => {
     setData((prev) => {
       if (prev) {
         prev?.map((post) => {
           if (post.id === postId) {
-            return { ...post, likes: [...post.likes, data] };
+            return { ...post, liked: true, likes_count: post.likes_count + 1 };
           }
           return post;
         });
@@ -79,12 +76,12 @@ const usePosts = (profileId: number | string | null) => {
     });
   };
 
-  const onLike = (newPostLike: PostLike) => {
-    likePostInState(setData, newPostLike);
+  const onLike = (postId: number) => {
+    likePostInState(setData, postId);
   };
 
   const onUnlike = (postId: number) => {
-    unlikePostInState(setData, postId, authProfile.id!);
+    unlikePostInState(setData, postId);
   };
 
   const onComment = (comment: PostCommentDetailed, postId: number) => {

@@ -2,7 +2,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useRef } from "react";
 
 import { PostDetailed } from "@/types";
-import { PostLike, PostCommentDetailed } from "@/types";
+import { PostCommentDetailed } from "@/types";
 
 import Post from "../Post/Post";
 import { POST_HEIGHT } from "../Post/Post";
@@ -12,7 +12,7 @@ type Props = {
   setPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   initialIndex?: number;
   onProfilePress: (profileId: number) => void;
-  onLike?: (newPostLike: PostLike) => void;
+  onLike?: (postId: number) => void;
   onUnlike?: (postId: number) => void;
   onComment?: (comment: PostCommentDetailed, postId: number) => void;
 };

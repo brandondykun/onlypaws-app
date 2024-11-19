@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 
 import { refreshToken } from "../api/auth";
@@ -14,6 +15,7 @@ type Props = {
 
 const AuthInterceptor = ({ children }: Props) => {
   const { isAuthenticated, logOut } = useAuthUserContext();
+  const { authProfile } = useAuthProfileContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -72,6 +74,8 @@ const AuthInterceptor = ({ children }: Props) => {
         // Do something before request is sent
         const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
         config.headers.Authorization = `Bearer ${accessToken}`;
+        // attach selected profile id to each request
+        config.headers["AUTH-PROFILE-ID"] = authProfile.id;
         return config;
       },
       function (error) {
@@ -82,7 +86,7 @@ const AuthInterceptor = ({ children }: Props) => {
     return () => {
       axiosInstance.interceptors.request.eject(requestInterceptor);
     };
-  }, [isAuthenticated, logOut]);
+  }, [isAuthenticated, logOut, authProfile]);
 
   return children;
 };
