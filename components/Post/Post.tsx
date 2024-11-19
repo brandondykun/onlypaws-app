@@ -40,10 +40,10 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   const handleHeartPress = async (postId: number, liked: boolean) => {
     setLikeLoading(true);
     if (!liked) {
-      const { error, data } = await addLike(postId, authProfile.id);
-      if (data && !error) {
-        onLike && onLike(postId);
-      } else {
+      onLike && onLike(postId);
+      const { error } = await addLike(postId, authProfile.id);
+      if (error) {
+        onUnlike && onUnlike(postId);
         Toast.show({
           type: "error",
           text1: "Error",
@@ -51,10 +51,10 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         });
       }
     } else {
+      onUnlike && onUnlike(postId);
       const { error } = await removeLike(postId, authProfile.id);
-      if (!error) {
-        onUnlike && onUnlike(postId);
-      } else {
+      if (error) {
+        onLike && onLike(postId);
         Toast.show({
           type: "error",
           text1: "Error",
