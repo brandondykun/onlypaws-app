@@ -9,7 +9,6 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
 import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
-import { PostCommentDetailed } from "@/types";
 
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
@@ -34,11 +33,11 @@ const FeedScreen = () => {
     profile.posts.onUnlike(postId);
   };
 
-  const onComment = (comment: PostCommentDetailed, postId: number) => {
+  const onComment = (postId: number) => {
     // update feed posts
-    feed.onComment(comment, postId);
+    feed.onComment(postId);
     // update selected profile posts in ProfileDetailsContextProvider for this stack
-    profile.posts.onComment(comment, postId);
+    profile.posts.onComment(postId);
   };
 
   let content = (

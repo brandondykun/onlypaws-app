@@ -105,7 +105,7 @@ export type PostDetailed = {
   created_at: string;
   updated_at: string;
   images: PostImage[];
-  comments: PostCommentDetailed[];
+  // comments: PostCommentDetailed[];
   comments_count: number;
   likes_count: number;
   liked: boolean;

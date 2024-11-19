@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 import usePosts from "@/hooks/usePosts";
 import useProfileDetails from "@/hooks/useProfileDetails";
 import { PostDetailed } from "@/types";
-import { ProfileDetails as ProfileDetailsType, PostCommentDetailed } from "@/types";
+import { ProfileDetails as ProfileDetailsType } from "@/types";
 
 type ProfileDetailsContextType = {
   posts: {
@@ -19,7 +19,7 @@ type ProfileDetailsContextType = {
     initialFetchComplete: boolean;
     onLike: (postId: number) => void;
     onUnlike: (postId: number) => void;
-    onComment: (comment: PostCommentDetailed, postId: number) => void;
+    onComment: (postId: number) => void;
   };
   profile: {
     loading: boolean;
@@ -46,7 +46,7 @@ const ProfileDetailsContext = createContext<ProfileDetailsContextType>({
     initialFetchComplete: false,
     onLike: (postId: number) => {},
     onUnlike: (postId: number) => {},
-    onComment: (comment: PostCommentDetailed, postId: number) => {},
+    onComment: (postId: number) => {},
   },
   profile: {
     loading: false,

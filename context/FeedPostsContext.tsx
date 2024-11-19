@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 
 import { axiosFetch } from "@/api/config";
 import { getFeed } from "@/api/profile";
-import { PaginatedFeedResponse, PostDetailed, PostCommentDetailed } from "@/types";
+import { PaginatedFeedResponse, PostDetailed } from "@/types";
 import { likePostInState, addCommentInState, unlikePostInState } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
@@ -22,7 +22,7 @@ type FeedPostsContextType = {
   refreshing: boolean;
   onLike: (postId: number) => void;
   onUnlike: (postId: number) => void;
-  onComment: (comment: PostCommentDetailed, postId: number) => void;
+  onComment: (postId: number) => void;
 };
 
 const FeedPostsContext = createContext<FeedPostsContextType>({
@@ -39,7 +39,7 @@ const FeedPostsContext = createContext<FeedPostsContextType>({
   refreshing: false,
   onLike: (postId: number) => {},
   onUnlike: (postId: number) => {},
-  onComment: (comment: PostCommentDetailed, postId: number) => {},
+  onComment: (postId: number) => {},
 });
 
 type Props = {
@@ -109,8 +109,8 @@ const FeedPostsContextProvider = ({ children }: Props) => {
     unlikePostInState(setData, postId);
   };
 
-  const onComment = (comment: PostCommentDetailed, postId: number) => {
-    addCommentInState(setData, comment, postId);
+  const onComment = (postId: number) => {
+    addCommentInState(setData, postId);
   };
 
   const value = {

@@ -2,7 +2,6 @@ import { FlashList } from "@shopify/flash-list";
 import { useRef } from "react";
 
 import { PostDetailed } from "@/types";
-import { PostCommentDetailed } from "@/types";
 
 import Post from "../Post/Post";
 import { POST_HEIGHT } from "../Post/Post";
@@ -14,7 +13,7 @@ type Props = {
   onProfilePress: (profileId: number) => void;
   onLike?: (postId: number) => void;
   onUnlike?: (postId: number) => void;
-  onComment?: (comment: PostCommentDetailed, postId: number) => void;
+  onComment?: (postId: number) => void;
 };
 
 const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike, onUnlike, onComment }: Props) => {

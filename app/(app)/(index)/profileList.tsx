@@ -3,7 +3,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
 import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
-import { PostCommentDetailed } from "@/types";
 import { addCommentInState, likePostInState, unlikePostInState } from "@/utils/utils";
 
 const FeedProfilePostsListScreen = () => {
@@ -27,9 +26,9 @@ const FeedProfilePostsListScreen = () => {
     unlikePostInState(feed.setData, postId);
   };
 
-  const onComment = (comment: PostCommentDetailed, postId: number) => {
-    addCommentInState(posts.setData, comment, postId);
-    addCommentInState(feed.setData, comment, postId);
+  const onComment = (postId: number) => {
+    addCommentInState(posts.setData, postId);
+    addCommentInState(feed.setData, postId);
   };
 
   return (

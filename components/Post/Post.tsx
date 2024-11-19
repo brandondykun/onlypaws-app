@@ -9,7 +9,7 @@ import { addLike, removeLike } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { PostCommentDetailed, PostDetailed } from "@/types";
+import { PostDetailed } from "@/types";
 import { getTimeSince } from "@/utils/utils";
 
 import CommentsModal from "../CommentsModal/CommentsModal";
@@ -27,7 +27,7 @@ type Props = {
   onProfilePress: (profileId: number) => void;
   onLike?: (postId: number) => void;
   onUnlike?: (postId: number) => void;
-  onComment?: (comment: PostCommentDetailed, postId: number) => void;
+  onComment?: (postId: number) => void;
 };
 
 const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: Props) => {
@@ -65,8 +65,8 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
     setLikeLoading(false);
   };
 
-  const addComment = (comment: PostCommentDetailed) => {
-    onComment && onComment(comment, post.id);
+  const addComment = () => {
+    onComment && onComment(post.id);
   };
 
   return (

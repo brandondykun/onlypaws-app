@@ -3,7 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { ImagePickerAsset } from "expo-image-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostCommentDetailed, PostDetailed } from "@/types";
+import { PostDetailed } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -43,7 +43,6 @@ export const unlikePostInState = (
 
 export const addCommentInState = (
   stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  comment: PostCommentDetailed,
   postId: number,
 ) => {
   stateSetter((prev) => {
@@ -52,7 +51,6 @@ export const addCommentInState = (
         return {
           ...prevPost,
           comments_count: prevPost.comments_count + 1,
-          comments: [...prevPost.comments, comment],
         };
       }
       return prevPost;

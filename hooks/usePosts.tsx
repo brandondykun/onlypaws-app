@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
 import { getProfilePosts } from "@/api/post";
-import { PaginatedProfilePostsResponse, PostDetailed, PostCommentDetailed } from "@/types";
+import { PaginatedProfilePostsResponse, PostDetailed } from "@/types";
 import { likePostInState, unlikePostInState, addCommentInState } from "@/utils/utils";
 
 const usePosts = (profileId: number | string | null) => {
@@ -84,8 +84,8 @@ const usePosts = (profileId: number | string | null) => {
     unlikePostInState(setData, postId);
   };
 
-  const onComment = (comment: PostCommentDetailed, postId: number) => {
-    addCommentInState(setData, comment, postId);
+  const onComment = (postId: number) => {
+    addCommentInState(setData, postId);
   };
 
   return {

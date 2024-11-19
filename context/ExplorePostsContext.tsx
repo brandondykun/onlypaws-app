@@ -1,7 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
 import { PostDetailed } from "@/types";
-import { PostCommentDetailed } from "@/types";
 import { likePostInState, unlikePostInState, addCommentInState } from "@/utils/utils";
 
 type ExplorePostsContextType = {
@@ -13,7 +12,7 @@ type ExplorePostsContextType = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   likePost: (postId: number) => void;
   unlikePost: (postId: number) => void;
-  addComment: (comment: PostCommentDetailed, postId: number) => void;
+  addComment: (postId: number) => void;
   setSelectedProfilePosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   selectedProfilePosts: PostDetailed[];
 };
@@ -27,7 +26,7 @@ const ExplorePostsContext = createContext<ExplorePostsContextType>({
   setSelectedIndex: () => {},
   likePost: (postId: number) => {},
   unlikePost: (postId: number) => {},
-  addComment: (comment: PostCommentDetailed, postId: number) => {},
+  addComment: (postId: number) => {},
   setSelectedProfilePosts: () => {},
   selectedProfilePosts: [],
 });
@@ -58,10 +57,10 @@ const ExplorePostsContextProvider = ({ children }: Props) => {
   };
 
   // add comment wherever it is displayed in the explore tab
-  const addComment = (comment: PostCommentDetailed, postId: number) => {
-    addCommentInState(setExplorePosts, comment, postId);
-    addCommentInState(setSimilarPosts, comment, postId);
-    addCommentInState(setSelectedProfilePosts, comment, postId);
+  const addComment = (postId: number) => {
+    addCommentInState(setExplorePosts, postId);
+    addCommentInState(setSimilarPosts, postId);
+    addCommentInState(setSelectedProfilePosts, postId);
   };
 
   const value = {
