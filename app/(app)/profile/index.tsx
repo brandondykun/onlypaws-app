@@ -36,7 +36,7 @@ const ProfileScreen = () => {
     user,
     logOut,
     profileOptions,
-    setActiveProfileId,
+    changeSelectedProfileId,
     selectedProfileId: authUserSelectedProfileId,
   } = useAuthUserContext();
   const {
@@ -65,7 +65,9 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     if (authProfile) {
+      // if auth profile changes, update text that shows in the edit modals
       setAboutText(authProfile.about ? authProfile.about : "");
+      setProfileName(authProfile.name ? authProfile.name : "");
     }
   }, [authProfile]);
 
@@ -176,6 +178,10 @@ const ProfileScreen = () => {
       }
       setUpdateNameLoading(false);
     }
+  };
+
+  const handleChangeProfile = async (profileId: number) => {
+    await changeSelectedProfileId(profileId);
   };
 
   return (
@@ -406,7 +412,7 @@ const ProfileScreen = () => {
                       key={profile.id}
                       style={({ pressed }) => [pressed && !isSelected && { opacity: 0.7 }]}
                       disabled={isSelected || authProfileLoading}
-                      onPress={() => setActiveProfileId(profile.id)}
+                      onPress={() => handleChangeProfile(profile.id)}
                     >
                       <View
                         style={[

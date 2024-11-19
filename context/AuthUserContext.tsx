@@ -15,6 +15,7 @@ type AuthUserContextType = {
   setActiveProfileId: (id: number) => void;
   profileOptions: ProfileOption[] | null;
   addProfileOption: (option: ProfileOption) => void;
+  changeSelectedProfileId: (profileId: number) => Promise<void>;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
@@ -27,6 +28,7 @@ const AuthUserContext = createContext<AuthUserContextType>({
   setActiveProfileId: (id: number) => {},
   profileOptions: null,
   addProfileOption: (option: ProfileOption) => {},
+  changeSelectedProfileId: (profileId: number) => Promise.resolve(),
 });
 
 type Props = {
@@ -40,11 +42,18 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
-  const authenticate = useCallback((user: MyInfo) => {
+  const authenticate = useCallback(async (user: MyInfo) => {
     setUser(user);
-    setSelectedProfileId(user.profiles[0].id);
     setProfileOptions(user.profiles);
     setIsAuthenticated(true);
+    // fetch last active profile id and set as the current active profile - persist last profile
+    const selectedId = await SecureStore.getItemAsync("SELECTED_PROFILE_ID");
+    if (selectedId && user.profiles.find((profile) => profile.id === Number(selectedId))) {
+      setSelectedProfileId(Number(selectedId));
+    } else {
+      // as a default, set first profile as active
+      setSelectedProfileId(user.profiles[0].id);
+    }
   }, []);
 
   const logOut = useCallback(async () => {
@@ -54,6 +63,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
     await SecureStore.deleteItemAsync("REFRESH_TOKEN");
     await SecureStore.deleteItemAsync("ACCESS_TOKEN");
   }, []);
+
+  const changeSelectedProfileId = async (profileId: number) => {
+    // save new selected profile id to persist profile selection between sessions
+    await SecureStore.setItemAsync("SELECTED_PROFILE_ID", profileId.toString());
+    setSelectedProfileId(profileId);
+  };
 
   useEffect(() => {
     // check for stored refresh token on app load - if token present
@@ -104,6 +119,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     setActiveProfileId,
     profileOptions,
     addProfileOption,
+    changeSelectedProfileId,
   };
 
   return <AuthUserContext.Provider value={value}>{children}</AuthUserContext.Provider>;
@@ -122,6 +138,7 @@ export const useAuthUserContext = () => {
     setActiveProfileId,
     profileOptions,
     addProfileOption,
+    changeSelectedProfileId,
   } = useContext(AuthUserContext);
   return {
     user,
@@ -133,5 +150,6 @@ export const useAuthUserContext = () => {
     setActiveProfileId,
     profileOptions,
     addProfileOption,
+    changeSelectedProfileId,
   };
 };
