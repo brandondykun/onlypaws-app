@@ -7,7 +7,7 @@ import { ProfileDetails } from "@/types";
 import { abbreviateNumber } from "@/utils/utils";
 
 import Button from "../Button/Button";
-import ProfileImage from "../ProfileImage/ProfileImage";
+import ProfileDetailsHeaderImage from "../ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import Text from "../Text/Text";
 
 type Props = {
@@ -86,7 +86,7 @@ const ProfileDetailsHeader = ({
           )}
           {profileData && profileData.id !== authProfile.id ? followButtons : null}
         </View>
-        <ProfileImage image={(!profileLoading && profileData?.image) || null} size={100} />
+        <ProfileDetailsHeaderImage image={(!profileLoading && profileData?.image) || null} />
       </View>
       <View style={{ paddingVertical: 24 }}>
         <Text style={{ fontSize: 16 }} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]}>
