@@ -54,6 +54,28 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
   const { authProfile } = useAuthProfileContext();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const handleLikeComment = (commentId: number) => {
+    setComments((prev) =>
+      prev.map((comment) => {
+        if (comment.id === commentId) {
+          return { ...comment, liked: true, likes_count: comment.likes_count + 1 };
+        }
+        return comment;
+      }),
+    );
+  };
+
+  const handleUnlikeComment = (commentId: number) => {
+    setComments((prev) =>
+      prev.map((comment) => {
+        if (comment.id === commentId) {
+          return { ...comment, liked: false, likes_count: comment.likes_count - 1 };
+        }
+        return comment;
+      }),
+    );
+  };
+
   useEffect(() => {
     if (visible) {
       Animated.timing(fadeAnim, {
@@ -208,7 +230,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
             colors={[COLORS.zinc[400]]}
           />
         }
-        renderItem={({ item }) => <Comment comment={item} />}
+        renderItem={({ item }) => <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />}
         ListFooterComponent={footerComponent}
       />
     );

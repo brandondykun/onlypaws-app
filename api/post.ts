@@ -5,6 +5,7 @@ import {
   PostDetailed,
   PostCommentDetailed,
   PostLike,
+  CommentLike,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete } from "./config";
@@ -59,4 +60,15 @@ export const getExplorePosts = async (profileId: number) => {
 export const getSimilarPosts = async (postId: number, profileId: number) => {
   const url = `/v1/post/${postId}/similar?profileId=${profileId}`;
   return await axiosFetch<PaginatedExploreResponse>(url);
+};
+
+export const likeComment = async (commentId: number, profileId: number) => {
+  const url = `/v1/comment/${commentId}/like/`;
+  return await axiosPost<CommentLike>(url, { profileId });
+};
+
+// authProfileId is the profile requesting the delete
+export const deleteCommentLike = async (commentId: number, authProfileId: number) => {
+  const url = `/v1/comment/${commentId}/like/${authProfileId}/`;
+  return await axiosDelete(url);
 };

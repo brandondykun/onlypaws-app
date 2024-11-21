@@ -71,6 +71,13 @@ export type PostLike = {
   liked_at: string;
 };
 
+export type CommentLike = {
+  id: number;
+  comment: number;
+  profile: number;
+  liked_at: string;
+};
+
 export type PostComment = {
   id: number;
   text: string;
@@ -85,6 +92,8 @@ export type PostCommentDetailed = {
   post: number;
   profile: Profile;
   created_at: string;
+  likes_count: number;
+  liked: boolean;
 };
 
 export type Post = {
@@ -105,7 +114,6 @@ export type PostDetailed = {
   created_at: string;
   updated_at: string;
   images: PostImage[];
-  // comments: PostCommentDetailed[];
   comments_count: number;
   likes_count: number;
   liked: boolean;
