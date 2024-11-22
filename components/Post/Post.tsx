@@ -1,7 +1,8 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useState } from "react";
-import { View, Pressable, Dimensions } from "react-native";
+import * as Haptics from "expo-haptics";
+import { useState, useRef } from "react";
+import { View, Pressable, Dimensions, Animated } from "react-native";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
@@ -10,7 +11,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostDetailed } from "@/types";
-import { getTimeSince } from "@/utils/utils";
+import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
 import CommentsModal from "../CommentsModal/CommentsModal";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
@@ -37,9 +38,24 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
 
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
   const handleHeartPress = async (postId: number, liked: boolean) => {
     setLikeLoading(true);
     if (!liked) {
+      Haptics.impactAsync();
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.5,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
       onLike && onLike(postId);
       const { error } = await addLike(postId, authProfile.id);
       if (error) {
@@ -51,6 +67,19 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         });
       }
     } else {
+      Haptics.selectionAsync();
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 0.7,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
       onUnlike && onUnlike(postId);
       const { error } = await removeLike(postId, authProfile.id);
       if (error) {
@@ -113,29 +142,51 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
 
       <View>
         <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8 }}>
-          <Pressable
-            onPress={() => handleHeartPress(post.id, post.liked)}
-            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-            disabled={post.profile.id === authProfile.id || likeLoading}
-            testID="post-like-button"
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <AntDesign
-                name={post.liked ? "heart" : "hearto"}
-                size={20}
-                color={post.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
-              />
-              <Text style={{ fontSize: 18 }}>{post.likes_count}</Text>
-            </View>
-          </Pressable>
+          <View style={{ minWidth: 35 }}>
+            <Pressable
+              onPress={() => handleHeartPress(post.id, post.liked)}
+              style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+              disabled={post.profile.id === authProfile.id || likeLoading}
+              testID="post-like-button"
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+                <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                  <AntDesign
+                    name={post.liked ? "heart" : "hearto"}
+                    size={20}
+                    color={post.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
+                  />
+                </Animated.View>
+                <Text
+                  darkColor={COLORS.zinc[300]}
+                  lightColor={COLORS.zinc[900]}
+                  style={{ fontSize: 16, fontWeight: "400" }}
+                >
+                  {abbreviateNumber(post.likes_count)}
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
           <Pressable
             onPress={() => setCommentsModalVisible(true)}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
             testID="post-comment-button"
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <FontAwesome name="comment-o" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]} />
-              <Text style={{ fontSize: 18 }}>{post.comments_count}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+              <FontAwesome
+                name="comment-o"
+                size={20}
+                color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
+                style={{ marginTop: -1 }}
+              />
+              <Text
+                darkColor={COLORS.zinc[300]}
+                lightColor={COLORS.zinc[900]}
+                style={{ fontSize: 16, fontWeight: "400" }}
+              >
+                {abbreviateNumber(post.comments_count)}
+              </Text>
             </View>
           </Pressable>
         </View>
