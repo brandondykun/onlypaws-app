@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { View, ActivityIndicator, RefreshControl } from "react-native";
 
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
+import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import { POST_HEIGHT } from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
@@ -47,7 +48,12 @@ const FeedScreen = () => {
     </View>
   );
 
-  const emptyComponent = (
+  const emptyComponent = !feed.initialFetchComplete ? (
+    <>
+      <PostSkeleton />
+      <PostSkeleton />
+    </>
+  ) : (
     <View style={{ flex: 1, justifyContent: "center", paddingTop: "50%" }}>
       <Text
         style={{
