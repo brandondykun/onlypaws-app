@@ -12,6 +12,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileDetails as ProfileDetailsType, PostDetailed } from "@/types";
 
 import Button from "../Button/Button";
+import PostTileSkeleton from "../LoadingSkeletons/PostTileSkeleton";
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 
@@ -142,9 +143,7 @@ const ProfileDetails = ({
 
   const emptyComponent =
     postsLoading || postsRefreshing ? (
-      <View style={{ justifyContent: "center", alignItems: "center", marginTop: 48 }}>
-        <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-      </View>
+      <PostTileSkeleton />
     ) : (
       <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
         <Text
@@ -153,6 +152,7 @@ const ProfileDetails = ({
             textAlign: "center",
             paddingHorizontal: 36,
             fontWeight: "300",
+            paddingTop: 96,
           }}
           darkColor={COLORS.zinc[400]}
           lightColor={COLORS.zinc[600]}
