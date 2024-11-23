@@ -14,7 +14,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 
 const AddProfileScreen = () => {
   const { setActiveProfileId, addProfileOption } = useAuthUserContext();
-  const isDarkMode = useColorMode();
+  const { isDarkMode } = useColorMode();
   const router = useRouter();
 
   const [username, setUsername] = useState("");

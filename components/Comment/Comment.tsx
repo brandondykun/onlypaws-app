@@ -19,7 +19,7 @@ type Props = {
 };
 
 const Comment = ({ comment, onLike, onUnlike }: Props) => {
-  const isDarkMode = useColorMode();
+  const { isDarkMode } = useColorMode();
 
   const { authProfile } = useAuthProfileContext();
 

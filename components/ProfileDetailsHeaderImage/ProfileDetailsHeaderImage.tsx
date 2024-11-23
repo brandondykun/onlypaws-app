@@ -15,7 +15,7 @@ type Props = {
 const ProfileDetailsHeaderImage = ({ image }: Props) => {
   const [visible, setVisible] = useState(false);
 
-  const isDarkMode = useColorMode();
+  const { isDarkMode } = useColorMode();
 
   const screenWidth = Dimensions.get("window").width;
   const imageSize = screenWidth - screenWidth / 5;

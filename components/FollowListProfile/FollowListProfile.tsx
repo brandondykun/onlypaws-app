@@ -15,7 +15,7 @@ type Props = {
 const ICON_SIZE = 42;
 
 const FollowListProfile = ({ profile }: Props) => {
-  const isDarkMode = useColorMode();
+  const { isDarkMode } = useColorMode();
 
   return (
     <View
