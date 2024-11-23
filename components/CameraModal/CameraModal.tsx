@@ -121,9 +121,24 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   if (!hasPermission) {
     // Camera permissions are not granted yet.
     content = (
-      <View style={s.requestPermissionsContainer}>
-        <Text style={s.message}>Uh oh! We need your permission to access the camera.</Text>
-        <Button onPress={requestPermission} text="Grant Permission" variant="secondary" />
+      <View
+        style={[s.requestPermissionsContainer, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
+      >
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Text style={s.message}>We can't wait to see your pets!</Text>
+          <Text style={s.message}>But first, we need your permission to access the camera.</Text>
+          <View style={{ alignItems: "center" }}>
+            <Button
+              onPress={requestPermission}
+              text="Grant Permission"
+              variant="text"
+              textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }}
+            />
+          </View>
+        </View>
+        <View style={{ alignItems: "center", paddingBottom: 48 }}>
+          <Button onPress={() => setVisible(false)} text="Cancel" variant="text" />
+        </View>
       </View>
     );
   }
@@ -377,7 +392,6 @@ const s = StyleSheet.create({
   requestPermissionsContainer: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: COLORS.zinc[900],
     paddingHorizontal: 26,
     gap: 24,
   },
@@ -387,9 +401,9 @@ const s = StyleSheet.create({
   },
   message: {
     textAlign: "center",
-    paddingBottom: 10,
-    color: COLORS.zinc[300],
+    paddingBottom: 16,
     fontSize: 18,
+    fontWeight: "300",
   },
   camera: {
     position: "relative",
