@@ -23,7 +23,7 @@ const PostSkeleton = ({ ...props }: Props) => {
 
   return (
     <ContentLoader
-      speed={2}
+      speed={1}
       width={screenWidth}
       height={POST_HEIGHT}
       viewBox={`0 0 ${screenWidth} ${POST_HEIGHT}`}
