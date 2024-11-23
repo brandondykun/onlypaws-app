@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
-import { View, ActivityIndicator, RefreshControl } from "react-native";
+import { View, RefreshControl } from "react-native";
 
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
@@ -41,13 +41,6 @@ const FeedScreen = () => {
     profile.posts.onComment(postId);
   };
 
-  let content = (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
-      <Text>Loading Posts...</Text>
-      <ActivityIndicator color={COLORS.zinc[500]} size="large" />
-    </View>
-  );
-
   const emptyComponent = !feed.initialFetchComplete ? (
     <>
       <PostSkeleton />
@@ -70,8 +63,8 @@ const FeedScreen = () => {
     </View>
   );
 
-  if (feed.initialFetchComplete) {
-    content = (
+  return (
+    <View style={{ flex: 1 }}>
       <FlashList
         data={feed.data}
         showsVerticalScrollIndicator={false}
@@ -109,10 +102,8 @@ const FeedScreen = () => {
         ListEmptyComponent={emptyComponent}
         estimatedItemSize={POST_HEIGHT}
       />
-    );
-  }
-
-  return <View style={{ flex: 1 }}>{content}</View>;
+    </View>
+  );
 };
 
 export default FeedScreen;
