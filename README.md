@@ -76,3 +76,8 @@ maestro test e2e/
 ```bash
 maestro studio 
 ```
+
+### Creating EAS Development Build
+```bash
+eas build --profile development --platform ios --message "With react content loader."
+```
