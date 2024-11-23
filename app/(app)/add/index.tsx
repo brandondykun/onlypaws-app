@@ -1,9 +1,9 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
 import { ScrollView, View, Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
@@ -24,12 +24,25 @@ const AddPostScreen = () => {
   const { addPost } = usePostsContext();
   const { authProfile, updatePostsCount } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
+  const navigation = useNavigation();
 
   const [caption, setCaption] = useState("");
   const [captionError, setCaptionError] = useState("");
   const [images, setImages] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
   const [cameraVisible, setCameraVisible] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // add search button to header
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <Button onPress={resetState} variant="text" text="Clear" />,
+    });
+  });
+
+  const resetState = () => {
+    setImages([]);
+    setCaption("");
+  };
 
   const handleAddPost = async () => {
     setCaptionError("");
