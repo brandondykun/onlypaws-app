@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native";
 import { axiosFetch } from "@/api/config";
 import { getExplorePosts } from "@/api/post";
 import Button from "@/components/Button/Button";
-import EmptyFlatListComponent from "@/components/EmptyFlatListComponent/EmptyFlatListComponent";
+import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -117,6 +117,33 @@ const ExploreScreen = () => {
     </View>
   ) : null;
 
+  const emptyComponent =
+    !initialFetchComplete || (hasInitialFetchError && refreshing) ? (
+      <PostTileSkeleton />
+    ) : hasInitialFetchError ? (
+      <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
+        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
+          There was an error fetching your explore posts. Swipe down to try again.
+        </Text>
+      </View>
+    ) : !refreshing ? (
+      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
+        <Text
+          style={{
+            fontSize: 18,
+            textAlign: "center",
+            paddingHorizontal: 36,
+            fontWeight: "300",
+            paddingTop: 96,
+          }}
+          darkColor={COLORS.zinc[400]}
+          lightColor={COLORS.zinc[600]}
+        >
+          There are no posts to display.
+        </Text>
+      </View>
+    ) : null;
+
   return (
     <View style={{ flex: 1, paddingTop: 8 }}>
       <FlashList
@@ -137,15 +164,7 @@ const ExploreScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        ListEmptyComponent={
-          <EmptyFlatListComponent
-            initialFetchComplete={initialFetchComplete}
-            hasInitialFetchError={hasInitialFetchError}
-            refreshing={refreshing}
-            emptyText1="There are no posts to display."
-            errorText="There was an error fetching explore posts. Swipe down to try again."
-          />
-        }
+        ListEmptyComponent={emptyComponent}
         renderItem={({ item: post, index }) => (
           <PostTile
             post={post}
