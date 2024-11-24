@@ -26,6 +26,7 @@ import { PaginatedPostCommentsResponse, PostCommentDetailed } from "@/types";
 
 import Button from "../Button/Button";
 import Comment from "../Comment/Comment";
+import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
 import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
 import TextInput from "../TextInput/TextInput";
@@ -163,30 +164,17 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
     setCommentText("");
   };
 
-  // default state while initial fetch is running
-  let content = (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 36,
-        backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[100],
-      }}
-    >
-      <ActivityIndicator size="large" color={COLORS.zinc[500]} />
-    </View>
-  );
-
-  // content to show in flat list if data is empty
-  const emptyComponent = hasInitialFetchError ? (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 36 }}>
+  // content to show in flat list if data is empty or loading
+  const emptyComponent = !initialFetchComplete ? (
+    <CommentSkeleton />
+  ) : hasInitialFetchError ? (
+    <View style={{ paddingTop: 96, paddingHorizontal: 36 }}>
       <Text style={{ textAlign: "center", color: COLORS.red[600] }}>
         There was an error fetching those comments. Swipe down to try again.
       </Text>
     </View>
   ) : !refreshing ? (
-    <View style={{ padding: 48, flex: 1, justifyContent: "center", gap: 16 }}>
+    <View style={{ padding: 48, paddingTop: 96, flex: 1, justifyContent: "center", gap: 16 }}>
       <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]} style={{ textAlign: "center", fontSize: 20 }}>
         No comments yet.
       </Text>
@@ -210,32 +198,6 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
     </View>
   ) : null;
 
-  // once initial fetch is complete, show the flat list
-  if (initialFetchComplete) {
-    content = (
-      <FlashList
-        data={comments}
-        keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
-        onEndReached={!fetchNextLoading ? () => fetchNext() : null}
-        ListEmptyComponent={emptyComponent}
-        showsVerticalScrollIndicator={false}
-        refreshing={refreshing}
-        estimatedItemSize={60}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refreshComments}
-            tintColor={COLORS.zinc[400]}
-            colors={[COLORS.zinc[400]]}
-          />
-        }
-        renderItem={({ item }) => <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />}
-        ListFooterComponent={footerComponent}
-      />
-    );
-  }
-
   return (
     <Modal visible={visible} withScroll={false} animationType="slide" transparent={true} raw style={{ flex: 1 }}>
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -255,6 +217,7 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
                 onPress={onClose}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
                 testID="comments-modal-close-button"
+                hitSlop={10}
               >
                 <AntDesign name="close" size={24} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700]} />
               </Pressable>
@@ -269,7 +232,30 @@ const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Pr
             >
               <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold" }}>Comments</Text>
             </View>
-            <View style={{ flex: 1 }}>{content}</View>
+            <View style={{ flex: 1 }}>
+              <FlashList
+                data={comments}
+                keyExtractor={(item) => item.id.toString()}
+                onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+                onEndReached={!fetchNextLoading ? () => fetchNext() : null}
+                ListEmptyComponent={emptyComponent}
+                showsVerticalScrollIndicator={false}
+                refreshing={refreshing}
+                estimatedItemSize={60}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={refreshComments}
+                    tintColor={COLORS.zinc[400]}
+                    colors={[COLORS.zinc[400]]}
+                  />
+                }
+                renderItem={({ item }) => (
+                  <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />
+                )}
+                ListFooterComponent={footerComponent}
+              />
+            </View>
             <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: 8, paddingTop: 8 }}>
               <View style={{ flex: 1 }}>
                 <TextInput
