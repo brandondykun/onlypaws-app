@@ -36,6 +36,7 @@ const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike,
       keyExtractor={(item) => item.id.toString()}
       initialScrollIndex={initialIndex}
       estimatedItemSize={POST_HEIGHT}
+      showsVerticalScrollIndicator={false}
     />
   );
 };

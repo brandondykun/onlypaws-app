@@ -181,6 +181,7 @@ const FollowingScreen = () => {
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={emptyComponent}
+        showsVerticalScrollIndicator={false}
         refreshing={refreshing}
         estimatedItemSize={62}
         onEndReachedThreshold={0.3} // Trigger when 30%

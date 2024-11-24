@@ -183,6 +183,7 @@ const FollowersScreen = () => {
         ListEmptyComponent={emptyComponent}
         refreshing={refreshing}
         estimatedItemSize={62}
+        showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.3} // Trigger when 30%
         onEndReached={searchResults ? searchOnEndReached : onEndReached}
         refreshControl={

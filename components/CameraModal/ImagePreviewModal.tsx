@@ -62,6 +62,7 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
           data={images}
           estimatedItemSize={screenWidth + 30}
           keyExtractor={(item) => getImageUri(item)}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginBottom: 16, marginTop: 8 }} key={getImageUri(item)}>
