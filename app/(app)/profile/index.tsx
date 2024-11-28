@@ -6,7 +6,7 @@ import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -19,9 +19,10 @@ import {
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { addProfileImage, editProfileImage, updateAboutText, updateName } from "@/api/profile";
+import { addProfileImage, editProfileImage, updateProfile, getPetTypeOptions } from "@/api/profile";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
+import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
@@ -39,46 +40,73 @@ const ProfileScreen = () => {
     changeSelectedProfileId,
     selectedProfileId: authUserSelectedProfileId,
   } = useAuthUserContext();
-  const {
-    updateAboutText: updateAbout,
-    updateProfileImage,
-    authProfile,
-    loading: authProfileLoading,
-    updateName: updateAuthProfileName,
-  } = useAuthProfileContext();
+  const { updateProfileImage, authProfile, updateAuthProfile, loading: authProfileLoading } = useAuthProfileContext();
 
   const { isDarkMode } = useColorMode();
 
-  const [showCamera, setShowCamera] = useState(false);
-  const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
-  const [aboutModalVisible, setAboutModalVisible] = useState(false);
-  const [updateNameModalVisible, setUpdateNameModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [changeProfileModalVisible, setChangeProfileModalVisible] = useState(false);
 
+  const [showCamera, setShowCamera] = useState(false);
+  const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
+
   const [aboutText, setAboutText] = useState(authProfile.about ? authProfile.about : "");
-  const [aboutTextLoading, setAboutTextLoading] = useState(false);
   const [profileName, setProfileName] = useState(authProfile.name ? authProfile.name : "");
-  const [updateNameLoading, setUpdateNameLoading] = useState(false);
+  const [breed, setBreed] = useState(authProfile.breed ? authProfile.breed : "");
+  const [petType, setPetType] = useState<{ id: number; title: string; name: string } | null>(null);
+
+  const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
+  const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
 
   const navigation = useNavigation();
   const router = useRouter();
+
+  const fetchPetTypeOptions = useCallback(async () => {
+    const { error, data } = await getPetTypeOptions();
+    if (!error && data) {
+      const formatted = data.map((item) => {
+        return { ...item, title: item.name };
+      });
+      setPetTypeOptions(formatted);
+      const selectedType = authProfile.pet_type?.id;
+      if (selectedType) {
+        const defaultSelected = formatted.find((item) => item.id === selectedType);
+        if (defaultSelected) {
+          setPetType(defaultSelected);
+        }
+      }
+    }
+    // TODO: handle error here
+  }, [authProfile.pet_type?.id]);
+
+  useEffect(() => {
+    fetchPetTypeOptions();
+  }, [fetchPetTypeOptions]);
 
   useEffect(() => {
     if (authProfile) {
       // if auth profile changes, update text that shows in the edit modals
       setAboutText(authProfile.about ? authProfile.about : "");
       setProfileName(authProfile.name ? authProfile.name : "");
+      setBreed(authProfile.breed ? authProfile.breed : "");
+      if (authProfile.pet_type) {
+        setPetType({ ...authProfile.pet_type, title: authProfile.pet_type.name });
+      } else {
+        setPetType(null);
+      }
     }
   }, [authProfile]);
 
-  const handleAboutModalClose = () => {
+  const handleEditModalClose = () => {
     setAboutText(authProfile.about ? authProfile.about : "");
-    setAboutModalVisible(false);
-  };
-
-  const handleNameModalClose = () => {
     setProfileName(authProfile.name ? authProfile.name : "");
-    setUpdateNameModalVisible(false);
+    setBreed(authProfile.breed ? authProfile.breed : "");
+    if (authProfile.pet_type) {
+      setPetType({ ...authProfile.pet_type, title: authProfile.pet_type.name });
+    } else {
+      setPetType(null);
+    }
+    setEditModalVisible(false);
   };
 
   // add search button to header
@@ -153,13 +181,22 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleAboutTextSubmit = async () => {
+  const handleProfileUpdate = async () => {
     if (aboutText && authProfile?.id) {
-      setAboutTextLoading(true);
-      const { error, data } = await updateAboutText(aboutText, authProfile.id);
+      setUpdateProfileLoading(true);
+      const updatedData = {
+        about: aboutText,
+        name: profileName,
+        breed,
+        pet_type: petType ? petType.id : null,
+      };
+      const { error, data } = await updateProfile(updatedData, authProfile.id);
       if (!error && data) {
-        updateAbout(data.about!);
-        setAboutModalVisible(false);
+        setProfileName(data.name);
+        setAboutText(data.about ? data.about : "");
+        setBreed(data.breed ? data.breed : "");
+        updateAuthProfile(data.name, data.about, data.breed, data.pet_type);
+        setEditModalVisible(false);
       } else {
         Toast.show({
           type: "error",
@@ -167,25 +204,7 @@ const ProfileScreen = () => {
           text2: "There was an error updating your about text",
         });
       }
-      setAboutTextLoading(false);
-    }
-  };
-
-  const handleUpdateNameSubmit = async () => {
-    if (profileName && authProfile?.id) {
-      setUpdateNameLoading(true);
-      const { error, data } = await updateName(profileName, authProfile.id);
-      if (!error && data) {
-        updateAuthProfileName(data.name!);
-        setUpdateNameModalVisible(false);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error updating your name",
-        });
-      }
-      setUpdateNameLoading(false);
+      setUpdateProfileLoading(false);
     }
   };
 
@@ -253,43 +272,54 @@ const ProfileScreen = () => {
           <View
             style={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200], borderRadius: 8, padding: 6 }}
           >
-            <View style={{ padding: 16 }}>
+            <View style={{ padding: 16, marginBottom: 8 }}>
               <Text style={s.label}>USERNAME</Text>
               <Text style={{ fontSize: 20 }}>{authProfile.username}</Text>
             </View>
-            <View style={{ padding: 16 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={s.label}>NAME</Text>
-                <Pressable
-                  style={({ pressed }) => [pressed && { opacity: 0.2 }]}
-                  onPress={() => setUpdateNameModalVisible(true)}
-                  hitSlop={10}
-                >
-                  <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
-                </Pressable>
-              </View>
+            <View style={{ padding: 16, marginBottom: 8 }}>
+              <Text style={s.label}>NAME</Text>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: authProfile.name ? 20 : 18,
                   color: authProfile.name ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
                   fontStyle: authProfile.name ? "normal" : "italic",
+                  fontWeight: authProfile.name ? "normal" : "300",
                 }}
               >
-                {authProfile.name ? authProfile.name : "No name"}
+                {authProfile.name ? authProfile.name : "No name entered"}
+              </Text>
+            </View>
+
+            <View style={{ padding: 16, marginBottom: 8 }}>
+              <Text style={s.label}>PET TYPE</Text>
+              <Text
+                style={{
+                  fontSize: authProfile.pet_type ? 20 : 18,
+                  color: authProfile.pet_type ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
+                  fontStyle: authProfile.pet_type ? "normal" : "italic",
+                  fontWeight: authProfile.pet_type ? "normal" : "300",
+                }}
+              >
+                {authProfile.pet_type ? authProfile.pet_type.name : "No pet type selected"}
+              </Text>
+            </View>
+
+            <View style={{ padding: 16, marginBottom: 8 }}>
+              <Text style={s.label}>BREED</Text>
+              <Text
+                style={{
+                  fontSize: authProfile.breed ? 20 : 18,
+                  color: authProfile.breed ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
+                  fontStyle: authProfile.breed ? "normal" : "italic",
+                  fontWeight: authProfile.breed ? "normal" : "300",
+                }}
+              >
+                {authProfile.breed ? authProfile.breed : "No breed entered"}
               </Text>
             </View>
 
             <View style={{ padding: 16 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={s.label}>ABOUT</Text>
-                <Pressable
-                  style={({ pressed }) => [pressed && { opacity: 0.2 }]}
-                  onPress={() => setAboutModalVisible(true)}
-                  hitSlop={10}
-                >
-                  <Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
-                </Pressable>
-              </View>
+              <Text style={s.label}>ABOUT</Text>
               {authProfile.about ? (
                 <Text style={{ fontSize: 20 }}>{authProfile.about}</Text>
               ) : (
@@ -303,8 +333,17 @@ const ProfileScreen = () => {
               )}
             </View>
           </View>
+          <View style={{ alignItems: "flex-end", paddingRight: 4 }}>
+            <Button
+              text="Edit"
+              icon={<Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />}
+              onPress={() => setEditModalVisible(true)}
+              hitSlop={10}
+              variant="text"
+            />
+          </View>
         </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <View style={{ flex: 1, justifyContent: "flex-end", marginTop: 48 }}>
           <Button text="Log Out" onPress={logOut} />
         </View>
       </ScrollView>
@@ -317,8 +356,8 @@ const ProfileScreen = () => {
         onSavePress={handleSavePress}
       />
       <Modal
-        visible={aboutModalVisible}
-        onRequestClose={handleAboutModalClose}
+        visible={editModalVisible}
+        onRequestClose={handleEditModalClose}
         animationType="slide"
         raw
         transparent={true}
@@ -327,57 +366,51 @@ const ProfileScreen = () => {
       >
         <Pressable
           style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={handleAboutModalClose}
+          onPress={handleEditModalClose}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <Pressable onPress={(e) => e.stopPropagation()}>
               <View
                 style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
+                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
                   paddingBottom: 48,
-                  paddingTop: 32,
+                  paddingTop: 16,
                   borderTopRightRadius: 25,
                   borderTopLeftRadius: 25,
                   paddingHorizontal: 24,
                 }}
               >
-                <Text>About</Text>
-                <TextInput value={aboutText} onChangeText={(val) => setAboutText(val)} multiline />
-                <Button text="Submit" onPress={handleAboutTextSubmit} loading={aboutTextLoading} />
-              </View>
-            </Pressable>
-          </KeyboardAvoidingView>
-        </Pressable>
-      </Modal>
-
-      <Modal
-        visible={updateNameModalVisible}
-        onRequestClose={handleNameModalClose}
-        animationType="slide"
-        raw
-        transparent={true}
-        withScroll={false}
-        style={{ flex: 1, alignItems: "flex-end" }}
-      >
-        <Pressable
-          style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={handleNameModalClose}
-        >
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <View
-                style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
-                  paddingBottom: 48,
-                  paddingTop: 32,
-                  borderTopRightRadius: 25,
-                  borderTopLeftRadius: 25,
-                  paddingHorizontal: 24,
-                }}
-              >
-                <Text>Name</Text>
-                <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} />
-                <Button text="Submit" onPress={handleUpdateNameSubmit} loading={updateNameLoading} />
+                <View style={s.header}>
+                  <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold" }}>Edit Profile</Text>
+                </View>
+                <View>
+                  <Text>Name</Text>
+                  <TextInput
+                    value={profileName}
+                    onChangeText={(val) => setProfileName(val)}
+                    placeholder="ex: Charlie"
+                  />
+                </View>
+                <View>
+                  <Text>About</Text>
+                  <TextInput value={aboutText} onChangeText={(val) => setAboutText(val)} multiline numberOfLines={5} />
+                </View>
+                <View>
+                  <Text>Breed</Text>
+                  <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
+                </View>
+                <View>
+                  <Text>Pet Type</Text>
+                  <DropdownSelect
+                    defaultText="Select a pet type"
+                    defaultValue={petType ? petType : null}
+                    data={petTypeOptions || []}
+                    onSelect={(selectedItem) => setPetType(selectedItem)}
+                  />
+                </View>
+                <View style={{ marginTop: 36 }}>
+                  <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
+                </View>
               </View>
             </Pressable>
           </KeyboardAvoidingView>
@@ -502,10 +535,15 @@ const s = StyleSheet.create({
     fontSize: 16,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
     color: COLORS.zinc[500],
     letterSpacing: 0.5,
-    paddingBottom: 6,
+    paddingBottom: 4,
+  },
+  header: {
+    paddingTop: 2,
+    paddingBottom: 12,
+    marginBottom: 12,
   },
 });

@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { getProfileDetails } from "@/api/profile";
-import { ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { PetType, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
 
 import { useAuthUserContext } from "./AuthUserContext";
 
@@ -15,6 +15,7 @@ type AuthProfileContextType = {
   addFollowing: () => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
+  updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => void;
   refetch: () => Promise<void>;
   refreshing: boolean;
 };
@@ -30,6 +31,8 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
     posts_count: 0,
     followers_count: 0,
     following_count: 0,
+    breed: "",
+    pet_type: null,
   },
   loading: false,
   updateProfileImage: (image: ProfileImage) => {},
@@ -38,6 +41,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   addFollowing: () => {},
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
   updateName: (name: string) => {},
+  updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => {},
   refetch: () => Promise.resolve(),
   refreshing: false,
 });
@@ -56,6 +60,8 @@ const defaultProfile = {
   posts_count: 0,
   followers_count: 0,
   following_count: 0,
+  breed: "",
+  pet_type: null,
 };
 
 const AuthProfileContextProvider = ({ children }: Props) => {
@@ -113,6 +119,12 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     });
   };
 
+  const updateAuthProfile = (name: string, about: string | null, breed: string | null, petType: PetType | null) => {
+    setAuthProfile((prev) => {
+      return { ...prev, name: name, about: about, breed: breed, pet_type: petType };
+    });
+  };
+
   const removeFollowing = () => {
     setAuthProfile((prev) => {
       return {
@@ -156,6 +168,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     addFollowing,
     updatePostsCount,
     updateName,
+    updateAuthProfile,
     refetch: refreshProfile,
     refreshing,
   };
@@ -175,6 +188,7 @@ export const useAuthProfileContext = () => {
     addFollowing,
     updatePostsCount,
     updateName,
+    updateAuthProfile,
     refetch,
     refreshing,
   } = useContext(AuthProfileContext);
@@ -187,6 +201,7 @@ export const useAuthProfileContext = () => {
     addFollowing,
     updatePostsCount,
     updateName,
+    updateAuthProfile,
     refetch,
     refreshing,
   };

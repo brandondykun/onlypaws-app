@@ -58,14 +58,9 @@ export const editProfileImage = async (imageId: number, postData: FormData, acce
   return await axiosPatch<ProfileImage>(url, postData, config);
 };
 
-export const updateAboutText = async (text: string, profileId: number) => {
+export const updateProfile = async (data: any, profileId: number) => {
   const url = `/v1/auth/profile/${profileId}/`;
-  return await axiosPatch<Profile>(url, { about: text });
-};
-
-export const updateName = async (text: string, profileId: number) => {
-  const url = `/v1/auth/profile/${profileId}/`;
-  return await axiosPatch<Profile>(url, { name: text });
+  return await axiosPatch<Profile>(url, data);
 };
 
 export const createProfile = async (username: string, about: string, name: string) => {
@@ -91,4 +86,9 @@ export const searchFollowers = async (profileId: number, username: string) => {
 export const searchFollowing = async (profileId: number, username: string) => {
   const url = `/v1/profile/${profileId}/following/?username=${username}`;
   return await axiosFetch<PaginatedProfileResponse>(url);
+};
+
+export const getPetTypeOptions = async () => {
+  const url = `/v1/auth/pet-type-options/`;
+  return await axiosFetch<{ id: number; name: string }[]>(url);
 };

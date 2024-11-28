@@ -16,7 +16,6 @@ export type User = {
 export type ProfileOption = {
   id: number;
   username: string;
-  // default: boolean;
 };
 
 export type ProfileImage = {
@@ -27,20 +26,25 @@ export type ProfileImage = {
   updated_at: string;
 };
 
+export type PetType = {
+  id: number;
+  name: string;
+};
+
 export type Profile = {
   id: null | number;
   username: null | string;
   about: null | string;
-  // user: null | number;
   image: null | ProfileImage;
   name: string;
+  pet_type: PetType | null;
+  breed: string | null;
 };
 
 export type SearchedProfile = {
   id: number;
   username: string;
   about: string;
-  // user: number;
   is_following: boolean;
   image: ProfileImage | null;
   name: string;
@@ -129,6 +133,8 @@ export type ProfileDetails = {
   posts_count: number;
   followers_count: number;
   following_count: number;
+  pet_type: PetType | null;
+  breed: string | null;
 };
 
 export type PaginatedExploreResponse = {
