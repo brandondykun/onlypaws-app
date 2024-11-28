@@ -111,21 +111,21 @@ const RegisterScreen = () => {
       </View>
       <View style={s.inputsContainer}>
         <TextInput
-          label="Username"
-          value={username}
-          onChangeText={setUsername}
-          error={usernameError}
-          placeholder="AwesomeUsername"
-          icon={<Feather name="user" size={20} color={COLORS.zinc[500]} />}
-          autoCapitalize="none"
-        />
-        <TextInput
           label="Email"
           value={email}
           onChangeText={setEmail}
           error={emailError}
           placeholder="youremail@email.com"
           icon={<Ionicons name="at-sharp" size={20} color={COLORS.zinc[500]} />}
+          autoCapitalize="none"
+        />
+        <TextInput
+          label="Username"
+          value={username}
+          onChangeText={setUsername}
+          error={usernameError}
+          placeholder="AwesomeUsername"
+          icon={<Feather name="user" size={20} color={COLORS.zinc[500]} />}
           autoCapitalize="none"
         />
         <TextInput
