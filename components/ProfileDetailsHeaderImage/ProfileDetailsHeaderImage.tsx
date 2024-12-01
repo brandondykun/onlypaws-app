@@ -1,5 +1,6 @@
+import { BlurView } from "expo-blur";
 import { useState } from "react";
-import { View, Dimensions, Pressable } from "react-native";
+import { View, Dimensions, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useColorMode } from "@/context/ColorModeContext";
@@ -43,21 +44,13 @@ const ProfileDetailsHeaderImage = ({ image }: Props) => {
         animationType="fade"
       >
         <Pressable style={{ flex: 1 }} onPress={handleClose}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: isDarkMode ? "#09090bb5" : "#18181bd4",
-              position: "relative",
-            }}
-          >
+          <BlurView intensity={10} style={[s.blurView, { backgroundColor: isDarkMode ? "#09090bb5" : "#18181bd4" }]}>
             <GestureHandlerRootView style={{ height: imageSize }}>
               <Pressable onPress={(e) => e.stopPropagation()}>
                 <ProfileImage image={image} size={imageSize} />
               </Pressable>
             </GestureHandlerRootView>
-          </View>
+          </BlurView>
         </Pressable>
       </Modal>
     </View>
@@ -65,3 +58,12 @@ const ProfileDetailsHeaderImage = ({ image }: Props) => {
 };
 
 export default ProfileDetailsHeaderImage;
+
+const s = StyleSheet.create({
+  blurView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+});
