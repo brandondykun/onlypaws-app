@@ -4,12 +4,12 @@ import { Image } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { Profile } from "@/types";
+import { FollowProfile } from "@/types";
 
 import Text from "../Text/Text";
 
 type Props = {
-  profile: Profile;
+  profile: FollowProfile;
 };
 
 const ICON_SIZE = 42;
