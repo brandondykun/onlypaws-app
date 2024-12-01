@@ -1,4 +1,3 @@
-import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { useState } from "react";
 import { View, Dimensions, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -54,11 +53,9 @@ const ProfileDetailsHeaderImage = ({ image }: Props) => {
             }}
           >
             <GestureHandlerRootView style={{ height: imageSize }}>
-              <Zoomable>
-                <Pressable onPress={(e) => e.stopPropagation()}>
-                  <ProfileImage image={image} size={imageSize} />
-                </Pressable>
-              </Zoomable>
+              <Pressable onPress={(e) => e.stopPropagation()}>
+                <ProfileImage image={image} size={imageSize} />
+              </Pressable>
             </GestureHandlerRootView>
           </View>
         </Pressable>
