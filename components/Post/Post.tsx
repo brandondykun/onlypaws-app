@@ -1,7 +1,8 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { View, Pressable, Dimensions, Animated } from "react-native";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
@@ -32,13 +33,13 @@ type Props = {
 };
 
 const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: Props) => {
-  const [commentsModalVisible, setCommentsModalVisible] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
 
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const handleHeartPress = async (postId: number, liked: boolean) => {
     setLikeLoading(true);
@@ -97,6 +98,9 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   const addComment = () => {
     onComment && onComment(post.id);
   };
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
 
   return (
     <View key={post.id} style={{ minHeight: POST_HEIGHT }}>
@@ -169,7 +173,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           </View>
 
           <Pressable
-            onPress={() => setCommentsModalVisible(true)}
+            onPress={handlePresentModalPress}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
             testID="post-comment-button"
           >
@@ -197,12 +201,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           </Text>
         </View>
       </View>
-      <CommentsModal
-        visible={commentsModalVisible}
-        onRequestClose={() => setCommentsModalVisible(false)}
-        postId={post.id}
-        addCommentToPost={addComment}
-      />
+      <CommentsModal postId={post.id} addCommentToPost={addComment} ref={bottomSheetModalRef} />
     </View>
   );
 };

@@ -1,19 +1,10 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { FlashList } from "@shopify/flash-list";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { BottomSheetModal as RNBottomSheetModal, BottomSheetView, BottomSheetFlashList } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
-import { useEffect, useState, useCallback, useRef } from "react";
-import {
-  NativeSyntheticEvent,
-  View,
-  Pressable,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  RefreshControl,
-  Animated,
-  GestureResponderEvent,
-} from "react-native";
+import { useState, useCallback, forwardRef, ForwardedRef, useRef } from "react";
+import { View, Pressable, ActivityIndicator, StyleSheet, RefreshControl, Platform, Keyboard } from "react-native";
+import { TextInput as RNGHTestInput } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
 import { axiosFetch } from "@/api/config";
@@ -24,276 +15,262 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PaginatedPostCommentsResponse, PostCommentDetailed } from "@/types";
 
+import BottomSheetModal, { BottomSheetTextInput } from "../BottomSheet/BottomSheet";
+import { DARK_BORDER_COLOR } from "../BottomSheet/BottomSheet";
 import Button from "../Button/Button";
 import Comment from "../Comment/Comment";
 import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
-import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
-import TextInput from "../TextInput/TextInput";
 
 type Props = {
-  visible: boolean;
-  onRequestClose: ((event: NativeSyntheticEvent<any>) => void) | undefined;
   addCommentToPost: (comment: PostCommentDetailed) => void;
   postId: number | null;
 };
 
-const CommentsModal = ({ visible, onRequestClose, addCommentToPost, postId }: Props) => {
-  // form state
-  const [commentText, setCommentText] = useState("");
-  const [addCommentLoading, setAddCommentLoading] = useState(false);
-  // fetching data state
-  const [comments, setComments] = useState<PostCommentDetailed[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
+const CommentsModal = forwardRef(
+  ({ addCommentToPost, postId }: Props, ref: ForwardedRef<RNBottomSheetModal<any>> | undefined) => {
+    // form state
+    const [addCommentLoading, setAddCommentLoading] = useState(false);
+    // fetching data state
+    const [comments, setComments] = useState<PostCommentDetailed[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
+    const [initialFetchComplete, setInitialFetchComplete] = useState(false);
+    const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
+    const [fetchNextLoading, setFetchNextLoading] = useState(false);
+    const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
-  const { isDarkMode } = useColorMode();
-  const { authProfile } = useAuthProfileContext();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+    const { isDarkMode } = useColorMode();
+    const { authProfile } = useAuthProfileContext();
+    const commentInputRef = useRef<RNGHTestInput>(null);
+    const inputValueRef = useRef("");
 
-  const handleLikeComment = (commentId: number) => {
-    setComments((prev) =>
-      prev.map((comment) => {
-        if (comment.id === commentId) {
-          return { ...comment, liked: true, likes_count: comment.likes_count + 1 };
-        }
-        return comment;
-      }),
-    );
-  };
-
-  const handleUnlikeComment = (commentId: number) => {
-    setComments((prev) =>
-      prev.map((comment) => {
-        if (comment.id === commentId) {
-          return { ...comment, liked: false, likes_count: comment.likes_count - 1 };
-        }
-        return comment;
-      }),
-    );
-  };
-
-  useEffect(() => {
-    if (visible) {
-      Animated.timing(fadeAnim, {
-        toValue: 0.5,
-        duration: 400, // Adjust duration as needed
-        useNativeDriver: true,
-        delay: isDarkMode ? 100 : 200,
-      }).start();
-    }
-
-    return () => {
-      fadeAnim.setValue(0);
+    const handleLikeComment = (commentId: number) => {
+      setComments((prev) =>
+        prev.map((comment) => {
+          if (comment.id === commentId) {
+            return { ...comment, liked: true, likes_count: comment.likes_count + 1 };
+          }
+          return comment;
+        }),
+      );
     };
-  }, [fadeAnim, visible, isDarkMode]);
 
-  // initial fetch or refresh fetch if initial fetch fails
-  const fetchComments = useCallback(async () => {
-    if (postId) {
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { error, data } = await getPostComments(postId);
-      if (!error && data) {
-        setComments(data.results);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasInitialFetchError(true);
+    const handleUnlikeComment = (commentId: number) => {
+      setComments((prev) =>
+        prev.map((comment) => {
+          if (comment.id === commentId) {
+            return { ...comment, liked: false, likes_count: comment.likes_count - 1 };
+          }
+          return comment;
+        }),
+      );
+    };
+
+    // initial fetch or refresh fetch if initial fetch fails
+    const fetchComments = useCallback(async () => {
+      if (postId) {
+        setHasInitialFetchError(false);
+        setHasFetchNextError(false);
+        const { error, data } = await getPostComments(postId);
+        if (!error && data) {
+          setComments(data.results);
+          setFetchNextUrl(data.next);
+        } else {
+          setHasInitialFetchError(true);
+        }
+        setInitialFetchComplete(true);
+        setRefreshing(false);
       }
-      setInitialFetchComplete(true);
+    }, [postId]);
+
+    // refresh comments fetch if user swipes down
+    const refreshComments = async () => {
+      setRefreshing(true);
+      Haptics.impactAsync();
+      await fetchComments();
       setRefreshing(false);
-    }
-  }, [postId]);
+    };
 
-  // refresh comments fetch if user swipes down
-  const refreshComments = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchComments();
-    setRefreshing(false);
-  };
+    // fetch comments when modal is opened
+    const handleSheetChanges = useCallback(
+      (index: number) => {
+        if (index > -1) {
+          fetchComments();
+        }
+      },
+      [fetchComments],
+    );
 
-  // perform initial comments fetch
-  useEffect(() => {
-    if (visible) {
-      fetchComments();
-    }
-  }, [postId, visible, fetchComments]);
-
-  // fetch next paginated list of comments
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedPostCommentsResponse>(fetchNextUrl);
-      if (!error && data) {
-        setComments((prev) => [...prev, ...data.results]);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasFetchNextError(true);
+    // fetch next paginated list of comments
+    const fetchNext = useCallback(async () => {
+      if (fetchNextUrl) {
+        setFetchNextLoading(true);
+        setHasFetchNextError(false);
+        const { error, data } = await axiosFetch<PaginatedPostCommentsResponse>(fetchNextUrl);
+        if (!error && data) {
+          setComments((prev) => [...prev, ...data.results]);
+          setFetchNextUrl(data.next);
+        } else {
+          setHasFetchNextError(true);
+        }
+        setFetchNextLoading(false);
       }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl]);
+    }, [fetchNextUrl]);
 
-  const handleAddComment = async () => {
-    if (postId && commentText) {
-      setAddCommentLoading(true);
-      const { error, data } = await addComment(postId, commentText, authProfile.id);
-      if (!error && data) {
-        setComments((prev) => [data, ...prev]);
-        setCommentText("");
-        addCommentToPost(data);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error adding that comment.",
-        });
+    const handleAddComment = useCallback(async () => {
+      if (postId && inputValueRef.current) {
+        setAddCommentLoading(true);
+        const { error, data } = await addComment(postId, inputValueRef.current, authProfile.id);
+        if (!error && data) {
+          setComments((prev) => [data, ...prev]);
+          addCommentToPost(data);
+          Keyboard.dismiss();
+          commentInputRef.current?.clear();
+          inputValueRef.current = "";
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "There was an error adding that comment.",
+          });
+        }
+        setAddCommentLoading(false);
       }
-      setAddCommentLoading(false);
-    }
-  };
+    }, [addCommentToPost, authProfile.id, postId]);
 
-  const onClose = (e: GestureResponderEvent) => {
-    onRequestClose && onRequestClose(e);
-    setCommentText("");
-  };
+    const onClose = useCallback(() => {
+      commentInputRef.current?.clear();
+      inputValueRef.current = "";
+    }, []);
 
-  // content to show in flat list if data is empty or loading
-  const emptyComponent = !initialFetchComplete ? (
-    <CommentSkeleton />
-  ) : hasInitialFetchError ? (
-    <View style={{ paddingTop: 96, paddingHorizontal: 36 }}>
-      <Text style={{ textAlign: "center", color: COLORS.red[600] }}>
-        There was an error fetching those comments. Swipe down to try again.
-      </Text>
-    </View>
-  ) : !refreshing ? (
-    <View style={{ padding: 48, paddingTop: 96, flex: 1, justifyContent: "center", gap: 16 }}>
-      <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]} style={{ textAlign: "center", fontSize: 20 }}>
-        No comments yet.
-      </Text>
-      <Text style={{ color: COLORS.zinc[500], textAlign: "center", fontSize: 18, fontWeight: "300" }}>
-        Add a comment to start the conversation!
-      </Text>
-    </View>
-  ) : null;
-
-  // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
-    <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-      <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-    </View>
-  ) : hasFetchNextError ? (
-    <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
-      <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
-        Oh no! There was an error fetching more comments.
-      </Text>
-      <Button text="Retry" variant="text" onPress={() => fetchNext()} />
-    </View>
-  ) : null;
-
-  return (
-    <Modal visible={visible} withScroll={false} animationType="slide" transparent={true} raw style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-          <Animated.View style={[s.backgroundOpacity, { opacity: fadeAnim }]} />
-          <Pressable style={{ flex: 1 }} onPress={onClose} />
-          <View
-            style={[
-              s.modalContent,
-              {
-                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[100],
-              },
-            ]}
+    // content to show in flat list if data is empty or loading
+    const emptyComponent =
+      !initialFetchComplete || refreshing ? (
+        <CommentSkeleton />
+      ) : hasInitialFetchError ? (
+        <View style={{ paddingTop: 96, paddingHorizontal: 36 }}>
+          <Text style={{ textAlign: "center", fontSize: 16, color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600] }}>
+            There was an error fetching those comments.
+          </Text>
+          <View style={{ paddingTop: 24, alignItems: "center" }}>
+            <Button
+              text="Retry"
+              variant="text"
+              icon={
+                <Ionicons name="refresh-sharp" size={20} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
+              }
+              onPress={refreshComments}
+            />
+          </View>
+        </View>
+      ) : !refreshing ? (
+        <View style={{ padding: 48, paddingTop: 96, flex: 1, justifyContent: "center", gap: 16 }}>
+          <Text
+            darkColor={COLORS.zinc[400]}
+            lightColor={COLORS.zinc[700]}
+            style={{ textAlign: "center", fontSize: 20 }}
           >
-            <View style={{ position: "absolute", right: 12, top: 12, zIndex: 4 }}>
-              <Pressable
-                onPress={onClose}
-                style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-                testID="comments-modal-close-button"
-                hitSlop={10}
-              >
-                <AntDesign name="close" size={24} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700]} />
-              </Pressable>
-            </View>
-            <View
-              style={[
-                s.header,
-                {
-                  borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200],
-                },
-              ]}
-            >
-              <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold" }}>Comments</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <FlashList
-                data={comments}
-                keyExtractor={(item) => item.id.toString()}
-                onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-                onEndReached={!fetchNextLoading ? () => fetchNext() : null}
-                ListEmptyComponent={emptyComponent}
-                showsVerticalScrollIndicator={false}
+            No comments yet.
+          </Text>
+          <Text style={{ color: COLORS.zinc[500], textAlign: "center", fontSize: 18, fontWeight: "300" }}>
+            Add a comment to start the conversation!
+          </Text>
+        </View>
+      ) : null;
+
+    // content to be displayed in the footer
+    const footerComponent = fetchNextLoading ? (
+      <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
+        <ActivityIndicator color={COLORS.zinc[500]} size="small" />
+      </View>
+    ) : hasFetchNextError ? (
+      <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
+        <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
+          Oh no! There was an error fetching more comments.
+        </Text>
+        <Button text="Retry" variant="text" onPress={() => fetchNext()} />
+      </View>
+    ) : null;
+
+    return (
+      <BottomSheetModal ref={ref} onChange={handleSheetChanges} onDismiss={onClose} handleTitle="Comments">
+        <BottomSheetView style={{ flex: 1 }}>
+          <BottomSheetFlashList
+            data={comments}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            keyExtractor={(item) => item.id.toString()}
+            onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+            onEndReached={!fetchNextLoading ? () => fetchNext() : null}
+            ListEmptyComponent={emptyComponent}
+            showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            estimatedItemSize={60}
+            refreshControl={
+              <RefreshControl
                 refreshing={refreshing}
-                estimatedItemSize={60}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={refreshComments}
-                    tintColor={COLORS.zinc[400]}
-                    colors={[COLORS.zinc[400]]}
-                  />
-                }
-                renderItem={({ item }) => (
-                  <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />
-                )}
-                ListFooterComponent={footerComponent}
+                onRefresh={refreshComments}
+                tintColor={COLORS.zinc[400]}
+                colors={[COLORS.zinc[400]]}
+              />
+            }
+            renderItem={({ item }) => (
+              <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />
+            )}
+            ListFooterComponent={footerComponent}
+          />
+          <View
+            style={{
+              paddingHorizontal: 16,
+              flexDirection: "row",
+              gap: 8,
+              paddingTop: 12,
+              alignItems: "center",
+              paddingBottom: Platform.OS === "ios" ? 24 : 18,
+              borderTopColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
+              borderTopWidth: 1,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <BottomSheetTextInput
+                placeholder="Add comment..."
+                ref={commentInputRef}
+                defaultValue={inputValueRef.current}
+                onChangeText={(text) => (inputValueRef.current = text)}
               />
             </View>
-            <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: 8, paddingTop: 8 }}>
-              <View style={{ flex: 1 }}>
-                <TextInput
-                  placeholder="Add comment..."
-                  value={commentText}
-                  onChangeText={setCommentText}
-                  inputStyle={{ borderRadius: 25, paddingHorizontal: 16 }}
-                  placeholderTextColor={COLORS.zinc[500]}
-                />
+            <Pressable
+              style={({ pressed }) => [{ opacity: pressed || addCommentLoading ? 0.5 : 1 }]}
+              onPress={handleAddComment}
+              disabled={addCommentLoading}
+              testID="add-comment-button"
+            >
+              <View style={s.addCommentButton}>
+                {!addCommentLoading ? (
+                  <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
+                ) : (
+                  <ActivityIndicator size="small" color={COLORS.zinc[200]} />
+                )}
               </View>
-              <Pressable
-                style={({ pressed }) => [
-                  { paddingTop: 6, opacity: pressed || addCommentLoading || !commentText ? 0.5 : 1 },
-                ]}
-                onPress={handleAddComment}
-                disabled={addCommentLoading}
-                testID="add-comment-button"
-              >
-                <View style={s.addCommentButton}>
-                  {!addCommentLoading ? (
-                    <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
-                  ) : (
-                    <ActivityIndicator size="small" color={COLORS.zinc[200]} />
-                  )}
-                </View>
-              </Pressable>
-            </View>
+            </Pressable>
           </View>
-        </KeyboardAvoidingView>
-      </View>
-      <Toast config={toastConfig} />
-    </Modal>
-  );
-};
+        </BottomSheetView>
+        <Toast config={toastConfig} />
+      </BottomSheetModal>
+    );
+  },
+);
 
+CommentsModal.displayName = "CommentsModal";
 export default CommentsModal;
 
 const s = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "grey",
+  },
   backgroundOpacity: {
     position: "absolute",
     top: 0,
@@ -315,11 +292,6 @@ const s = StyleSheet.create({
     paddingBottom: 16,
     paddingTop: 16,
     position: "relative",
-  },
-  header: {
-    paddingTop: 2,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
   },
   addCommentButton: {
     justifyContent: "center",

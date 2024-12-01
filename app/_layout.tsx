@@ -1,6 +1,8 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import { useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
 import { toastConfig } from "@/config/ToastConfig";
@@ -18,29 +20,33 @@ const RootLayout = () => {
   SystemUI.setBackgroundColorAsync(isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50]);
 
   return (
-    <AuthUserContextProvider>
-      <AuthProfileContextProvider>
-        <ColorModeContextProvider>
-          <AuthInterceptor>
-            <Stack
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                },
-                headerShadowVisible: false, // applied here
-                contentStyle: {
-                  backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                },
-              }}
-            >
-              <Stack.Screen name="auth" options={{ title: "", headerShown: false }} />
-              <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false }} />
-            </Stack>
-            <Toast config={toastConfig} />
-          </AuthInterceptor>
-        </ColorModeContextProvider>
-      </AuthProfileContextProvider>
-    </AuthUserContextProvider>
+    <GestureHandlerRootView>
+      <AuthUserContextProvider>
+        <AuthProfileContextProvider>
+          <ColorModeContextProvider>
+            <AuthInterceptor>
+              <BottomSheetModalProvider>
+                <Stack
+                  screenOptions={{
+                    headerStyle: {
+                      backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                    },
+                    headerShadowVisible: false, // applied here
+                    contentStyle: {
+                      backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                    },
+                  }}
+                >
+                  <Stack.Screen name="auth" options={{ title: "", headerShown: false }} />
+                  <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false }} />
+                </Stack>
+                <Toast config={toastConfig} />
+              </BottomSheetModalProvider>
+            </AuthInterceptor>
+          </ColorModeContextProvider>
+        </AuthProfileContextProvider>
+      </AuthUserContextProvider>
+    </GestureHandlerRootView>
   );
 };
 
