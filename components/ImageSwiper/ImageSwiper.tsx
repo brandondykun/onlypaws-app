@@ -1,4 +1,3 @@
-import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { useState } from "react";
 import { StyleProp, ImageStyle, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -33,9 +32,7 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
         {images.map((image, i) => {
           return (
             <GestureHandlerRootView key={i}>
-              <Zoomable>
-                <ImageLoader uri={image.image} height={imageHeight} width={imageWidth} style={imageStyle} />
-              </Zoomable>
+              <ImageLoader uri={image.image} height={imageHeight} width={imageWidth} style={imageStyle} />
             </GestureHandlerRootView>
           );
         })}
