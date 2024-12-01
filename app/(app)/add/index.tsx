@@ -1,4 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
@@ -25,6 +26,7 @@ const AddPostScreen = () => {
   const { authProfile, updatePostsCount } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
   const navigation = useNavigation();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const [caption, setCaption] = useState("");
   const [captionError, setCaptionError] = useState("");
@@ -104,7 +106,10 @@ const AddPostScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: 16 }} automaticallyAdjustKeyboardInsets={true}>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight }}
+      automaticallyAdjustKeyboardInsets={true}
+    >
       <View style={{ marginBottom: 12, paddingLeft: 16 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
           Add your images

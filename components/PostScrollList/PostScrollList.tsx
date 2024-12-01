@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useRef } from "react";
 
@@ -18,11 +19,13 @@ type Props = {
 
 const PostScrollList = ({ posts, setPosts, initialIndex, onProfilePress, onLike, onUnlike, onComment }: Props) => {
   const flatListRef = useRef<FlashList<PostDetailed>>(null);
+  const tabBarHeight = useBottomTabBarHeight();
 
   return (
     <FlashList
       ref={flatListRef}
       data={posts}
+      contentContainerStyle={{ paddingBottom: tabBarHeight }}
       renderItem={({ item }) => (
         <Post
           post={item}

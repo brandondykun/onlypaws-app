@@ -2,6 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
@@ -43,6 +44,7 @@ const ProfileScreen = () => {
   const { updateProfileImage, authProfile, updateAuthProfile, loading: authProfileLoading } = useAuthProfileContext();
 
   const { isDarkMode } = useColorMode();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [changeProfileModalVisible, setChangeProfileModalVisible] = useState(false);
@@ -214,7 +216,10 @@ const ProfileScreen = () => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 18 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View>
           <View style={{ marginBottom: 36 }}>
             <Pressable style={({ pressed }) => [pressed && { opacity: 0.7 }]} onPress={() => setShowCamera(true)}>

@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
 import { useLayoutEffect, useState } from "react";
@@ -60,6 +61,7 @@ const ProfileDetails = ({
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
   const screenWidth = Dimensions.get("window").width;
+  const tabBarHeight = useBottomTabBarHeight();
 
   const { authProfile, addFollowing, removeFollowing } = useAuthProfileContext();
   const [followLoading, setFollowLoading] = useState(false);
@@ -189,6 +191,7 @@ const ProfileDetails = ({
       onEndReached={!fetchNextLoading ? () => fetchNext() : null}
       ListEmptyComponent={emptyComponent}
       estimatedItemSize={screenWidth / 3}
+      contentContainerStyle={{ paddingBottom: tabBarHeight }}
       ListHeaderComponentStyle={{
         borderBottomWidth: 1,
         borderBottomColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],

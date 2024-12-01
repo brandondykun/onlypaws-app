@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
 import { useLayoutEffect } from "react";
@@ -20,6 +21,7 @@ const ProfileSearchScreen = () => {
   const search = useProfileSearchContext();
   const { addFollowing, removeFollowing, authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
+  const tabBarHeight = useBottomTabBarHeight();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -108,7 +110,7 @@ const ProfileSearchScreen = () => {
   if (search.initialFetchComplete) {
     content = (
       <FlashList
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
         data={search.data}
         keyExtractor={(item) => item.id.toString()}
         estimatedItemSize={61}

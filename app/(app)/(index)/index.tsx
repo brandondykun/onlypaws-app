@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
 import { View, RefreshControl } from "react-native";
@@ -14,6 +15,7 @@ import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
   const profile = useProfileDetailsContext(); // selected profile in this stack
+  const tabBarHeight = useBottomTabBarHeight();
 
   const handleProfilePress = (profileId: number | string) => {
     profile.setProfileId(Number(profileId));
@@ -69,6 +71,7 @@ const FeedScreen = () => {
         data={feed.data}
         showsVerticalScrollIndicator={false}
         refreshing={feed.refreshing}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
         refreshControl={
           <RefreshControl
             refreshing={feed.refreshing}

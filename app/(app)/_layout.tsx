@@ -2,10 +2,11 @@ import Feather from "@expo/vector-icons/Feather";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
+import { BlurView } from "expo-blur";
 import { Tabs, Redirect } from "expo-router";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
 import React from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -39,12 +40,31 @@ const TabLayout = () => {
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-          tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[400],
+          tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
           tabBarStyle: {
-            backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-            borderTopColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+            borderTopWidth: 0,
+            elevation: 0,
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            left: 0,
+            backgroundColor: "transparent",
           },
           headerShadowVisible: false, // applied here
+          tabBarBackground: () => {
+            // only show blur view on ios
+            if (Platform.OS === "ios") {
+              return (
+                <BlurView
+                  style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
+                  intensity={isDarkMode ? 20 : 10}
+                  tint="dark"
+                />
+              );
+            } else {
+              return <View style={{ flex: 1, backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }} />;
+            }
+          },
         }}
         sceneContainerStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}
       >

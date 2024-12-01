@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
@@ -26,6 +27,7 @@ const ExploreScreen = () => {
 
   const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const { explorePosts, setExplorePosts } = useExplorePostsContext();
   const [refreshing, setRefreshing] = useState(false);
@@ -151,6 +153,7 @@ const ExploreScreen = () => {
         data={explorePosts}
         numColumns={3}
         estimatedItemSize={screenWidth / 3}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}

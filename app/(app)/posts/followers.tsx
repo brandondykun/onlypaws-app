@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation } from "expo-router";
@@ -35,6 +36,7 @@ const FollowersScreen = () => {
 
   const navigation = useNavigation();
   const screenWidth = Dimensions.get("window").width;
+  const tabBarHeight = useBottomTabBarHeight();
 
   const fetchFollowers = useCallback(async () => {
     if (authProfile.id) {
@@ -184,6 +186,7 @@ const FollowersScreen = () => {
         refreshing={refreshing}
         estimatedItemSize={62}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
         onEndReachedThreshold={0.3} // Trigger when 30%
         onEndReached={searchResults ? searchOnEndReached : onEndReached}
         refreshControl={

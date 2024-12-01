@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,6 +16,7 @@ const ExplorePostsListScreen = () => {
   const { postIndex } = useLocalSearchParams<{ postIndex: string }>();
   const { authProfile } = useAuthProfileContext();
   const { explorePosts, similarPosts, setSimilarPosts, likePost, unlikePost, addComment } = useExplorePostsContext();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const router = useRouter();
   const selectedPost = explorePosts[Number(postIndex!)];
@@ -62,6 +64,7 @@ const ExplorePostsListScreen = () => {
   return (
     <FlashList
       data={similarPosts}
+      contentContainerStyle={{ paddingBottom: tabBarHeight }}
       ListHeaderComponent={
         <Post
           post={selectedPost}

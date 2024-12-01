@@ -8,7 +8,6 @@ module.exports = {
     // "import/named": 2, // Ensures that named imports exist in the module
     "import/default": 2, // Ensures that default imports exist in the module
     "import/namespace": 2, // Ensures that namespace imports exist in the module
-    "import/no-extraneous-dependencies": [2, { devDependencies: true }], // Prevents importing modules that aren't listed in package.json
     "import/order": [
       "error",
       {

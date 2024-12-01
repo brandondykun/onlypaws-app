@@ -1,4 +1,5 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -16,6 +17,7 @@ const AddProfileScreen = () => {
   const { setActiveProfileId, addProfileOption } = useAuthUserContext();
   const { isDarkMode } = useColorMode();
   const router = useRouter();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
@@ -50,7 +52,7 @@ const AddProfileScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 18 }}>
       <View style={{ flex: 1 }}>
         <View style={{ paddingTop: 24, paddingBottom: 48, gap: 24 }}>
           <Text style={{ fontSize: 18, fontWeight: "300" }} darkColor={COLORS.zinc[100]}>
