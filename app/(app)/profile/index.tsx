@@ -1,28 +1,20 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import {
-  View,
-  ScrollView,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { View, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { addProfileImage, editProfileImage, updateProfile, getPetTypeOptions } from "@/api/profile";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
+import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
@@ -34,20 +26,14 @@ import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
-  const {
-    user,
-    logOut,
-    profileOptions,
-    changeSelectedProfileId,
-    selectedProfileId: authUserSelectedProfileId,
-  } = useAuthUserContext();
-  const { updateProfileImage, authProfile, updateAuthProfile, loading: authProfileLoading } = useAuthProfileContext();
+  const { user, logOut } = useAuthUserContext();
+  const { updateProfileImage, authProfile, updateAuthProfile } = useAuthProfileContext();
 
   const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
+  const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
 
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [changeProfileModalVisible, setChangeProfileModalVisible] = useState(false);
 
   const [showCamera, setShowCamera] = useState(false);
   const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
@@ -116,7 +102,7 @@ const ProfileScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <Button
-          onPress={() => setChangeProfileModalVisible(true)}
+          onPress={() => changeProfileModalRef.current?.present()}
           variant="text"
           text="Change"
           icon={
@@ -210,8 +196,9 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleChangeProfile = async (profileId: number) => {
-    await changeSelectedProfileId(profileId);
+  const handleAddProfilePress = () => {
+    changeProfileModalRef?.current?.close();
+    router.push("/(app)/profile/add");
   };
 
   return (
@@ -421,104 +408,7 @@ const ProfileScreen = () => {
           </KeyboardAvoidingView>
         </Pressable>
       </Modal>
-
-      <Modal
-        visible={changeProfileModalVisible}
-        onRequestClose={() => setChangeProfileModalVisible(false)}
-        animationType="slide"
-        raw
-        transparent={true}
-        withScroll={false}
-        style={{ flex: 1, alignItems: "flex-end" }}
-      >
-        <Pressable
-          style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={() => setChangeProfileModalVisible(false)}
-        >
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <Pressable onPress={(e) => e.stopPropagation()} android_disableSound={true}>
-              <View
-                style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
-                  paddingBottom: 48,
-                  paddingTop: 18,
-                  borderTopRightRadius: 25,
-                  borderTopLeftRadius: 25,
-                  paddingHorizontal: 24,
-                  gap: 12,
-                }}
-              >
-                <View style={{ paddingBottom: 12 }}>
-                  <Text style={{ textAlign: "center", fontWeight: "bold", fontSize: 16 }}>Change Profile</Text>
-                </View>
-                {profileOptions?.map((profile) => {
-                  const isSelected = profile.id === authProfile.id;
-                  const isSelectedButLoading = authUserSelectedProfileId === profile.id && authProfileLoading;
-                  return (
-                    <Pressable
-                      key={profile.id}
-                      style={({ pressed }) => [pressed && !isSelected && { opacity: 0.7 }]}
-                      disabled={isSelected || authProfileLoading}
-                      onPress={() => handleChangeProfile(profile.id)}
-                    >
-                      <View
-                        style={[
-                          s.profileOption,
-                          {
-                            backgroundColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[50],
-                            borderColor:
-                              isSelected && isDarkMode
-                                ? COLORS.lime[600]
-                                : isSelected
-                                  ? COLORS.lime[500]
-                                  : isDarkMode
-                                    ? COLORS.zinc[800]
-                                    : COLORS.zinc[200],
-                          },
-                        ]}
-                      >
-                        <Text style={s.profileOptionText}>{profile.username}</Text>
-                        {isSelected ? (
-                          <Ionicons name="checkmark-circle-sharp" size={24} color={COLORS.lime[500]} />
-                        ) : null}
-                        {isSelectedButLoading ? <ActivityIndicator size="small" color={COLORS.lime[500]} /> : null}
-                      </View>
-                    </Pressable>
-                  );
-                })}
-                <View style={{ paddingTop: 16, paddingLeft: 8 }}>
-                  <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 16, fontStyle: "italic" }}>
-                    Have another pet?
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={() => {
-                    setChangeProfileModalVisible(false);
-                    router.push("/(app)/profile/add");
-                  }}
-                  style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-                  disabled={authProfileLoading}
-                >
-                  <View
-                    style={[
-                      s.profileOption,
-                      {
-                        backgroundColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[50],
-                        borderColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-                      },
-                    ]}
-                  >
-                    <Text style={[s.profileOptionText, { color: isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700] }]}>
-                      Add Another Profile
-                    </Text>
-                    <AntDesign name="pluscircle" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[700]} />
-                  </View>
-                </Pressable>
-              </View>
-            </Pressable>
-          </KeyboardAvoidingView>
-        </Pressable>
-      </Modal>
+      <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
     </>
   );
 };
@@ -526,19 +416,6 @@ const ProfileScreen = () => {
 export default ProfileScreen;
 
 const s = StyleSheet.create({
-  profileOption: {
-    paddingHorizontal: 18,
-    height: 40,
-    borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1,
-    borderStyle: "solid",
-  },
-  profileOptionText: {
-    fontSize: 16,
-  },
   label: {
     fontSize: 13,
     fontWeight: "bold",
