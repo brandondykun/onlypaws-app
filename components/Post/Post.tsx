@@ -201,9 +201,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           </Text>
         </View>
       </View>
-      <View style={{ height: 0 /* so comments modal doesn't take up vertical space when closed */ }}>
-        <CommentsModal postId={post.id} addCommentToPost={addComment} ref={bottomSheetModalRef} />
-      </View>
+      <CommentsModal postId={post.id} addCommentToPost={addComment} ref={bottomSheetModalRef} />
     </View>
   );
 };

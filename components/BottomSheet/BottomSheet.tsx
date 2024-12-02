@@ -10,7 +10,6 @@ import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/c
 import { forwardRef, ForwardedRef, useMemo, RefObject } from "react";
 import { Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -35,47 +34,45 @@ const BottomSheetModal = forwardRef(
     const { isDarkMode } = useColorMode();
 
     return (
-      <SafeAreaView>
-        <RNBottomSheetModal
-          ref={ref}
-          onChange={onChange}
-          snapPoints={snapPoints}
-          index={0}
-          backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] }}
-          enablePanDownToClose={true}
-          onDismiss={onDismiss}
-          enableHandlePanningGesture={true}
-          enableContentPanningGesture={Platform.OS === "ios" ? true : false}
-          enableDynamicSizing={false}
-          handleIndicatorStyle={{ marginTop: 4, backgroundColor: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900] }}
-          android_keyboardInputMode="adjustResize"
-          keyboardBehavior={Platform.OS === "ios" ? "extend" : "interactive"}
-          keyboardBlurBehavior="restore"
-          handleComponent={() => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  borderBottomColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
-                  borderBottomWidth: 1,
-                  paddingBottom: 8,
-                }}
-              >
-                <Octicons name="horizontal-rule" size={30} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
-                <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", marginTop: -5 }}>
-                  {handleTitle}
-                </Text>
-              </View>
-            );
-          }}
-          backdropComponent={(props) => {
-            return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.6} {...props} />;
-          }}
-          {...props}
-        >
-          {children}
-        </RNBottomSheetModal>
-      </SafeAreaView>
+      <RNBottomSheetModal
+        ref={ref}
+        onChange={onChange}
+        snapPoints={snapPoints}
+        index={0}
+        backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] }}
+        enablePanDownToClose={true}
+        onDismiss={onDismiss}
+        enableHandlePanningGesture={true}
+        enableContentPanningGesture={Platform.OS === "ios" ? true : false}
+        enableDynamicSizing={false}
+        handleIndicatorStyle={{ marginTop: 4, backgroundColor: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900] }}
+        android_keyboardInputMode="adjustResize"
+        keyboardBehavior={Platform.OS === "ios" ? "extend" : "interactive"}
+        keyboardBlurBehavior="restore"
+        handleComponent={() => {
+          return (
+            <View
+              style={{
+                alignItems: "center",
+                borderBottomColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
+                borderBottomWidth: 1,
+                paddingBottom: 8,
+              }}
+            >
+              <Octicons name="horizontal-rule" size={30} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
+              <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", marginTop: -5 }}>
+                {handleTitle}
+              </Text>
+            </View>
+          );
+        }}
+        backdropComponent={(props) => {
+          return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.6} {...props} />;
+        }}
+        {...props}
+      >
+        {children}
+      </RNBottomSheetModal>
     );
   },
 );
