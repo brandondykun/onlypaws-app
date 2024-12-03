@@ -1,22 +1,22 @@
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { View, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { addProfileImage, editProfileImage, updateProfile, getPetTypeOptions } from "@/api/profile";
+import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
-import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -32,8 +32,7 @@ const ProfileScreen = () => {
   const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
-
-  const [editModalVisible, setEditModalVisible] = useState(false);
+  const editProfileModalRef = useRef<RNBottomSheetModal>(null);
 
   const [showCamera, setShowCamera] = useState(false);
   const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
@@ -94,7 +93,6 @@ const ProfileScreen = () => {
     } else {
       setPetType(null);
     }
-    setEditModalVisible(false);
   };
 
   // add search button to header
@@ -184,7 +182,6 @@ const ProfileScreen = () => {
         setAboutText(data.about ? data.about : "");
         setBreed(data.breed ? data.breed : "");
         updateAuthProfile(data.name, data.about, data.breed, data.pet_type);
-        setEditModalVisible(false);
       } else {
         Toast.show({
           type: "error",
@@ -193,6 +190,7 @@ const ProfileScreen = () => {
         });
       }
       setUpdateProfileLoading(false);
+      editProfileModalRef.current?.close();
     }
   };
 
@@ -329,7 +327,7 @@ const ProfileScreen = () => {
             <Button
               text="Edit"
               icon={<Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />}
-              onPress={() => setEditModalVisible(true)}
+              onPress={() => editProfileModalRef.current?.present()}
               hitSlop={10}
               variant="text"
             />
@@ -347,67 +345,34 @@ const ProfileScreen = () => {
         maxImages={1}
         onSavePress={handleSavePress}
       />
-      <Modal
-        visible={editModalVisible}
-        onRequestClose={handleEditModalClose}
-        animationType="slide"
-        raw
-        transparent={true}
-        withScroll={false}
-        style={{ flex: 1, alignItems: "flex-end" }}
-      >
-        <Pressable
-          style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-          onPress={handleEditModalClose}
-        >
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <View
-                style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
-                  paddingBottom: 48,
-                  paddingTop: 16,
-                  borderTopRightRadius: 25,
-                  borderTopLeftRadius: 25,
-                  paddingHorizontal: 24,
-                }}
-              >
-                <View style={s.header}>
-                  <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold" }}>Edit Profile</Text>
-                </View>
-                <View>
-                  <Text>Name</Text>
-                  <TextInput
-                    value={profileName}
-                    onChangeText={(val) => setProfileName(val)}
-                    placeholder="ex: Charlie"
-                  />
-                </View>
-                <View>
-                  <Text>About</Text>
-                  <TextInput value={aboutText} onChangeText={(val) => setAboutText(val)} multiline numberOfLines={5} />
-                </View>
-                <View>
-                  <Text>Breed</Text>
-                  <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
-                </View>
-                <View>
-                  <Text>Pet Type</Text>
-                  <DropdownSelect
-                    defaultText="Select a pet type"
-                    defaultValue={petType ? petType : null}
-                    data={petTypeOptions || []}
-                    onSelect={(selectedItem) => setPetType(selectedItem)}
-                  />
-                </View>
-                <View style={{ marginTop: 36 }}>
-                  <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
-                </View>
-              </View>
-            </Pressable>
-          </KeyboardAvoidingView>
-        </Pressable>
-      </Modal>
+      <BottomSheetModal handleTitle="Edit Profile" ref={editProfileModalRef} onDismiss={handleEditModalClose}>
+        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 48, paddingTop: 16, paddingHorizontal: 24 }}>
+          <View>
+            <Text>Name</Text>
+            <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} placeholder="ex: Charlie" />
+          </View>
+          <View>
+            <Text>About</Text>
+            <TextInput value={aboutText} onChangeText={(val) => setAboutText(val)} multiline numberOfLines={5} />
+          </View>
+          <View>
+            <Text>Breed</Text>
+            <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
+          </View>
+          <View>
+            <Text>Pet Type</Text>
+            <DropdownSelect
+              defaultText="Select a pet type"
+              defaultValue={petType ? petType : null}
+              data={petTypeOptions || []}
+              onSelect={(selectedItem) => setPetType(selectedItem)}
+            />
+          </View>
+          <View style={{ marginTop: 36 }}>
+            <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
+          </View>
+        </BottomSheetScrollView>
+      </BottomSheetModal>
       <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
     </>
   );
