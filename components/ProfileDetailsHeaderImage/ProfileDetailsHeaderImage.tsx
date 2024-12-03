@@ -11,8 +11,9 @@ import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {
   image: TProfileImage | null;
+  size?: number;
 };
-const ProfileDetailsHeaderImage = ({ image }: Props) => {
+const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
   const [visible, setVisible] = useState(false);
 
   const { isDarkMode } = useColorMode();
@@ -30,9 +31,9 @@ const ProfileDetailsHeaderImage = ({ image }: Props) => {
 
   return (
     <View>
-      <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]} onPress={handleOpen}>
+      <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]} onPress={handleOpen}>
         <View>
-          <ProfileImage image={image} size={100} />
+          <ProfileImage image={image} size={size ? size : 100} />
         </View>
       </Pressable>
       <Modal
