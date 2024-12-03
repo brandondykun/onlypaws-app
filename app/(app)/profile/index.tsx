@@ -1,8 +1,6 @@
-import Feather from "@expo/vector-icons/Feather";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { BottomSheetScrollView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import { BottomSheetScrollView, BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -17,6 +15,7 @@ import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
+import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -31,6 +30,7 @@ const ProfileScreen = () => {
 
   const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
+  const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
   const editProfileModalRef = useRef<RNBottomSheetModal>(null);
 
@@ -99,18 +99,13 @@ const ProfileScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Button
-          onPress={() => changeProfileModalRef.current?.present()}
-          variant="text"
-          text="Change"
-          icon={
-            <MaterialCommunityIcons
-              name="rotate-3d-variant"
-              size={18}
-              color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]}
-            />
-          }
-        />
+        <Pressable
+          onPress={() => profileOptionsModalRef.current?.present()}
+          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
+          hitSlop={20}
+        >
+          <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+        </Pressable>
       ),
     });
   });
@@ -202,49 +197,12 @@ const ProfileScreen = () => {
   return (
     <>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 18 }}
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 36 }}
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <View style={{ marginBottom: 36 }}>
-            <Pressable style={({ pressed }) => [pressed && { opacity: 0.7 }]} onPress={() => setShowCamera(true)}>
-              <View
-                style={{
-                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-                  height: 130,
-                  width: 130,
-                  borderRadius: 150,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingTop: 2,
-                  position: "relative",
-                }}
-              >
-                <MaterialCommunityIcons name="dog" size={72} color={isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400]} />
-                <View
-                  style={{
-                    height: 30,
-                    width: 30,
-                    backgroundColor: COLORS.sky[600],
-                    borderRadius: 50,
-                    position: "absolute",
-                    right: 5,
-                    bottom: 5,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 2,
-                  }}
-                >
-                  <Feather name="edit-3" size={16} color={COLORS.zinc[50]} />
-                </View>
-                {authProfile.image ? (
-                  <Image
-                    source={{ uri: authProfile.image.image }}
-                    style={{ position: "absolute", top: 0, right: 0, left: 0, bottom: 0, borderRadius: 150 }}
-                  />
-                ) : null}
-              </View>
-            </Pressable>
+          <View style={{ marginBottom: 28, alignItems: "center" }}>
+            <ProfileDetailsHeaderImage image={authProfile.image} size={150} />
           </View>
           <View
             style={{
@@ -307,7 +265,6 @@ const ProfileScreen = () => {
                 {authProfile.breed ? authProfile.breed : "No breed entered"}
               </Text>
             </View>
-
             <View style={{ padding: 16 }}>
               <Text style={s.label}>ABOUT</Text>
               {authProfile.about ? (
@@ -323,18 +280,6 @@ const ProfileScreen = () => {
               )}
             </View>
           </View>
-          <View style={{ alignItems: "flex-end", paddingRight: 4 }}>
-            <Button
-              text="Edit"
-              icon={<Feather name="edit-3" size={16} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />}
-              onPress={() => editProfileModalRef.current?.present()}
-              hitSlop={10}
-              variant="text"
-            />
-          </View>
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end", marginTop: 48 }}>
-          <Button text="Log Out" onPress={logOut} />
         </View>
       </ScrollView>
       <CameraModal
@@ -353,7 +298,13 @@ const ProfileScreen = () => {
           </View>
           <View>
             <Text>About</Text>
-            <TextInput value={aboutText} onChangeText={(val) => setAboutText(val)} multiline numberOfLines={5} />
+            <TextInput
+              value={aboutText}
+              onChangeText={(val) => setAboutText(val)}
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+            />
           </View>
           <View>
             <Text>Breed</Text>
@@ -372,6 +323,70 @@ const ProfileScreen = () => {
             <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
           </View>
         </BottomSheetScrollView>
+      </BottomSheetModal>
+      <BottomSheetModal
+        ref={profileOptionsModalRef}
+        handleTitle="Profile Options"
+        enableDynamicSizing={true}
+        snapPoints={["50%"]}
+      >
+        <BottomSheetView style={{ paddingTop: 24, paddingBottom: 48, paddingHorizontal: 36 }}>
+          <View
+            style={{
+              borderRadius: 8,
+              overflow: "hidden",
+              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+            }}
+          >
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                profileOptionsModalRef.current?.dismiss();
+                editProfileModalRef.current?.present();
+              }}
+            >
+              <View
+                style={[
+                  s.profileOption,
+                  { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                ]}
+              >
+                <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Profile</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                profileOptionsModalRef.current?.dismiss();
+                setShowCamera(true);
+              }}
+            >
+              <View
+                style={[
+                  s.profileOption,
+                  { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                ]}
+              >
+                <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Profile Image</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                profileOptionsModalRef.current?.dismiss();
+                changeProfileModalRef.current?.present();
+              }}
+            >
+              <View style={[s.profileOption]}>
+                <Text style={{ textAlign: "center", fontSize: 18 }}>Switch Profile</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          <View style={{ flex: 1, justifyContent: "flex-end", marginTop: 48 }}>
+            <Button text="Log Out" onPress={logOut} />
+          </View>
+        </BottomSheetView>
       </BottomSheetModal>
       <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
     </>
@@ -392,5 +407,8 @@ const s = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 12,
     marginBottom: 12,
+  },
+  profileOption: {
+    paddingVertical: 16,
   },
 });
