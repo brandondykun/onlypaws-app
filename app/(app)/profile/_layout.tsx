@@ -19,7 +19,7 @@ const ProfileStack = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Profile" }} />
+      <Stack.Screen name="index" options={{ title: "Your Profile" }} />
       <Stack.Screen name="add" options={{ title: "Add Profile" }} />
     </Stack>
   );
