@@ -58,7 +58,7 @@ const TabLayout = () => {
                 <BlurView
                   style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
                   intensity={isDarkMode ? 20 : 10}
-                  tint="dark"
+                  tint={isDarkMode ? "dark" : "light"}
                 />
               );
             } else {
