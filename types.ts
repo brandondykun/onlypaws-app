@@ -98,6 +98,10 @@ export type PostCommentDetailed = {
   created_at: string;
   likes_count: number;
   liked: boolean;
+  replies_count: number;
+  replies: PostCommentDetailed[];
+  parent_comment_username: string | null;
+  reply_to_comment_username: string | null;
 };
 
 export type Post = {

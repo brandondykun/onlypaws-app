@@ -1,6 +1,10 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BottomSheetModal as RNBottomSheetModal, BottomSheetView, BottomSheetFlashList } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetFlatList,
+  BottomSheetFlatListMethods,
+  BottomSheetModal as RNBottomSheetModal,
+} from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
 import { useState, useCallback, forwardRef, ForwardedRef, useRef } from "react";
 import { View, Pressable, ActivityIndicator, StyleSheet, RefreshControl, Platform, Keyboard } from "react-native";
@@ -23,7 +27,7 @@ import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
 import Text from "../Text/Text";
 
 type Props = {
-  addCommentToPost: (comment: PostCommentDetailed) => void;
+  addCommentToPost: () => void;
   postId: number | null;
 };
 
@@ -40,11 +44,18 @@ const CommentsModal = forwardRef(
     const [fetchNextLoading, setFetchNextLoading] = useState(false);
     const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
+    // top level comment with nested replies
+    const [parentComment, setParentComment] = useState<PostCommentDetailed | null>(null);
+    // specific comment being replied to
+    const [replyToComment, setReplyToComment] = useState<PostCommentDetailed | null>(null);
+
     const { isDarkMode } = useColorMode();
     const { authProfile } = useAuthProfileContext();
-    const commentInputRef = useRef<RNGHTestInput>(null);
-    const inputValueRef = useRef("");
+    const commentInputRef = useRef<RNGHTestInput>(null); // comment input component ref
+    const inputValueRef = useRef(""); // comment text ref
+    const flatListRef = useRef<BottomSheetFlatListMethods>(null); // ref to comments flat list
 
+    // like a top level comment
     const handleLikeComment = (commentId: number) => {
       setComments((prev) =>
         prev.map((comment) => {
@@ -56,6 +67,7 @@ const CommentsModal = forwardRef(
       );
     };
 
+    // unlike a top level comment
     const handleUnlikeComment = (commentId: number) => {
       setComments((prev) =>
         prev.map((comment) => {
@@ -65,6 +77,12 @@ const CommentsModal = forwardRef(
           return comment;
         }),
       );
+    };
+
+    const handleReplyPress = (parentComment: PostCommentDetailed, replyingToComment: PostCommentDetailed) => {
+      setParentComment(parentComment);
+      setReplyToComment(replyingToComment);
+      commentInputRef.current?.focus();
     };
 
     // initial fetch or refresh fetch if initial fetch fails
@@ -97,6 +115,10 @@ const CommentsModal = forwardRef(
       (index: number) => {
         if (index > -1) {
           fetchComments();
+        } else {
+          setInitialFetchComplete(false);
+          setFetchNextUrl(null);
+          setComments([]);
         }
       },
       [fetchComments],
@@ -118,13 +140,117 @@ const CommentsModal = forwardRef(
       }
     }, [fetchNextUrl]);
 
+    // add a single reply to a comment so it displays nested under the top level comment
+    // this is used when a user manually adds a reply
+    const handleAddReply = (parentCommentId: number, reply: PostCommentDetailed) => {
+      setComments((prev) => {
+        return prev.map((prevComment) => {
+          if (prevComment.id === parentCommentId) {
+            return {
+              ...prevComment,
+              replies_count: prevComment.replies_count + 1,
+              replies: [...prevComment.replies, reply],
+            };
+          }
+          return prevComment;
+        });
+      });
+    };
+
+    // add multiple replies to a comment so they display nested under the top level comment
+    // this is used when a user fetches multiple replies for a top level comment
+    const handleAddReplies = (parentCommentId: number, replies: PostCommentDetailed[]) => {
+      setComments((prev) => {
+        return prev.map((prevComment) => {
+          if (prevComment.id === parentCommentId) {
+            // filter added replies to remove duplicate replies
+            // this can happen if a user adds a comment and then fetches more comments.
+            // It will eventually return the newly added comment that was added
+            // on the front end without an api call
+            const currentReplies = prevComment.replies.map((reply) => reply.id);
+            const newFilteredReplies = replies.filter((reply) => !currentReplies.includes(reply.id));
+            return { ...prevComment, replies: [...prevComment.replies, ...newFilteredReplies] };
+          }
+          return prevComment;
+        });
+      });
+    };
+
+    // clear replies array for a comment to visually hide the replies
+    const handleHideReplies = (parentCommentId: number) => {
+      setComments((prev) => {
+        return prev.map((prevComment) => {
+          if (prevComment.id === parentCommentId) {
+            return { ...prevComment, replies: [] };
+          }
+          return prevComment;
+        });
+      });
+    };
+
+    // like a nested reply comment
+    const handleLikeReply = (commentId: number, replyId: number) => {
+      setComments((prev) =>
+        prev.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: comment.replies.map((reply) => {
+                if (reply.id === replyId) {
+                  return { ...reply, liked: true, likes_count: reply.likes_count + 1 };
+                }
+                return reply;
+              }),
+            };
+          }
+          return comment;
+        }),
+      );
+    };
+
+    // unlike a nested reply comment
+    const handleUnlikeReply = (commentId: number, replyId: number) => {
+      setComments((prev) =>
+        prev.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: comment.replies.map((reply) => {
+                if (reply.id === replyId) {
+                  return { ...reply, liked: false, likes_count: reply.likes_count - 1 };
+                }
+                return reply;
+              }),
+            };
+          }
+          return comment;
+        }),
+      );
+    };
+
+    // handle adding a comment or reply
+    // if a parent comment is selected, a reply will be added
+    // else a top level comment will be added
     const handleAddComment = useCallback(async () => {
       if (postId && inputValueRef.current) {
         setAddCommentLoading(true);
-        const { error, data } = await addComment(postId, inputValueRef.current, authProfile.id);
+        const parentId = parentComment ? parentComment.id : null;
+        const replyCommentId = replyToComment ? replyToComment.id : null;
+
+        const { error, data } = await addComment(
+          postId,
+          inputValueRef.current,
+          authProfile.id,
+          parentId,
+          replyCommentId,
+        );
         if (!error && data) {
-          setComments((prev) => [data, ...prev]);
-          addCommentToPost(data);
+          if (!parentId) {
+            setComments((prev) => [data, ...prev]); // add top level comment
+          } else {
+            handleAddReply(parentId, data); // add a nested reply
+          }
+          addCommentToPost(); // update comments count for the post - to show on main post
           Keyboard.dismiss();
           commentInputRef.current?.clear();
           inputValueRef.current = "";
@@ -137,11 +263,13 @@ const CommentsModal = forwardRef(
         }
         setAddCommentLoading(false);
       }
-    }, [addCommentToPost, authProfile.id, postId]);
+    }, [addCommentToPost, authProfile.id, postId, parentComment, replyToComment]);
 
     const onClose = useCallback(() => {
       commentInputRef.current?.clear();
       inputValueRef.current = "";
+      setParentComment(null);
+      setReplyToComment(null);
     }, []);
 
     // content to show in flat list if data is empty or loading
@@ -195,48 +323,71 @@ const CommentsModal = forwardRef(
 
     return (
       <BottomSheetModal ref={ref} onChange={handleSheetChanges} onDismiss={onClose} handleTitle="Comments">
-        <BottomSheetView style={{ flex: 1 }}>
-          <BottomSheetFlashList
-            data={comments}
-            contentContainerStyle={{ paddingBottom: 24 }}
-            keyExtractor={(item) => item.id.toString()}
-            onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-            onEndReached={!fetchNextLoading ? () => fetchNext() : null}
-            ListEmptyComponent={emptyComponent}
-            showsVerticalScrollIndicator={false}
-            refreshing={refreshing}
-            estimatedItemSize={60}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={refreshComments}
-                tintColor={COLORS.zinc[400]}
-                colors={[COLORS.zinc[400]]}
-              />
-            }
-            renderItem={({ item }) => (
-              <Comment comment={item} onLike={handleLikeComment} onUnlike={handleUnlikeComment} />
-            )}
-            ListFooterComponent={footerComponent}
-          />
-          <View
-            style={{
-              paddingHorizontal: 16,
-              flexDirection: "row",
-              gap: 8,
-              paddingTop: 12,
-              alignItems: "center",
-              paddingBottom: Platform.OS === "ios" ? 24 : 18,
-              borderTopColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
-              borderTopWidth: 1,
-            }}
-          >
+        <BottomSheetFlatList
+          ref={flatListRef}
+          data={comments}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          keyExtractor={(item) => item.id.toString()}
+          onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+          onEndReached={!fetchNextLoading ? () => fetchNext() : null}
+          ListEmptyComponent={emptyComponent}
+          showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refreshComments}
+              tintColor={COLORS.zinc[400]}
+              colors={[COLORS.zinc[400]]}
+            />
+          }
+          renderItem={({ item, index }) => (
+            <Comment
+              comment={item}
+              onLike={handleLikeComment}
+              onUnlike={handleUnlikeComment}
+              onReplyPress={handleReplyPress}
+              handleAddReplies={handleAddReplies}
+              handleHideReplies={handleHideReplies}
+              onLikeReply={handleLikeReply}
+              onUnlikeReply={handleUnlikeReply}
+              commentIndex={index}
+              listRef={flatListRef}
+              replyToCommentId={replyToComment?.id}
+            />
+          )}
+          ListFooterComponent={footerComponent}
+        />
+        <View
+          style={{
+            paddingBottom: Platform.OS === "ios" ? 24 : 18,
+            borderTopColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
+            borderTopWidth: 1,
+          }}
+        >
+          <View>
+            {parentComment ? (
+              <View style={{ paddingTop: 12 }}>
+                <Text darkColor={COLORS.sky[500]} lightColor={COLORS.sky[600]} style={{ paddingHorizontal: 18 }}>
+                  replying to @{replyToComment?.profile?.username}: <Text>{replyToComment?.text}</Text>
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: 8, paddingTop: 12, alignItems: "center" }}>
             <View style={{ flex: 1 }}>
               <BottomSheetTextInput
-                placeholder="Add comment..."
+                placeholder={parentComment ? `Reply to @${parentComment.profile.username}...` : "Add comment..."}
                 ref={commentInputRef}
                 defaultValue={inputValueRef.current}
                 onChangeText={(text) => (inputValueRef.current = text)}
+                onBlur={() => {
+                  if (!inputValueRef.current) {
+                    // if input has text don't clear the parent and reply to comment
+                    setParentComment(null);
+                    setReplyToComment(null);
+                  }
+                }}
               />
             </View>
             <Pressable
@@ -254,7 +405,7 @@ const CommentsModal = forwardRef(
               </View>
             </Pressable>
           </View>
-        </BottomSheetView>
+        </View>
         <Toast config={toastConfig} />
       </BottomSheetModal>
     );

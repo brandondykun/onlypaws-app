@@ -22,6 +22,7 @@ type PostContextType = {
   hasFetchNextError: boolean;
   initialFetchComplete: boolean;
   hasInitialFetchError: boolean;
+  addToCommentCount: (postId: number) => void;
 };
 
 const PostsContext = createContext<PostContextType>({
@@ -39,6 +40,7 @@ const PostsContext = createContext<PostContextType>({
   hasFetchNextError: false,
   initialFetchComplete: false,
   hasInitialFetchError: false,
+  addToCommentCount: (postId: number) => {},
 });
 
 type Props = {
@@ -114,6 +116,17 @@ const PostsContextProvider = ({ children }: Props) => {
     });
   };
 
+  const addToCommentCount = (postId: number) => {
+    setData((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          return { ...post, comments_count: post.comments_count + 1 };
+        }
+        return post;
+      }),
+    );
+  };
+
   const value = {
     data,
     loading,
@@ -129,6 +142,7 @@ const PostsContextProvider = ({ children }: Props) => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
+    addToCommentCount,
   };
 
   return <PostsContext.Provider value={value}>{children}</PostsContext.Provider>;
@@ -152,6 +166,7 @@ export const usePostsContext = () => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
+    addToCommentCount,
   } = useContext(PostsContext);
   return {
     data,
@@ -168,5 +183,6 @@ export const usePostsContext = () => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
+    addToCommentCount,
   };
 };

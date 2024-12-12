@@ -7,7 +7,7 @@ import {
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput";
-import { forwardRef, ForwardedRef, useMemo, RefObject } from "react";
+import { forwardRef, ForwardedRef, useMemo, RefObject, useState } from "react";
 import { Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
@@ -39,7 +39,7 @@ const BottomSheetModal = forwardRef(
         onChange={onChange}
         snapPoints={snapPoints}
         index={0}
-        backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200] }}
+        backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100] }}
         enablePanDownToClose={true}
         onDismiss={onDismiss}
         enableHandlePanningGesture={true}
@@ -82,7 +82,8 @@ export const BottomSheetTextInput = forwardRef(
     { ...props }: BottomSheetTextInputProps,
     ref: ((instance: TextInput | null) => void) | RefObject<TextInput> | null | undefined,
   ) => {
-    const { isDarkMode } = useColorMode();
+    const { isDarkMode, setLightOrDark } = useColorMode();
+    const [isFocused, setIsFocused] = useState(false);
 
     return (
       <RNBottomSheetTextInput
@@ -90,14 +91,19 @@ export const BottomSheetTextInput = forwardRef(
         style={{
           borderRadius: 25,
           paddingHorizontal: 16,
-          borderColor: COLORS.zinc[500],
+          borderColor: isFocused ? setLightOrDark(COLORS.zinc[950], COLORS.zinc[400]) : COLORS.zinc[500],
           borderWidth: 1,
           fontSize: 18,
           paddingVertical: 10,
           color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900],
         }}
         placeholderTextColor={COLORS.zinc[500]}
+        onFocus={() => setIsFocused(true)}
         {...props}
+        onBlur={(e) => {
+          props.onBlur && props.onBlur(e);
+          setIsFocused(false);
+        }}
       />
     );
   },

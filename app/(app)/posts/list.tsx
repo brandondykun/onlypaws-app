@@ -6,7 +6,7 @@ import { usePostsContext } from "@/context/PostsContext";
 const PostsListScreen = () => {
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
 
-  const { data, setData } = usePostsContext();
+  const { data, setData, addToCommentCount } = usePostsContext();
 
   const router = useRouter();
 
@@ -20,6 +20,7 @@ const PostsListScreen = () => {
       onProfilePress={onProfilePress}
       initialIndex={Number(initialIndex)}
       setPosts={setData}
+      onComment={addToCommentCount}
     />
   );
 };

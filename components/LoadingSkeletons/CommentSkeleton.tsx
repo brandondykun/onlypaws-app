@@ -26,9 +26,10 @@ const CommentSkeleton = ({ rows = 10, ...props }: Props) => {
 
     return (
       <Fragment key={i}>
-        <Rect x={screenWidth - 30} y={60 * i + 18} rx="8" ry="8" width="20" height="15" />
-        <Rect x="12" y={60 * i + 15} rx="4" ry="4" width="90" height="8" />
-        <Rect x="12" y={60 * i + 32} rx="7" ry="7" width={screenWidth * 0.6} height="12" />
+        <Rect x={screenWidth - 30} y={80 * i + 18} rx="8" ry="8" width="20" height="15" />
+        <Rect x="12" y={80 * i + 17} rx="4" ry="4" width="65" height="8" />
+        <Rect x="12" y={80 * i + 30} rx="7" ry="7" width={screenWidth * 0.6} height="12" />
+        <Rect x="12" y={80 * i + 55} rx="7" ry="7" width={35} height="9" />
       </Fragment>
     );
   });

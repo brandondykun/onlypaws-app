@@ -37,13 +37,24 @@ export const removeLike = async (postId: number, profileId: number) => {
   return await axiosDelete(url);
 };
 
-export const addComment = async (post: number, text: string, profileId: number) => {
+export const addComment = async (
+  post: number,
+  text: string,
+  profileId: number,
+  parent_comment: number | null,
+  reply_to_comment: number | null,
+) => {
   const url = `/v1/post/${post}/comment/`;
-  return await axiosPost<PostCommentDetailed>(url, { text, profileId });
+  return await axiosPost<PostCommentDetailed>(url, { text, profileId, parent_comment, reply_to_comment });
 };
 
 export const getPostComments = async (postId: number) => {
   const url = `/v1/post/${postId}/comments/`;
+  return await axiosFetch<PaginatedPostCommentsResponse>(url);
+};
+
+export const getCommentReplies = async (postId: number, commentId: number) => {
+  const url = `/v1/post/${postId}/comments/${commentId}/reply/`;
   return await axiosFetch<PaginatedPostCommentsResponse>(url);
 };
 
