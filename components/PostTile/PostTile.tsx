@@ -12,12 +12,17 @@ type Props = {
 };
 
 const NUM_COLUMNS = 3;
-const GAP_SIZE = 3;
+const GAP_SIZE = 1;
 
 const PostTile = ({ post, index, onPress }: Props) => {
   const screenWidth = Dimensions.get("window").width;
+  // calculate available space horizontally on screen for images minus the gap pixels
   const availableSpace = screenWidth - (NUM_COLUMNS - 1) * GAP_SIZE;
+  // calculate image size considering the pixels removed from the gap pixels
   const itemSize = availableSpace / NUM_COLUMNS;
+  const isRightColumnImage = (index - 2) % 3 === 0;
+  // make right column image one pixel wider to avoid single pixel gap along right edge
+  const width = isRightColumnImage ? itemSize + 1 : itemSize;
 
   return (
     <View style={{ position: "relative" }} key={post.id}>
@@ -31,7 +36,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
         onPress={() => onPress(index)}
         testID="post-tile-pressable"
       >
-        <Image source={{ uri: post.images[0].image }} style={{ height: itemSize, width: itemSize }} />
+        <Image source={{ uri: post.images[0].image }} style={{ height: itemSize, width: width }} />
       </Pressable>
     </View>
   );

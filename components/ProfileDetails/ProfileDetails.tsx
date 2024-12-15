@@ -185,7 +185,7 @@ const ProfileDetails = ({
       showsVerticalScrollIndicator={false}
       data={postsLoading || postsRefreshing ? [] : postsData}
       numColumns={3}
-      ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
+      ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.1} // Trigger when 10% from the bottom
       onEndReached={!fetchNextLoading ? () => fetchNext() : null}

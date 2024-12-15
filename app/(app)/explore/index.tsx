@@ -157,7 +157,7 @@ const ExploreScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
-        ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         refreshing={refreshing}
         refreshControl={
           <RefreshControl
