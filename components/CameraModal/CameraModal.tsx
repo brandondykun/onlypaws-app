@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef, useState, useCallback } from "react";
-import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform, ActivityIndicator } from "react-native";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
@@ -32,9 +32,10 @@ type Props = {
   setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
   maxImages?: number;
   onSavePress?: () => void;
+  loading?: boolean;
 };
 
-const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSavePress }: Props) => {
+const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSavePress, loading }: Props) => {
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
@@ -355,6 +356,11 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   return (
     <Modal withScroll={false} visible={visible} onRequestClose={() => setVisible(false)}>
       <View style={s.contentContainer}>{visible ? content : null}</View>
+      {loading ? (
+        <View style={s.loadingView}>
+          <ActivityIndicator color={COLORS.zinc[500]} />
+        </View>
+      ) : null}
       <ImagePreviewModal
         images={images}
         setImages={setImages}
@@ -426,5 +432,17 @@ const s = StyleSheet.create({
     borderRadius: 4,
     height: 100,
     width: 100,
+  },
+  loadingView: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: COLORS.zinc[900],
+    opacity: 0.7,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

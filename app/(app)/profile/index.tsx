@@ -123,6 +123,7 @@ const ProfileScreen = () => {
 
     const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
     if (accessToken) {
+      setUpdateProfileLoading(true);
       if (authProfile.image) {
         // edit profile image
         const { error, data } = await editProfileImage(authProfile.image.id, formData, accessToken);
@@ -153,6 +154,7 @@ const ProfileScreen = () => {
           });
         }
       }
+      setUpdateProfileLoading(false);
     } else {
       Toast.show({
         type: "error",
@@ -289,6 +291,7 @@ const ProfileScreen = () => {
         setImages={setImage}
         maxImages={1}
         onSavePress={handleSavePress}
+        loading={updateProfileLoading}
       />
       <BottomSheetModal handleTitle="Edit Profile" ref={editProfileModalRef} onDismiss={handleEditModalClose}>
         <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 48, paddingTop: 16, paddingHorizontal: 24 }}>
