@@ -1,9 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { FlashList } from "@shopify/flash-list";
+import { BottomSheetModalProvider, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState, useRef, useEffect } from "react";
-import { Dimensions, View, Pressable, TouchableOpacity, StyleSheet } from "react-native";
+import { Dimensions, View, Pressable, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
@@ -26,7 +26,8 @@ type Props = {
 
 const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialIndex }: Props) => {
   const screenWidth = Dimensions.get("window").width;
-  const flatListRef = useRef<FlashList<PhotoFile | ImagePickerAsset>>(null);
+  const flatListRef = useRef<FlatList<PhotoFile | ImagePickerAsset>>(null);
+  const deleteImageModalRef = useRef<RNBottomSheetModal>(null);
 
   const { isDarkMode } = useColorMode();
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
@@ -42,6 +43,10 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
     }
   }, [initialIndex, visible]);
 
+  const closeDeleteImageModal = () => {
+    deleteImageModalRef.current?.dismiss();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -49,58 +54,66 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages, initialInde
       withScroll={false}
       backgroundColor={isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50]}
     >
-      <View style={{ flex: 1, paddingTop: 60 }}>
-        <View style={s.header}>
-          <TouchableOpacity onPress={() => setVisible(false)} hitSlop={10}>
-            <Ionicons name="chevron-back-outline" size={30} color={isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]} />
-          </TouchableOpacity>
-          <Text style={{ opacity: 0.8, fontSize: 18 }}>Long press to delete image.</Text>
+      <BottomSheetModalProvider>
+        <View style={{ flex: 1, paddingTop: 60 }}>
+          <View style={s.header}>
+            <TouchableOpacity onPress={() => setVisible(false)} hitSlop={10}>
+              <Ionicons
+                name="chevron-back-outline"
+                size={30}
+                color={isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]}
+              />
+            </TouchableOpacity>
+            <Text style={{ opacity: 0.8, fontSize: 18, fontStyle: "italic", color: COLORS.zinc[500] }}>
+              Long press to remove image
+            </Text>
+          </View>
+          <FlatList
+            ref={flatListRef}
+            contentContainerStyle={{ paddingBottom: 36 }}
+            data={images}
+            keyExtractor={(item) => getImageUri(item)}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => {
+              return (
+                <View style={{ marginBottom: 16, marginTop: 8 }} key={getImageUri(item)}>
+                  <Text style={{ fontSize: 24, paddingLeft: 8, color: COLORS.zinc[600], marginBottom: 6 }}>
+                    Image {index + 1}
+                  </Text>
+                  <Pressable
+                    onLongPress={() => {
+                      setSelectedImageUri(getImageUri(item));
+                      Haptics.impactAsync();
+                      deleteImageModalRef.current?.present();
+                    }}
+                  >
+                    <View style={{ overflow: "hidden", backgroundColor: COLORS.zinc[900] }}>
+                      <ImageLoader
+                        uri={getImageUri(item)}
+                        width={screenWidth}
+                        height={screenWidth}
+                        style={[
+                          getImageUri(item) === selectedImageUri
+                            ? { borderColor: "red" }
+                            : { borderColor: "transparent" },
+                          { borderWidth: 1 },
+                        ]}
+                      />
+                    </View>
+                  </Pressable>
+                </View>
+              );
+            }}
+          />
         </View>
-        <FlashList
-          ref={flatListRef}
-          contentContainerStyle={{ paddingBottom: 36 }}
-          data={images}
-          estimatedItemSize={screenWidth + 30}
-          keyExtractor={(item) => getImageUri(item)}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => {
-            return (
-              <View style={{ marginBottom: 16, marginTop: 8 }} key={getImageUri(item)}>
-                <Text style={{ fontSize: 24, paddingLeft: 8, color: COLORS.zinc[600], marginBottom: 6 }}>
-                  Image {index + 1}
-                </Text>
-                <Pressable
-                  onLongPress={() => {
-                    setSelectedImageUri(getImageUri(item));
-                    Haptics.impactAsync();
-                  }}
-                >
-                  <View style={{ overflow: "hidden", backgroundColor: COLORS.zinc[900] }}>
-                    <ImageLoader
-                      uri={getImageUri(item)}
-                      width={screenWidth}
-                      height={screenWidth}
-                      style={[
-                        getImageUri(item) === selectedImageUri
-                          ? { borderColor: "red" }
-                          : { borderColor: "transparent" },
-                        { borderWidth: 1 },
-                      ]}
-                    />
-                  </View>
-                </Pressable>
-              </View>
-            );
-          }}
+        <DeleteImageModal
+          closeDeleteImageModal={closeDeleteImageModal}
+          ref={deleteImageModalRef}
+          setImages={setImages}
+          selectedImageUri={selectedImageUri}
+          setSelectedImageUri={setSelectedImageUri}
         />
-      </View>
-      <DeleteImageModal
-        visible={!!selectedImageUri}
-        images={images}
-        setImages={setImages}
-        selectedImageUri={selectedImageUri}
-        setSelectedImageUri={setSelectedImageUri}
-      />
+      </BottomSheetModalProvider>
     </Modal>
   );
 };

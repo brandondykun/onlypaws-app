@@ -1,72 +1,99 @@
+import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { ImagePickerAsset } from "expo-image-picker";
-import { Pressable, View } from "react-native";
+import { forwardRef, ForwardedRef } from "react";
+import { StyleSheet, View } from "react-native";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
+import BottomSheetModal from "../BottomSheet/BottomSheet";
 import Button from "../Button/Button";
-import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
 
 type Props = {
-  visible: boolean;
-  images: (PhotoFile | ImagePickerAsset)[];
   setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
   selectedImageUri: string | null;
   setSelectedImageUri: React.Dispatch<React.SetStateAction<string | null>>;
+  closeDeleteImageModal: () => void;
 };
 
-const DeleteImageModal = ({ visible, images, setImages, selectedImageUri, setSelectedImageUri }: Props) => {
-  const { isDarkMode } = useColorMode();
+const DeleteImageModal = forwardRef(
+  (
+    { setImages, selectedImageUri, setSelectedImageUri, closeDeleteImageModal }: Props,
+    ref: ForwardedRef<RNBottomSheetModal> | undefined,
+  ) => {
+    const { isDarkMode } = useColorMode();
 
-  const handleDelete = () => {
-    setImages((prev) => {
-      return prev.filter((image) => {
-        return getImageUri(image) !== selectedImageUri;
+    const handleDelete = () => {
+      setImages((prev) => {
+        return prev.filter((image) => {
+          return getImageUri(image) !== selectedImageUri;
+        });
       });
-    });
-    setSelectedImageUri(null);
-  };
+      setSelectedImageUri(null);
+      closeDeleteImageModal();
+    };
 
-  return (
-    <Modal
-      visible={visible}
-      onRequestClose={() => setSelectedImageUri(null)}
-      withScroll={false}
-      style={{ flex: 1, alignItems: "flex-end" }}
-      animationType="slide"
-      raw
-      transparent={true}
-    >
-      <Pressable
-        style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "transparent" }}
-        onPress={() => setSelectedImageUri(null)}
+    const handleCancelPress = () => {
+      setSelectedImageUri(null);
+      closeDeleteImageModal();
+    };
+
+    return (
+      <BottomSheetModal
+        ref={ref}
+        enableDynamicSizing={true}
+        handleTitle="Delete Image"
+        onDismiss={() => setSelectedImageUri(null)}
       >
-        <View
-          style={{
-            paddingBottom: 64,
-            paddingTop: 32,
-            paddingHorizontal: 24,
-            backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200],
-            borderTopRightRadius: 25,
-            borderTopLeftRadius: 25,
-          }}
+        <BottomSheetView
+          style={[
+            s.sheetView,
+            {
+              backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
+            },
+          ]}
         >
-          <Text style={{ fontSize: 18, marginBottom: 32 }}>Are you sure you want to delete this photo?</Text>
-          <View style={{ flexDirection: "row", gap: 24 }}>
-            <View style={{ flex: 1 }}>
-              <Button onPress={handleDelete} buttonStyle={{ backgroundColor: COLORS.red[600] }} text="Delete" />
+          <Text style={s.confirmText}>Are you sure you want to delete this photo?</Text>
+          <View style={s.buttonsContainer}>
+            <View style={s.buttonContainer}>
+              <Button onPress={handleDelete} buttonStyle={s.deleteButton} text="Delete" />
             </View>
-            <View style={{ flex: 1 }}>
-              <Button onPress={() => setSelectedImageUri(null)} text="Cancel" variant="outline" />
+            <View style={s.buttonContainer}>
+              <Button onPress={handleCancelPress} text="Cancel" variant="outline" />
             </View>
           </View>
-        </View>
-      </Pressable>
-    </Modal>
-  );
-};
+        </BottomSheetView>
+      </BottomSheetModal>
+    );
+  },
+);
 
+DeleteImageModal.displayName = "DeleteImageModal";
 export default DeleteImageModal;
+
+const s = StyleSheet.create({
+  buttonsContainer: {
+    flexDirection: "row",
+    gap: 24,
+  },
+  buttonContainer: {
+    flex: 1,
+  },
+  deleteButton: {
+    backgroundColor: COLORS.red[600],
+  },
+  sheetView: {
+    paddingBottom: 64,
+    paddingTop: 32,
+    paddingHorizontal: 24,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+  },
+  confirmText: {
+    fontSize: 18,
+    marginBottom: 32,
+  },
+});

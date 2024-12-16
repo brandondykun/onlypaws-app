@@ -21,7 +21,6 @@ import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
 
 import CameraBackground from "./CameraBackground";
-import DeleteImageModal from "./DeleteImageModal";
 import FocusIcon from "./FocusIcon";
 import ImagePreviewModal from "./ImagePreviewModal";
 
@@ -39,7 +38,6 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
-  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [initialPreviewIndex, setInitialPreviewIndex] = useState<number | null>(null);
   const [flash, setFlash] = useState<"on" | "off">("off");
 
@@ -153,6 +151,8 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   };
 
   if (device && hasPermission) {
+    const maxImagesReached = images.length === maxImages;
+
     content = (
       <GestureHandlerRootView>
         <View style={{ flex: 1, position: "relative" }}>
@@ -202,7 +202,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                   fontSize: 14,
                 }}
               >
-                {images.length > 1 ? "Press, hold, drag to reorder images." : ""}
+                {images.length > 1 ? "Tap to edit - or - press, hold, drag to reorder" : ""}
               </Text>
               {images.length ? (
                 <DraggableFlatList
@@ -231,24 +231,18 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                             },
                             shadowOpacity: 0.58,
                             shadowRadius: 16.0,
-
                             elevation: 24,
                           },
                         ]}
                       >
                         <Image
                           source={{ uri: getImageUri(item) }}
-                          style={[
-                            getImageUri(item) === selectedImageUri
-                              ? { borderWidth: 1, borderColor: COLORS.red[600] }
-                              : undefined,
-                            {
-                              borderRadius: 4,
-                              marginHorizontal: 2,
-                              height: 100,
-                              width: 100,
-                            },
-                          ]}
+                          style={{
+                            borderRadius: 4,
+                            marginHorizontal: 2,
+                            height: 100,
+                            width: 100,
+                          }}
                         />
                       </Pressable>
                     );
@@ -280,9 +274,6 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
           {/* Bottom */}
           <View
             style={{
-              flex: 1,
-              justifyContent: "center",
-              flexDirection: "row",
               position: "absolute",
               bottom: 0,
               right: 0,
@@ -291,49 +282,73 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
               zIndex: 1,
             }}
           >
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={pickImage}>
-                <MaterialIcons
-                  name="camera-roll"
-                  size={36}
-                  color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])}
-                />
-              </Pressable>
-            </View>
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <TouchableOpacity
-                onPress={takePicture}
-                disabled={maxImages && maxImages === images.length ? true : false}
-              >
-                <View
-                  style={[
-                    s.takeImageButtonRing,
-                    { backgroundColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]) },
+            {maxImages ? (
+              <>
+                <View style={{ paddingTop: 4, justifyContent: "center", flexDirection: "row" }}>
+                  <Text
+                    darkColor={maxImagesReached ? COLORS.red[600] : COLORS.zinc[300]}
+                    lightColor={COLORS.zinc[700]}
+                    style={{ textAlign: "center", minWidth: 100 }}
+                  >
+                    {images.length} of {maxImages}
+                  </Text>
+                </View>
+                <View>
+                  <Text darkColor={COLORS.zinc[400]} style={{ textAlign: "center", fontWeight: 200 }}>
+                    {maxImagesReached ? "Remove images above to add more." : ""}
+                  </Text>
+                </View>
+              </>
+            ) : null}
+            <View style={{ flex: 1, justifyContent: "center", flexDirection: "row", marginTop: -32 }}>
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Pressable
+                  style={({ pressed }) => [
+                    !maxImagesReached && pressed && { opacity: 0.6 },
+                    { opacity: maxImagesReached ? 0.3 : 1.0 },
                   ]}
+                  onPress={pickImage}
+                  disabled={maxImagesReached}
                 >
+                  <MaterialIcons
+                    name="camera-roll"
+                    size={36}
+                    color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])}
+                  />
+                </Pressable>
+              </View>
+              <View style={{ justifyContent: "center", alignItems: "center", opacity: maxImagesReached ? 0.3 : 1 }}>
+                <TouchableOpacity onPress={takePicture} disabled={maxImagesReached ? true : false}>
                   <View
                     style={[
-                      s.takeImageButton,
-                      {
-                        backgroundColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-                        borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
-                      },
+                      s.takeImageButtonRing,
+                      { backgroundColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]) },
                     ]}
                   >
-                    <Ionicons name="paw" size={36} color={COLORS.zinc[400]} />
+                    <View
+                      style={[
+                        s.takeImageButton,
+                        {
+                          backgroundColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+                          borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                        },
+                      ]}
+                    >
+                      <Ionicons name="paw" size={36} color={COLORS.zinc[400]} />
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              {onSavePress && images.length ? (
-                <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
-                  <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[500]} />
-                  <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ textAlign: "center" }}>
-                    Save
-                  </Text>
-                </Pressable>
-              ) : null}
+                </TouchableOpacity>
+              </View>
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                {onSavePress && images.length ? (
+                  <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
+                    <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[500]} />
+                    <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ textAlign: "center" }}>
+                      Save
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </View>
             </View>
           </View>
           {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
@@ -367,13 +382,6 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
         visible={previewModalVisible}
         setVisible={setPreviewModalVisible}
         initialIndex={initialPreviewIndex}
-      />
-      <DeleteImageModal
-        visible={!!selectedImageUri}
-        selectedImageUri={selectedImageUri}
-        setSelectedImageUri={setSelectedImageUri}
-        images={images}
-        setImages={setImages}
       />
     </Modal>
   );

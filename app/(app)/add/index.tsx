@@ -112,7 +112,7 @@ const AddPostScreen = () => {
     >
       <View style={{ marginBottom: 12, paddingLeft: 16 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
-          Add your images
+          Add your images (up to 5)
         </Text>
       </View>
       <View style={{ marginBottom: 36 }}>
@@ -187,7 +187,13 @@ const AddPostScreen = () => {
           <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
         </View>
       </View>
-      <CameraModal images={images} setImages={setImages} visible={cameraVisible} setVisible={setCameraVisible} />
+      <CameraModal
+        images={images}
+        setImages={setImages}
+        visible={cameraVisible}
+        setVisible={setCameraVisible}
+        maxImages={5}
+      />
     </ScrollView>
   );
 };
