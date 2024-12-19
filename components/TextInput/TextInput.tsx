@@ -16,7 +16,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import Text from "../Text/Text";
 
 type Props = {
-  value: string;
+  value?: string;
   label?: string;
   error?: string;
   inputStyle?: StyleProp<TextStyle>;
@@ -115,14 +115,14 @@ const TextInput = forwardRef(
             <Text
               style={{
                 color:
-                  maxLength && value.length >= maxLength
+                  maxLength && value && value.length >= maxLength
                     ? COLORS.red[500]
                     : isDarkMode
                       ? COLORS.zinc[300]
                       : COLORS.zinc[800],
               }}
             >
-              {value.length}/{maxLength}
+              {value ? value.length : 0}/{maxLength}
             </Text>
           ) : null}
         </View>

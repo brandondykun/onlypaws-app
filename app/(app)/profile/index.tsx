@@ -302,7 +302,7 @@ const ProfileScreen = () => {
           <View>
             <Text>About</Text>
             <TextInput
-              value={aboutText}
+              defaultValue={aboutText}
               onChangeText={(val) => setAboutText(val)}
               multiline
               numberOfLines={5}
