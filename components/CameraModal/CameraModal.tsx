@@ -304,8 +304,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Pressable
                   style={({ pressed }) => [
-                    !maxImagesReached && pressed && { opacity: 0.6 },
-                    { opacity: maxImagesReached ? 0.3 : 1.0 },
+                    !maxImagesReached && pressed ? { opacity: 0.5 } : maxImagesReached ? { opacity: 0.3 } : null,
                   ]}
                   onPress={pickImage}
                   disabled={maxImagesReached}
