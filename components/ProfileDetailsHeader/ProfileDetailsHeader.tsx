@@ -32,19 +32,22 @@ const ProfileDetailsHeader = ({
 }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
+  // const navigation = useNavigation();
 
   const followButtons = (
     <>
-      {profileData && profileData?.is_following ? (
+      {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
         <Button
           text="unfollow"
-          textStyle={{ fontSize: 12, color: isDarkMode ? COLORS.sky[500] : COLORS.sky[600] }}
+          textStyle={{ fontSize: 14, color: isDarkMode ? COLORS.sky[500] : COLORS.sky[600] }}
           buttonStyle={{
-            paddingHorizontal: 6,
+            paddingHorizontal: 0,
             height: 30,
-            width: 70,
+            width: 75,
             borderColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[600],
             borderRadius: 4,
+            marginRight: 4,
+            marginTop: 2,
           }}
           variant="outline"
           onPress={() => handleUnfollowPress(profileData.id)}
@@ -52,16 +55,18 @@ const ProfileDetailsHeader = ({
           loadingIconSize={12}
           loadingIconScale={0.7}
         />
-      ) : profileData ? (
+      ) : profileData && profileData?.id !== authProfile.id ? (
         <Button
           text="follow"
-          textStyle={{ fontSize: 12 }}
+          textStyle={{ fontSize: 14 }}
           buttonStyle={{
-            paddingHorizontal: 6,
+            paddingHorizontal: 0,
             height: 30,
-            width: 70,
+            width: 75,
             backgroundColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[500],
             borderRadius: 4,
+            marginRight: 4,
+            marginTop: 2,
           }}
           onPress={() => handleFollowPress(profileData)}
           loading={followLoading}
@@ -74,24 +79,33 @@ const ProfileDetailsHeader = ({
 
   return (
     <View style={{ padding: 16, backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View style={{ paddingTop: 12, gap: 12 }}>
+      <View style={{ flexDirection: "row", gap: 12, marginBottom: 8 }}>
+        <View style={{ gap: 16, flex: 1 }}>
           {!profileLoading ? (
-            <>
-              {/* <Text style={{ fontSize: 24 }}>{profileData?.username}</Text> */}
-              <Text style={{ fontSize: 18 }}>{profileData?.name}</Text>
-            </>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>{profileData?.name}</Text>
+              <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 16 }}>
+                {profileData?.breed}
+              </Text>
+              <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 16, marginBottom: 4 }}>
+                {profileData?.pet_type?.name}
+              </Text>
+            </View>
           ) : (
             <Text style={{ fontSize: 24, color: COLORS.zinc[500] }}>Loading...</Text>
           )}
-          {profileData && profileData.id !== authProfile.id ? followButtons : null}
         </View>
         <ProfileDetailsHeaderImage image={(!profileLoading && profileData?.image) || null} />
       </View>
-      <View style={{ paddingVertical: 24 }}>
-        <Text style={{ fontSize: 16 }} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]}>
+      <View style={{ paddingVertical: 24, gap: 24 }}>
+        <Text
+          style={{ fontSize: 16, fontWeight: "300", marginBottom: 12 }}
+          darkColor={COLORS.zinc[300]}
+          lightColor={COLORS.zinc[900]}
+        >
           {profileData?.about ? profileData.about : "No about text"}
         </Text>
+        {profileData && profileData.id !== authProfile.id ? followButtons : null}
       </View>
       <View style={{ flexDirection: "row", paddingTop: 12 }}>
         <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
