@@ -18,14 +18,14 @@ const PostTileSkeleton = ({ rows = 6, ...props }: Props) => {
   const { isDarkMode } = useColorMode();
 
   // size of each post tile
-  const size = screenWidth / 3 - 2; // subtract 2 to account for gap
+  const size = screenWidth / 3; // subtract 2 to account for gap
 
-  const firstPosition = 2; // first position offset
-  const secondPosition = size + 4; // second position offset
-  const thirdPosition = size * 2 + 4; // third position offset
+  const firstPosition = 1; // first position offset
+  const secondPosition = size + 2; // second position offset
+  const thirdPosition = size * 2 + 1; // third position offset
 
   // svg area height
-  const viewHeight = size * rows + 2 * rows;
+  const viewHeight = size * rows + 1 * rows;
 
   const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200]; // tile color
   const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300]; // swiping tile highlight color
@@ -33,7 +33,7 @@ const PostTileSkeleton = ({ rows = 6, ...props }: Props) => {
   // create correctly positioned row for each row in rows prop
   const tiles = [...Array(rows)].map((_, i) => {
     // offset down from top for the entire row
-    const y = i === 0 ? 0 : i * size + 2 * i;
+    const y = i === 0 ? 0 : i * size + 1 * i;
 
     return (
       <Fragment key={i}>
