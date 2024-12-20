@@ -1,3 +1,4 @@
+import DraggableFlatList from "@bwjohns4/react-native-draggable-flatlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Haptics from "expo-haptics";
@@ -6,7 +7,6 @@ import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform, ActivityIndicator } from "react-native";
-import DraggableFlatList from "react-native-draggable-flatlist";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
