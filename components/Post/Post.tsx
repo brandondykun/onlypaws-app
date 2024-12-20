@@ -1,9 +1,10 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
 import { useState, useRef, useCallback } from "react";
-import { View, Pressable, Dimensions, Animated } from "react-native";
+import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
@@ -20,6 +21,7 @@ import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";
 
 import PostCaption from "./PostCaption";
+import PostMenu from "./PostMenu";
 
 export const POST_HEIGHT = Dimensions.get("window").width + 200;
 
@@ -40,6 +42,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const postMenuRef = useRef<BottomSheetModal>(null);
 
   const handleHeartPress = async (postId: number, liked: boolean) => {
     setLikeLoading(true);
@@ -98,23 +101,52 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   const addComment = () => {
     onComment && onComment(post.id);
   };
+
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
 
+  // function for post menu
+  const openMenu = () => {
+    postMenuRef.current?.present();
+  };
+
+  // function for post menu
+  const handleProfilePress = () => {
+    onProfilePress(post.profile.id!);
+  };
+
+  // function for post menu
+  const handleLike = () => {
+    handleHeartPress(post.id, post.liked);
+  };
+
+  // function for post menu
+  const handleUnlike = () => {
+    handleHeartPress(post.id, post.liked);
+  };
+
   return (
     <View key={post.id} style={{ minHeight: POST_HEIGHT }}>
       <View style={{ padding: 8 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          <ProfileImage image={post.profile.image} size={35} />
-          <Pressable
-            style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-            onPress={() => onProfilePress(post.profile.id!)}
-          >
-            <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
-              {post.profile.username}
-            </Text>
-          </Pressable>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <ProfileImage image={post.profile.image} size={35} />
+            <Pressable style={({ pressed }) => [pressed && { opacity: 0.7 }]} onPress={handleProfilePress}>
+              <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
+                {post.profile.username}
+              </Text>
+            </Pressable>
+          </View>
+          {post.profile.id !== authProfile.id ? (
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
+              hitSlop={8}
+              onPress={openMenu}
+            >
+              <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
+            </Pressable>
+          ) : null}
         </View>
       </View>
       <View>
@@ -202,8 +234,21 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         </View>
       </View>
       <CommentsModal postId={post.id} addCommentToPost={addComment} ref={bottomSheetModalRef} />
+      <PostMenu
+        ref={postMenuRef}
+        onViewProfilePress={handleProfilePress}
+        onLike={handleLike}
+        onUnlike={handleUnlike}
+        liked={post.liked}
+      />
     </View>
   );
 };
 
 export default Post;
+
+const s = StyleSheet.create({
+  menuButton: {
+    marginRight: 4,
+  },
+});

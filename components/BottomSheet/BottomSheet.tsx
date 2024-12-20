@@ -60,7 +60,7 @@ const BottomSheetModal = forwardRef(
               }}
             >
               <Octicons name="horizontal-rule" size={30} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
-              <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "bold", marginTop: -5 }}>
+              <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "bold", marginTop: -5 }}>
                 {handleTitle}
               </Text>
             </View>
