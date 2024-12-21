@@ -138,15 +138,14 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
               </Text>
             </Pressable>
           </View>
-          {post.profile.id !== authProfile.id ? (
-            <Pressable
-              style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
-              hitSlop={8}
-              onPress={openMenu}
-            >
-              <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
-            </Pressable>
-          ) : null}
+          <Pressable
+            style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
+            hitSlop={8}
+            onPress={openMenu}
+            testID={`post-menu-button-${post.id}`}
+          >
+            <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
+          </Pressable>
         </View>
       </View>
       <View>
@@ -240,6 +239,8 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         onLike={handleLike}
         onUnlike={handleUnlike}
         liked={post.liked}
+        postProfileId={post.profile.id}
+        postId={post.id}
       />
     </View>
   );

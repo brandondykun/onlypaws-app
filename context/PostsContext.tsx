@@ -48,7 +48,7 @@ type Props = {
 };
 
 const PostsContextProvider = ({ children }: Props) => {
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, updatePostsCount } = useAuthProfileContext();
   const [data, setData] = useState<PostDetailed[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -108,12 +108,13 @@ const PostsContextProvider = ({ children }: Props) => {
     setData((prev) => [data, ...prev]);
   };
 
-  const deletePost = async (id: number) => {
+  const deletePost = (id: number) => {
     setData((prev) => {
       return prev.filter((post) => {
         return post.id !== id;
       });
     });
+    updatePostsCount("subtract", 1); // update auth profile post count
   };
 
   const addToCommentCount = (postId: number) => {

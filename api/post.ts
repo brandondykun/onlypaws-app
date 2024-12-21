@@ -26,6 +26,11 @@ export const createPost = async (postData: FormData, accessToken: string) => {
   return await axiosPost<PostDetailed>(url, postData, config);
 };
 
+export const deletePost = async (postId: number) => {
+  const url = `/v1/post/${postId}`;
+  return await axiosDelete(url);
+};
+
 export const addLike = async (postId: number, profileId: number) => {
   const url = `/v1/post/${postId}/like/`;
   return await axiosPost<PostLike>(url, { profileId });
