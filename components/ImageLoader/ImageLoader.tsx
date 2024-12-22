@@ -1,3 +1,4 @@
+import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { ActivityIndicator, Dimensions, ImageStyle, StyleProp, View } from "react-native";
@@ -38,13 +39,15 @@ const ImageLoader = ({ uri, width, height, style }: Props) => {
         </View>
       ) : null}
 
-      <Image
-        source={{ uri: uri }}
-        style={[{ width: width ? width : screenWidth, height: height ? height : screenWidth }, style]}
-        onLoadEnd={() => {
-          setLoading(false);
-        }}
-      />
+      <Zoomable>
+        <Image
+          source={{ uri: uri }}
+          style={[{ width: width ? width : screenWidth, height: height ? height : screenWidth }, style]}
+          onLoadEnd={() => {
+            setLoading(false);
+          }}
+        />
+      </Zoomable>
     </View>
   );
 };

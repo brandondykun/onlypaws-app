@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 
 import { toastConfig } from "@/config/ToastConfig";
@@ -11,6 +12,12 @@ import AuthProfileContextProvider from "@/context/AuthProfileContext";
 import AuthUserContextProvider from "@/context/AuthUserContext";
 import ColorModeContextProvider from "@/context/ColorModeContext";
 import AuthInterceptor from "@/interceptors/AuthInterceptor";
+
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 const RootLayout = () => {
   const colorScheme = useColorScheme();
