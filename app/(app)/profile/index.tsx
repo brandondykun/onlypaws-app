@@ -294,36 +294,41 @@ const ProfileScreen = () => {
         loading={updateProfileLoading}
       />
       <BottomSheetModal handleTitle="Edit Profile" ref={editProfileModalRef} onDismiss={handleEditModalClose}>
-        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 48, paddingTop: 16, paddingHorizontal: 24 }}>
-          <View>
-            <Text>Name</Text>
-            <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} placeholder="ex: Charlie" />
-          </View>
-          <View>
-            <Text>About</Text>
-            <TextInput
-              defaultValue={aboutText}
-              onChangeText={(val) => setAboutText(val)}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-            />
-          </View>
-          <View>
-            <Text>Breed</Text>
-            <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
-          </View>
-          <View>
-            <Text>Pet Type</Text>
-            <DropdownSelect
-              defaultText="Select a pet type"
-              defaultValue={petType ? petType : null}
-              data={petTypeOptions || []}
-              onSelect={(selectedItem) => setPetType(selectedItem)}
-            />
-          </View>
-          <View style={{ marginTop: 36 }}>
-            <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
+        <BottomSheetScrollView contentContainerStyle={s.editProfileBottomSheetContainer}>
+          <View style={{ flexGrow: 1 }}>
+            <View style={{ flexGrow: 1 }}>
+              <View>
+                <Text>Name</Text>
+                <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} placeholder="ex: Charlie" />
+              </View>
+              <View style={{ marginBottom: 12 }}>
+                <Text>Pet Type</Text>
+                <DropdownSelect
+                  defaultText="Select a pet type"
+                  defaultValue={petType ? petType : null}
+                  data={petTypeOptions || []}
+                  onSelect={(selectedItem) => setPetType(selectedItem)}
+                />
+              </View>
+              <View>
+                <Text>Breed</Text>
+                <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
+              </View>
+              <View>
+                <Text>About</Text>
+                <TextInput
+                  defaultValue={aboutText}
+                  onChangeText={(val) => setAboutText(val)}
+                  multiline
+                  numberOfLines={5}
+                  textAlignVertical="top"
+                />
+              </View>
+            </View>
+
+            <View style={{ marginTop: 36 }}>
+              <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
+            </View>
           </View>
         </BottomSheetScrollView>
       </BottomSheetModal>
@@ -413,5 +418,11 @@ const s = StyleSheet.create({
   },
   profileOption: {
     paddingVertical: 16,
+  },
+  editProfileBottomSheetContainer: {
+    paddingBottom: 48,
+    paddingTop: 16,
+    paddingHorizontal: 24,
+    flexGrow: 1,
   },
 });
