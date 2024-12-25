@@ -25,6 +25,8 @@ const PostsStack = () => {
         <Stack.Screen name="list" options={{ title: "Posts", headerBackTitle: "My Posts" }} />
         <Stack.Screen name="followers" options={{ title: "Followers", headerBackTitleVisible: false }} />
         <Stack.Screen name="following" options={{ title: "Following", headerBackTitleVisible: false }} />
+        <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackTitleVisible: false }} />
+        <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackTitleVisible: false }} />
       </Stack>
     </ProfileDetailsContextProvider>
   );

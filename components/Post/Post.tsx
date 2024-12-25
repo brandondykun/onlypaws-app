@@ -8,10 +8,11 @@ import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native"
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
-import { addLike, removeLike } from "@/api/post";
+import { addLike, removeLike, savePost, unSavePost } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PostDetailed } from "@/types";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
@@ -36,11 +37,14 @@ type Props = {
 
 const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: Props) => {
   const [likeLoading, setLikeLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
+  const savedPosts = useSavedPostsContext();
 
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const postMenuRef = useRef<BottomSheetModal>(null);
 
@@ -124,6 +128,86 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   // function for post menu
   const handleUnlike = () => {
     handleHeartPress(post.id, post.liked);
+  };
+
+  const handleUnSavePost = () => {
+    setPosts((prev) => {
+      return prev.map((prevPost) => {
+        if (prevPost.id === post.id) {
+          return { ...prevPost, is_saved: false };
+        }
+        return prevPost;
+      });
+    });
+  };
+
+  const handleSavePost = () => {
+    setPosts((prev) => {
+      return prev.map((prevPost) => {
+        if (prevPost.id === post.id) {
+          return { ...prevPost, is_saved: true };
+        }
+        return prevPost;
+      });
+    });
+  };
+
+  const handleBookmarkPress = async () => {
+    setSaveLoading(true);
+    if (post.is_saved) {
+      Haptics.selectionAsync();
+      Animated.sequence([
+        Animated.timing(saveButtonScaleValue, {
+          toValue: 0.7,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(saveButtonScaleValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      handleUnSavePost();
+      const { error } = await unSavePost(post.id);
+      if (!error) {
+        savedPosts.unSavePost(post.id);
+      } else {
+        handleSavePost();
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Error un-saving that post.",
+        });
+      }
+    } else {
+      Haptics.impactAsync();
+      Animated.sequence([
+        Animated.timing(saveButtonScaleValue, {
+          toValue: 1.5,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(saveButtonScaleValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      handleSavePost();
+      const { error } = await savePost(post.id, authProfile.id);
+      if (!error) {
+        savedPosts.savePost({ ...post, is_saved: true });
+      } else {
+        handleUnSavePost();
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Error saving that post.",
+        });
+      }
+    }
+    setSaveLoading(false);
   };
 
   return (
@@ -224,6 +308,22 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
               </Text>
             </View>
           </Pressable>
+          {post.profile.id !== authProfile.id ? (
+            <Pressable
+              style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, { marginLeft: "auto", marginRight: 2 }]}
+              hitSlop={10}
+              onPress={handleBookmarkPress}
+              disabled={saveLoading}
+            >
+              <Animated.View style={{ transform: [{ scale: saveButtonScaleValue }] }}>
+                <FontAwesome
+                  name={!post.is_saved ? "bookmark-o" : "bookmark"}
+                  size={20}
+                  color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]}
+                />
+              </Animated.View>
+            </Pressable>
+          ) : null}
         </View>
         <PostCaption caption={post.caption} />
         <View style={{ paddingLeft: 8, paddingTop: 6 }}>

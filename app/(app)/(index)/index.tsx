@@ -11,10 +11,12 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
 import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
+import { useSavedPostsContext } from "@/context/SavedPostsContext";
 
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
   const profile = useProfileDetailsContext(); // selected profile in this stack
+  const savedPosts = useSavedPostsContext();
   const tabBarHeight = useBottomTabBarHeight();
 
   const handleProfilePress = (profileId: number | string) => {
@@ -23,24 +25,21 @@ const FeedScreen = () => {
   };
 
   const onLike = (postId: number) => {
-    // update feed posts
-    feed.onLike(postId);
     // update selected profile posts in ProfileDetailsContextProvider for this stack
     profile.posts.onLike(postId);
+    savedPosts.onLike(postId); // update feed posts, explore posts, similar posts and saved posts
   };
 
   const onUnlike = (postId: number) => {
-    // update feed posts
-    feed.onUnlike(postId);
     // update selected profile posts in ProfileDetailsContextProvider for this stack
     profile.posts.onUnlike(postId);
+    savedPosts.onUnlike(postId); // update feed posts, explore posts, similar posts and saved posts
   };
 
   const onComment = (postId: number) => {
-    // update feed posts
-    feed.onComment(postId);
     // update selected profile posts in ProfileDetailsContextProvider for this stack
     profile.posts.onComment(postId);
+    savedPosts.onComment(postId); // update feed posts, explore posts, similar posts and saved posts
   };
 
   const emptyComponent = !feed.initialFetchComplete ? (

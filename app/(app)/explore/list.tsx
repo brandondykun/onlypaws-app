@@ -10,16 +10,18 @@ import Post from "@/components/Post/Post";
 import { POST_HEIGHT } from "@/components/Post/Post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PaginatedExploreResponse } from "@/types";
+import { addCommentInState, likePostInState, unlikePostInState } from "@/utils/utils";
 
 const ExplorePostsListScreen = () => {
-  const { postIndex } = useLocalSearchParams<{ postIndex: string }>();
+  const { postId } = useLocalSearchParams<{ postId: string }>();
   const { authProfile } = useAuthProfileContext();
-  const { explorePosts, similarPosts, setSimilarPosts, likePost, unlikePost, addComment } = useExplorePostsContext();
+  const { similarPosts, setSimilarPosts, likePost, unlikePost, addComment } = useExplorePostsContext();
+  const savedPosts = useSavedPostsContext();
   const tabBarHeight = useBottomTabBarHeight();
 
   const router = useRouter();
-  const selectedPost = explorePosts[Number(postIndex!)];
 
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
@@ -33,13 +35,13 @@ const ExplorePostsListScreen = () => {
   );
 
   const fetchSimilar = useCallback(async () => {
-    const { error, data } = await getSimilarPosts(selectedPost.id, authProfile.id);
+    const { error, data } = await getSimilarPosts(Number(postId), authProfile.id);
     if (!error && data) {
-      setSimilarPosts((prev) => data.results);
+      setSimilarPosts((prev) => [...prev, ...data.results]);
       setNextUrl(data.next);
       setInitialFetchLoading(false);
     }
-  }, [authProfile.id, selectedPost.id, setSimilarPosts]);
+  }, [authProfile.id, setSimilarPosts, postId]);
 
   useEffect(() => {
     fetchSimilar();
@@ -61,28 +63,33 @@ const ExplorePostsListScreen = () => {
     }
   }, [setSimilarPosts, nextUrl]);
 
+  const onLike = (postId: number) => {
+    likePost(postId);
+    likePostInState(savedPosts.setData, postId);
+  };
+
+  const onUnlike = (postId: number) => {
+    unlikePost(postId);
+    unlikePostInState(savedPosts.setData, postId);
+  };
+
+  const onComment = (postId: number) => {
+    addComment(postId);
+    addCommentInState(savedPosts.setData, postId);
+  };
+
   return (
     <FlashList
       data={similarPosts}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
-      ListHeaderComponent={
-        <Post
-          post={selectedPost}
-          onProfilePress={onProfilePress}
-          setPosts={setSimilarPosts}
-          onLike={likePost}
-          onUnlike={unlikePost}
-          onComment={addComment}
-        />
-      }
       renderItem={({ item }) => (
         <Post
           post={item}
           onProfilePress={onProfilePress}
           setPosts={setSimilarPosts}
-          onLike={likePost}
-          onUnlike={unlikePost}
-          onComment={addComment}
+          onLike={onLike}
+          onUnlike={onUnlike}
+          onComment={onComment}
         />
       )}
       keyExtractor={(item) => item.id.toString()}

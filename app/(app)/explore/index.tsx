@@ -23,13 +23,12 @@ const screenWidth = Dimensions.get("window").width;
 const ExploreScreen = () => {
   const router = useRouter();
   const navigation = useNavigation();
-  const screenWidth = Dimensions.get("window").width;
 
   const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const { explorePosts, setExplorePosts } = useExplorePostsContext();
+  const { explorePosts, setExplorePosts, setSimilarPosts } = useExplorePostsContext();
   const [refreshing, setRefreshing] = useState(false);
   const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
@@ -172,7 +171,10 @@ const ExploreScreen = () => {
           <PostTile
             post={post}
             index={index}
-            onPress={() => router.push({ pathname: "/(app)/explore/list", params: { postIndex: index } })}
+            onPress={() => {
+              setSimilarPosts([post]);
+              router.push({ pathname: "/(app)/explore/list", params: { postId: post.id.toString() } });
+            }}
           />
         )}
         ListFooterComponent={footerComponent}

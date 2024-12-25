@@ -58,6 +58,31 @@ export const addCommentInState = (
   });
 };
 
+export const savePostInState = (stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>, postId: number) => {
+  stateSetter((prev) => {
+    return prev.map((post) => {
+      if (post.id === postId) {
+        return { ...post, is_saved: true };
+      }
+      return post;
+    });
+  });
+};
+
+export const unSavePostInState = (
+  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
+  postId: number,
+) => {
+  stateSetter((prev) => {
+    return prev.map((post) => {
+      if (post.id === postId) {
+        return { ...post, is_saved: false };
+      }
+      return post;
+    });
+  });
+};
+
 export const abbreviateNumber = (num: number) => {
   if (num < 1000) {
     return num;

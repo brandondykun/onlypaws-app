@@ -2,10 +2,12 @@ import {
   PaginatedExploreResponse,
   PaginatedPostCommentsResponse,
   PaginatedProfilePostsResponse,
+  PaginatedSavedPostsResponse,
   PostDetailed,
   PostCommentDetailed,
   PostLike,
   CommentLike,
+  SavedPost,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete } from "./config";
@@ -28,6 +30,21 @@ export const createPost = async (postData: FormData, accessToken: string) => {
 
 export const deletePost = async (postId: number) => {
   const url = `/v1/post/${postId}`;
+  return await axiosDelete(url);
+};
+
+export const getSavedPosts = async () => {
+  const url = "/v1/post/saved/";
+  return await axiosFetch<PaginatedSavedPostsResponse>(url);
+};
+
+export const savePost = async (postId: number, profileId: number) => {
+  const url = `/v1/post/saved/`;
+  return await axiosPost<SavedPost>(url, { profile: profileId, post: postId });
+};
+
+export const unSavePost = async (postId: number) => {
+  const url = `/v1/post/saved/${postId}/`;
   return await axiosDelete(url);
 };
 

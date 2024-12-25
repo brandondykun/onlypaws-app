@@ -125,6 +125,7 @@ export type PostDetailed = {
   comments_count: number;
   likes_count: number;
   liked: boolean;
+  is_saved: boolean;
 };
 
 export type ProfileDetails = {
@@ -176,6 +177,13 @@ export type PaginatedFeedResponse = {
   results: PostDetailed[];
 };
 
+export type PaginatedSavedPostsResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PostDetailed[];
+};
+
 export type FollowProfile = {
   id: number;
   username: string;
@@ -204,4 +212,10 @@ export type CreateProfileResponse = {
   user: number;
   username: string;
   name: string;
+};
+
+export type SavedPost = {
+  id: number;
+  profile: number;
+  post: number;
 };

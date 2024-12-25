@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
 import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
+import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { addCommentInState, likePostInState, unlikePostInState } from "@/utils/utils";
 
 const FeedProfilePostsListScreen = () => {
@@ -10,6 +11,7 @@ const FeedProfilePostsListScreen = () => {
 
   const { posts } = useProfileDetailsContext();
   const feed = useFeedPostsContext();
+  const savedPosts = useSavedPostsContext();
   const router = useRouter();
 
   const onProfilePress = () => {
@@ -19,16 +21,19 @@ const FeedProfilePostsListScreen = () => {
   const onLike = (postId: number) => {
     likePostInState(posts.setData, postId);
     likePostInState(feed.setData, postId);
+    likePostInState(savedPosts.setData, postId);
   };
 
   const onUnlike = (postId: number) => {
     unlikePostInState(posts.setData, postId);
     unlikePostInState(feed.setData, postId);
+    unlikePostInState(savedPosts.setData, postId);
   };
 
   const onComment = (postId: number) => {
     addCommentInState(posts.setData, postId);
     addCommentInState(feed.setData, postId);
+    addCommentInState(savedPosts.setData, postId);
   };
 
   return (
