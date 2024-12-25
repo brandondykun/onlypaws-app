@@ -216,7 +216,12 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <ProfileImage image={post.profile.image} size={35} />
-            <Pressable style={({ pressed }) => [pressed && { opacity: 0.7 }]} onPress={handleProfilePress}>
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              onPress={handleProfilePress}
+              hitSlop={10}
+              testID={`post-username-button-${post.id}`}
+            >
               <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
                 {post.profile.username}
               </Text>
@@ -266,7 +271,8 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
               onPress={() => handleHeartPress(post.id, post.liked)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
               disabled={post.profile.id === authProfile.id || likeLoading}
-              testID="post-like-button"
+              testID={`post-like-button-${post.id}`}
+              hitSlop={7}
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                 <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
@@ -290,7 +296,8 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
           <Pressable
             onPress={handlePresentModalPress}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-            testID="post-comment-button"
+            testID={`post-comment-button-${post.id}`}
+            hitSlop={7}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
               <FontAwesome
@@ -314,6 +321,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
               hitSlop={10}
               onPress={handleBookmarkPress}
               disabled={saveLoading}
+              testID={`post-save-button-${post.id}`}
             >
               <Animated.View style={{ transform: [{ scale: saveButtonScaleValue }] }}>
                 <FontAwesome

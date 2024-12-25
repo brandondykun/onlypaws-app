@@ -25,7 +25,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
   const width = isRightColumnImage ? itemSize + 1 : itemSize;
 
   return (
-    <View style={{ position: "relative" }} key={post.id}>
+    <View style={{ position: "relative" }}>
       {post.images.length > 1 ? (
         <View style={{ position: "absolute", top: 3, right: 3, zIndex: 2 }}>
           <MaterialCommunityIcons name="card-multiple" size={16} color={COLORS.zinc[50]} />
@@ -34,7 +34,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
       <Pressable
         style={({ pressed }) => [pressed && { opacity: 0.7 }]}
         onPress={() => onPress(index)}
-        testID="post-tile-pressable"
+        testID={`post-tile-pressable-${post.id}`}
       >
         <Image source={{ uri: post.images[0].image }} style={{ height: itemSize, width: width }} />
       </Pressable>
