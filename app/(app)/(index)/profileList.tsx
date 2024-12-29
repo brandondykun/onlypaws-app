@@ -1,52 +1,19 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
-import { useFeedPostsContext } from "@/context/FeedPostsContext";
-import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
-import { useSavedPostsContext } from "@/context/SavedPostsContext";
-import { addCommentInState, likePostInState, unlikePostInState } from "@/utils/utils";
+import { useFeedProfileDetailsContext } from "@/context/FeedProfileDetailsContext";
 
 const FeedProfilePostsListScreen = () => {
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
 
-  const { posts } = useProfileDetailsContext();
-  const feed = useFeedPostsContext();
-  const savedPosts = useSavedPostsContext();
+  const { posts } = useFeedProfileDetailsContext();
   const router = useRouter();
 
   const onProfilePress = () => {
     router.back();
   };
 
-  const onLike = (postId: number) => {
-    likePostInState(posts.setData, postId);
-    likePostInState(feed.setData, postId);
-    likePostInState(savedPosts.setData, postId);
-  };
-
-  const onUnlike = (postId: number) => {
-    unlikePostInState(posts.setData, postId);
-    unlikePostInState(feed.setData, postId);
-    unlikePostInState(savedPosts.setData, postId);
-  };
-
-  const onComment = (postId: number) => {
-    addCommentInState(posts.setData, postId);
-    addCommentInState(feed.setData, postId);
-    addCommentInState(savedPosts.setData, postId);
-  };
-
-  return (
-    <PostScrollList
-      posts={posts.data!}
-      onProfilePress={onProfilePress}
-      initialIndex={Number(initialIndex)}
-      setPosts={posts.setData}
-      onLike={onLike}
-      onUnlike={onUnlike}
-      onComment={onComment}
-    />
-  );
+  return <PostScrollList posts={posts.data!} onProfilePress={onProfilePress} initialIndex={Number(initialIndex)} />;
 };
 
 export default FeedProfilePostsListScreen;

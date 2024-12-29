@@ -4,17 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { axiosFetch } from "@/api/config";
 import { getSavedPosts } from "@/api/post";
 import { PaginatedSavedPostsResponse, PostDetailed } from "@/types";
-import {
-  likePostInState,
-  unlikePostInState,
-  savePostInState,
-  unSavePostInState,
-  addCommentInState,
-} from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useExplorePostsContext } from "./ExplorePostsContext";
-import { useFeedPostsContext } from "./FeedPostsContext";
 
 type SavedPostsContextType = {
   data: PostDetailed[];
@@ -31,9 +22,6 @@ type SavedPostsContextType = {
   hasFetchNextError: boolean;
   initialFetchComplete: boolean;
   hasInitialFetchError: boolean;
-  onLike: (postId: number) => void;
-  onUnlike: (postId: number) => void;
-  onComment: (postId: number) => void;
 };
 
 const SavedPostsContext = createContext<SavedPostsContextType>({
@@ -51,9 +39,6 @@ const SavedPostsContext = createContext<SavedPostsContextType>({
   hasFetchNextError: false,
   initialFetchComplete: false,
   hasInitialFetchError: false,
-  onLike: (postId: number) => {},
-  onUnlike: (postId: number) => {},
-  onComment: (postId: number) => {},
 });
 
 type Props = {
@@ -62,8 +47,6 @@ type Props = {
 
 const SavedPostsContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
-  const { setExplorePosts, setSimilarPosts } = useExplorePostsContext();
-  const { setData: setFeedPosts } = useFeedPostsContext();
 
   const [data, setData] = useState<PostDetailed[]>([]);
   const [loading, setLoading] = useState(false);
@@ -137,9 +120,6 @@ const SavedPostsContextProvider = ({ children }: Props) => {
     } else {
       setData((prev) => [postData, ...prev]);
     }
-    savePostInState(setExplorePosts, postData.id);
-    savePostInState(setFeedPosts, postData.id);
-    savePostInState(setSimilarPosts, postData.id);
   };
 
   const unSavePost = (id: number) => {
@@ -153,30 +133,6 @@ const SavedPostsContextProvider = ({ children }: Props) => {
         return prevPost;
       });
     });
-    unSavePostInState(setExplorePosts, id);
-    unSavePostInState(setFeedPosts, id);
-    unSavePostInState(setSimilarPosts, id);
-  };
-
-  const onLike = (postId: number) => {
-    likePostInState(setData, postId);
-    likePostInState(setExplorePosts, postId);
-    likePostInState(setSimilarPosts, postId);
-    likePostInState(setFeedPosts, postId);
-  };
-
-  const onUnlike = (postId: number) => {
-    unlikePostInState(setData, postId);
-    unlikePostInState(setExplorePosts, postId);
-    unlikePostInState(setSimilarPosts, postId);
-    unlikePostInState(setFeedPosts, postId);
-  };
-
-  const onComment = (postId: number) => {
-    addCommentInState(setData, postId);
-    addCommentInState(setExplorePosts, postId);
-    addCommentInState(setSimilarPosts, postId);
-    addCommentInState(setFeedPosts, postId);
   };
 
   const value = {
@@ -194,9 +150,6 @@ const SavedPostsContextProvider = ({ children }: Props) => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
-    onLike,
-    onUnlike,
-    onComment,
   };
 
   return <SavedPostsContext.Provider value={value}>{children}</SavedPostsContext.Provider>;
@@ -220,9 +173,6 @@ export const useSavedPostsContext = () => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
-    onLike,
-    onUnlike,
-    onComment,
   } = useContext(SavedPostsContext);
   return {
     data,
@@ -239,8 +189,5 @@ export const useSavedPostsContext = () => {
     hasFetchNextError,
     initialFetchComplete,
     hasInitialFetchError,
-    onLike,
-    onUnlike,
-    onComment,
   };
 };

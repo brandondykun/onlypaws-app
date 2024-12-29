@@ -10,15 +10,12 @@ import Post from "@/components/Post/Post";
 import { POST_HEIGHT } from "@/components/Post/Post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
-import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PaginatedExploreResponse } from "@/types";
-import { addCommentInState, likePostInState, unlikePostInState } from "@/utils/utils";
 
 const ExplorePostsListScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { authProfile } = useAuthProfileContext();
-  const { similarPosts, setSimilarPosts, likePost, unlikePost, addComment } = useExplorePostsContext();
-  const savedPosts = useSavedPostsContext();
+  const { similarPosts, setSimilarPosts } = useExplorePostsContext();
   const tabBarHeight = useBottomTabBarHeight();
 
   const router = useRouter();
@@ -63,35 +60,11 @@ const ExplorePostsListScreen = () => {
     }
   }, [setSimilarPosts, nextUrl]);
 
-  const onLike = (postId: number) => {
-    likePost(postId);
-    likePostInState(savedPosts.setData, postId);
-  };
-
-  const onUnlike = (postId: number) => {
-    unlikePost(postId);
-    unlikePostInState(savedPosts.setData, postId);
-  };
-
-  const onComment = (postId: number) => {
-    addComment(postId);
-    addCommentInState(savedPosts.setData, postId);
-  };
-
   return (
     <FlashList
       data={similarPosts}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
-      renderItem={({ item }) => (
-        <Post
-          post={item}
-          onProfilePress={onProfilePress}
-          setPosts={setSimilarPosts}
-          onLike={onLike}
-          onUnlike={onUnlike}
-          onComment={onComment}
-        />
-      )}
+      renderItem={({ item }) => <Post post={item} onProfilePress={onProfilePress} />}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? getNextPage : null}

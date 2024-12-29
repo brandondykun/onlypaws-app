@@ -10,36 +10,16 @@ import { POST_HEIGHT } from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFeedPostsContext } from "@/context/FeedPostsContext";
-import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
-import { useSavedPostsContext } from "@/context/SavedPostsContext";
+import { useFeedProfileDetailsContext } from "@/context/FeedProfileDetailsContext";
 
 const FeedScreen = () => {
   const feed = useFeedPostsContext();
-  const profile = useProfileDetailsContext(); // selected profile in this stack
-  const savedPosts = useSavedPostsContext();
+  const profile = useFeedProfileDetailsContext(); // selected profile in this stack
   const tabBarHeight = useBottomTabBarHeight();
 
   const handleProfilePress = (profileId: number | string) => {
     profile.setProfileId(Number(profileId));
     router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId } });
-  };
-
-  const onLike = (postId: number) => {
-    // update selected profile posts in ProfileDetailsContextProvider for this stack
-    profile.posts.onLike(postId);
-    savedPosts.onLike(postId); // update feed posts, explore posts, similar posts and saved posts
-  };
-
-  const onUnlike = (postId: number) => {
-    // update selected profile posts in ProfileDetailsContextProvider for this stack
-    profile.posts.onUnlike(postId);
-    savedPosts.onUnlike(postId); // update feed posts, explore posts, similar posts and saved posts
-  };
-
-  const onComment = (postId: number) => {
-    // update selected profile posts in ProfileDetailsContextProvider for this stack
-    profile.posts.onComment(postId);
-    savedPosts.onComment(postId); // update feed posts, explore posts, similar posts and saved posts
   };
 
   const emptyComponent = !feed.initialFetchComplete ? (
@@ -79,16 +59,7 @@ const FeedScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        renderItem={({ item }) => (
-          <Post
-            post={item}
-            onProfilePress={handleProfilePress}
-            setPosts={feed.setData}
-            onLike={onLike}
-            onUnlike={onUnlike}
-            onComment={onComment}
-          />
-        )}
+        renderItem={({ item }) => <Post post={item} onProfilePress={handleProfilePress} />}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
         onEndReached={

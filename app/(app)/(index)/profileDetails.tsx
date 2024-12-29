@@ -2,7 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
-import { useProfileDetailsContext } from "@/context/ProfileDetailsContext";
+import { useFeedProfileDetailsContext } from "@/context/FeedProfileDetailsContext";
 
 const ProfileDetailsScreen = () => {
   const { profileId } = useLocalSearchParams<{ profileId: string }>();
@@ -13,7 +13,7 @@ const ProfileDetailsScreen = () => {
     router.push({ pathname: "/(app)/(index)/profileList", params: { initialIndex: index } });
   };
 
-  const { posts, profile } = useProfileDetailsContext();
+  const { posts, profile } = useFeedProfileDetailsContext();
 
   return (
     <ProfileDetails

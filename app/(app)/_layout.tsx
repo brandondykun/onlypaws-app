@@ -13,8 +13,12 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
+import ExploreProfileDetailsContextProvider from "@/context/ExploreProfileDetailsContext";
 import FeedPostsContextProvider from "@/context/FeedPostsContext";
+import FeedProfileDetailsContextProvider from "@/context/FeedProfileDetailsContext";
+import PostManagerContextProvider from "@/context/PostManagerContext";
 import PostsContextProvider from "@/context/PostsContext";
+import PostsProfileDetailsContextProvider from "@/context/PostsProfileDetailsContext";
 import SavedPostsContextProvider from "@/context/SavedPostsContext";
 
 const TabLayout = () => {
@@ -42,81 +46,93 @@ const TabLayout = () => {
       <FeedPostsContextProvider>
         <ExplorePostsContextProvider>
           <SavedPostsContextProvider>
-            <ExpoStatusBar style="auto" />
-            <Tabs
-              screenOptions={{
-                tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-                tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
-                tabBarStyle: {
-                  borderTopWidth: 0,
-                  elevation: 0,
-                  position: "absolute",
-                  right: 0,
-                  bottom: 0,
-                  left: 0,
-                  backgroundColor: "transparent",
-                },
-                headerShadowVisible: false, // applied here
-                tabBarBackground: () => {
-                  // only show blur view on ios
-                  if (Platform.OS === "ios") {
-                    return (
-                      <BlurView
-                        style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
-                        intensity={isDarkMode ? 20 : 10}
-                        tint={isDarkMode ? "dark" : "light"}
+            <FeedProfileDetailsContextProvider>
+              <ExploreProfileDetailsContextProvider>
+                <PostsProfileDetailsContextProvider>
+                  <PostManagerContextProvider>
+                    <ExpoStatusBar style="auto" />
+                    <Tabs
+                      screenOptions={{
+                        tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+                        tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
+                        tabBarStyle: {
+                          borderTopWidth: 0,
+                          elevation: 0,
+                          position: "absolute",
+                          right: 0,
+                          bottom: 0,
+                          left: 0,
+                          backgroundColor: "transparent",
+                        },
+                        headerShadowVisible: false, // applied here
+                        tabBarBackground: () => {
+                          // only show blur view on ios
+                          if (Platform.OS === "ios") {
+                            return (
+                              <BlurView
+                                style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
+                                intensity={isDarkMode ? 20 : 10}
+                                tint={isDarkMode ? "dark" : "light"}
+                              />
+                            );
+                          } else {
+                            return (
+                              <View
+                                style={{ flex: 1, backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }}
+                              />
+                            );
+                          }
+                        },
+                      }}
+                      sceneContainerStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}
+                    >
+                      <Tabs.Screen
+                        name="(index)"
+                        options={{
+                          title: "Feed",
+                          tabBarIcon: ({ color, focused }) => (
+                            <FontAwesome5 name="square-full" size={20} color={color} />
+                          ),
+                          headerShown: false,
+                        }}
                       />
-                    );
-                  } else {
-                    return (
-                      <View style={{ flex: 1, backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }} />
-                    );
-                  }
-                },
-              }}
-              sceneContainerStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}
-            >
-              <Tabs.Screen
-                name="(index)"
-                options={{
-                  title: "Feed",
-                  tabBarIcon: ({ color, focused }) => <FontAwesome5 name="square-full" size={20} color={color} />,
-                  headerShown: false,
-                }}
-              />
-              <Tabs.Screen
-                name="explore"
-                options={{
-                  title: "Explore",
-                  tabBarIcon: ({ color, focused }) => <Feather name="search" size={24} color={color} />,
-                  headerShown: false,
-                }}
-              />
-              <Tabs.Screen
-                name="add"
-                options={{
-                  title: "Add Post",
-                  tabBarIcon: ({ color, focused }) => <Octicons name="diff-added" size={24} color={color} />,
-                  headerShown: false,
-                }}
-              />
-              <Tabs.Screen
-                name="posts"
-                options={{
-                  title: "Posts",
-                  tabBarIcon: ({ color, focused }) => <MaterialIcons name="grid-on" size={24} color={color} />,
-                  headerShown: false,
-                }}
-              />
-              <Tabs.Screen
-                name="profile"
-                options={{
-                  title: "Profile",
-                  tabBarIcon: ({ color, focused }) => <MaterialIcons name="person" size={24} color={color} />,
-                  headerShown: false,
-                }}
-              />
-            </Tabs>
+                      <Tabs.Screen
+                        name="explore"
+                        options={{
+                          title: "Explore",
+                          tabBarIcon: ({ color, focused }) => <Feather name="search" size={24} color={color} />,
+                          headerShown: false,
+                        }}
+                      />
+                      <Tabs.Screen
+                        name="add"
+                        options={{
+                          title: "Add Post",
+                          tabBarIcon: ({ color, focused }) => <Octicons name="diff-added" size={24} color={color} />,
+                          headerShown: false,
+                        }}
+                      />
+                      <Tabs.Screen
+                        name="posts"
+                        options={{
+                          title: "Posts",
+                          tabBarIcon: ({ color, focused }) => <MaterialIcons name="grid-on" size={24} color={color} />,
+                          headerShown: false,
+                        }}
+                      />
+                      <Tabs.Screen
+                        name="profile"
+                        options={{
+                          title: "Profile",
+                          tabBarIcon: ({ color, focused }) => <MaterialIcons name="person" size={24} color={color} />,
+                          headerShown: false,
+                        }}
+                      />
+                    </Tabs>
+                  </PostManagerContextProvider>
+                </PostsProfileDetailsContextProvider>
+              </ExploreProfileDetailsContextProvider>
+            </FeedProfileDetailsContextProvider>
           </SavedPostsContextProvider>
         </ExplorePostsContextProvider>
       </FeedPostsContextProvider>

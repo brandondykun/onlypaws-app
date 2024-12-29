@@ -7,7 +7,7 @@ import { useSavedPostsContext } from "@/context/SavedPostsContext";
 const SavedPostsListScreen = () => {
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
 
-  const { data, setData, onLike, onUnlike, onComment } = useSavedPostsContext();
+  const { data } = useSavedPostsContext();
 
   const router = useRouter();
 
@@ -21,17 +21,7 @@ const SavedPostsListScreen = () => {
     }
   }, [data, router]);
 
-  return (
-    <PostScrollList
-      posts={data}
-      onProfilePress={onProfilePress}
-      initialIndex={Number(initialIndex)}
-      setPosts={setData}
-      onLike={onLike}
-      onUnlike={onUnlike}
-      onComment={onComment}
-    />
-  );
+  return <PostScrollList posts={data} onProfilePress={onProfilePress} initialIndex={Number(initialIndex)} />;
 };
 
 export default SavedPostsListScreen;

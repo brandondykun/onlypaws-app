@@ -8,10 +8,11 @@ import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native"
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
-import { addLike, removeLike, savePost, unSavePost } from "@/api/post";
+import { addLike, removeLike, savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { usePostManagerContext } from "@/context/PostManagerContext";
 import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PostDetailed } from "@/types";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
@@ -28,20 +29,17 @@ export const POST_HEIGHT = Dimensions.get("window").width + 200;
 
 type Props = {
   post: PostDetailed;
-  setPosts: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
   onProfilePress: (profileId: number) => void;
-  onLike?: (postId: number) => void;
-  onUnlike?: (postId: number) => void;
-  onComment?: (postId: number) => void;
 };
 
-const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: Props) => {
+const Post = ({ post, onProfilePress }: Props) => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
   const savedPosts = useSavedPostsContext();
+  const { savePost, unSavePost, onLike, onUnlike, onComment } = usePostManagerContext();
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
@@ -131,25 +129,11 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
   };
 
   const handleUnSavePost = () => {
-    setPosts((prev) => {
-      return prev.map((prevPost) => {
-        if (prevPost.id === post.id) {
-          return { ...prevPost, is_saved: false };
-        }
-        return prevPost;
-      });
-    });
+    unSavePost(post.id);
   };
 
   const handleSavePost = () => {
-    setPosts((prev) => {
-      return prev.map((prevPost) => {
-        if (prevPost.id === post.id) {
-          return { ...prevPost, is_saved: true };
-        }
-        return prevPost;
-      });
-    });
+    savePost(post);
   };
 
   const handleBookmarkPress = async () => {
@@ -169,7 +153,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         }),
       ]).start();
       handleUnSavePost();
-      const { error } = await unSavePost(post.id);
+      const { error } = await unSavePostApi(post.id);
       if (!error) {
         savedPosts.unSavePost(post.id);
       } else {
@@ -195,7 +179,7 @@ const Post = ({ post, setPosts, onProfilePress, onLike, onUnlike, onComment }: P
         }),
       ]).start();
       handleSavePost();
-      const { error } = await savePost(post.id, authProfile.id);
+      const { error } = await savePostApi(post.id, authProfile.id);
       if (!error) {
         savedPosts.savePost({ ...post, is_saved: true });
       } else {
