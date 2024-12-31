@@ -1,14 +1,20 @@
 # exploreFollowProfile.yaml
+
 # Test navigating to Profile and following/un-following profile
 
 appId: com.bdykun.onlypawsapp
 name: Explore Follow Profile Flow
 
 ---
-- launchApp:
-    clearState: true
+- launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- runFlow:
+    when:
+      visible:
+        text: "Explore, tab, 2 of 5"
+    commands:
+      - tapOn: "Explore, tab, 2 of 5"
+
 
 # tap on first explore post
 - tapOn:

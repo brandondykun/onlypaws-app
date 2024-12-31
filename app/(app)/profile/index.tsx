@@ -5,6 +5,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
@@ -103,6 +104,7 @@ const ProfileScreen = () => {
           onPress={() => profileOptionsModalRef.current?.present()}
           style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
           hitSlop={20}
+          testID="view-profile-options-button"
         >
           <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
         </Pressable>

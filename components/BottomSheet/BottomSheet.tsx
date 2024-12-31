@@ -35,6 +35,11 @@ const BottomSheetModal = forwardRef(
 
     return (
       <RNBottomSheetModal
+        accessible={Platform.select({
+          // make child elements accessible during testing
+          // setting it to false on Android seems to cause issues with TalkBack instead
+          ios: false,
+        })}
         ref={ref}
         onChange={onChange}
         snapPoints={snapPoints}
@@ -58,6 +63,7 @@ const BottomSheetModal = forwardRef(
                 borderBottomWidth: 1,
                 paddingBottom: 8,
               }}
+              testID="bottom-sheet-handle"
             >
               <Octicons name="horizontal-rule" size={30} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
               <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "bold", marginTop: -5 }}>

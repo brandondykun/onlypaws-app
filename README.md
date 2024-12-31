@@ -67,6 +67,14 @@ npx expo run:android --device
 npx expo start --dev-client  
 ```
 
+### Run dev client during testing
+#### --no-dev prevents the splash screen warning from blocking the tabs
+#### --minify minifies the app code
+```bash
+npx expo start --no-dev --dev-client
+npx expo start --no-dev --minify --dev-client 
+```
+
 ### Running tests
 ```bash
 maestro test e2e/

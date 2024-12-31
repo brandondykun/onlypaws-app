@@ -6,10 +6,15 @@ appId: com.bdykun.onlypawsapp
 name: Search Profile And View Page Flow
 
 ---
-- launchApp:
-    clearState: true
+- launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- runFlow:
+    when:
+      visible:
+        text: "Explore, tab, 2 of 5"
+    commands:
+      - tapOn: "Explore, tab, 2 of 5"
+
 - tapOn: "Search profiles..."
 - tapOn: "Search profiles..."
 - inputText: "user"

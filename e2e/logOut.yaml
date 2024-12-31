@@ -5,10 +5,18 @@
 appId: com.bdykun.onlypawsapp
 name: Log Out Flow
 
----
-- launchApp:
-    clearState: true
 
-- tapOn: "Profile, tab, 5 of 5"
+---
+- launchApp
+
+- runFlow:
+    when:
+      visible:
+        text: "Profile, tab, 5 of 5"
+    commands:
+      - tapOn: "Profile, tab, 5 of 5"
+
+- tapOn: 
+    id: "view-profile-options-button"
 - tapOn: "Log Out"
 - assertVisible: "Create an Account"
