@@ -1,0 +1,53 @@
+# likePost.yaml
+
+# Test liking and un-liking a post.
+# Test that liking/un-liking propagates through the app.
+
+appId: com.bdykun.onlypawsapp
+name: Like Post
+
+---
+- launchApp
+
+- tapOn: "Explore, tab, 2 of 5"
+- tapOn:
+    id: "post-tile-pressable-33"
+
+# like post
+- tapOn:
+    id: "post-like-button-33-false"
+- assertVisible:
+    id: "post-like-button-33-true"
+
+# un-like post
+- tapOn:
+    id: "post-like-button-33-true"
+- assertVisible:
+    id: "post-like-button-33-false"
+
+# navigate to post in profile list
+- tapOn:
+    id: "post-username-button-33"
+- tapOn:
+    id: "post-tile-pressable-33"
+
+# like post
+- assertVisible:
+    id: "post-like-button-33-false"
+- tapOn:
+    id: "post-like-button-33-false"
+- assertVisible:
+    id: "post-like-button-33-true"
+
+# navigate back to explore list
+- tapOn: "usereleven"
+- tapOn: "Posts"
+
+# make sure post is liked from other screen and un-like post
+- assertVisible:
+    id: "post-like-button-33-true"
+- tapOn:
+    id: "post-like-button-33-true"
+- assertVisible:
+    id: "post-like-button-33-false"
+

@@ -8,4 +8,5 @@ executionOrder:
         - Search Profile And View Page Flow
         - Add Post Comment Flow
         - Save Post
+        - Like Post
         - Log Out Flow

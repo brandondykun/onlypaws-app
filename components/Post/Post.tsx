@@ -255,7 +255,7 @@ const Post = ({ post, onProfilePress }: Props) => {
               onPress={() => handleHeartPress(post.id, post.liked)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
               disabled={post.profile.id === authProfile.id || likeLoading}
-              testID={`post-like-button-${post.id}`}
+              testID={`post-like-button-${post.id}-${post.liked}`}
               hitSlop={7}
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
