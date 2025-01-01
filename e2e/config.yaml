@@ -7,4 +7,5 @@ executionOrder:
         - Explore Follow Profile Flow
         - Search Profile And View Page Flow
         - Add Post Comment Flow
+        - Save Post
         - Log Out Flow
