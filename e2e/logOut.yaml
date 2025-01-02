@@ -14,7 +14,7 @@ name: Log Out Flow
       visible:
         text: "Profile, tab, 5 of 5"
     commands:
-      - tapOn: "Profile, tab, 5 of 5"
+        - tapOn: "Profile, tab, 5 of 5"
 
 - tapOn: 
     id: "view-profile-options-button"
