@@ -1,0 +1,39 @@
+# addPostCommentReply.yaml
+
+# Test adding a reply to a post comment
+# Test hiding replies to the comment and then displaying them again
+
+appId: com.bdykun.onlypawsapp
+name: Add Post Comment Reply Flow
+
+---
+- launchApp
+
+- tapOn: "Explore, tab, 2 of 5"
+
+- tapOn:
+    id: "post-tile-pressable-28"
+- tapOn:
+    id: "post-comment-button-28"
+
+- assertVisible: "Love the bandana! Where did you get it?"
+
+# reply to comment
+- tapOn: "Reply"
+- assertVisible: "replying to @userone: Love the bandana! Where did you get it?"
+- tapOn: "Reply to @userone..."
+- inputText: "I want to know that too!"
+- tapOn:
+    id: "add-comment-button"
+
+# assert comment was added
+- assertVisible: "@userone I want to know that too!"
+
+# hide replies
+- tapOn: "hide replies"
+- assertNotVisible: "@userone I want to know that too!"
+- assertVisible: "View 1 reply"
+
+# show replies
+- tapOn: "View 1 reply"
+- assertVisible: "@userone I want to know that too!"
