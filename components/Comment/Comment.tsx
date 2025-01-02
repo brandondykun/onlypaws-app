@@ -3,6 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
 import { useCallback, useState } from "react";
+import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -157,7 +158,11 @@ const Comment = ({
           </Text>
         </View>
         <View style={s.likeContainer}>
-          <Pressable hitSlop={10} onPress={() => handleHeartPress(comment.id)}>
+          <Pressable
+            hitSlop={10}
+            onPress={() => handleHeartPress(comment.id)}
+            testID={`comment-like-button-${comment.id}-${comment.liked}`}
+          >
             <View style={s.buttonContainer}>
               <AntDesign
                 name={comment.liked ? "heart" : "hearto"}

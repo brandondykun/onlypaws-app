@@ -1,0 +1,32 @@
+# addPostCommentLike.yaml
+
+# Test liking a post comment
+
+appId: com.bdykun.onlypawsapp
+name: Add Post Comment Like Flow
+
+---
+- launchApp
+
+# navigate to post comments
+- tapOn: "Explore, tab, 2 of 5"
+- tapOn:
+    id: "post-tile-pressable-35"
+- tapOn:
+    id: "post-comment-button-35"
+
+# comment should not be liked to start
+- assertVisible:
+    id: "comment-like-button-10-false"
+
+# like comment
+- tapOn:
+    id: "comment-like-button-10-false"
+- assertVisible:
+    id: "comment-like-button-10-true"
+
+# unlike comment
+- tapOn:
+    id: "comment-like-button-10-true"
+- assertVisible:
+    id: "comment-like-button-10-false"
