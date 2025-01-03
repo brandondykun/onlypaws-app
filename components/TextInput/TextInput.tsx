@@ -94,6 +94,7 @@ const TextInput = forwardRef(
                 <Pressable
                   style={({ pressed }) => [pressed && { opacity: 0.7 }]}
                   onPress={() => setTextHidden((prev) => !prev)}
+                  testID="input-show-text-button"
                 >
                   <Feather name="eye" size={20} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
                 </Pressable>
@@ -101,6 +102,7 @@ const TextInput = forwardRef(
                 <Pressable
                   style={({ pressed }) => [pressed && { opacity: 0.7 }]}
                   onPress={() => setTextHidden((prev) => !prev)}
+                  testID="input-hide-text-button"
                 >
                   <Feather name="eye-off" size={20} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
                 </Pressable>

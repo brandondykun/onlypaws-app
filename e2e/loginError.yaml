@@ -1,0 +1,55 @@
+# loginError.yaml
+
+# Test failed login messages
+
+appId: com.bdykun.onlypawsapp
+name: Log In Error Flow
+
+---
+- launchApp
+
+# navigate to login screen
+- runFlow:
+    when:
+      visible:
+        text: "Log in"
+    commands:
+        - tapOn: "Log in"
+
+# log in without entering an email or password
+- tapOn: "Log In"
+- assertVisible: "Please enter your email."
+- assertVisible: "Please enter your password."
+
+# enter email
+- tapOn: "youremail@email.com"
+- inputText: "admin@email.com"
+
+# attempt login again with only email complete
+- tapOn: "Log In"
+- assertNotVisible: "Please enter your email."
+- assertVisible: "Please enter your password."
+
+# enter incorrect password
+- tapOn:
+    id: "login-password"
+- inputText: "bad-password"
+
+# assert password is hidden by default
+- assertNotVisible: "bad-password"
+
+# show password - password text should be visible
+- tapOn:
+    id: "input-show-text-button"
+- assertVisible: "bad-password"
+
+# hide password - password text should be hidden
+- tapOn: 
+    id: "input-hide-text-button"
+- assertNotVisible: "bad-password"
+
+# try to login with valid email but bad password - error toast should show
+- tapOn: "Log In"
+- assertNotVisible: "Please enter your email."
+- assertNotVisible: "Please enter your password."
+- assertVisible: Invalid credentials. Please try again.
