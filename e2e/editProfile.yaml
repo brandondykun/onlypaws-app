@@ -1,0 +1,61 @@
+# editProfile.yaml
+
+# Test editing a profile from profile screen
+
+appId: com.bdykun.onlypawsapp
+name: Edit Profile Flow
+
+---
+- launchApp
+
+# navigate to profile screen
+- tapOn: "Profile, tab, 5 of 5"
+
+# assert correct initial state
+- assertVisible: "Linus"
+- assertVisible: "No pet type selected"
+- assertVisible: "No breed entered"
+- scrollUntilVisible:
+    element: "Admin profile."
+    direction: DOWN
+
+# open profile menu
+- tapOn:
+    id: "view-profile-options-button"
+
+# open edit profile menu - wait for menu to open
+- runFlow:
+    when:
+      visible:
+        text: "Edit Profile"
+    commands:
+        - tapOn: "Edit Profile"
+
+# TODO: need to test selecting pet type from the dropdown
+# edit inputs
+- runFlow:
+    when:
+      visible:
+        text: "Linus"
+    commands:
+        - tapOn: "Linus"
+# wait for input to focus (this was giving errors)
+- waitForAnimationToEnd:
+    timeout: 5000
+- eraseText
+- inputText: "L"
+
+- tapOn: "ex: Golden Retriever"
+- inputText: "C"
+
+- tapOn: "Admin profile."
+- eraseText
+- inputText: "A"
+
+# submit changes
+- tapOn: "Submit"
+
+# assert that the profile is updated
+- assertVisible: "L"
+- assertVisible: "C"
+- assertVisible: "A"
