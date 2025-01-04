@@ -156,7 +156,7 @@ const FollowingScreen = () => {
         darkColor={COLORS.zinc[400]}
         lightColor={COLORS.zinc[600]}
       >
-        You not following any profiles.
+        You are not following any profiles.
       </Text>
       <Text
         style={{
