@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Pressable,
   View,
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
 
 type ButtonType = "primary" | "secondary" | "text" | "outline";
 
@@ -47,6 +49,12 @@ const Button = ({
 }: Props) => {
   const colorScheme = useColorScheme();
   const styles = getButtonStyles(colorScheme, variant);
+  const { setLightOrDark } = useColorMode();
+
+  const spinnerColor =
+    variant === "primary"
+      ? setLightOrDark(COLORS.zinc[300], COLORS.zinc[900])
+      : setLightOrDark(COLORS.zinc[700], COLORS.zinc[300]);
 
   return (
     <Pressable
@@ -65,7 +73,7 @@ const Button = ({
         ) : (
           <ActivityIndicator
             size={loadingIconSize ? loadingIconSize : "small"}
-            color={variant === "primary" ? COLORS.zinc[900] : COLORS.zinc[300]}
+            color={spinnerColor}
             testID="button-loading-spinner"
             style={{ transform: [{ scale: Platform.OS === "ios" ? loadingIconScale : 1 }] }}
           />
