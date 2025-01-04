@@ -6,6 +6,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef, useState, useCallback } from "react";
+import React from "react";
 import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
@@ -112,7 +113,10 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   if (device == null) {
     content = (
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 18, fontWeight: 300 }}>No Camera Device Found</Text>
+        <Text style={s.message}>Uh oh! No Camera Device Found.</Text>
+        <View style={{ alignItems: "center", paddingBottom: 48 }}>
+          <Button onPress={() => setVisible(false)} text="Back" variant="text" />
+        </View>
       </View>
     );
   }
