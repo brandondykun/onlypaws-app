@@ -12,5 +12,6 @@ executionOrder:
         - Like Post
         - Add Post Comment Like Flow
         - Add Post Comment Reply Flow
+        - Change Profile Flow
         - Edit Profile Flow
         - Log Out Flow
