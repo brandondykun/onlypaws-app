@@ -1,3 +1,5 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetScrollView, BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -361,6 +363,7 @@ const ProfileScreen = () => {
                   { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
                 ]}
               >
+                <MaterialIcons name="person" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
                 <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Profile</Text>
               </View>
             </Pressable>
@@ -377,6 +380,7 @@ const ProfileScreen = () => {
                   { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
                 ]}
               >
+                <Ionicons name="camera" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
                 <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Profile Image</Text>
               </View>
             </Pressable>
@@ -388,6 +392,7 @@ const ProfileScreen = () => {
               }}
             >
               <View style={[s.profileOption]}>
+                <MaterialIcons name="people" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
                 <Text style={{ textAlign: "center", fontSize: 18 }}>Switch Profile</Text>
               </View>
             </Pressable>
@@ -420,6 +425,11 @@ const s = StyleSheet.create({
   },
   profileOption: {
     paddingVertical: 16,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
   },
   editProfileBottomSheetContainer: {
     paddingBottom: 48,
