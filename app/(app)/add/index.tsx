@@ -44,6 +44,7 @@ const AddPostScreen = () => {
   const resetState = () => {
     setImages([]);
     setCaption("");
+    setCaptionError("");
   };
 
   const handleAddPost = async () => {
