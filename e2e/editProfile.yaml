@@ -27,9 +27,9 @@ name: Edit Profile Flow
 - runFlow:
     when:
       visible:
-        text: "Edit Profile"
+        text: .*Edit Profile
     commands:
-        - tapOn: "Edit Profile"
+        - tapOn: .*Edit Profile
 
 # TODO: need to test selecting pet type from the dropdown
 # edit inputs
