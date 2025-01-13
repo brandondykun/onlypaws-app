@@ -1,0 +1,29 @@
+# ownPostsShowReports.yaml
+
+# Test that own posts show that they have been reported
+
+appId: com.bdykun.onlypawsapp
+name: Own Posts Show Reports Flow
+
+---
+- launchApp
+
+# navigate to posts screen
+- tapOn: "Posts, tab, 4 of 5"
+
+# tap on reported post
+# TODO: test that alert icon shows on tile
+- tapOn:
+    id: "post-tile-pressable-55"
+
+# post should show message that it has been reported
+- assertVisible: "This post has been reported. See menu for details."
+- tapOn:
+    id: "post-menu-button-55"
+
+# menu should show reasons why post was reported
+- assertVisible: "This post has been reported for:"
+- assertVisible: "Not Pet Related"
+- assertVisible: "Too Much Human"
+- assertVisible: "Other users can still see this post, but the images are initially\
+    \ hidden."

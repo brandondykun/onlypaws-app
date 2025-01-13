@@ -126,6 +126,9 @@ export type PostDetailed = {
   likes_count: number;
   liked: boolean;
   is_saved: boolean;
+  reports: PostReportPreview[];
+  is_hidden: boolean;
+  is_reported: boolean; // has current profile already reported the post
 };
 
 export type ProfileDetails = {
@@ -218,4 +221,32 @@ export type SavedPost = {
   id: number;
   profile: number;
   post: number;
+};
+
+export type PostReportStatus = "PENDING" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED";
+
+export type ReportReason = {
+  id: number;
+  name: string;
+  description: string;
+};
+
+export type PaginatedReportReasonsResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ReportReason[];
+};
+
+export type CreatePostReportResponse = {
+  id: number;
+  post: number;
+  reason: number;
+  details: string;
+};
+
+export type PostReportPreview = {
+  id: number;
+  reason: ReportReason;
+  status: PostReportStatus;
 };

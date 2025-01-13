@@ -7,6 +7,9 @@ import {
   savePostInState,
   unSavePostInState,
   addCommentInState,
+  togglePostHiddenInState,
+  addPostReportedInState,
+  removePostInState,
 } from "@/utils/utils";
 
 import { useExplorePostsContext } from "./ExplorePostsContext";
@@ -27,6 +30,8 @@ type PostManagerContextType = {
   onComment: (postId: number) => void;
   savePost: (postData: PostDetailed) => void;
   unSavePost: (postId: number) => void;
+  onToggleHidden: (postId: number) => void;
+  onReportPost: (postId: number, is_inappropriate_content: boolean) => void;
 };
 
 const PostManagerContext = createContext<PostManagerContextType>({
@@ -35,6 +40,8 @@ const PostManagerContext = createContext<PostManagerContextType>({
   onComment: (postId: number) => {},
   savePost: (postData: PostDetailed) => {},
   unSavePost: (postId: number) => {},
+  onToggleHidden: (postId: number) => {},
+  onReportPost: (postId: number, is_inappropriate_content: boolean) => {},
 });
 
 type Props = {
@@ -109,12 +116,55 @@ const PostManagerContextProvider = ({ children }: Props) => {
     addCommentInState(postsProfile.posts.setData, postId);
   };
 
+  const onToggleHidden = (postId: number) => {
+    // toggle is_hidden true or false for post wherever it appears in the app
+    togglePostHiddenInState(explorePosts.setExplorePosts, postId);
+    togglePostHiddenInState(explorePosts.setSimilarPosts, postId);
+    togglePostHiddenInState(explorePosts.setSelectedProfilePosts, postId);
+    togglePostHiddenInState(feedPosts.setData, postId);
+    togglePostHiddenInState(savedPosts.setData, postId);
+    togglePostHiddenInState(exploreProfile.posts.setData, postId);
+    togglePostHiddenInState(feedProfile.posts.setData, postId);
+    togglePostHiddenInState(postsProfile.posts.setData, postId);
+  };
+
+  const removePostFromData = (postId: number) => {
+    // remove post wherever it appears in the app
+    removePostInState(explorePosts.setExplorePosts, postId);
+    removePostInState(explorePosts.setSimilarPosts, postId);
+    removePostInState(explorePosts.setSelectedProfilePosts, postId);
+    removePostInState(feedPosts.setData, postId);
+    removePostInState(savedPosts.setData, postId);
+    removePostInState(exploreProfile.posts.setData, postId);
+    removePostInState(feedProfile.posts.setData, postId);
+    removePostInState(postsProfile.posts.setData, postId);
+  };
+
+  const onReportPost = (postId: number, is_inappropriate_content: boolean) => {
+    // toggle is_reported true for post wherever it appears in the app
+    addPostReportedInState(explorePosts.setExplorePosts, postId);
+    addPostReportedInState(explorePosts.setSimilarPosts, postId);
+    addPostReportedInState(explorePosts.setSelectedProfilePosts, postId);
+    addPostReportedInState(feedPosts.setData, postId);
+    addPostReportedInState(savedPosts.setData, postId);
+    addPostReportedInState(exploreProfile.posts.setData, postId);
+    addPostReportedInState(feedProfile.posts.setData, postId);
+    addPostReportedInState(postsProfile.posts.setData, postId);
+
+    // if post was reported as inappropriate, remove it from wherever it appears in the app
+    if (is_inappropriate_content) {
+      removePostFromData(postId);
+    }
+  };
+
   const value = {
     onLike,
     onUnlike,
     onComment,
     unSavePost,
     savePost,
+    onToggleHidden,
+    onReportPost,
   };
 
   return <PostManagerContext.Provider value={value}>{children}</PostManagerContext.Provider>;
@@ -123,12 +173,7 @@ const PostManagerContextProvider = ({ children }: Props) => {
 export default PostManagerContextProvider;
 
 export const usePostManagerContext = () => {
-  const { onLike, onUnlike, onComment, unSavePost, savePost } = useContext(PostManagerContext);
-  return {
-    onLike,
-    onUnlike,
-    onComment,
-    unSavePost,
-    savePost,
-  };
+  const { onLike, onUnlike, onComment, unSavePost, savePost, onToggleHidden, onReportPost } =
+    useContext(PostManagerContext);
+  return { onLike, onUnlike, onComment, unSavePost, savePost, onToggleHidden, onReportPost };
 };

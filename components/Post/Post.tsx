@@ -1,7 +1,9 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { useState, useRef, useCallback } from "react";
 import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native";
@@ -17,6 +19,7 @@ import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PostDetailed } from "@/types";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
+import Button from "../Button/Button";
 import CommentsModal from "../CommentsModal/CommentsModal";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
 import ProfileImage from "../ProfileImage/ProfileImage";
@@ -39,7 +42,7 @@ const Post = ({ post, onProfilePress }: Props) => {
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
   const savedPosts = useSavedPostsContext();
-  const { savePost, unSavePost, onLike, onUnlike, onComment } = usePostManagerContext();
+  const { savePost, unSavePost, onLike, onUnlike, onComment, onToggleHidden } = usePostManagerContext();
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
@@ -47,6 +50,7 @@ const Post = ({ post, onProfilePress }: Props) => {
   const postMenuRef = useRef<BottomSheetModal>(null);
 
   const handleHeartPress = async (postId: number, liked: boolean) => {
+    if (post.is_hidden) return;
     setLikeLoading(true);
     if (!liked) {
       Haptics.impactAsync();
@@ -221,7 +225,48 @@ const Post = ({ post, onProfilePress }: Props) => {
           </Pressable>
         </View>
       </View>
-      <View>
+      <View style={{ position: "relative" }}>
+        {post.is_hidden && post.profile.id !== authProfile.id ? (
+          <BlurView
+            intensity={90}
+            style={[s.blurView, { backgroundColor: isDarkMode ? "#09090bb5" : "#d6d6dbb5" }]}
+            testID={`post-${post.id}-hidden-view`}
+          >
+            <Ionicons name="eye-off" size={42} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[700]} />
+            <Text style={{ fontSize: 18, paddingHorizontal: 36, textAlign: "center", fontWeight: 300 }}>
+              {(post.is_reported ? "You reported this post, " : "This post has been reported, ") +
+                "so we hid it for you."}
+            </Text>
+            <Button
+              text="Show Post"
+              variant="text"
+              onPress={() => onToggleHidden(post.id)}
+              textStyle={{ color: COLORS.sky[600] }}
+              testID={`post-${post.id}-show-post-button`}
+            />
+          </BlurView>
+        ) : null}
+        {post.is_hidden && post.profile.id === authProfile.id ? (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+              backgroundColor: COLORS.zinc[900],
+              paddingVertical: 2,
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+              gap: 6,
+            }}
+          >
+            <Ionicons name="alert-circle-outline" size={14} color={COLORS.red[600]} />
+            <Text style={{ color: COLORS.red[600] }}>This post has been reported. See menu for details.</Text>
+            <Ionicons name="alert-circle-outline" size={14} color={COLORS.red[600]} />
+          </View>
+        ) : null}
         <GestureHandlerRootView>
           <TapGestureHandler
             numberOfTaps={2}
@@ -254,7 +299,7 @@ const Post = ({ post, onProfilePress }: Props) => {
             <Pressable
               onPress={() => handleHeartPress(post.id, post.liked)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-              disabled={post.profile.id === authProfile.id || likeLoading}
+              disabled={post.profile.id === authProfile.id || likeLoading || post.is_hidden}
               testID={`post-like-button-${post.id}-${post.liked}`}
               hitSlop={7}
             >
@@ -282,6 +327,7 @@ const Post = ({ post, onProfilePress }: Props) => {
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
             testID={`post-comment-button-${post.id}`}
             hitSlop={7}
+            disabled={post.is_hidden}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
               <FontAwesome
@@ -304,7 +350,7 @@ const Post = ({ post, onProfilePress }: Props) => {
               style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, { marginLeft: "auto", marginRight: 2 }]}
               hitSlop={10}
               onPress={handleBookmarkPress}
-              disabled={saveLoading}
+              disabled={saveLoading || post.is_hidden}
               testID={`post-save-button-${post.id}`}
             >
               <Animated.View style={{ transform: [{ scale: saveButtonScaleValue }] }}>
@@ -333,6 +379,9 @@ const Post = ({ post, onProfilePress }: Props) => {
         liked={post.liked}
         postProfileId={post.profile.id}
         postId={post.id}
+        is_reported={post.is_reported}
+        is_hidden={post.is_hidden}
+        reports={post.reports}
       />
     </View>
   );
@@ -343,5 +392,17 @@ export default Post;
 const s = StyleSheet.create({
   menuButton: {
     marginRight: 4,
+  },
+  blurView: {
+    position: "absolute",
+    top: 0,
+    bottom: 18,
+    right: 0,
+    left: 0,
+    backgroundColor: "red",
+    zIndex: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 24,
   },
 });

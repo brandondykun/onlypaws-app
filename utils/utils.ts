@@ -83,6 +83,43 @@ export const unSavePostInState = (
   });
 };
 
+export const togglePostHiddenInState = (
+  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
+  postId: number,
+) => {
+  stateSetter((prev) => {
+    return prev.map((prevPost) => {
+      if (prevPost.id === postId) {
+        return { ...prevPost, is_hidden: !prevPost.is_hidden };
+      }
+      return prevPost;
+    });
+  });
+};
+
+export const addPostReportedInState = (
+  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
+  postId: number,
+) => {
+  stateSetter((prev) => {
+    return prev.map((prevPost) => {
+      if (prevPost.id === postId) {
+        return { ...prevPost, is_reported: true, is_hidden: true };
+      }
+      return prevPost;
+    });
+  });
+};
+
+export const removePostInState = (
+  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
+  postId: number,
+) => {
+  stateSetter((prev) => {
+    return prev.filter((prevPost) => prevPost.id !== postId);
+  });
+};
+
 export const abbreviateNumber = (num: number) => {
   if (num < 1000) {
     return num;

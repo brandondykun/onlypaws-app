@@ -1,0 +1,99 @@
+# feedReportedPostHidden.yaml
+
+# Test that reported posts images are initially hidden in the feed
+
+appId: com.bdykun.onlypawsapp
+name: Feed Reported Post Hidden Flow
+
+---
+- launchApp
+
+# navigate to profile screen
+- tapOn: Profile, tab, 5 of 5
+
+# switch profiles
+- tapOn:
+    id: view-profile-options-button
+- tapOn: .*Switch Profile
+- tapOn: "LinusTheHighness"
+
+# close modal
+- tapOn:
+    point: 50%,10%
+
+# assert profile has been changed
+- assertVisible: "LinusTheHighness"
+
+# follow admin_profile that has reported posts
+- tapOn: "Explore, tab, 2 of 5"
+- tapOn: "Search profiles..."
+- tapOn: "Search profiles..."
+- inputText: "admin"
+- pressKey: "enter"
+- tapOn: "follow"
+- assertVisible: "unfollow"
+
+# navigate to feed screen
+- tapOn: Feed, tab, 1 of 5
+
+# assert that post images are initially hidden
+- assertVisible:
+    id: "post-55-hidden-view"
+
+# show the post
+- tapOn:
+    id: "post-55-show-post-button"
+
+# assert that post images are now shown
+- assertNotVisible:
+    id: "post-55-hidden-view"
+
+
+# open post menu 
+- tapOn:
+    id: "post-menu-button-55"
+
+# assert reported post warning is displayed
+- assertVisible: "This post has been reported for:"
+- assertVisible: "Not Pet Related"
+- assertVisible: "Too Much Human"
+
+# hide the post from the menu - menu should close automatically
+- tapOn: "Hide Post"
+
+# post images should again be hidden
+- assertVisible:
+    id: "post-55-hidden-view"
+
+# like and comment button should be disabled while post is hidden
+- tapOn:
+    id: "post-like-button-55-false"
+- assertVisible:
+    id: "post-like-button-55-false"
+- tapOn:
+    id: "post-comment-button-55"
+- assertNotVisible: "Comments"
+
+# unfollow admin_profile
+- tapOn:
+    id: "post-username-button-55"
+- assertVisible: ".*Hidden"
+- tapOn: "unfollow"
+- assertVisible: "follow"
+
+# change profiles back to admin_profile
+# navigate to profile screen
+- tapOn: Profile, tab, 5 of 5
+
+# switch profiles
+- tapOn:
+    id: view-profile-options-button
+- tapOn: .*Switch Profile
+- tapOn: "admin_profile"
+
+# close modal
+- tapOn:
+    point: 50%,10%
+
+# assert profile has been changed
+- assertVisible: "admin_profile"
