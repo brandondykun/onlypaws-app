@@ -18,7 +18,7 @@ name: Change Profile Flow
 # change profile
 - tapOn:
     id: "view-profile-options-button"
-- tapOn: "Switch Profile"
+- tapOn: .*Switch Profile
 - assertVisible: "Change Profile"
 - tapOn: "LinusTheHighness"
 - tapOn:
@@ -31,7 +31,7 @@ name: Change Profile Flow
 # change profile
 - tapOn:
     id: "view-profile-options-button"
-- tapOn: "Switch Profile"
+- tapOn: .*Switch Profile
 - tapOn: "admin_profile"
 - tapOn:
     point: "50%,15%"
