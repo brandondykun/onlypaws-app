@@ -5,6 +5,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef, useState } from "react";
+import React from "react";
 import { View, ActivityIndicator, RefreshControl, Dimensions, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -75,18 +76,25 @@ const ProfileDetails = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       title: profileData ? profileData.username : "",
-      headerRight: () => (
-        <Pressable
-          onPress={() => optionsModalRef.current?.present()}
-          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
-          hitSlop={20}
-          testID="profile-details-menu-button"
-        >
-          <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
-        </Pressable>
-      ),
+      headerRight: () => {
+        if (profileData?.id === authProfile.id) {
+          // only show if user is looking at own profile
+          return (
+            <Pressable
+              onPress={() => optionsModalRef.current?.present()}
+              style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
+              hitSlop={20}
+              testID="profile-details-menu-button"
+            >
+              <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+            </Pressable>
+          );
+        } else {
+          return null;
+        }
+      },
     });
-  }, [profileData, navigation, isDarkMode]);
+  }, [profileData, navigation, isDarkMode, authProfile.id]);
 
   const handlePostPreviewPress = (index: number) => {
     onPostPreviewPress(index);
