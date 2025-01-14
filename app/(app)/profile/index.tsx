@@ -1,3 +1,4 @@
+import Foundation from "@expo/vector-icons/Foundation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
@@ -31,7 +32,7 @@ const ProfileScreen = () => {
   const { user, logOut } = useAuthUserContext();
   const { updateProfileImage, authProfile, updateAuthProfile } = useAuthProfileContext();
 
-  const { isDarkMode } = useColorMode();
+  const { isDarkMode, setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
@@ -343,6 +344,27 @@ const ProfileScreen = () => {
         snapPoints={["50%"]}
       >
         <BottomSheetView style={{ paddingTop: 24, paddingBottom: 48, paddingHorizontal: 36 }}>
+          <View style={{ marginBottom: 24 }}>
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              onPress={() => {
+                profileOptionsModalRef.current?.dismiss();
+                router.push("/(app)/profile/guidelines");
+              }}
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                  padding: 8,
+                  backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+                  borderRadius: 8,
+                }}
+              >
+                <Foundation name="guide-dog" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
+                <Text>App Guidelines</Text>
+              </View>
+            </Pressable>
+          </View>
           <View
             style={{
               borderRadius: 8,
