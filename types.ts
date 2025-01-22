@@ -31,6 +31,10 @@ export type PetType = {
   name: string;
 };
 
+export type PetTypeWithTitle = {
+  title: string;
+} & PetType;
+
 export type Profile = {
   id: null | number;
   username: null | string;

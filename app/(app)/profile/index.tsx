@@ -1,5 +1,5 @@
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { BottomSheetScrollView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
+import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
@@ -11,19 +11,18 @@ import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { addProfileImage, editProfileImage, updateProfile, getPetTypeOptions } from "@/api/profile";
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
-import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
+import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
+import EditProfileModal from "@/components/EditProfileModal/EditProfileModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { PetTypeWithTitle } from "@/types";
 import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
@@ -42,7 +41,7 @@ const ProfileScreen = () => {
   const [aboutText, setAboutText] = useState(authProfile.about ? authProfile.about : "");
   const [profileName, setProfileName] = useState(authProfile.name ? authProfile.name : "");
   const [breed, setBreed] = useState(authProfile.breed ? authProfile.breed : "");
-  const [petType, setPetType] = useState<{ id: number; title: string; name: string } | null>(null);
+  const [petType, setPetType] = useState<PetTypeWithTitle | null>(null);
 
   const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
   const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
@@ -296,45 +295,21 @@ const ProfileScreen = () => {
         onSavePress={handleSavePress}
         loading={updateProfileLoading}
       />
-      <BottomSheetModal handleTitle="Edit Profile" ref={editProfileModalRef} onDismiss={handleEditModalClose}>
-        <BottomSheetScrollView contentContainerStyle={s.editProfileBottomSheetContainer}>
-          <View style={{ flexGrow: 1 }}>
-            <View style={{ flexGrow: 1 }}>
-              <View>
-                <Text>Name</Text>
-                <TextInput value={profileName} onChangeText={(val) => setProfileName(val)} placeholder="ex: Charlie" />
-              </View>
-              <View style={{ marginBottom: 12 }}>
-                <Text>Pet Type</Text>
-                <DropdownSelect
-                  defaultText="Select a pet type"
-                  defaultValue={petType ? petType : null}
-                  data={petTypeOptions || []}
-                  onSelect={(selectedItem) => setPetType(selectedItem)}
-                />
-              </View>
-              <View>
-                <Text>Breed</Text>
-                <TextInput value={breed} onChangeText={(val) => setBreed(val)} placeholder="ex: Golden Retriever" />
-              </View>
-              <View>
-                <Text>About</Text>
-                <TextInput
-                  defaultValue={aboutText}
-                  onChangeText={(val) => setAboutText(val)}
-                  multiline
-                  numberOfLines={5}
-                  textAlignVertical="top"
-                />
-              </View>
-            </View>
-
-            <View style={{ marginTop: 36 }}>
-              <Button text="Submit" onPress={handleProfileUpdate} loading={updateProfileLoading} />
-            </View>
-          </View>
-        </BottomSheetScrollView>
-      </BottomSheetModal>
+      <EditProfileModal
+        petTypeOptions={petTypeOptions}
+        profileName={profileName}
+        setProfileName={setProfileName}
+        handleEditModalClose={handleEditModalClose}
+        petType={petType}
+        setPetType={setPetType}
+        aboutText={aboutText}
+        setAboutText={setAboutText}
+        breed={breed}
+        setBreed={setBreed}
+        editProfileModalRef={editProfileModalRef}
+        handleProfileUpdate={handleProfileUpdate}
+        updateProfileLoading={updateProfileLoading}
+      />
       <ProfileOptionsModal
         setShowCamera={setShowCamera}
         profileOptionsModalRef={profileOptionsModalRef}
@@ -355,24 +330,5 @@ const s = StyleSheet.create({
     color: COLORS.zinc[500],
     letterSpacing: 0.5,
     paddingBottom: 4,
-  },
-  header: {
-    paddingTop: 2,
-    paddingBottom: 12,
-    marginBottom: 12,
-  },
-  profileOption: {
-    paddingVertical: 16,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  editProfileBottomSheetContainer: {
-    paddingBottom: 48,
-    paddingTop: 16,
-    paddingHorizontal: 24,
-    flexGrow: 1,
   },
 });
