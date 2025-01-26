@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
 import React from "react";
-import { View, Text } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -14,8 +14,8 @@ const TabLayout = () => {
 
   if (authLoading) {
     return (
-      <View>
-        <Text>Loading</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
       </View>
     );
   }
