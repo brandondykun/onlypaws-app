@@ -11,6 +11,7 @@ export type User = {
   id: null | number;
   email: null | string;
   profiles: ProfileOption[] | null;
+  is_email_verified: boolean;
 };
 
 export type ProfileOption = {
@@ -58,6 +59,7 @@ export type MyInfo = {
   email: string;
   id: number;
   profiles: ProfileOption[];
+  is_email_verified: boolean;
 };
 
 export type UserProfile = {

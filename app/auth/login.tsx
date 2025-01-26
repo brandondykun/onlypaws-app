@@ -53,7 +53,11 @@ const LoginScreen = () => {
       if (myInfoData && !myInfoError) {
         authenticate(myInfoData);
         setLoginLoading(false);
-        router.replace("/(app)/");
+        if (!myInfoData.is_email_verified) {
+          router.push("/auth/verifyEmail");
+        } else {
+          router.replace("/(app)/");
+        }
       } else {
         logOut();
         Toast.show({

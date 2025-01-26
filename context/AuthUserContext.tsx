@@ -16,10 +16,11 @@ type AuthUserContextType = {
   profileOptions: ProfileOption[] | null;
   addProfileOption: (option: ProfileOption) => void;
   changeSelectedProfileId: (profileId: number) => Promise<void>;
+  updateEmailVerified: (value: boolean) => void;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
-  user: { id: null, email: null, profiles: null },
+  user: { id: null, email: null, profiles: null, is_email_verified: false },
   selectedProfileId: null,
   authenticate: (user: MyInfo) => {},
   isAuthenticated: false,
@@ -29,6 +30,7 @@ const AuthUserContext = createContext<AuthUserContextType>({
   profileOptions: null,
   addProfileOption: (option: ProfileOption) => {},
   changeSelectedProfileId: (profileId: number) => Promise.resolve(),
+  updateEmailVerified: (value: boolean) => {},
 });
 
 type Props = {
@@ -38,7 +40,7 @@ type Props = {
 const AuthUserContextProvider = ({ children }: Props) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
-  const [user, setUser] = useState<User>({ id: null, email: null, profiles: null });
+  const [user, setUser] = useState<User>({ id: null, email: null, profiles: null, is_email_verified: false });
   const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
@@ -57,7 +59,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
   }, []);
 
   const logOut = useCallback(async () => {
-    setUser({ id: null, email: null, profiles: null });
+    setUser({ id: null, email: null, profiles: null, is_email_verified: false });
     setSelectedProfileId(null);
     setIsAuthenticated(false);
     await SecureStore.deleteItemAsync("REFRESH_TOKEN");
@@ -68,6 +70,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
     // save new selected profile id to persist profile selection between sessions
     await SecureStore.setItemAsync("SELECTED_PROFILE_ID", profileId.toString());
     setSelectedProfileId(profileId);
+  };
+
+  const updateEmailVerified = (value: boolean) => {
+    setUser((prev) => {
+      return { ...prev, is_email_verified: value };
+    });
   };
 
   useEffect(() => {
@@ -120,6 +128,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     profileOptions,
     addProfileOption,
     changeSelectedProfileId,
+    updateEmailVerified,
   };
 
   return <AuthUserContext.Provider value={value}>{children}</AuthUserContext.Provider>;
@@ -139,6 +148,7 @@ export const useAuthUserContext = () => {
     profileOptions,
     addProfileOption,
     changeSelectedProfileId,
+    updateEmailVerified,
   } = useContext(AuthUserContext);
   return {
     user,
@@ -151,5 +161,6 @@ export const useAuthUserContext = () => {
     profileOptions,
     addProfileOption,
     changeSelectedProfileId,
+    updateEmailVerified,
   };
 };

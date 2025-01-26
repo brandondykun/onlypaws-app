@@ -25,7 +25,7 @@ import SavedPostsContextProvider from "@/context/SavedPostsContext";
 const TabLayout = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
 
-  const { authLoading, isAuthenticated } = useAuthUserContext();
+  const { authLoading, isAuthenticated, user } = useAuthUserContext();
 
   if (authLoading) {
     return (
@@ -40,6 +40,10 @@ const TabLayout = () => {
 
   if (!isAuthenticated) {
     return <Redirect href="/auth/" />;
+  }
+
+  if (!user.is_email_verified) {
+    return <Redirect href="/auth/verifyEmail" />;
   }
 
   return (

@@ -10,7 +10,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 const TabLayout = () => {
   const { isDarkMode } = useColorMode();
 
-  const { authLoading, isAuthenticated } = useAuthUserContext();
+  const { authLoading, isAuthenticated, user } = useAuthUserContext();
 
   if (authLoading) {
     return (
@@ -19,8 +19,7 @@ const TabLayout = () => {
       </View>
     );
   }
-
-  if (isAuthenticated) {
+  if (isAuthenticated && user.is_email_verified) {
     return <Redirect href="/(app)/" />;
   }
 
@@ -50,6 +49,15 @@ const TabLayout = () => {
           name="login"
           options={{
             title: "Login",
+            headerStyle: {
+              backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+            },
+          }}
+        />
+        <Stack.Screen
+          name="verifyEmail"
+          options={{
+            title: "Verify Email",
             headerStyle: {
               backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
             },

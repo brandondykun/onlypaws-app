@@ -44,3 +44,18 @@ export const axiosPatch = async <T>(url: string, data: any, config?: AxiosReques
     return { data: null, error: error.message };
   }
 };
+
+interface CustomErrorResponse {
+  error: string;
+}
+
+export const axiosPostCustomError = async <T>(url: string, data: any, config?: AxiosRequestConfig<any>) => {
+  try {
+    const res = await axiosInstance.post<T>(url, data, config);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as CustomErrorResponse;
+    return { data: null, error: data.error, status: error.status };
+  }
+};

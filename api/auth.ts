@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 
 import { Tokens, AccessToken, UserProfile, MyInfo } from "../types";
 
-import { axiosPost, axiosFetch } from "./config";
+import { axiosPost, axiosFetch, axiosPostCustomError } from "./config";
 import { BASE_URL } from "./config";
 
 export const login = async (email: string, password: string) => {
@@ -31,4 +31,14 @@ export const getMyInfo = async () => {
 export const registerUser = async (email: string, password: string, username: string) => {
   const url = "/v1/auth/create-user/";
   return await axiosPost<UserProfile>(url, { email, password, username });
+};
+
+export const verifyEmail = async (token: string) => {
+  const url = "/v1/auth/verify-email-token/";
+  return await axiosPostCustomError(url, { token });
+};
+
+export const resendVerifyEmail = async (userId: number) => {
+  const url = "/v1/auth/resend-verify-email-token/";
+  return await axiosPostCustomError(url, { userId });
 };
