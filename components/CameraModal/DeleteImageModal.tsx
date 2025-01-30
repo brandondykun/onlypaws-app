@@ -5,7 +5,6 @@ import { StyleSheet, View } from "react-native";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
-import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
@@ -24,8 +23,6 @@ const DeleteImageModal = forwardRef(
     { setImages, selectedImageUri, setSelectedImageUri, closeDeleteImageModal }: Props,
     ref: ForwardedRef<RNBottomSheetModal> | undefined,
   ) => {
-    const { isDarkMode } = useColorMode();
-
     const handleDelete = () => {
       setImages((prev) => {
         return prev.filter((image) => {
@@ -48,14 +45,7 @@ const DeleteImageModal = forwardRef(
         handleTitle="Delete Image"
         onDismiss={() => setSelectedImageUri(null)}
       >
-        <BottomSheetView
-          style={[
-            s.sheetView,
-            {
-              backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
-            },
-          ]}
-        >
+        <BottomSheetView style={s.sheetView}>
           <Text style={s.confirmText}>Are you sure you want to delete this photo?</Text>
           <View style={s.buttonsContainer}>
             <View style={s.buttonContainer}>
@@ -86,11 +76,9 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.red[600],
   },
   sheetView: {
-    paddingBottom: 64,
+    paddingBottom: 48,
     paddingTop: 32,
     paddingHorizontal: 24,
-    borderTopRightRadius: 25,
-    borderTopLeftRadius: 25,
   },
   confirmText: {
     fontSize: 18,
