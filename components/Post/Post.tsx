@@ -247,24 +247,14 @@ const Post = ({ post, onProfilePress }: Props) => {
           </BlurView>
         ) : null}
         {post.is_hidden && post.profile.id === authProfile.id ? (
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              zIndex: 10,
-              backgroundColor: COLORS.zinc[900],
-              paddingVertical: 2,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-              gap: 6,
-            }}
-          >
-            <Ionicons name="alert-circle-outline" size={14} color={COLORS.red[600]} />
-            <Text style={{ color: COLORS.red[600] }}>This post has been reported. See menu for details.</Text>
-            <Ionicons name="alert-circle-outline" size={14} color={COLORS.red[600]} />
+          <View style={s.reportedMessageContainer}>
+            <View style={[s.reportedMessage, { backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[50] }]}>
+              <Ionicons name="alert-circle-outline" size={14} color={isDarkMode ? COLORS.red[600] : COLORS.red[500]} />
+              <Text style={{ color: isDarkMode ? COLORS.red[600] : COLORS.red[500], fontSize: 15 }}>
+                This post has been reported.
+              </Text>
+              <Ionicons name="alert-circle-outline" size={14} color={isDarkMode ? COLORS.red[600] : COLORS.red[500]} />
+            </View>
           </View>
         ) : null}
         <GestureHandlerRootView>
@@ -404,5 +394,24 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 24,
+  },
+  reportedMessageContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  reportedMessage: {
+    paddingVertical: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 12,
+    marginTop: 4,
+    borderRadius: 10,
   },
 });
