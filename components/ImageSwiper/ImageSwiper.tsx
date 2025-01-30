@@ -1,7 +1,9 @@
+import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
-import { StyleProp, ImageStyle, View } from "react-native";
+import { StyleProp, ImageStyle, View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PagerView, { PagerViewProps } from "react-native-pager-view";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { PostImage } from "@/types";
@@ -9,7 +11,7 @@ import { PostImage } from "@/types";
 import ImageLoader from "../ImageLoader/ImageLoader";
 
 type Props = {
-  images: PostImage[];
+  images: PostImage[] | (PhotoFile | ImagePickerAsset)[];
   imageHeight: number;
   imageWidth: number;
   imageStyle?: StyleProp<ImageStyle>;
@@ -18,6 +20,16 @@ type Props = {
 const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: Props) => {
   const [currentPage, setCurrentPage] = useState(0);
   const imageCount = images.length;
+
+  const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage) => {
+    if ("uri" in image) {
+      return image.uri;
+    } else if ("path" in image) {
+      return image.path;
+    } else {
+      return image.image;
+    }
+  };
 
   return (
     <View>
@@ -32,22 +44,13 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
         {images.map((image, i) => {
           return (
             <GestureHandlerRootView key={i}>
-              <ImageLoader uri={image.image} height={imageHeight} width={imageWidth} style={imageStyle} />
+              <ImageLoader uri={getImageUri(image)} height={imageHeight} width={imageWidth} style={imageStyle} />
             </GestureHandlerRootView>
           );
         })}
       </PagerView>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 6,
-          paddingTop: 4,
-          height: 18,
-        }}
-      >
+      <View style={s.imageCountIconsContainer}>
         {imageCount > 1
           ? images.map((image, i) => {
               return (
@@ -70,3 +73,14 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
 };
 
 export default ImageSwiper;
+
+const s = StyleSheet.create({
+  imageCountIconsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
+    paddingTop: 4,
+    height: 18,
+  },
+});
