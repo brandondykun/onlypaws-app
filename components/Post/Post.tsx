@@ -22,6 +22,7 @@ import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 import Button from "../Button/Button";
 import CommentsModal from "../CommentsModal/CommentsModal";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
+import PostAiModal from "../PostAiModal/PostAiModal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";
 
@@ -48,6 +49,7 @@ const Post = ({ post, onProfilePress }: Props) => {
   const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const postMenuRef = useRef<BottomSheetModal>(null);
+  const aiMenuRef = useRef<BottomSheetModal>(null);
 
   const handleHeartPress = async (postId: number, liked: boolean) => {
     if (post.is_hidden) return;
@@ -198,6 +200,10 @@ const Post = ({ post, onProfilePress }: Props) => {
     setSaveLoading(false);
   };
 
+  const handleAiPress = () => {
+    aiMenuRef.current?.present();
+  };
+
   return (
     <View key={post.id} style={{ minHeight: POST_HEIGHT }}>
       <View style={{ padding: 8 }}>
@@ -335,23 +341,47 @@ const Post = ({ post, onProfilePress }: Props) => {
               </Text>
             </View>
           </Pressable>
-          {post.profile.id !== authProfile.id ? (
-            <Pressable
-              style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, { marginLeft: "auto", marginRight: 2 }]}
-              hitSlop={10}
-              onPress={handleBookmarkPress}
-              disabled={saveLoading || post.is_hidden}
-              testID={`post-save-button-${post.id}`}
-            >
-              <Animated.View style={{ transform: [{ scale: saveButtonScaleValue }] }}>
-                <FontAwesome
-                  name={!post.is_saved ? "bookmark-o" : "bookmark"}
-                  size={20}
-                  color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]}
-                />
-              </Animated.View>
-            </Pressable>
-          ) : null}
+          <View style={{ flexDirection: "row", alignItems: "center", marginLeft: "auto" }}>
+            {post.contains_ai ? (
+              <Pressable
+                style={({ pressed }) => [
+                  pressed && { opacity: 0.6 },
+                  {
+                    marginRight: post.profile.id !== authProfile.id ? 14 : 0,
+                    paddingHorizontal: 4,
+                  },
+                ]}
+                onPress={handleAiPress}
+                hitSlop={10}
+              >
+                <Text
+                  darkColor={COLORS.zinc[400]}
+                  lightColor={COLORS.zinc[800]}
+                  style={{ fontSize: 18, fontWeight: "600" }}
+                  testID={`post-${post.id}-ai-button`}
+                >
+                  AI
+                </Text>
+              </Pressable>
+            ) : null}
+            {post.profile.id !== authProfile.id ? (
+              <Pressable
+                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, { marginRight: 2 }]}
+                hitSlop={10}
+                onPress={handleBookmarkPress}
+                disabled={saveLoading || post.is_hidden}
+                testID={`post-save-button-${post.id}`}
+              >
+                <Animated.View style={{ transform: [{ scale: saveButtonScaleValue }] }}>
+                  <FontAwesome
+                    name={!post.is_saved ? "bookmark-o" : "bookmark"}
+                    size={20}
+                    color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]}
+                  />
+                </Animated.View>
+              </Pressable>
+            ) : null}
+          </View>
         </View>
         <PostCaption caption={post.caption} />
         <View style={{ paddingLeft: 8, paddingTop: 6 }}>
@@ -373,6 +403,7 @@ const Post = ({ post, onProfilePress }: Props) => {
         is_hidden={post.is_hidden}
         reports={post.reports}
       />
+      <PostAiModal ref={aiMenuRef} />
     </View>
   );
 };
