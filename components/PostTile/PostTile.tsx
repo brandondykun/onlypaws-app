@@ -45,11 +45,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
         testID={`post-tile-pressable-${post.id}`}
       >
         {post.is_hidden && post.profile.id === authProfile.id ? (
-          <View style={s.alertIconContainer} testID={`post-${post.id}-alert-icon`}>
-            <View style={{ margin: -1 }}>
-              <Ionicons name="alert-circle" size={16} color={COLORS.red[600]} />
-            </View>
-          </View>
+          <View style={s.reportedFilter} testID={`post-${post.id}-reported-filter`} />
         ) : null}
         {post.is_hidden && post.profile.id !== authProfile.id ? (
           <View
@@ -90,5 +86,15 @@ const s = StyleSheet.create({
     zIndex: 10,
     backgroundColor: COLORS.zinc[950],
     borderRadius: 50,
+  },
+  reportedFilter: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 10,
+    backgroundColor: COLORS.red[600],
+    opacity: 0.4,
   },
 });
