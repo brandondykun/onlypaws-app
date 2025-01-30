@@ -119,6 +119,7 @@ export type Post = {
   images: PostImage[];
   likes: PostLike[];
   comments: PostComment[];
+  contains_ai: boolean;
 };
 
 export type PostDetailed = {
@@ -135,6 +136,7 @@ export type PostDetailed = {
   reports: PostReportPreview[];
   is_hidden: boolean;
   is_reported: boolean; // has current profile already reported the post
+  contains_ai: boolean;
 };
 
 export type ProfileDetails = {

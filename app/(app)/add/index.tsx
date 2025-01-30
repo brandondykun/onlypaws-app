@@ -1,17 +1,19 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useState, useLayoutEffect } from "react";
-import { ScrollView, View, Pressable } from "react-native";
+import React, { useState, useLayoutEffect, useRef } from "react";
+import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { createPost } from "@/api/post";
+import AiModal from "@/components/AiModal/AiModal";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
+import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -22,16 +24,20 @@ import { getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
   const router = useRouter();
-  const { addPost } = usePostsContext();
-  const { authProfile, updatePostsCount } = useAuthProfileContext();
-  const { isDarkMode } = useColorMode();
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
+  const aiModalRef = useRef<RNBottomSheetModal>(null);
+  const screenWidth = Dimensions.get("window").width;
+
+  const { addPost } = usePostsContext();
+  const { authProfile, updatePostsCount } = useAuthProfileContext();
+  const { isDarkMode, setLightOrDark } = useColorMode();
 
   const [caption, setCaption] = useState("");
   const [captionError, setCaptionError] = useState("");
   const [images, setImages] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
   const [cameraVisible, setCameraVisible] = useState(false);
+  const [aiGenerated, setAiGenerated] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // add search button to header
@@ -70,6 +76,7 @@ const AddPostScreen = () => {
     const formData = new FormData();
     formData.append("caption", caption);
     formData.append("profileId", authProfile.id.toString());
+    formData.append("aiGenerated", aiGenerated.toString());
 
     images.forEach((image, i) => {
       formData.append("images", {
@@ -89,6 +96,7 @@ const AddPostScreen = () => {
         updatePostsCount("add", 1);
         setCaption("");
         setImages([]);
+        setAiGenerated(false);
         router.replace("/(app)/posts");
         Toast.show({
           type: "success",
@@ -110,59 +118,42 @@ const AddPostScreen = () => {
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight }}
       automaticallyAdjustKeyboardInsets={true}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={{ marginBottom: 12, paddingLeft: 16 }}>
+      <View style={{ marginBottom: 4, paddingLeft: 12 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
-          Add your images (up to 5)
+          Add up to 5 images
         </Text>
       </View>
       <View style={{ marginBottom: 36 }}>
-        <ScrollView
-          horizontal
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 4 }}
-          showsHorizontalScrollIndicator={false}
-        >
-          {images.length === 0 ? (
-            <>
-              <Pressable onPress={() => setCameraVisible(true)}>
-                <View
-                  style={{
-                    height: 200,
-                    width: 200,
-                    backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
-                    borderRadius: 8,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <MaterialIcons
-                      name="add-circle-outline"
-                      size={24}
-                      color={isDarkMode ? COLORS.lime[500] : COLORS.zinc[900]}
-                    />
-                    <Text>Add Images</Text>
-                  </View>
-                </View>
-              </Pressable>
-              <View
-                style={{
-                  height: 200,
-                  width: 200,
-                  backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
-                  borderRadius: 8,
-                }}
-              ></View>
-            </>
-          ) : (
-            images.map((image) => {
-              const uri = getImageUri(image);
-              return <Image source={{ uri: uri }} style={{ borderRadius: 8, height: 200, width: 200 }} key={uri} />;
-            })
-          )}
-        </ScrollView>
         {images.length ? (
-          <View style={{ flexDirection: "row", justifyContent: "flex-end", padding: 16 }}>
+          <ImageSwiper images={images} imageHeight={screenWidth} imageWidth={screenWidth} />
+        ) : (
+          <Pressable onPress={() => setCameraVisible(true)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+            <View
+              style={{
+                height: screenWidth,
+                width: screenWidth,
+                backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <MaterialIcons
+                  name="add-circle-outline"
+                  size={28}
+                  color={setLightOrDark(COLORS.lime[600], COLORS.lime[500])}
+                />
+                <Text lightColor={COLORS.zinc[700]} darkColor={COLORS.zinc[200]} style={{ fontSize: 20 }}>
+                  Add Images
+                </Text>
+              </View>
+            </View>
+          </Pressable>
+        )}
+        {images.length ? (
+          <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 16 }}>
             <Button variant="text" text="Edit Images" onPress={() => setCameraVisible(true)} />
           </View>
         ) : null}
@@ -173,17 +164,40 @@ const AddPostScreen = () => {
         </Text>
       </View>
       <View style={{ padding: 16, paddingTop: 0, flex: 1 }}>
-        <TextInput
-          value={caption}
-          onChangeText={setCaption}
-          label="Caption"
-          multiline={true}
-          numberOfLines={6}
-          error={captionError}
-          showCharCount
-          maxLength={128}
-          textAlignVertical="top"
-        />
+        <View style={{ marginBottom: 36 }}>
+          <TextInput
+            value={caption}
+            onChangeText={setCaption}
+            label="Caption"
+            multiline={true}
+            numberOfLines={6}
+            error={captionError}
+            showCharCount
+            maxLength={128}
+            textAlignVertical="top"
+          />
+        </View>
+        <View style={s.aiGeneratedContainer}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 18, fontWeight: "400" }}>Contains AI Generated Content</Text>
+            <Text
+              darkColor={COLORS.zinc[400]}
+              lightColor={COLORS.zinc[600]}
+              style={{ fontSize: 14, fontWeight: "400" }}
+            >
+              Please identify if this post contains AI generated content.{" "}
+              <Button
+                buttonStyle={s.learnMoreButton}
+                textStyle={[s.learnMoreButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[400]) }]}
+                variant="text"
+                text="Learn More"
+                onPress={() => aiModalRef.current?.present()}
+                hitSlop={10}
+              />
+            </Text>
+          </View>
+          <Switch value={aiGenerated} onValueChange={() => setAiGenerated((prev) => !prev)} />
+        </View>
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
           <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
         </View>
@@ -195,8 +209,31 @@ const AddPostScreen = () => {
         setVisible={setCameraVisible}
         maxImages={5}
       />
+      <AiModal ref={aiModalRef} />
     </ScrollView>
   );
 };
 
 export default AddPostScreen;
+
+const s = StyleSheet.create({
+  aiGeneratedContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 64,
+  },
+  learnMoreButton: {
+    padding: 0,
+    margin: 0,
+    paddingTop: 0,
+    height: "auto",
+    marginBottom: -3,
+  },
+  learnMoreButtonText: {
+    fontSize: 14,
+    fontWeight: "400",
+    textDecorationLine: "none",
+  },
+});
