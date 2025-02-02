@@ -91,7 +91,7 @@ const ProfileSearchScreen = () => {
   }
 
   const emptyComponent = (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 48 }}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
       <Text
         style={{
           fontSize: 20,

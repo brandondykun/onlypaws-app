@@ -128,14 +128,13 @@ const ExploreScreen = () => {
         </Text>
       </View>
     ) : !refreshing ? (
-      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
+      <View style={{ flex: 1, justifyContent: "center", paddingTop: "50%" }}>
         <Text
           style={{
-            fontSize: 18,
+            fontSize: 20,
             textAlign: "center",
             paddingHorizontal: 36,
             fontWeight: "300",
-            paddingTop: 96,
           }}
           darkColor={COLORS.zinc[400]}
           lightColor={COLORS.zinc[600]}
