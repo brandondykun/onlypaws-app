@@ -271,17 +271,16 @@ const ProfileScreen = () => {
             </View>
             <View style={{ padding: 16 }}>
               <Text style={s.label}>ABOUT</Text>
-              {authProfile.about ? (
-                <Text style={{ fontSize: 20 }}>{authProfile.about}</Text>
-              ) : (
-                <Text
-                  darkColor={COLORS.zinc[600]}
-                  lightColor={COLORS.zinc[400]}
-                  style={{ fontSize: 16, fontStyle: "italic", paddingTop: 4 }}
-                >
-                  No About Text
-                </Text>
-              )}
+              <Text
+                style={{
+                  fontSize: authProfile.about ? 20 : 18,
+                  color: authProfile.about ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
+                  fontStyle: authProfile.about ? "normal" : "italic",
+                  fontWeight: authProfile.about ? "normal" : "300",
+                }}
+              >
+                {authProfile.about ? authProfile.about : "No about text"}
+              </Text>
             </View>
           </View>
         </View>
