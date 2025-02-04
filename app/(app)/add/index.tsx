@@ -5,7 +5,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useState, useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet } from "react-native";
+import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet, ActivityIndicator } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -43,7 +43,7 @@ const AddPostScreen = () => {
   // add search button to header
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button onPress={resetState} variant="text" text="Clear" />,
+      headerRight: () => <Button onPress={resetState} variant="text" text="Clear" disabled={submitLoading} />,
     });
   });
 
@@ -119,7 +119,27 @@ const AddPostScreen = () => {
       contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight }}
       automaticallyAdjustKeyboardInsets={true}
       showsVerticalScrollIndicator={false}
+      scrollEnabled={!submitLoading}
     >
+      {submitLoading ? (
+        <View
+          style={[
+            s.loadingContainer,
+            {
+              backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)",
+            },
+          ]}
+        >
+          <Text
+            darkColor={COLORS.zinc[400]}
+            lightColor={COLORS.zinc[600]}
+            style={{ fontSize: 20, fontWeight: isDarkMode ? "300" : "400" }}
+          >
+            Uploading post...
+          </Text>
+          <ActivityIndicator color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]} />
+        </View>
+      ) : null}
       <View style={{ marginBottom: 4, paddingLeft: 12 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
           Add up to 5 images
@@ -236,5 +256,16 @@ const s = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     textDecorationLine: "none",
+  },
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+    gap: 12,
   },
 });
