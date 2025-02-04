@@ -344,9 +344,16 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
               </View>
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 {onSavePress && images.length ? (
-                  <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onSavePress}>
-                    <Ionicons name="checkmark-circle" size={48} color={COLORS.lime[500]} />
-                    <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ textAlign: "center" }}>
+                  <Pressable
+                    style={({ pressed }) => [pressed && { opacity: 0.6 }, { alignItems: "center" }]}
+                    onPress={onSavePress}
+                  >
+                    <Ionicons name="checkmark-circle" size={32} color={COLORS.lime[500]} />
+                    <Text
+                      darkColor={COLORS.zinc[300]}
+                      lightColor={COLORS.zinc[800]}
+                      style={{ textAlign: "center", fontSize: 18 }}
+                    >
                       Save
                     </Text>
                   </Pressable>
