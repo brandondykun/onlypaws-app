@@ -5,6 +5,9 @@ import useProfileDetails from "@/hooks/useProfileDetails";
 import { PostDetailed } from "@/types";
 import { ProfileDetails as ProfileDetailsType } from "@/types";
 
+// Context for the Posts tab to fetch the profile details and posts of the selected profile (profileId).
+// Used to view profiles of followers and following.
+
 type PostsProfileDetailsContextType = {
   posts: {
     data: PostDetailed[] | null;

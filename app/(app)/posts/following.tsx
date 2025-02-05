@@ -1,10 +1,10 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { useState, useCallback, useEffect, useLayoutEffect, useMemo } from "react";
-import { View, ActivityIndicator, RefreshControl, Dimensions, StyleSheet, Platform } from "react-native";
+import { View, ActivityIndicator, RefreshControl, Dimensions, StyleSheet, Platform, Pressable } from "react-native";
 
 import { axiosFetch } from "@/api/config";
 import { getFollowing, searchFollowing } from "@/api/profile";
@@ -13,12 +13,15 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { usePostsProfileDetailsContext } from "@/context/PostsProfileDetailsContext";
 import { PaginatedProfileResponse, FollowProfile } from "@/types";
 
 const platform = Platform.OS;
 
 const FollowingScreen = () => {
   const { authProfile } = useAuthProfileContext();
+  const { setProfileId } = usePostsProfileDetailsContext();
+
   const [data, setData] = useState<FollowProfile[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
@@ -37,6 +40,7 @@ const FollowingScreen = () => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get("window").width;
   const tabBarHeight = useBottomTabBarHeight();
+  const router = useRouter();
 
   const fetchFollowing = useCallback(async () => {
     if (authProfile.id) {
@@ -120,6 +124,7 @@ const FollowingScreen = () => {
         <View style={{ flex: 1 }}>
           <TextInput
             inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
+            editable={!!data.length}
             returnKeyType="search"
             value={searchText}
             onChangeText={(text) => {
@@ -144,34 +149,27 @@ const FollowingScreen = () => {
     </View>
   );
 
-  const emptyComponent = (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 24, marginTop: 48 }}>
-      <Text
-        style={{
-          fontSize: 20,
-          textAlign: "center",
-          paddingHorizontal: 36,
-          fontWeight: "300",
-        }}
-        darkColor={COLORS.zinc[400]}
-        lightColor={COLORS.zinc[600]}
-      >
-        You are not following any profiles.
-      </Text>
-      <Text
-        style={{
-          fontSize: 18,
-          textAlign: "center",
-          paddingHorizontal: 36,
-          fontWeight: "300",
-        }}
-        darkColor={COLORS.zinc[500]}
-        lightColor={COLORS.zinc[500]}
-      >
-        Get out there and find some profiles to follow!
-      </Text>
-    </View>
-  );
+  const emptyComponent =
+    searchResults?.length === 0 ? (
+      <View style={{ marginTop: 48 }}>
+        <Text
+          style={{ textAlign: "center", fontSize: 20, fontWeight: "300" }}
+          darkColor={COLORS.zinc[400]}
+          lightColor={COLORS.zinc[600]}
+        >
+          No results found
+        </Text>
+      </View>
+    ) : (
+      <View style={s.emptyComponent}>
+        <Text style={s.emptyComponentMainText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+          You are not following any profiles.
+        </Text>
+        <Text style={s.emptyComponentSubText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
+          Get out there and find some profiles to follow!
+        </Text>
+      </View>
+    );
 
   if (initialFetchComplete && !searchLoading) {
     const dataToRender = searchResults ? searchResults : data;
@@ -199,7 +197,16 @@ const FollowingScreen = () => {
             />
           )
         }
-        renderItem={({ item: profile }) => <FollowListProfile profile={profile} />}
+        renderItem={({ item: profile }) => (
+          <Pressable
+            onPress={() => {
+              setProfileId(profile.id);
+              router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: profile.id } });
+            }}
+          >
+            <FollowListProfile profile={profile} />
+          </Pressable>
+        )}
         ListFooterComponent={
           fetchNextLoading || searchFetchNextLoading ? (
             <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 12 }}>
@@ -224,5 +231,24 @@ const s = StyleSheet.create({
     fontSize: 16,
     height: 35,
     marginTop: platform === "android" ? 4 : -3,
+  },
+  emptyComponent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 24,
+    marginTop: 48,
+  },
+  emptyComponentMainText: {
+    fontSize: 20,
+    textAlign: "center",
+    paddingHorizontal: 36,
+    fontWeight: "300",
+  },
+  emptyComponentSubText: {
+    fontSize: 18,
+    textAlign: "center",
+    paddingHorizontal: 36,
+    fontWeight: "300",
   },
 });
