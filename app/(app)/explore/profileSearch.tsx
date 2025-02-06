@@ -11,6 +11,7 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
 
@@ -19,7 +20,8 @@ const platform = Platform.OS;
 const ProfileSearchScreen = () => {
   const navigation = useNavigation();
   const search = useProfileSearchContext();
-  const { addFollowing, removeFollowing, authProfile } = useAuthProfileContext();
+  const { authProfile } = useAuthProfileContext();
+  const profileDetailsManager = useProfileDetailsManagerContext();
   const screenWidth = Dimensions.get("window").width;
   const tabBarHeight = useBottomTabBarHeight();
 
@@ -47,8 +49,7 @@ const ProfileSearchScreen = () => {
   const handleUnfollowPress = async (profileId: number) => {
     const { error } = await unfollowProfile(profileId, authProfile.id);
     if (!error) {
-      search.onUnfollow(profileId);
-      removeFollowing();
+      profileDetailsManager.onUnfollow(profileId);
     } else {
       Toast.show({
         type: "error",
@@ -61,8 +62,7 @@ const ProfileSearchScreen = () => {
   const handleFollowPress = async (searchedProfile: SearchedProfile) => {
     const { error, data } = await followProfile(searchedProfile.id, authProfile.id);
     if (!error && data) {
-      search.onFollow(searchedProfile.id);
-      addFollowing();
+      profileDetailsManager.onFollow(searchedProfile.id);
     } else {
       Toast.show({
         type: "error",

@@ -3,7 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { ImagePickerAsset } from "expo-image-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostDetailed } from "@/types";
+import { PostDetailed, ProfileDetails } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -117,6 +117,20 @@ export const removePostInState = (
 ) => {
   stateSetter((prev) => {
     return prev.filter((prevPost) => prevPost.id !== postId);
+  });
+};
+
+export const followProfileInState = (stateSetter: React.Dispatch<React.SetStateAction<ProfileDetails | null>>) => {
+  stateSetter((prev) => {
+    if (!prev) return null;
+    return { ...prev, is_following: true, followers_count: prev.followers_count + 1 };
+  });
+};
+
+export const unFollowProfileInState = (stateSetter: React.Dispatch<React.SetStateAction<ProfileDetails | null>>) => {
+  stateSetter((prev) => {
+    if (!prev) return null;
+    return { ...prev, is_following: false, followers_count: prev.followers_count - 1 };
   });
 };
 

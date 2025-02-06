@@ -10,6 +10,7 @@ import Post from "@/components/Post/Post";
 import { POST_HEIGHT } from "@/components/Post/Post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
 import { PaginatedExploreResponse } from "@/types";
 
 const ExplorePostsListScreen = () => {
@@ -17,6 +18,7 @@ const ExplorePostsListScreen = () => {
   const { authProfile } = useAuthProfileContext();
   const { similarPosts, setSimilarPosts } = useExplorePostsContext();
   const tabBarHeight = useBottomTabBarHeight();
+  const exploreProfile = useExploreProfileDetailsContext();
 
   const router = useRouter();
 
@@ -26,9 +28,10 @@ const ExplorePostsListScreen = () => {
 
   const onProfilePress = useMemo(
     () => (profileId: number) => {
+      exploreProfile.setProfileId(profileId);
       router.push({ pathname: "/(app)/explore/profile", params: { profileId: profileId } });
     },
-    [router],
+    [router, exploreProfile],
   );
 
   const fetchSimilar = useCallback(async () => {

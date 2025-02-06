@@ -14,6 +14,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { ProfileDetails as ProfileDetailsType, PostDetailed } from "@/types";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
@@ -39,8 +40,6 @@ type Props = {
   fetchNext: () => Promise<void>;
   fetchNextLoading: boolean;
   hasFetchNextError: boolean;
-  onFollow?: (profileId: number) => void;
-  onUnfollow?: (profileId: number) => void;
 };
 
 const ProfileDetails = ({
@@ -60,8 +59,6 @@ const ProfileDetails = ({
   fetchNext,
   fetchNextLoading,
   hasFetchNextError,
-  onFollow,
-  onUnfollow,
 }: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
@@ -70,7 +67,9 @@ const ProfileDetails = ({
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
 
-  const { authProfile, addFollowing, removeFollowing } = useAuthProfileContext();
+  const { authProfile } = useAuthProfileContext();
+  const profileDetailsManager = useProfileDetailsManagerContext();
+
   const [followLoading, setFollowLoading] = useState(false);
 
   useLayoutEffect(() => {
@@ -105,14 +104,7 @@ const ProfileDetails = ({
       setFollowLoading(true);
       const { error } = await unfollowProfile(profileId, authProfile.id);
       if (!error) {
-        setProfileData((prev) => {
-          if (prev) {
-            return { ...prev, is_following: false, followers_count: prev.followers_count - 1 };
-          }
-          return prev;
-        });
-        removeFollowing();
-        onUnfollow && onUnfollow(profileId);
+        profileDetailsManager.onUnfollow(profileId);
       } else {
         Toast.show({
           type: "error",
@@ -129,14 +121,7 @@ const ProfileDetails = ({
       setFollowLoading(true);
       const { error, data } = await followProfile(profile.id, authProfile.id);
       if (!error && data) {
-        setProfileData((prev) => {
-          if (prev) {
-            return { ...prev, is_following: true, followers_count: prev.followers_count + 1 };
-          }
-          return prev;
-        });
-        addFollowing();
-        onFollow && onFollow(profile.id);
+        profileDetailsManager.onFollow(profile.id);
       } else {
         Toast.show({
           type: "error",
