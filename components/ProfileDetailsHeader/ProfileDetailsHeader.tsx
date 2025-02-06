@@ -1,3 +1,5 @@
+import Entypo from "@expo/vector-icons/Entypo";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import { View, Pressable } from "react-native";
 
@@ -20,6 +22,7 @@ type Props = {
   handleUnfollowPress: (profileId: number) => void;
   profileLoading: boolean;
   followLoading?: boolean;
+  profileError: boolean;
 };
 const ProfileDetailsHeader = ({
   profileData,
@@ -30,13 +33,13 @@ const ProfileDetailsHeader = ({
   handleFollowPress,
   profileLoading,
   followLoading,
+  profileError,
 }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
-  // const navigation = useNavigation();
 
   const followButtons = (
-    <>
+    <View style={{ flexDirection: "row" }}>
       {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
         <Button
           text="unfollow"
@@ -75,8 +78,10 @@ const ProfileDetailsHeader = ({
           loadingIconScale={0.7}
         />
       ) : null}
-    </>
+    </View>
   );
+
+  if (profileError) return <ProfileErrorMessage />;
 
   return (
     <View style={{ padding: 16, backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}>
@@ -141,3 +146,26 @@ const ProfileDetailsHeader = ({
 };
 
 export default ProfileDetailsHeader;
+
+const ProfileErrorMessage = () => {
+  const { isDarkMode } = useColorMode();
+
+  return (
+    <View
+      style={{
+        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+        height: 280,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 12,
+      }}
+    >
+      <Ionicons name="alert-circle-outline" size={36} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[700]} />
+      <Text style={{ fontSize: 19, fontWeight: "400" }}>Error loading profile details</Text>
+      <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ fontSize: 16, fontWeight: "300" }}>
+        Swipe down to refresh
+      </Text>
+      <Entypo name="chevron-thin-down" size={20} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500]} />
+    </View>
+  );
+};

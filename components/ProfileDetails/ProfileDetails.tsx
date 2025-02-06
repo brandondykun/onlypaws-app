@@ -218,6 +218,7 @@ const ProfileDetails = ({
             handleFollowPress={handleFollowPress}
             profileLoading={profileLoading}
             followLoading={followLoading}
+            profileError={!!profileError}
           />
         }
         renderItem={({ item, index }) => {
