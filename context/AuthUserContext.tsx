@@ -1,4 +1,5 @@
 // import { Redirect } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
@@ -44,6 +45,8 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
+  const router = useRouter();
+
   const authenticate = useCallback(async (user: MyInfo) => {
     setUser(user);
     setProfileOptions(user.profiles);
@@ -64,7 +67,8 @@ const AuthUserContextProvider = ({ children }: Props) => {
     setIsAuthenticated(false);
     await SecureStore.deleteItemAsync("REFRESH_TOKEN");
     await SecureStore.deleteItemAsync("ACCESS_TOKEN");
-  }, []);
+    router.replace("/auth/login");
+  }, [router]);
 
   const changeSelectedProfileId = async (profileId: number) => {
     // save new selected profile id to persist profile selection between sessions
