@@ -1,5 +1,7 @@
 import { SimpleLineIcons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
@@ -155,7 +157,7 @@ const ProfileDetails = ({
   const emptyComponent =
     postsLoading || postsRefreshing ? (
       <PostTileSkeleton />
-    ) : (
+    ) : !postsError ? (
       <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
         <Text
           style={{
@@ -172,6 +174,23 @@ const ProfileDetails = ({
             ? "You don't have any posts yet! Add a post to see it here."
             : "No posts to see yet."}
         </Text>
+      </View>
+    ) : (
+      <View
+        style={{
+          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+          height: 280,
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <Ionicons name="alert-circle-outline" size={36} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[700]} />
+        <Text style={{ fontSize: 19, fontWeight: "400" }}>Error loading posts</Text>
+        <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ fontSize: 16, fontWeight: "300" }}>
+          Swipe down to refresh
+        </Text>
+        <Entypo name="chevron-thin-down" size={20} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500]} />
       </View>
     );
 
