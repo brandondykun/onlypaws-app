@@ -6,7 +6,7 @@ import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import React from "react";
-import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, ScrollView, Pressable, StyleSheet, TextStyle } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -29,7 +29,7 @@ const ProfileScreen = () => {
   const { user } = useAuthUserContext();
   const { updateProfileImage, authProfile, updateAuthProfile } = useAuthProfileContext();
 
-  const { isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
@@ -106,7 +106,7 @@ const ProfileScreen = () => {
           hitSlop={20}
           testID="view-profile-options-button"
         >
-          <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+          <SimpleLineIcons name="options" size={18} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
         </Pressable>
       ),
     });
@@ -205,83 +205,24 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <View style={{ marginBottom: 28, alignItems: "center" }}>
+          <View style={{ marginBottom: 48, alignItems: "center" }}>
             <ProfileDetailsHeaderImage image={authProfile.image} size={150} />
           </View>
-          <View
-            style={{
-              backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
-              borderRadius: 8,
-              marginBottom: 24,
-              padding: 6,
-            }}
-          >
-            <View style={{ padding: 16 }}>
-              <Text style={s.label}>EMAIL</Text>
-              <Text style={{ fontSize: 20 }}>{user.email}</Text>
-            </View>
+          <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]} style={s.sectionHeader}>
+            ACCOUNT DETAILS
+          </Text>
+          <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[925]) }]}>
+            <LabelAndText label="EMAIL" text={user.email} />
+            <LabelAndText label="USERNAME" text={authProfile.username} />
           </View>
-          <View
-            style={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200], borderRadius: 8, padding: 6 }}
-          >
-            <View style={{ padding: 16, marginBottom: 8 }}>
-              <Text style={s.label}>USERNAME</Text>
-              <Text style={{ fontSize: 20 }}>{authProfile.username}</Text>
-            </View>
-            <View style={{ padding: 16, marginBottom: 8 }}>
-              <Text style={s.label}>NAME</Text>
-              <Text
-                style={{
-                  fontSize: authProfile.name ? 20 : 18,
-                  color: authProfile.name ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
-                  fontStyle: authProfile.name ? "normal" : "italic",
-                  fontWeight: authProfile.name ? "normal" : "300",
-                }}
-              >
-                {authProfile.name ? authProfile.name : "No name entered"}
-              </Text>
-            </View>
-
-            <View style={{ padding: 16, marginBottom: 8 }}>
-              <Text style={s.label}>PET TYPE</Text>
-              <Text
-                style={{
-                  fontSize: authProfile.pet_type ? 20 : 18,
-                  color: authProfile.pet_type ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
-                  fontStyle: authProfile.pet_type ? "normal" : "italic",
-                  fontWeight: authProfile.pet_type ? "normal" : "300",
-                }}
-              >
-                {authProfile.pet_type ? authProfile.pet_type.name : "No pet type selected"}
-              </Text>
-            </View>
-
-            <View style={{ padding: 16, marginBottom: 8 }}>
-              <Text style={s.label}>BREED</Text>
-              <Text
-                style={{
-                  fontSize: authProfile.breed ? 20 : 18,
-                  color: authProfile.breed ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
-                  fontStyle: authProfile.breed ? "normal" : "italic",
-                  fontWeight: authProfile.breed ? "normal" : "300",
-                }}
-              >
-                {authProfile.breed ? authProfile.breed : "No breed entered"}
-              </Text>
-            </View>
-            <View style={{ padding: 16 }}>
-              <Text style={s.label}>ABOUT</Text>
-              <Text
-                style={{
-                  fontSize: authProfile.about ? 20 : 18,
-                  color: authProfile.about ? (isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]) : COLORS.zinc[500],
-                  fontStyle: authProfile.about ? "normal" : "italic",
-                  fontWeight: authProfile.about ? "normal" : "300",
-                }}
-              >
-                {authProfile.about ? authProfile.about : "No about text"}
-              </Text>
-            </View>
+          <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]} style={s.sectionHeader}>
+            PROFILE DETAILS
+          </Text>
+          <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[925]) }]}>
+            <LabelAndText label="NAME" text={authProfile.name} placeholder="No name entered" />
+            <LabelAndText label="PET TYPE" text={authProfile.pet_type?.name} placeholder="No pet type selected" />
+            <LabelAndText label="BREED" text={authProfile.breed} placeholder="No breed entered" />
+            <LabelAndText label="ABOUT" text={authProfile.about} placeholder="No about text" />
           </View>
         </View>
       </ScrollView>
@@ -322,12 +263,49 @@ const ProfileScreen = () => {
 
 export default ProfileScreen;
 
+type LabelAndTextProps = {
+  label: string;
+  text: string | undefined | null;
+  placeholder?: string;
+};
+
+const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProps) => {
+  const { setLightOrDark } = useColorMode();
+
+  return (
+    <View style={{ padding: 12 }}>
+      <Text style={s.label}>{label}</Text>
+      <Text
+        style={{
+          fontSize: text ? 20 : 18,
+          color: text ? setLightOrDark(COLORS.zinc[900], COLORS.zinc[100]) : COLORS.zinc[500],
+          fontStyle: text ? "normal" : "italic",
+          fontWeight: text ? (setLightOrDark("400", "300") as TextStyle["fontWeight"]) : "300",
+        }}
+      >
+        {text ? text : placeholder}
+      </Text>
+    </View>
+  );
+};
+
 const s = StyleSheet.create({
   label: {
-    fontSize: 13,
-    fontWeight: "bold",
+    fontSize: 12,
+    fontWeight: "600",
     color: COLORS.zinc[500],
     letterSpacing: 0.5,
     paddingBottom: 4,
+  },
+  sectionHeader: {
+    fontSize: 14,
+    marginBottom: 12,
+    paddingLeft: 8,
+    fontWeight: "500",
+  },
+  card: {
+    borderRadius: 8,
+    marginBottom: 48,
+    padding: 6,
   },
 });
