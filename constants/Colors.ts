@@ -7,6 +7,7 @@ export const COLORS = {
   zinc: {
     50: "#fafafa",
     100: "#f4f4f5",
+    125: "#ECECEE",
     200: "#e4e4e7",
     300: "#d4d4d8",
     400: "#a1a1aa",
@@ -15,6 +16,7 @@ export const COLORS = {
     700: "#3f3f46",
     800: "#27272a",
     900: "#18181b",
+    925: "#111113",
     950: "#09090b",
   },
   red: {
