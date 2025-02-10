@@ -85,7 +85,7 @@ const BottomSheetModal = forwardRef(
         }}
         {...props}
       >
-        <Pressable onPress={() => Keyboard.dismiss()} style={{ flex: 1 }}>
+        <Pressable onPress={() => Keyboard.dismiss()} style={{ flex: 1 }} android_disableSound>
           {children}
         </Pressable>
       </RNBottomSheetModal>
