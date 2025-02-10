@@ -8,7 +8,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput";
 import { forwardRef, ForwardedRef, useMemo, RefObject, useState } from "react";
-import { Platform, View } from "react-native";
+import { Keyboard, Platform, Pressable, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
@@ -73,11 +73,21 @@ const BottomSheetModal = forwardRef(
           );
         }}
         backdropComponent={(props) => {
-          return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.6} {...props} />;
+          return (
+            <BottomSheetBackdrop
+              appearsOnIndex={0}
+              disappearsOnIndex={-1}
+              opacity={0.6}
+              onPress={() => Keyboard.dismiss()}
+              {...props}
+            />
+          );
         }}
         {...props}
       >
-        {children}
+        <Pressable onPress={() => Keyboard.dismiss()} style={{ flex: 1 }}>
+          {children}
+        </Pressable>
       </RNBottomSheetModal>
     );
   },
