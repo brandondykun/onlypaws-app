@@ -190,7 +190,7 @@ const AddPostScreen = () => {
             onChangeText={setCaption}
             label="Caption"
             multiline={true}
-            numberOfLines={6}
+            numberOfLines={3}
             error={captionError}
             showCharCount
             maxLength={128}
