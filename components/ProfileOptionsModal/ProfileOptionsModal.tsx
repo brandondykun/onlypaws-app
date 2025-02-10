@@ -19,6 +19,7 @@ type Props = {
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal>;
   editProfileModalRef: React.RefObject<RNBottomSheetModal>;
   changeProfileModalRef: React.RefObject<RNBottomSheetModal>;
+  editUsernameModalRef: React.RefObject<RNBottomSheetModal>;
 };
 
 const ProfileOptionsModal = ({
@@ -26,6 +27,7 @@ const ProfileOptionsModal = ({
   profileOptionsModalRef,
   editProfileModalRef,
   changeProfileModalRef,
+  editUsernameModalRef,
 }: Props) => {
   const { logOut } = useAuthUserContext();
 
@@ -100,6 +102,23 @@ const ProfileOptionsModal = ({
             backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
           }}
         >
+          <Pressable
+            style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+            onPress={() => {
+              profileOptionsModalRef.current?.dismiss();
+              editUsernameModalRef.current?.present();
+            }}
+          >
+            <View
+              style={[
+                s.profileOption,
+                { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+              ]}
+            >
+              <Ionicons name="pencil" size={18} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
+              <Text style={{ textAlign: "center", fontSize: 18 }}>Change Username</Text>
+            </View>
+          </Pressable>
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {

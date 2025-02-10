@@ -9,7 +9,7 @@ import {
   PaginatedProfileResponse,
 } from "../types";
 
-import { axiosFetch, axiosPost, axiosDelete, axiosPatch } from "./config";
+import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError } from "./config";
 
 export const getProfileDetails = async (profileId: number | string, authProfileId: number | undefined) => {
   const url = `/v1/profile/${profileId}?profileId=${authProfileId}`;
@@ -61,6 +61,11 @@ export const editProfileImage = async (imageId: number, postData: FormData, acce
 export const updateProfile = async (data: any, profileId: number) => {
   const url = `/v1/auth/profile/${profileId}/`;
   return await axiosPatch<Profile>(url, data);
+};
+
+export const updateUsername = async (profileId: number, username: string) => {
+  const url = `/v1/auth/profile/${profileId}/`;
+  return await axiosPatchCustomError<Profile>(url, { username });
 };
 
 export const createProfile = async (username: string, about: string, name: string) => {

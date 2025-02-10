@@ -16,6 +16,7 @@ type AuthProfileContextType = {
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
   updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => void;
+  updateUsername: (username: string) => void;
   refetch: () => Promise<void>;
   refreshing: boolean;
 };
@@ -42,6 +43,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
   updateName: (name: string) => {},
   updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => {},
+  updateUsername: (username: string) => {},
   refetch: () => Promise.resolve(),
   refreshing: false,
 });
@@ -125,6 +127,12 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     });
   };
 
+  const updateUsername = (username: string) => {
+    setAuthProfile((prev) => {
+      return { ...prev, username };
+    });
+  };
+
   const removeFollowing = () => {
     setAuthProfile((prev) => {
       return {
@@ -169,6 +177,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updatePostsCount,
     updateName,
     updateAuthProfile,
+    updateUsername,
     refetch: refreshProfile,
     refreshing,
   };
@@ -189,6 +198,7 @@ export const useAuthProfileContext = () => {
     updatePostsCount,
     updateName,
     updateAuthProfile,
+    updateUsername,
     refetch,
     refreshing,
   } = useContext(AuthProfileContext);
@@ -202,6 +212,7 @@ export const useAuthProfileContext = () => {
     updatePostsCount,
     updateName,
     updateAuthProfile,
+    updateUsername,
     refetch,
     refreshing,
   };
