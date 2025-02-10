@@ -106,10 +106,11 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
   });
 
   let content = (
-    <View>
-      <Text>Loading...</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator color={COLORS.zinc[500]} />
     </View>
   );
+
   if (device == null) {
     content = (
       <View style={{ alignItems: "center" }}>
@@ -380,7 +381,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
 
   return (
     <Modal withScroll={false} visible={visible} onRequestClose={() => setVisible(false)}>
-      <View style={s.contentContainer}>{visible ? content : null}</View>
+      <View style={s.contentContainer}>{content}</View>
       {loading ? (
         <View style={s.loadingView}>
           <ActivityIndicator color={COLORS.zinc[500]} />
