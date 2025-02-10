@@ -1,6 +1,6 @@
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
-import { StyleProp, ImageStyle, View, StyleSheet } from "react-native";
+import { StyleProp, ImageStyle, View, StyleSheet, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PagerView, { PagerViewProps } from "react-native-pager-view";
 import { PhotoFile } from "react-native-vision-camera";
@@ -25,6 +25,9 @@ const ImageSwiper = ({ images, imageHeight, imageWidth, imageStyle, ...rest }: P
     if ("uri" in image) {
       return image.uri;
     } else if ("path" in image) {
+      if (Platform.OS === "android") {
+        return `file://${image.path}`;
+      }
       return image.path;
     } else {
       return image.image;
