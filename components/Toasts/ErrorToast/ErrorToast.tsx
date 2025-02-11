@@ -12,9 +12,9 @@ type Props = {
 
 const DARK_BG_COLOR = COLORS.red[950];
 const DARK_BORDER_COLOR = COLORS.red[600];
-const LIGHT_BG_COLOR = COLORS.red[600];
-const LIGHT_BORDER_COLOR = COLORS.red[900];
-const LIGHT_TEXT_COLOR = COLORS.zinc[100];
+const LIGHT_BG_COLOR = COLORS.red[700];
+const LIGHT_BORDER_COLOR = COLORS.red[400];
+const LIGHT_TEXT_COLOR = COLORS.zinc[50];
 const ICON_COLOR = COLORS.zinc[100];
 
 const ErrorToast = ({ text1, text2 }: Props) => {

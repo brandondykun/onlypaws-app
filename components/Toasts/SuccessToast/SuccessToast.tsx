@@ -12,8 +12,8 @@ type Props = {
 
 const DARK_BG_COLOR = COLORS.lime[950];
 const DARK_BORDER_COLOR = COLORS.lime[600];
-const LIGHT_BG_COLOR = COLORS.lime[600];
-const LIGHT_BORDER_COLOR = COLORS.lime[900];
+const LIGHT_BG_COLOR = COLORS.lime[700];
+const LIGHT_BORDER_COLOR = COLORS.lime[400];
 const ICON_COLOR = COLORS.zinc[100];
 const LIGHT_TEXT_COLOR = COLORS.zinc[100];
 
