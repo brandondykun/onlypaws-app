@@ -126,7 +126,7 @@ const LoginScreen = () => {
           <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
             Don't have an account?
           </Text>
-          <Button text="Register" variant="text" onPress={() => router.push("/auth/register")} />
+          <Button text="Register" variant="text" onPress={() => router.replace("/auth/register")} />
         </View>
       </View>
     </ScrollView>
