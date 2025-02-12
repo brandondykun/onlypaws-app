@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 
 import { Tokens, AccessToken, UserProfile, MyInfo } from "../types";
 
-import { axiosPost, axiosFetch, axiosPostCustomError } from "./config";
+import { axiosPost, axiosFetch, axiosPostCustomError, axiosInstance } from "./config";
 import { BASE_URL } from "./config";
 
 export const login = async (email: string, password: string) => {
@@ -28,9 +28,21 @@ export const getMyInfo = async () => {
   return await axiosFetch<MyInfo>(url);
 };
 
+// register api call that can handle returning specific field errors
 export const registerUser = async (email: string, password: string, username: string) => {
   const url = "/v1/auth/create-user/";
-  return await axiosPost<UserProfile>(url, { email, password, username });
+  try {
+    const res = await axiosInstance.post<UserProfile>(url, { email, password, username });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as any;
+    return {
+      data: null,
+      error: data as { email?: string[]; username?: string[]; password?: string[] },
+      status: error.status,
+    };
+  }
 };
 
 export const verifyEmail = async (token: string) => {

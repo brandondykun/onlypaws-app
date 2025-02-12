@@ -13,11 +13,9 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
-import { useColorMode } from "@/context/ColorModeContext";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
-  const { isDarkMode } = useColorMode();
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -88,10 +86,22 @@ const RegisterScreen = () => {
         Toast.show({
           type: "error",
           text1: "Error",
-          text2: "There was an error creating your account. Please try again.",
+          text2: "Your account was created, but there was an error logging you in. Please log in manually.",
         });
+        router.replace("/auth/login");
       }
     } else {
+      // handle errors here
+      if (error.email) {
+        setEmailError(error.email[0]);
+      }
+      if (error.username) {
+        setUsernameError(error.username[0]);
+      }
+      if (error.password) {
+        setPasswordError(error.password[0]);
+      }
+
       Toast.show({
         type: "error",
         text1: "Error",
@@ -102,32 +112,29 @@ const RegisterScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root}>
+    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets>
       <Text style={s.title} darkColor={COLORS.zinc[300]}>
         OnlyPaws
       </Text>
-      <View style={s.icon}>
-        <Ionicons name="paw" size={64} color={isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200]} />
-      </View>
       <View style={s.inputsContainer}>
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          error={emailError}
-          placeholder="youremail@email.com"
-          icon={<Ionicons name="at-sharp" size={20} color={COLORS.zinc[500]} />}
-          autoCapitalize="none"
-        />
-        <TextInput
-          label="Username"
-          value={username}
-          onChangeText={setUsername}
-          error={usernameError}
-          placeholder="AwesomeUsername"
-          icon={<Feather name="user" size={20} color={COLORS.zinc[500]} />}
-          autoCapitalize="none"
-        />
+        <View style={{ marginBottom: 36 }}>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            error={emailError}
+            placeholder="youremail@email.com"
+            icon={<Ionicons name="at-sharp" size={20} color={COLORS.zinc[500]} />}
+            autoCapitalize="none"
+          />
+          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+            * Choose an email you can access to verify your account.
+          </Text>
+          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+            * Your email will not be visible to other users.
+          </Text>
+        </View>
+
         <TextInput
           label="Password"
           value={password}
@@ -138,16 +145,38 @@ const RegisterScreen = () => {
           autoCapitalize="none"
           secureTextEntry
         />
-        <TextInput
-          label="Confirm Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          error={confirmPasswordError}
-          placeholder="*********"
-          icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
-          autoCapitalize="none"
-          secureTextEntry
-        />
+        <View style={{ marginBottom: 24 }}>
+          <TextInput
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            error={confirmPasswordError}
+            placeholder="*********"
+            icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
+            autoCapitalize="none"
+            secureTextEntry
+          />
+          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+            * Password must be at least 9 characters.
+          </Text>
+        </View>
+        <View style={{ marginBottom: 36 }}>
+          <TextInput
+            label="Username"
+            value={username}
+            onChangeText={setUsername}
+            error={usernameError}
+            placeholder="AwesomeUsername"
+            icon={<Feather name="user" size={20} color={COLORS.zinc[500]} />}
+            autoCapitalize="none"
+          />
+          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+            * Username must be unique from all other profiles.
+          </Text>
+          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+            * You can change your username later.
+          </Text>
+        </View>
       </View>
 
       <Button text="Create Account" onPress={handleCreateAccount} loading={submitLoading} />
@@ -156,7 +185,7 @@ const RegisterScreen = () => {
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
           Already have an account?
         </Text>
-        <Button text="Log in" variant="text" onPress={() => router.back()} />
+        <Button text="Log in" variant="text" onPress={() => router.replace("/auth/login")} />
       </View>
     </ScrollView>
   );
@@ -168,12 +197,12 @@ const s = StyleSheet.create({
   root: {
     flexGrow: 1,
     padding: 16,
-    paddingTop: 96,
+    paddingTop: 72,
   },
   title: {
     textAlign: "center",
     fontSize: 36,
-    marginBottom: 36,
+    marginBottom: 24,
     fontStyle: "italic",
   },
   icon: {
@@ -190,5 +219,10 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    marginBottom: 24,
+  },
+  helperText: {
+    fontStyle: "italic",
+    fontWeight: "300",
   },
 });
