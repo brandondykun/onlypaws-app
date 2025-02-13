@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import {
   ProfileDetails,
   ProfileImage,
@@ -9,7 +11,7 @@ import {
   PaginatedProfileResponse,
 } from "../types";
 
-import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError } from "./config";
+import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
 export const getProfileDetails = async (profileId: number | string, authProfileId: number | undefined) => {
   const url = `/v1/profile/${profileId}?profileId=${authProfileId}`;
@@ -68,9 +70,23 @@ export const updateUsername = async (profileId: number, username: string) => {
   return await axiosPatchCustomError<Profile>(url, { username });
 };
 
-export const createProfile = async (username: string, about: string, name: string) => {
+// handle creating a new profile on add profile screen
+export const createProfile = async (
+  username: string,
+  about: string,
+  name: string,
+  breed: string,
+  pet_type?: number,
+) => {
   const url = "/v1/auth/profile/";
-  return await axiosPost<CreateProfileResponse>(url, { username, about, name });
+  try {
+    const res = await axiosInstance.post<CreateProfileResponse>(url, { username, about, name, breed, pet_type });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as { username?: string[] };
+    return { data: null, error: data, status: error.status };
+  }
 };
 
 export const getFollowers = async (profileId: number) => {
