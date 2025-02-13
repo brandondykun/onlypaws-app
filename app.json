@@ -5,9 +5,9 @@
     "version": "1.0.0",
     "newArchEnabled": true,
     "orientation": "portrait",
-    "icon": "./assets/icons/ios-dark.png",
+    "icon": "./assets/images/icon.png",
     "splash": {
-      "image": "./assets/icons/splash-icon-dark.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#f4f4f5"
     },
