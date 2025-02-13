@@ -16,14 +16,28 @@ export type DropdownSelectOption = {
 type Props = {
   data: DropdownSelectOption[];
   defaultText: string;
+  label?: string;
 } & Omit<SelectDropdownProps, "renderButton" | "renderItem" | "data">;
 
 const DropdownSelect = forwardRef(
-  ({ data, defaultText, ...props }: Props, ref: LegacyRef<SelectDropdown> | undefined) => {
+  ({ data, defaultText, label, ...props }: Props, ref: LegacyRef<SelectDropdown> | undefined) => {
     const { isDarkMode } = useColorMode();
 
     return (
-      <View style={{ marginVertical: 4 }}>
+      <View style={{ marginVertical: 4, position: "relative" }}>
+        {label ? (
+          <Text
+            style={[
+              s.label,
+              {
+                backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[500],
+              },
+            ]}
+          >
+            {label}
+          </Text>
+        ) : null}
         <SelectDropdown
           ref={ref}
           data={data}
@@ -93,5 +107,14 @@ const s = StyleSheet.create({
   dropdownItemTxtStyle: {
     flex: 1,
     fontSize: 18,
+  },
+  label: {
+    width: "auto",
+    position: "absolute",
+    top: -6,
+    left: 15,
+    zIndex: 2,
+    paddingHorizontal: 4,
+    fontSize: 12,
   },
 });
