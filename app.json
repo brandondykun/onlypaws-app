@@ -5,26 +5,27 @@
     "version": "1.0.0",
     "newArchEnabled": true,
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icons/ios-dark.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f5f5f4"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bdykun.onlypawsapp",
       "infoPlist": {
         "NSCameraUsageDescription": "OnlyPaws needs access to your Camera.",
         "NSMicrophoneUsageDescription": "OnlyPaws needs access to your Microphone."
+      },
+      "icon": {
+        "dark": "./assets/icons/ios-dark.png",
+        "light": "./assets/icons/ios-light.png",
+        "tinted": "./assets/icons/ios-tinted.png"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#f5f5f4"
+        "foregroundImage": "./assets/icon/adaptive-icon.png",
+        "monochromeImage": "./assets/icon/adaptive-icon.png",
+        "backgroundColor": "#f4f4f5"
       },
       "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       "package": "com.bdykun.onlypawsapp"
@@ -49,6 +50,19 @@
           "cameraPermissionText": "OnlyPaws needs access to your Camera.",
           "enableMicrophonePermission": true,
           "microphonePermissionText": "OnlyPaws needs access to your Microphone."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f4f4f5",
+          "image": "./assets/icons/splash-icon-dark.png",
+          "dark": {
+            "image": "./assets/icons/splash-icon-light.png",
+            "backgroundColor": "#09090b"
+          },
+          "imageWidth": 200,
+          "resizeMode": "contain"
         }
       ]
     ],

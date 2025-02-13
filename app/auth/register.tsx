@@ -13,9 +13,12 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useColorMode } from "@/context/ColorModeContext";
+import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
+  const { isDarkMode } = useColorMode();
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -113,9 +116,9 @@ const RegisterScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets>
-      <Text style={s.title} darkColor={COLORS.zinc[300]}>
-        OnlyPaws
-      </Text>
+      <View style={{ alignItems: "center" }}>
+        <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
+      </View>
       <View style={s.inputsContainer}>
         <View style={{ marginBottom: 36 }}>
           <TextInput
@@ -198,12 +201,6 @@ const s = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     paddingTop: 72,
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 36,
-    marginBottom: 24,
-    fontStyle: "italic",
   },
   icon: {
     justifyContent: "center",
