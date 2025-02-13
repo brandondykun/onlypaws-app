@@ -6,6 +6,11 @@
     "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icons/ios-dark.png",
+    "splash": {
+      "image": "./assets/icons/splash-icon-dark.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f4f4f5"
+    },
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
