@@ -1,6 +1,7 @@
 // import { Redirect } from "expo-router";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import * as SplashScreen from "expo-splash-screen";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { getMyInfo, refreshToken } from "@/api/auth";
@@ -46,6 +47,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [authLoading]);
 
   const authenticate = useCallback(async (user: MyInfo) => {
     setUser(user);
