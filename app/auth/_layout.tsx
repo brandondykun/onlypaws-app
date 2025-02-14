@@ -1,5 +1,5 @@
 import { Redirect, Stack } from "expo-router";
-import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
+import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator } from "react-native";
 
@@ -20,12 +20,12 @@ const TabLayout = () => {
     );
   }
   if (isAuthenticated && user.is_email_verified) {
-    return <Redirect href="/(app)/" />;
+    return <Redirect href="/(app)/(index)" />;
   }
 
   return (
     <>
-      <ExpoStatusBar style="auto" />
+      <StatusBar style="auto" />
       <Stack
         screenOptions={{
           title: "Welcome",

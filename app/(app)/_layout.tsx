@@ -4,7 +4,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { BlurView } from "expo-blur";
 import { Tabs, Redirect } from "expo-router";
-import ExpoStatusBar from "expo-status-bar/build/ExpoStatusBar";
+import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
@@ -41,7 +41,7 @@ const TabLayout = () => {
   }
 
   if (!isAuthenticated) {
-    return <Redirect href="/auth/" />;
+    return <Redirect href="/auth" />;
   }
 
   if (!user.is_email_verified) {
@@ -60,7 +60,7 @@ const TabLayout = () => {
                     <PostManagerContextProvider>
                       <ProfileDetailsManagerContextProvider>
                         <ReportReasonsContextProvider>
-                          <ExpoStatusBar style="auto" />
+                          <StatusBar style="auto" />
                           <Tabs
                             screenOptions={{
                               tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
@@ -97,7 +97,6 @@ const TabLayout = () => {
                                 }
                               },
                             }}
-                            sceneContainerStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}
                           >
                             <Tabs.Screen
                               name="(index)"

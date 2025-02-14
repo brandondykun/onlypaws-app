@@ -41,14 +41,14 @@ const ProfileOptionsModal = ({
       enableDynamicSizing={true}
       snapPoints={["60%"]}
     >
-      <BottomSheetView style={{ paddingTop: 24, paddingBottom: 48, paddingHorizontal: 36 }}>
+      <BottomSheetView style={{ paddingTop: 24, paddingBottom: 88, paddingHorizontal: 36 }}>
         <View style={{ marginBottom: 12, flexDirection: "row", gap: 12, height: 70 }}>
           <View style={{ flex: 1 }}>
             <Pressable
               style={({ pressed }) => [pressed && { opacity: 0.7 }, { flex: 1 }]}
               onPress={() => {
-                profileOptionsModalRef.current?.dismiss();
                 router.push("/(app)/profile/guidelines");
+                profileOptionsModalRef.current?.dismiss();
               }}
             >
               <View
@@ -70,8 +70,8 @@ const ProfileOptionsModal = ({
             <Pressable
               style={({ pressed }) => [pressed && { opacity: 0.7 }, { flex: 1 }]}
               onPress={() => {
-                profileOptionsModalRef.current?.dismiss();
                 router.push("/(app)/profile/about");
+                profileOptionsModalRef.current?.dismiss();
               }}
             >
               <View
@@ -105,8 +105,8 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              profileOptionsModalRef.current?.dismiss();
               editUsernameModalRef.current?.present();
+              profileOptionsModalRef.current?.dismiss();
             }}
           >
             <View
@@ -122,8 +122,8 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              profileOptionsModalRef.current?.dismiss();
               editProfileModalRef.current?.present();
+              profileOptionsModalRef.current?.dismiss();
             }}
           >
             <View
@@ -139,8 +139,8 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              profileOptionsModalRef.current?.dismiss();
               setShowCamera(true);
+              profileOptionsModalRef.current?.dismiss();
             }}
           >
             <View
@@ -156,8 +156,8 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              profileOptionsModalRef.current?.dismiss();
               changeProfileModalRef.current?.present();
+              profileOptionsModalRef.current?.dismiss();
             }}
           >
             <View style={[s.profileOption]}>
@@ -180,7 +180,6 @@ export default ProfileOptionsModal;
 const s = StyleSheet.create({
   profileOption: {
     paddingVertical: 16,
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
