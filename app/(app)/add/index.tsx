@@ -228,7 +228,7 @@ const AddPostScreen = () => {
         visible={cameraVisible}
         setVisible={setCameraVisible}
         maxImages={5}
-        onSavePress={() => setCameraVisible(false)}
+        hasNextButton
       />
       <AiModal ref={aiModalRef} />
     </ScrollView>

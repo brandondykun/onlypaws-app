@@ -1,8 +1,5 @@
-import DraggableFlatList from "@bwjohns4/react-native-draggable-flatlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef, useState, useCallback } from "react";
@@ -15,7 +12,6 @@ import { Camera, PhotoFile, useCameraDevice, useCameraPermission, Point } from "
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
@@ -24,22 +20,46 @@ import Text from "../Text/Text";
 import CameraBackground from "./CameraBackground";
 import FocusIcon from "./FocusIcon";
 import ImagePreviewModal from "./ImagePreviewModal";
+import PreviewImages from "./PreviewImages";
 
-type Props = {
-  visible: boolean;
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  images: (PhotoFile | ImagePickerAsset)[];
-  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
-  maxImages?: number;
-  onSavePress?: () => void;
-  loading?: boolean;
-};
+type Props =
+  | {
+      visible: boolean;
+      setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+      images: (PhotoFile | ImagePickerAsset)[];
+      setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
+      maxImages?: number;
+      onSavePress?: () => void;
+      hasNextButton?: undefined;
+      loading?: boolean;
+      onBackButtonPress?: () => void;
+    }
+  | {
+      visible: boolean;
+      setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+      images: (PhotoFile | ImagePickerAsset)[];
+      setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
+      maxImages?: number;
+      onSavePress?: undefined;
+      hasNextButton?: boolean;
+      loading?: boolean;
+      onBackButtonPress?: () => void;
+    };
 
-const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSavePress, loading }: Props) => {
+const CameraModal = ({
+  visible,
+  setVisible,
+  images,
+  setImages,
+  maxImages,
+  onSavePress,
+  hasNextButton = false,
+  loading,
+  onBackButtonPress,
+}: Props) => {
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
-  const [initialPreviewIndex, setInitialPreviewIndex] = useState<number | null>(null);
   const [flash, setFlash] = useState<"on" | "off">("off");
 
   const insets = useSafeAreaInsets();
@@ -155,6 +175,12 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
     setFlash((prev) => (prev === "on" ? "off" : "on"));
   };
 
+  const handleBackButtonPress = () => {
+    setVisible(false);
+    // handle extra actions needed on back button press
+    onBackButtonPress && onBackButtonPress();
+  };
+
   if (device && hasPermission) {
     const maxImagesReached = images.length === maxImages;
 
@@ -173,7 +199,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
             ]}
           >
             <View style={[s.topIconContainer, { marginTop: Platform.OS === "ios" ? insets.top : 12 }]}>
-              <TouchableOpacity onPress={() => setVisible(false)}>
+              <TouchableOpacity onPress={handleBackButtonPress}>
                 <Ionicons
                   name={Platform.OS === "ios" ? "chevron-back-outline" : "arrow-back-sharp"}
                   size={Platform.OS === "ios" ? 30 : 25}
@@ -197,81 +223,7 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={{ flex: 1, paddingBottom: 4, justifyContent: "flex-end" }}>
-              <Text
-                style={{
-                  color: COLORS.zinc[500],
-                  paddingLeft: 8,
-                  paddingBottom: 2,
-                  fontStyle: "italic",
-                  fontSize: 14,
-                }}
-              >
-                {images.length > 1 ? "Tap to edit - or - press, hold, drag to reorder" : ""}
-              </Text>
-              {images.length ? (
-                <DraggableFlatList
-                  horizontal={true}
-                  data={images}
-                  contentContainerStyle={{ flexGrow: 1, alignItems: "flex-end" }}
-                  showsHorizontalScrollIndicator={false}
-                  onDragBegin={() => Haptics.impactAsync()}
-                  renderItem={({ item, drag, isActive }) => {
-                    return (
-                      <Pressable
-                        onLongPress={drag}
-                        onPress={() => {
-                          const index = images.findIndex((image) => getImageUri(image) === getImageUri(item));
-                          setInitialPreviewIndex(index);
-                          setPreviewModalVisible(true);
-                        }}
-                        style={[
-                          { borderRadius: 4 },
-
-                          isActive && {
-                            shadowColor: COLORS.zinc[950],
-                            shadowOffset: {
-                              width: 0,
-                              height: 12,
-                            },
-                            shadowOpacity: 0.58,
-                            shadowRadius: 16.0,
-                            elevation: 24,
-                          },
-                        ]}
-                      >
-                        <Image
-                          source={{ uri: getImageUri(item) }}
-                          style={{
-                            borderRadius: 4,
-                            marginHorizontal: 2,
-                            height: 100,
-                            width: 100,
-                          }}
-                        />
-                      </Pressable>
-                    );
-                  }}
-                  keyExtractor={(item) => getImageUri(item)}
-                  onDragEnd={({ data }) => setImages(data)}
-                />
-              ) : (
-                <View style={{ flexDirection: "row", gap: 2, paddingLeft: 4 }}>
-                  <View
-                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
-                  />
-                  <View
-                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
-                  />
-                  <View
-                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
-                  />
-                  <View
-                    style={[s.placeholder, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}
-                  />
-                </View>
-              )}
-            </View>
+            <PreviewImages images={images} setPreviewModalVisible={setPreviewModalVisible} />
           </View>
 
           {/* Camera Square */}
@@ -359,6 +311,15 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
                     </Text>
                   </Pressable>
                 ) : null}
+                {hasNextButton && images.length ? (
+                  <Button
+                    onPress={() => setVisible(false)}
+                    variant="text"
+                    text="Next"
+                    textStyle={{ color: setLightOrDark(COLORS.sky[500], COLORS.sky[600]) }}
+                    hitSlop={25}
+                  />
+                ) : null}
               </View>
             </View>
           </View>
@@ -392,7 +353,6 @@ const CameraModal = ({ visible, setVisible, images, setImages, maxImages, onSave
         setImages={setImages}
         visible={previewModalVisible}
         setVisible={setPreviewModalVisible}
-        initialIndex={initialPreviewIndex}
       />
     </Modal>
   );
@@ -446,11 +406,6 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 1,
-  },
-  placeholder: {
-    borderRadius: 4,
-    height: 100,
-    width: 100,
   },
   loadingView: {
     position: "absolute",

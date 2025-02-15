@@ -270,6 +270,7 @@ const ProfileScreen = () => {
         maxImages={1}
         onSavePress={handleSavePress}
         loading={updateProfileLoading}
+        onBackButtonPress={() => setImage([])} // clear temp image if profile image was not updated
       />
       <EditProfileModal
         petTypeOptions={petTypeOptions}
