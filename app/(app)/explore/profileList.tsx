@@ -1,12 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
-import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
 
 const ExploreProfilePostsListScreen = () => {
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
 
-  const { selectedProfilePosts } = useExplorePostsContext();
+  const { posts } = useExploreProfileDetailsContext();
 
   const router = useRouter();
 
@@ -14,9 +14,7 @@ const ExploreProfilePostsListScreen = () => {
     router.back();
   };
 
-  return (
-    <PostScrollList posts={selectedProfilePosts!} onProfilePress={onProfilePress} initialIndex={Number(initialIndex)} />
-  );
+  return <PostScrollList posts={posts.data!} onProfilePress={onProfilePress} initialIndex={Number(initialIndex)} />;
 };
 
 export default ExploreProfilePostsListScreen;
