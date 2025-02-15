@@ -119,7 +119,6 @@ const FollowingScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerBackTitleVisible: false,
       headerTitle: () => (
         <View style={{ flex: 1 }}>
           <TextInput

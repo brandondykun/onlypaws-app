@@ -21,10 +21,10 @@ const PostsStack = () => {
     >
       <Stack.Screen name="index" options={{ title: "Posts" }} />
       <Stack.Screen name="list" options={{ title: "Posts", headerBackTitle: "My Posts" }} />
-      <Stack.Screen name="followers" options={{ title: "Followers", headerBackTitleVisible: false }} />
-      <Stack.Screen name="following" options={{ title: "Following", headerBackTitleVisible: false }} />
-      <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackTitleVisible: false }} />
-      <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackTitleVisible: false }} />
+      <Stack.Screen name="followers" options={{ title: "Followers", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen name="following" options={{ title: "Following", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackButtonDisplayMode: "minimal" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
       <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
     </Stack>
