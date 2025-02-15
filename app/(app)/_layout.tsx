@@ -10,6 +10,8 @@ import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import AuthProfileFollowersContextProvider from "@/context/AuthProfileFollowersContext";
+import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
@@ -57,99 +59,105 @@ const TabLayout = () => {
               <ExploreProfileDetailsContextProvider>
                 <PostsProfileDetailsContextProvider>
                   <ProfileSearchContextProvider>
-                    <PostManagerContextProvider>
-                      <ProfileDetailsManagerContextProvider>
-                        <ReportReasonsContextProvider>
-                          <StatusBar style="auto" />
-                          <Tabs
-                            screenOptions={{
-                              tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-                              tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
-                              tabBarStyle: {
-                                borderTopWidth: 0,
-                                elevation: 0,
-                                position: "absolute",
-                                right: 0,
-                                bottom: 0,
-                                left: 0,
-                                backgroundColor: "transparent",
-                              },
-                              headerShadowVisible: false, // applied here
-                              tabBarBackground: () => {
-                                // only show blur view on ios
-                                if (Platform.OS === "ios") {
-                                  return (
-                                    <BlurView
-                                      style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
-                                      intensity={isDarkMode ? 20 : 10}
-                                      tint={isDarkMode ? "dark" : "light"}
-                                    />
-                                  );
-                                } else {
-                                  return (
-                                    <View
-                                      style={{
-                                        flex: 1,
-                                        backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
-                                      }}
-                                    />
-                                  );
-                                }
-                              },
-                            }}
-                          >
-                            <Tabs.Screen
-                              name="(index)"
-                              options={{
-                                title: "Feed",
-                                tabBarIcon: ({ color, focused }) => (
-                                  <FontAwesome5 name="square-full" size={20} color={color} />
-                                ),
-                                headerShown: false,
-                              }}
-                            />
-                            <Tabs.Screen
-                              name="explore"
-                              options={{
-                                title: "Explore",
-                                tabBarIcon: ({ color, focused }) => <Feather name="search" size={24} color={color} />,
-                                headerShown: false,
-                              }}
-                            />
-                            <Tabs.Screen
-                              name="add"
-                              options={{
-                                title: "Add Post",
-                                tabBarIcon: ({ color, focused }) => (
-                                  <Octicons name="diff-added" size={24} color={color} />
-                                ),
-                                headerShown: false,
-                              }}
-                            />
-                            <Tabs.Screen
-                              name="posts"
-                              options={{
-                                title: "Posts",
-                                tabBarIcon: ({ color, focused }) => (
-                                  <MaterialIcons name="grid-on" size={24} color={color} />
-                                ),
-                                headerShown: false,
-                              }}
-                            />
-                            <Tabs.Screen
-                              name="profile"
-                              options={{
-                                title: "Profile",
-                                tabBarIcon: ({ color, focused }) => (
-                                  <MaterialIcons name="person" size={24} color={color} />
-                                ),
-                                headerShown: false,
-                              }}
-                            />
-                          </Tabs>
-                        </ReportReasonsContextProvider>
-                      </ProfileDetailsManagerContextProvider>
-                    </PostManagerContextProvider>
+                    <AuthProfileFollowingContextProvider>
+                      <AuthProfileFollowersContextProvider>
+                        <PostManagerContextProvider>
+                          <ProfileDetailsManagerContextProvider>
+                            <ReportReasonsContextProvider>
+                              <StatusBar style="auto" />
+                              <Tabs
+                                screenOptions={{
+                                  tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+                                  tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
+                                  tabBarStyle: {
+                                    borderTopWidth: 0,
+                                    elevation: 0,
+                                    position: "absolute",
+                                    right: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    backgroundColor: "transparent",
+                                  },
+                                  headerShadowVisible: false, // applied here
+                                  tabBarBackground: () => {
+                                    // only show blur view on ios
+                                    if (Platform.OS === "ios") {
+                                      return (
+                                        <BlurView
+                                          style={{ flex: 1, backgroundColor: setLightOrDark("#fafafaCC", "#000000CC") }}
+                                          intensity={isDarkMode ? 20 : 10}
+                                          tint={isDarkMode ? "dark" : "light"}
+                                        />
+                                      );
+                                    } else {
+                                      return (
+                                        <View
+                                          style={{
+                                            flex: 1,
+                                            backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                                          }}
+                                        />
+                                      );
+                                    }
+                                  },
+                                }}
+                              >
+                                <Tabs.Screen
+                                  name="(index)"
+                                  options={{
+                                    title: "Feed",
+                                    tabBarIcon: ({ color, focused }) => (
+                                      <FontAwesome5 name="square-full" size={20} color={color} />
+                                    ),
+                                    headerShown: false,
+                                  }}
+                                />
+                                <Tabs.Screen
+                                  name="explore"
+                                  options={{
+                                    title: "Explore",
+                                    tabBarIcon: ({ color, focused }) => (
+                                      <Feather name="search" size={24} color={color} />
+                                    ),
+                                    headerShown: false,
+                                  }}
+                                />
+                                <Tabs.Screen
+                                  name="add"
+                                  options={{
+                                    title: "Add Post",
+                                    tabBarIcon: ({ color, focused }) => (
+                                      <Octicons name="diff-added" size={24} color={color} />
+                                    ),
+                                    headerShown: false,
+                                  }}
+                                />
+                                <Tabs.Screen
+                                  name="posts"
+                                  options={{
+                                    title: "Posts",
+                                    tabBarIcon: ({ color, focused }) => (
+                                      <MaterialIcons name="grid-on" size={24} color={color} />
+                                    ),
+                                    headerShown: false,
+                                  }}
+                                />
+                                <Tabs.Screen
+                                  name="profile"
+                                  options={{
+                                    title: "Profile",
+                                    tabBarIcon: ({ color, focused }) => (
+                                      <MaterialIcons name="person" size={24} color={color} />
+                                    ),
+                                    headerShown: false,
+                                  }}
+                                />
+                              </Tabs>
+                            </ReportReasonsContextProvider>
+                          </ProfileDetailsManagerContextProvider>
+                        </PostManagerContextProvider>
+                      </AuthProfileFollowersContextProvider>
+                    </AuthProfileFollowingContextProvider>
                   </ProfileSearchContextProvider>
                 </PostsProfileDetailsContextProvider>
               </ExploreProfileDetailsContextProvider>
