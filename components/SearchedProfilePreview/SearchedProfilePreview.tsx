@@ -6,6 +6,7 @@ import { View, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
 import { SearchedProfile } from "@/types";
 
 import Button from "../Button/Button";
@@ -21,6 +22,7 @@ const ICON_SIZE = 42;
 
 const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPress }: Props) => {
   const router = useRouter();
+  const exploreProfileDetails = useExploreProfileDetailsContext();
   const { isDarkMode } = useColorMode();
   const [followLoading, setFollowLoading] = useState(false);
 
@@ -50,6 +52,7 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
       <Pressable
         style={({ pressed }) => [pressed && { opacity: 0.6 }, { flex: 1 }]}
         onPress={() => {
+          exploreProfileDetails.setProfileId(profile.id);
           router.push({ pathname: "/(app)/explore/profile", params: { profileId: profile.id } });
         }}
       >
