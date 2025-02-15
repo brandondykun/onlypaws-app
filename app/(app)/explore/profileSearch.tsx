@@ -1,50 +1,22 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
-import { useNavigation } from "expo-router";
-import { useLayoutEffect } from "react";
-import { StyleSheet, View, ActivityIndicator, Dimensions, Platform } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
 
-const platform = Platform.OS;
-
 const ProfileSearchScreen = () => {
-  const navigation = useNavigation();
   const search = useProfileSearchContext();
   const { authProfile } = useAuthProfileContext();
   const profileDetailsManager = useProfileDetailsManagerContext();
-  const screenWidth = Dimensions.get("window").width;
   const tabBarHeight = useBottomTabBarHeight();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerBackTitleVisible: false,
-      headerTitle: () => (
-        <View style={{ flex: 1 }}>
-          <TextInput
-            inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
-            returnKeyType="search"
-            value={search.searchText}
-            onChangeText={search.setSearchText}
-            onSubmitEditing={search.search}
-            placeholder="Search profiles..."
-            autoFocus={true}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
-      ),
-    });
-  });
 
   const handleUnfollowPress = async (profileId: number) => {
     const { error } = await unfollowProfile(profileId, authProfile.id);
@@ -141,14 +113,3 @@ const ProfileSearchScreen = () => {
 };
 
 export default ProfileSearchScreen;
-
-const s = StyleSheet.create({
-  modalSearchInput: {
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    fontSize: 16,
-    height: 35,
-    marginTop: platform === "android" ? 4 : 0,
-  },
-});
