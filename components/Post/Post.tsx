@@ -68,10 +68,10 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      onLike && onLike(postId);
+      onLike(postId); // optimistic like
       const { error } = await addLike(postId, authProfile.id);
       if (error) {
-        onUnlike && onUnlike(postId);
+        onUnlike(postId); // roll back if error
         Toast.show({
           type: "error",
           text1: "Error",
@@ -92,10 +92,10 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      onUnlike && onUnlike(postId);
+      onUnlike(postId); // optimistic un-like
       const { error } = await removeLike(postId, authProfile.id);
       if (error) {
-        onLike && onLike(postId);
+        onLike(postId); // roll back if error
         Toast.show({
           type: "error",
           text1: "Error",
@@ -158,12 +158,12 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      handleUnSavePost();
+      handleUnSavePost(); // optimistic update
       const { error } = await unSavePostApi(post.id);
       if (!error) {
-        savedPosts.unSavePost(post.id);
+        savedPosts.unSavePost(post.id); //special behavior for saved posts
       } else {
-        handleSavePost();
+        handleSavePost(); // rollback if error
         Toast.show({
           type: "error",
           text1: "Error",
@@ -184,12 +184,12 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      handleSavePost();
+      handleSavePost(); // optimistic update
       const { error } = await savePostApi(post.id, authProfile.id);
       if (!error) {
-        savedPosts.savePost({ ...post, is_saved: true });
+        savedPosts.savePost({ ...post, is_saved: true }); //special behavior for saved posts
       } else {
-        handleUnSavePost();
+        handleUnSavePost(); // rollback if error
         Toast.show({
           type: "error",
           text1: "Error",
