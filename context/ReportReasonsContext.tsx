@@ -35,7 +35,7 @@ const ReportReasonsContextProvider = ({ children }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
   // TODO: retry fetch if fails
-  const fetchSavedPosts = useCallback(async () => {
+  const fetchReportReasons = useCallback(async () => {
     if (authProfile?.id) {
       setLoading(true);
       setError("");
@@ -60,13 +60,13 @@ const ReportReasonsContextProvider = ({ children }: Props) => {
   }, [authProfile]);
 
   useEffect(() => {
-    fetchSavedPosts();
-  }, [authProfile, fetchSavedPosts]);
+    fetchReportReasons();
+  }, [authProfile, fetchReportReasons]);
 
-  const refreshPosts = async () => {
+  const refreshReportReasons = async () => {
     setRefreshing(true);
     Haptics.impactAsync();
-    await fetchSavedPosts();
+    await fetchReportReasons();
     setRefreshing(false);
   };
 
@@ -74,7 +74,7 @@ const ReportReasonsContextProvider = ({ children }: Props) => {
     data,
     loading,
     error,
-    refetch: refreshPosts,
+    refetch: refreshReportReasons,
     refreshing,
   };
 
