@@ -4,7 +4,6 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { axiosFetch } from "@/api/config";
 import { getFeed } from "@/api/profile";
 import { PaginatedFeedResponse, PostDetailed } from "@/types";
-import { likePostInState, addCommentInState, unlikePostInState } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
@@ -20,9 +19,6 @@ type FeedPostsContextType = {
   hasFetchNextError: boolean;
   refresh: () => Promise<void>;
   refreshing: boolean;
-  onLike: (postId: number) => void;
-  onUnlike: (postId: number) => void;
-  onComment: (postId: number) => void;
 };
 
 const FeedPostsContext = createContext<FeedPostsContextType>({
@@ -37,9 +33,6 @@ const FeedPostsContext = createContext<FeedPostsContextType>({
   hasFetchNextError: false,
   refresh: () => Promise.resolve(),
   refreshing: false,
-  onLike: (postId: number) => {},
-  onUnlike: (postId: number) => {},
-  onComment: (postId: number) => {},
 });
 
 type Props = {
@@ -101,18 +94,6 @@ const FeedPostsContextProvider = ({ children }: Props) => {
     }
   }, [fetchNextUrl]);
 
-  const onLike = (postId: number) => {
-    likePostInState(setData, postId);
-  };
-
-  const onUnlike = (postId: number) => {
-    unlikePostInState(setData, postId);
-  };
-
-  const onComment = (postId: number) => {
-    addCommentInState(setData, postId);
-  };
-
   const value = {
     data,
     setData,
@@ -125,9 +106,6 @@ const FeedPostsContextProvider = ({ children }: Props) => {
     hasFetchNextError,
     refresh: refreshFeed,
     refreshing,
-    onLike,
-    onUnlike,
-    onComment,
   };
 
   return <FeedPostsContext.Provider value={value}>{children}</FeedPostsContext.Provider>;
@@ -148,9 +126,6 @@ export const useFeedPostsContext = () => {
     hasFetchNextError,
     refresh,
     refreshing,
-    onLike,
-    onUnlike,
-    onComment,
   } = useContext(FeedPostsContext);
   return {
     data,
@@ -164,8 +139,5 @@ export const useFeedPostsContext = () => {
     hasFetchNextError,
     refresh,
     refreshing,
-    onLike,
-    onUnlike,
-    onComment,
   };
 };
