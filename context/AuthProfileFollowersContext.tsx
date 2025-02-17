@@ -1,9 +1,10 @@
 import * as Haptics from "expo-haptics";
 import { debounce, DebouncedFunc } from "lodash";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
 import { getFollowers, searchFollowers } from "@/api/profile";
+import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { FollowProfile, PaginatedProfileResponse } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
@@ -71,13 +72,26 @@ type Props = {
 const AuthProfileFollowersContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
 
-  const [data, setData] = useState<FollowProfile[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
+  const initialFetch = useCallback(async () => {
+    const { data, error } = await getFollowers(authProfile.id);
+    return { data, error };
+  }, [authProfile]);
+
+  const {
+    data,
+    setData,
+    refresh,
+    refreshing,
+    initialFetchComplete,
+    hasInitialFetchError,
+    fetchNext,
+    fetchNextUrl,
+    fetchNextLoading,
+    hasFetchNextError,
+  } = usePaginatedFetch<FollowProfile>(initialFetch, {
+    onRefresh: () => Haptics.impactAsync(),
+    enabled: !!authProfile?.id,
+  });
 
   const [searchText, setSearchText] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
@@ -86,50 +100,6 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
   const [searchFetchNextLoading, setSearchFetchNextLoading] = useState(false);
   const [hasSearchFetchNextError, setHasSearchFetchNextError] = useState(false);
   const [searchResults, setSearchResults] = useState<FollowProfile[] | null>(null);
-
-  const fetchFollowers = useCallback(async () => {
-    if (authProfile.id) {
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { data: feedData, error } = await getFollowers(authProfile.id);
-      if (feedData && !error) {
-        setData(feedData.results);
-        setFetchNextUrl(feedData.next);
-      } else {
-        setHasInitialFetchError(true);
-      }
-      setInitialFetchComplete(true);
-      setRefreshing(false);
-    }
-  }, [authProfile]);
-
-  useEffect(() => {
-    setFetchNextUrl(null);
-    fetchFollowers();
-  }, [fetchFollowers, authProfile]);
-
-  // refresh following fetch if user swipes down
-  const refreshFollowers = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchFollowers();
-    setRefreshing(false);
-  };
-
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data: fetchNextData } = await axiosFetch<PaginatedProfileResponse>(fetchNextUrl);
-      if (!error && fetchNextData) {
-        setData((prev) => [...prev, ...fetchNextData.results]);
-        setFetchNextUrl(fetchNextData.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl]);
 
   const fetchSearchNext = useCallback(async () => {
     if (searchFetchNextUrl) {
@@ -184,7 +154,7 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
     data,
     loading: !initialFetchComplete,
     error: hasInitialFetchError,
-    refetch: refreshFollowers,
+    refetch: refresh,
     refreshing,
     setData,
     fetchNext,
