@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { axiosFetch } from "@/api/config";
 import { getProfilePosts } from "@/api/post";
 import { PaginatedProfilePostsResponse, PostDetailed } from "@/types";
-import { likePostInState, unlikePostInState, addCommentInState } from "@/utils/utils";
 
 const usePosts = (profileId: number | string | null) => {
   const [data, setData] = useState<PostDetailed[]>([]);
@@ -76,18 +75,6 @@ const usePosts = (profileId: number | string | null) => {
     });
   };
 
-  const onLike = (postId: number) => {
-    likePostInState(setData, postId);
-  };
-
-  const onUnlike = (postId: number) => {
-    unlikePostInState(setData, postId);
-  };
-
-  const onComment = (postId: number) => {
-    addCommentInState(setData, postId);
-  };
-
   return {
     data,
     addLike,
@@ -100,9 +87,6 @@ const usePosts = (profileId: number | string | null) => {
     refreshing,
     hasInitialFetchError,
     initialFetchComplete,
-    onLike,
-    onUnlike,
-    onComment,
   };
 };
 

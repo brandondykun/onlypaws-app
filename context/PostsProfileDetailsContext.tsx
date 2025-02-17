@@ -20,9 +20,6 @@ type PostsProfileDetailsContextType = {
     refreshing: boolean;
     hasInitialFetchError: boolean;
     initialFetchComplete: boolean;
-    onLike: (postId: number) => void;
-    onUnlike: (postId: number) => void;
-    onComment: (postId: number) => void;
   };
   profile: {
     loading: boolean;
@@ -47,9 +44,6 @@ const PostsProfileDetailsContext = createContext<PostsProfileDetailsContextType>
     refreshing: false,
     hasInitialFetchError: false,
     initialFetchComplete: false,
-    onLike: (postId: number) => {},
-    onUnlike: (postId: number) => {},
-    onComment: (postId: number) => {},
   },
   profile: {
     loading: false,
