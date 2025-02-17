@@ -6,6 +6,11 @@ import { PetType, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/t
 
 import { useAuthUserContext } from "./AuthUserContext";
 
+// Context for the auth profile details.
+// This is the profile details of the user who is currently logged in.
+// It is used to display the profile details on the profile screen and to update the profile details.
+// Since users can have multiple profiles, this context manages the currently selected profile.
+
 type AuthProfileContextType = {
   authProfile: ProfileDetailsType;
   loading: boolean;
@@ -85,6 +90,20 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     }
   }, [authLoading, selectedProfileId]);
 
+  // refresh the profile details without setting the loading state.
+  // setting the loading state to true will trigger the auth interceptor to
+  // return null and redirect the app the the index route (feed screen).
+  // since the profile has been authenticated already, there's no need to set loading to true.
+  const backgroundRefreshProfileDetails = useCallback(async () => {
+    if (selectedProfileId && !authLoading) {
+      // the second argument is only necessary so the backend doesn't throw an error
+      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
+      if (!error && data) {
+        setAuthProfile(data);
+      }
+    }
+  }, [authLoading, selectedProfileId]);
+
   useEffect(() => {
     fetchProfileDetails();
   }, [fetchProfileDetails]);
@@ -99,7 +118,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   const refreshProfile = async () => {
     setRefreshing(true);
     Haptics.impactAsync();
-    await fetchProfileDetails();
+    await backgroundRefreshProfileDetails();
     setRefreshing(false);
   };
 
