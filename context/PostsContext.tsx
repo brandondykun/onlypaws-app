@@ -1,18 +1,16 @@
 import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext } from "react";
 
-import { axiosFetch } from "@/api/config";
 import { getProfilePosts } from "@/api/post";
-import { PaginatedProfilePostsResponse, PostDetailed } from "@/types";
+import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
+import { PostDetailed } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
 type PostContextType = {
   data: PostDetailed[];
-  loading: boolean;
   addPost: (data: PostDetailed) => void;
   deletePost: (id: number) => void;
-  error: string;
   refetch: () => Promise<void>;
   refreshing: boolean;
   setData: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
@@ -27,10 +25,8 @@ type PostContextType = {
 
 const PostsContext = createContext<PostContextType>({
   data: [],
-  loading: false,
   addPost: (data: PostDetailed) => {},
   deletePost: (id: number) => {},
-  error: "",
   refetch: () => Promise.resolve(),
   refreshing: false,
   setData: () => {},
@@ -49,60 +45,27 @@ type Props = {
 
 const PostsContextProvider = ({ children }: Props) => {
   const { authProfile, updatePostsCount } = useAuthProfileContext();
-  const [data, setData] = useState<PostDetailed[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchPosts = useCallback(async () => {
-    if (authProfile?.id) {
-      setLoading(true);
-      setError("");
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { error, data } = await getProfilePosts(authProfile.id);
-      if (!error && data) {
-        setData(data.results);
-        setFetchNextUrl(data.next);
-      } else {
-        setError("There was an error fetching your posts. Please try again.");
-        setHasInitialFetchError(true);
-      }
-      setInitialFetchComplete(true);
-    }
+  const initialFetch = useCallback(async () => {
+    const { data, error } = await getProfilePosts(authProfile.id);
+    return { data, error };
   }, [authProfile]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [authProfile, fetchPosts]);
-
-  // refresh posts if user swipes down
-  const refreshPosts = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchPosts();
-    setRefreshing(false);
-  };
-
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl && !refreshing) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedProfilePostsResponse>(fetchNextUrl);
-      if (!error && data) {
-        setData((prev) => [...prev, ...data.results]);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl, refreshing]);
+  const {
+    data,
+    setData,
+    refresh,
+    refreshing,
+    initialFetchComplete,
+    hasInitialFetchError,
+    fetchNext,
+    fetchNextUrl,
+    fetchNextLoading,
+    hasFetchNextError,
+  } = usePaginatedFetch<PostDetailed>(initialFetch, {
+    onRefresh: () => Haptics.impactAsync(),
+    enabled: !!authProfile?.id,
+  });
 
   const addPost = (data: PostDetailed) => {
     setData((prev) => [data, ...prev]);
@@ -130,11 +93,9 @@ const PostsContextProvider = ({ children }: Props) => {
 
   const value = {
     data,
-    loading,
     addPost,
     deletePost,
-    error,
-    refetch: refreshPosts,
+    refetch: refresh,
     refreshing,
     setData,
     fetchNext,
@@ -154,10 +115,8 @@ export default PostsContextProvider;
 export const usePostsContext = () => {
   const {
     data,
-    loading,
     addPost,
     deletePost,
-    error,
     refetch,
     refreshing,
     setData,
@@ -171,10 +130,8 @@ export const usePostsContext = () => {
   } = useContext(PostsContext);
   return {
     data,
-    loading,
     addPost,
     deletePost,
-    error,
     refetch,
     refreshing,
     setData,
