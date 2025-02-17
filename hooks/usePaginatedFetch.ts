@@ -64,6 +64,17 @@ export function usePaginatedFetch<T>(
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
+  // Add reset effect when initialFetchFn changes
+  useEffect(() => {
+    setData([]);
+    setRefreshing(false);
+    setHasInitialFetchError(false);
+    setInitialFetchComplete(false);
+    setFetchNextUrl(null);
+    setFetchNextLoading(false);
+    setHasFetchNextError(false);
+  }, [initialFetchFn]);
+
   const fetchInitial = useCallback(async () => {
     setHasInitialFetchError(false);
     setHasFetchNextError(false);
