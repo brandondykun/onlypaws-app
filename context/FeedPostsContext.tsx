@@ -1,16 +1,15 @@
 import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext } from "react";
 
-import { axiosFetch } from "@/api/config";
 import { getFeed } from "@/api/profile";
-import { PaginatedFeedResponse, PostDetailed } from "@/types";
+import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
+import { PostDetailed } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
 type FeedPostsContextType = {
   data: PostDetailed[];
   setData: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
-  refetch: () => Promise<void>;
   initialFetchComplete: boolean;
   hasInitialFetchError: boolean;
   fetchNext: () => Promise<void>;
@@ -24,7 +23,6 @@ type FeedPostsContextType = {
 const FeedPostsContext = createContext<FeedPostsContextType>({
   data: [],
   setData: () => {},
-  refetch: () => Promise.resolve(),
   initialFetchComplete: false,
   hasInitialFetchError: false,
   fetchNext: () => Promise.resolve(),
@@ -40,71 +38,38 @@ type Props = {
 };
 
 const FeedPostsContextProvider = ({ children }: Props) => {
-  const [data, setData] = useState<PostDetailed[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
-
   const { authProfile } = useAuthProfileContext();
-
-  const fetchFeed = useCallback(async () => {
-    if (authProfile.id) {
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { data: feedData, error } = await getFeed(authProfile.id);
-      if (feedData && !error) {
-        setData(feedData.results);
-        setFetchNextUrl(feedData.next);
-      } else {
-        setHasInitialFetchError(true);
-      }
-      setInitialFetchComplete(true);
-      setRefreshing(false);
-    }
+  const initialFetch = useCallback(async () => {
+    const { data, error } = await getFeed(authProfile.id);
+    return { data, error };
   }, [authProfile]);
 
-  // refresh feed fetch if user swipes down
-  const refreshFeed = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchFeed();
-    setRefreshing(false);
-  };
-
-  useEffect(() => {
-    setFetchNextUrl(null);
-    fetchFeed();
-  }, [fetchFeed, authProfile]);
-
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data: fetchNextData } = await axiosFetch<PaginatedFeedResponse>(fetchNextUrl);
-      if (!error && fetchNextData) {
-        setData((prev) => [...prev, ...fetchNextData.results]);
-        setFetchNextUrl(fetchNextData.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl]);
-
-  const value = {
+  const {
     data,
     setData,
-    refetch: fetchFeed,
+    refresh,
+    refreshing,
     initialFetchComplete,
     hasInitialFetchError,
     fetchNext,
     fetchNextUrl,
     fetchNextLoading,
     hasFetchNextError,
-    refresh: refreshFeed,
+  } = usePaginatedFetch<PostDetailed>(initialFetch, {
+    onRefresh: () => Haptics.impactAsync(),
+    enabled: !!authProfile.id,
+  });
+
+  const value = {
+    data,
+    setData,
+    initialFetchComplete,
+    hasInitialFetchError,
+    fetchNext,
+    fetchNextUrl,
+    fetchNextLoading,
+    hasFetchNextError,
+    refresh,
     refreshing,
   };
 
@@ -117,7 +82,6 @@ export const useFeedPostsContext = () => {
   const {
     data,
     setData,
-    refetch,
     initialFetchComplete,
     hasInitialFetchError,
     fetchNext,
@@ -130,7 +94,6 @@ export const useFeedPostsContext = () => {
   return {
     data,
     setData,
-    refetch,
     initialFetchComplete,
     hasInitialFetchError,
     fetchNext,
