@@ -15,7 +15,7 @@ type Props = {
 
 const AuthInterceptor = ({ children }: Props) => {
   const { isAuthenticated, logOut } = useAuthUserContext();
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, loading } = useAuthProfileContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -87,6 +87,12 @@ const AuthInterceptor = ({ children }: Props) => {
       axiosInstance.interceptors.request.eject(requestInterceptor);
     };
   }, [isAuthenticated, logOut, authProfile]);
+
+  // without this check, requests will be made before the auth profile is set in the auth interceptor
+  // it will result in several 401's and cause multiple requests to be retried
+  if (loading) {
+    return null;
+  }
 
   return children;
 };
