@@ -1,18 +1,16 @@
 import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext } from "react";
 
-import { axiosFetch } from "@/api/config";
 import { getSavedPosts } from "@/api/post";
-import { PaginatedSavedPostsResponse, PostDetailed } from "@/types";
+import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
+import { PostDetailed } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
 type SavedPostsContextType = {
   data: PostDetailed[];
-  loading: boolean;
   savePost: (data: PostDetailed) => void;
   unSavePost: (id: number) => void;
-  error: string;
   refetch: () => Promise<void>;
   refreshing: boolean;
   setData: React.Dispatch<React.SetStateAction<PostDetailed[]>>;
@@ -26,10 +24,8 @@ type SavedPostsContextType = {
 
 const SavedPostsContext = createContext<SavedPostsContextType>({
   data: [],
-  loading: false,
   savePost: (data: PostDetailed) => {},
   unSavePost: (id: number) => {},
-  error: "",
   refetch: () => Promise.resolve(),
   refreshing: false,
   setData: () => {},
@@ -48,60 +44,26 @@ type Props = {
 const SavedPostsContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
 
-  const [data, setData] = useState<PostDetailed[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const initialFetch = useCallback(async () => {
+    const { data, error } = await getSavedPosts();
+    return { data, error };
+  }, []);
 
-  const fetchSavedPosts = useCallback(async () => {
-    if (authProfile?.id) {
-      setLoading(true);
-      setError("");
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { error, data } = await getSavedPosts();
-      if (!error && data) {
-        setData(data.results);
-        setFetchNextUrl(data.next);
-      } else {
-        setError("There was an error fetching your saved posts. Please try again.");
-        setHasInitialFetchError(true);
-      }
-      setInitialFetchComplete(true);
-    }
-  }, [authProfile]);
-
-  useEffect(() => {
-    fetchSavedPosts();
-  }, [authProfile, fetchSavedPosts]);
-
-  // refresh posts if user swipes down
-  const refreshPosts = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchSavedPosts();
-    setRefreshing(false);
-  };
-
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl && !refreshing) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedSavedPostsResponse>(fetchNextUrl);
-      if (!error && data) {
-        setData((prev) => [...prev, ...data.results]);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl, refreshing]);
+  const {
+    data,
+    setData,
+    refresh,
+    refreshing,
+    initialFetchComplete,
+    hasInitialFetchError,
+    fetchNext,
+    fetchNextUrl,
+    fetchNextLoading,
+    hasFetchNextError,
+  } = usePaginatedFetch<PostDetailed>(initialFetch, {
+    onRefresh: () => Haptics.impactAsync(),
+    enabled: !!authProfile?.id,
+  });
 
   const savePost = (postData: PostDetailed) => {
     // post might be in data already. If post was unsaved from savedPostsList screen, it is not removed from the list
@@ -137,11 +99,9 @@ const SavedPostsContextProvider = ({ children }: Props) => {
 
   const value = {
     data,
-    loading,
     savePost,
     unSavePost,
-    error,
-    refetch: refreshPosts,
+    refetch: refresh,
     refreshing,
     setData,
     fetchNext,
@@ -160,10 +120,8 @@ export default SavedPostsContextProvider;
 export const useSavedPostsContext = () => {
   const {
     data,
-    loading,
     savePost,
     unSavePost,
-    error,
     refetch,
     refreshing,
     setData,
@@ -176,10 +134,8 @@ export const useSavedPostsContext = () => {
   } = useContext(SavedPostsContext);
   return {
     data,
-    loading,
     savePost,
     unSavePost,
-    error,
     refetch,
     refreshing,
     setData,
