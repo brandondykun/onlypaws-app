@@ -15,7 +15,6 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
-import { useSavedPostsContext } from "@/context/SavedPostsContext";
 import { PostDetailed } from "@/types";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
@@ -42,7 +41,6 @@ const Post = ({ post, onProfilePress }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
-  const savedPosts = useSavedPostsContext();
   const { savePost, unSavePost, onLike, onUnlike, onComment, onToggleHidden } = usePostManagerContext();
 
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -134,14 +132,6 @@ const Post = ({ post, onProfilePress }: Props) => {
     handleHeartPress(post.id, post.liked);
   };
 
-  const handleUnSavePost = () => {
-    unSavePost(post.id);
-  };
-
-  const handleSavePost = () => {
-    savePost(post);
-  };
-
   const handleBookmarkPress = async () => {
     setSaveLoading(true);
     if (post.is_saved) {
@@ -158,12 +148,10 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      handleUnSavePost(); // optimistic update
+      unSavePost(post.id); // optimistic update
       const { error } = await unSavePostApi(post.id);
-      if (!error) {
-        savedPosts.unSavePost(post.id); //special behavior for saved posts
-      } else {
-        handleSavePost(); // rollback if error
+      if (error) {
+        savePost(post); // rollback if error
         Toast.show({
           type: "error",
           text1: "Error",
@@ -184,12 +172,10 @@ const Post = ({ post, onProfilePress }: Props) => {
           useNativeDriver: true,
         }),
       ]).start();
-      handleSavePost(); // optimistic update
+      savePost(post); // optimistic update
       const { error } = await savePostApi(post.id, authProfile.id);
-      if (!error) {
-        savedPosts.savePost({ ...post, is_saved: true }); //special behavior for saved posts
-      } else {
-        handleUnSavePost(); // rollback if error
+      if (error) {
+        unSavePost(post.id); // rollback if error
         Toast.show({
           type: "error",
           text1: "Error",

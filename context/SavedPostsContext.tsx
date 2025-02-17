@@ -118,7 +118,7 @@ const SavedPostsContextProvider = ({ children }: Props) => {
         });
       });
     } else {
-      setData((prev) => [postData, ...prev]);
+      setData((prev) => [{ ...postData, is_saved: true }, ...prev]);
     }
   };
 
