@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { View, ActivityIndicator, RefreshControl, StyleSheet, Platform, Pressable } from "react-native";
 
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
+import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
@@ -88,11 +89,7 @@ const FollowersScreen = () => {
           </Pressable>
         )}
         ListFooterComponent={
-          followersCtx.fetchNextLoading || followersCtx.searchFetchNextLoading ? (
-            <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 12 }}>
-              <ActivityIndicator color={COLORS.zinc[500]} size="large" />
-            </View>
-          ) : null
+          followersCtx.fetchNextLoading || followersCtx.searchFetchNextLoading ? <LoadingFooter /> : null
         }
       />
     );

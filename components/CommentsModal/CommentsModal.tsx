@@ -23,7 +23,9 @@ import BottomSheetModal, { BottomSheetTextInput } from "../BottomSheet/BottomShe
 import { DARK_BORDER_COLOR } from "../BottomSheet/BottomSheet";
 import Button from "../Button/Button";
 import Comment from "../Comment/Comment";
+import LoadingFooter from "../LoadingFooter/LoadingFooter";
 import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
+import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 import Text from "../Text/Text";
 
 type Props = {
@@ -309,16 +311,13 @@ const CommentsModal = forwardRef(
 
     // content to be displayed in the footer
     const footerComponent = fetchNextLoading ? (
-      <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-        <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-      </View>
+      <LoadingFooter />
     ) : hasFetchNextError ? (
-      <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
-        <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
-          Oh no! There was an error fetching more comments.
-        </Text>
-        <Button text="Retry" variant="text" onPress={() => fetchNext()} />
-      </View>
+      <RetryFetchFooter
+        fetchFn={fetchNext}
+        message="Oh no! There was an error fetching more comments!"
+        buttonText="Retry"
+      />
     ) : null;
 
     return (

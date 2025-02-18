@@ -8,7 +8,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef, useState } from "react";
 import React from "react";
-import { View, ActivityIndicator, RefreshControl, Dimensions, Pressable, StyleSheet } from "react-native";
+import { View, RefreshControl, Dimensions, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { unfollowProfile, followProfile } from "@/api/profile";
@@ -20,10 +20,11 @@ import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManager
 import { ProfileDetails as ProfileDetailsType, PostDetailed } from "@/types";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
-import Button from "../Button/Button";
+import LoadingFooter from "../LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "../LoadingSkeletons/PostTileSkeleton";
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
+import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 
 type Props = {
   profileId: number | string;
@@ -196,16 +197,9 @@ const ProfileDetails = ({
 
   // content to be displayed in the footer
   const footerComponent = fetchNextLoading ? (
-    <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-      <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-    </View>
+    <LoadingFooter />
   ) : hasFetchNextError ? (
-    <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
-      <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
-        Oh no! There was an error fetching more posts.
-      </Text>
-      <Button text="Retry" variant="text" onPress={() => fetchNext()} />
-    </View>
+    <RetryFetchFooter fetchFn={fetchNext} message="Oh no! There was an error fetching more posts!" buttonText="Retry" />
   ) : null;
 
   return (

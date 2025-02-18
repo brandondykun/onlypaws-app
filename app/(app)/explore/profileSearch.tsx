@@ -1,9 +1,10 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
+import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -98,13 +99,7 @@ const ProfileSearchScreen = () => {
         )}
         onEndReachedThreshold={0.1} // Trigger when 20% from the bottom
         onEndReached={!search.fetchNextLoading ? () => search.fetchNext() : null} // prevent from being called twice
-        ListFooterComponent={
-          search.fetchNextLoading ? (
-            <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-              <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-            </View>
-          ) : null
-        }
+        ListFooterComponent={search.fetchNextLoading ? <LoadingFooter /> : null}
       />
     );
   }

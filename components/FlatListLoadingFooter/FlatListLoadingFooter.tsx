@@ -1,8 +1,9 @@
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 
+import LoadingFooter from "../LoadingFooter/LoadingFooter";
 import Text from "../Text/Text";
 
 type Props = {
@@ -16,11 +17,7 @@ const FlatListLoadingFooter = ({ nextUrl, fetchNextLoading, initialFetchLoading 
 
   if (nextUrl && !fetchNextLoading) return null;
   if ((nextUrl && fetchNextLoading) || initialFetchLoading) {
-    return (
-      <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 12 }}>
-        <ActivityIndicator color={COLORS.zinc[500]} size="large" />
-      </View>
-    );
+    return <LoadingFooter />;
   }
   return (
     <View style={{ paddingVertical: 48, gap: 12, paddingHorizontal: 24 }}>

@@ -3,11 +3,12 @@ import { useIsFocused } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Dimensions, RefreshControl, View } from "react-native";
+import { Dimensions, RefreshControl, View } from "react-native";
 
-import Button from "@/components/Button/Button";
+import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
+import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useSavedPostsContext } from "@/context/SavedPostsContext";
@@ -33,16 +34,13 @@ const SavedPostsScreen = () => {
 
   // content to be displayed in the footer
   const footerComponent = posts.fetchNextLoading ? (
-    <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-      <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-    </View>
+    <LoadingFooter />
   ) : posts.hasFetchNextError ? (
-    <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
-      <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
-        Oh no! There was an error fetching more posts.
-      </Text>
-      <Button text="Retry" variant="text" onPress={() => posts.fetchNext()} />
-    </View>
+    <RetryFetchFooter
+      fetchFn={posts.fetchNext}
+      message="Oh no! There was an error fetching more posts!"
+      buttonText="Retry"
+    />
   ) : null;
 
   const emptyComponent =

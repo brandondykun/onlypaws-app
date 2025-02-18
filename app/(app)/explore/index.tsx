@@ -3,11 +3,12 @@ import { FlashList } from "@shopify/flash-list";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
 import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
-import { ActivityIndicator } from "react-native";
 
 import Button from "@/components/Button/Button";
+import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
+import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -58,16 +59,9 @@ const ExploreScreen = () => {
 
   // content to be displayed in the footer
   const footerComponent = fetchNextLoading ? (
-    <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 16 }}>
-      <ActivityIndicator color={COLORS.zinc[500]} size="small" />
-    </View>
+    <LoadingFooter />
   ) : hasFetchNextError ? (
-    <View style={{ paddingVertical: 48, alignItems: "center", paddingHorizontal: 24 }}>
-      <Text style={{ color: COLORS.red[600], textAlign: "center" }}>
-        Oh no! There was an error fetching more posts.
-      </Text>
-      <Button text="Retry" variant="text" onPress={() => fetchNext()} />
-    </View>
+    <RetryFetchFooter fetchFn={fetchNext} message="Oh no! There was an error fetching more posts!" buttonText="Retry" />
   ) : null;
 
   const emptyComponent =
