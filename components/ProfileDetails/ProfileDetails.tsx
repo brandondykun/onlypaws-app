@@ -32,7 +32,7 @@ type Props = {
   profileLoading: boolean;
   profileRefresh: () => Promise<void>;
   profileRefreshing: boolean;
-  profileError: string;
+  profileError: boolean;
   postsLoading: boolean;
   postsError: boolean;
   postsData: PostDetailed[] | null;

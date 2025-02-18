@@ -24,7 +24,7 @@ type PostsProfileDetailsContextType = {
   profile: {
     loading: boolean;
     data: ProfileDetailsType | null;
-    error: string;
+    error: boolean;
     setData: React.Dispatch<React.SetStateAction<ProfileDetailsType | null>>;
     refetch: () => Promise<void>;
     refreshing: boolean;
@@ -48,7 +48,7 @@ const PostsProfileDetailsContext = createContext<PostsProfileDetailsContextType>
   profile: {
     loading: false,
     data: null,
-    error: "",
+    error: false,
     setData: () => {},
     refetch: () => Promise.resolve(),
     refreshing: false,
