@@ -8,6 +8,7 @@ import { getSimilarPosts } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
 import { POST_HEIGHT } from "@/components/Post/Post";
+import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
@@ -22,9 +23,11 @@ const ExplorePostsListScreen = () => {
 
   const router = useRouter();
 
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
+  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
+  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [initialFetchLoading, setInitialFetchLoading] = useState(true);
+  const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
   const onProfilePress = useMemo(
     () => (profileId: number) => {
@@ -35,12 +38,17 @@ const ExplorePostsListScreen = () => {
   );
 
   const fetchSimilar = useCallback(async () => {
+    setHasInitialFetchError(false);
+    setHasFetchNextError(false);
     const { error, data } = await getSimilarPosts(Number(postId), authProfile.id);
+
     if (!error && data) {
       setSimilarPosts((prev) => [...prev, ...data.results]);
-      setNextUrl(data.next);
-      setInitialFetchLoading(false);
+      setFetchNextUrl(data.next);
+    } else {
+      setHasInitialFetchError(true);
     }
+    setInitialFetchComplete(true);
   }, [authProfile.id, setSimilarPosts, postId]);
 
   useEffect(() => {
@@ -51,17 +59,28 @@ const ExplorePostsListScreen = () => {
     };
   }, [fetchSimilar, setSimilarPosts]);
 
-  const getNextPage = useCallback(async () => {
-    if (nextUrl) {
+  const fetchNext = useCallback(async () => {
+    if (fetchNextUrl) {
       setFetchNextLoading(true);
-      const res = await axiosInstance.get<PaginatedExploreResponse>(nextUrl);
-      if (res.data) {
-        setSimilarPosts((prev) => [...prev, ...res.data.results]);
-        setNextUrl(res.data.next);
+      setHasFetchNextError(false);
+
+      try {
+        const response = await axiosInstance.get<PaginatedExploreResponse>(fetchNextUrl);
+        const nextData = response.data;
+
+        if (nextData && nextData.results) {
+          setSimilarPosts((prev) => [...prev, ...nextData.results]);
+          setFetchNextUrl(nextData.next);
+        } else {
+          setHasFetchNextError(true);
+        }
+      } catch {
+        setHasFetchNextError(true);
+      } finally {
+        setFetchNextLoading(false);
       }
-      setFetchNextLoading(false);
     }
-  }, [setSimilarPosts, nextUrl]);
+  }, [setSimilarPosts, fetchNextUrl]);
 
   return (
     <FlashList
@@ -70,16 +89,30 @@ const ExplorePostsListScreen = () => {
       renderItem={({ item }) => <Post post={item} onProfilePress={onProfilePress} />}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
-      onEndReached={!fetchNextLoading ? getNextPage : null}
+      onEndReached={!fetchNextLoading ? fetchNext : null}
       showsVerticalScrollIndicator={false}
       estimatedItemSize={POST_HEIGHT}
-      ListFooterComponent={() => (
-        <FlatListLoadingFooter
-          nextUrl={nextUrl}
-          fetchNextLoading={fetchNextLoading}
-          initialFetchLoading={initialFetchLoading}
-        />
-      )}
+      ListFooterComponent={
+        hasInitialFetchError ? (
+          <RetryFetchFooter
+            fetchFn={fetchSimilar}
+            message="Oh no! There was an error fetching posts!"
+            buttonText="Retry"
+          />
+        ) : hasFetchNextError ? (
+          <RetryFetchFooter
+            fetchFn={fetchNext}
+            message="Oh no! There was an error fetching more posts!"
+            buttonText="Retry"
+          />
+        ) : (
+          <FlatListLoadingFooter
+            nextUrl={fetchNextUrl}
+            fetchNextLoading={fetchNextLoading}
+            initialFetchLoading={!initialFetchComplete}
+          />
+        )
+      }
     />
   );
 };
