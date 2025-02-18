@@ -62,7 +62,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     savePostInState(feedPosts.setData, postData.id);
     savePostInState(explorePosts.setExplorePosts, postData.id);
     savePostInState(explorePosts.setSimilarPosts, postData.id);
-    savePostInState(explorePosts.setSelectedProfilePosts, postData.id);
     savePostInState(exploreProfile.posts.setData, postData.id);
     savePostInState(feedProfile.posts.setData, postData.id);
     savePostInState(postsProfile.posts.setData, postData.id);
@@ -74,7 +73,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     unSavePostInState(feedPosts.setData, postId);
     unSavePostInState(explorePosts.setExplorePosts, postId);
     unSavePostInState(explorePosts.setSimilarPosts, postId);
-    unSavePostInState(explorePosts.setSelectedProfilePosts, postId);
     unSavePostInState(exploreProfile.posts.setData, postId);
     unSavePostInState(feedProfile.posts.setData, postId);
     unSavePostInState(postsProfile.posts.setData, postId);
@@ -84,7 +82,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // like post wherever it appears in the app
     likePostInState(explorePosts.setExplorePosts, postId);
     likePostInState(explorePosts.setSimilarPosts, postId);
-    likePostInState(explorePosts.setSelectedProfilePosts, postId);
     likePostInState(feedPosts.setData, postId);
     likePostInState(savedPosts.setData, postId);
     likePostInState(exploreProfile.posts.setData, postId);
@@ -96,7 +93,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // un-like post wherever it appears in the app
     unlikePostInState(explorePosts.setExplorePosts, postId);
     unlikePostInState(explorePosts.setSimilarPosts, postId);
-    unlikePostInState(explorePosts.setSelectedProfilePosts, postId);
     unlikePostInState(feedPosts.setData, postId);
     unlikePostInState(savedPosts.setData, postId);
     unlikePostInState(exploreProfile.posts.setData, postId);
@@ -108,7 +104,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // add comment count to post wherever it appears in the app
     addCommentInState(explorePosts.setExplorePosts, postId);
     addCommentInState(explorePosts.setSimilarPosts, postId);
-    addCommentInState(explorePosts.setSelectedProfilePosts, postId);
     addCommentInState(feedPosts.setData, postId);
     addCommentInState(savedPosts.setData, postId);
     addCommentInState(exploreProfile.posts.setData, postId);
@@ -120,7 +115,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // toggle is_hidden true or false for post wherever it appears in the app
     togglePostHiddenInState(explorePosts.setExplorePosts, postId);
     togglePostHiddenInState(explorePosts.setSimilarPosts, postId);
-    togglePostHiddenInState(explorePosts.setSelectedProfilePosts, postId);
     togglePostHiddenInState(feedPosts.setData, postId);
     togglePostHiddenInState(savedPosts.setData, postId);
     togglePostHiddenInState(exploreProfile.posts.setData, postId);
@@ -132,7 +126,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // remove post wherever it appears in the app
     removePostInState(explorePosts.setExplorePosts, postId);
     removePostInState(explorePosts.setSimilarPosts, postId);
-    removePostInState(explorePosts.setSelectedProfilePosts, postId);
     removePostInState(feedPosts.setData, postId);
     removePostInState(savedPosts.setData, postId);
     removePostInState(exploreProfile.posts.setData, postId);
@@ -144,7 +137,6 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // toggle is_reported true for post wherever it appears in the app
     addPostReportedInState(explorePosts.setExplorePosts, postId);
     addPostReportedInState(explorePosts.setSimilarPosts, postId);
-    addPostReportedInState(explorePosts.setSelectedProfilePosts, postId);
     addPostReportedInState(feedPosts.setData, postId);
     addPostReportedInState(savedPosts.setData, postId);
     addPostReportedInState(exploreProfile.posts.setData, postId);

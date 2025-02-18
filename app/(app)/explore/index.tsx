@@ -1,22 +1,17 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
-import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
-import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { ActivityIndicator } from "react-native";
 
-import { axiosFetch } from "@/api/config";
-import { getExplorePosts } from "@/api/post";
 import Button from "@/components/Button/Button";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
-import { PaginatedExploreResponse } from "@/types";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -24,17 +19,20 @@ const ExploreScreen = () => {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const { explorePosts, setExplorePosts, setSimilarPosts } = useExplorePostsContext();
-  const [refreshing, setRefreshing] = useState(false);
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
+  const {
+    explorePosts,
+    setSimilarPosts,
+    refresh,
+    refreshing,
+    initialFetchComplete,
+    hasInitialFetchError,
+    fetchNext,
+    fetchNextLoading,
+    hasFetchNextError,
+  } = useExplorePostsContext();
 
   // add search button to header
   useLayoutEffect(() => {
@@ -57,52 +55,6 @@ const ExploreScreen = () => {
       ),
     });
   });
-
-  // initial fetch or refresh fetch if initial fetch fails
-  const fetchPosts = useCallback(async () => {
-    if (authProfile.id) {
-      setHasInitialFetchError(false);
-      setHasFetchNextError(false);
-      const { error, data } = await getExplorePosts(authProfile.id);
-      if (!error && data) {
-        setExplorePosts(data.results);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasInitialFetchError(true);
-      }
-      setInitialFetchComplete(true);
-      setRefreshing(false);
-    }
-  }, [authProfile.id, setExplorePosts]);
-
-  // refresh posts fetch if user swipes down
-  const refreshPosts = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchPosts();
-    setRefreshing(false);
-  };
-
-  // perform initial explore posts fetch
-  useEffect(() => {
-    fetchPosts();
-  }, [authProfile.id, fetchPosts]);
-
-  // fetch next paginated list of explore posts
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedExploreResponse>(fetchNextUrl);
-      if (!error && data) {
-        setExplorePosts((prev) => [...prev, ...data.results]);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
-    }
-  }, [fetchNextUrl, setExplorePosts]);
 
   // content to be displayed in the footer
   const footerComponent = fetchNextLoading ? (
@@ -153,14 +105,14 @@ const ExploreScreen = () => {
         estimatedItemSize={screenWidth / 3}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
+        onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         refreshing={refreshing}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={refreshPosts}
+            onRefresh={refresh}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
           />
