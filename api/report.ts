@@ -1,10 +1,10 @@
-import { PaginatedReportReasonsResponse, CreatePostReportResponse } from "@/types";
+import { ReportReason, CreatePostReportResponse } from "@/types";
 
 import { axiosFetch, axiosPost } from "./config";
 
 export const getReportReasons = async () => {
   const url = `/v1/report-reason/`;
-  return await axiosFetch<PaginatedReportReasonsResponse>(url);
+  return await axiosFetch<ReportReason[]>(url);
 };
 
 export const reportPost = async (postId: number, reasonId: number, details: string) => {

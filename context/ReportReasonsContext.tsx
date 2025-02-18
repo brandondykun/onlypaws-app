@@ -1,23 +1,22 @@
-import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext } from "react";
 
 import { getReportReasons } from "@/api/report";
+import { useDataFetch } from "@/hooks/useDataFetch";
 import { ReportReason } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-
 type ReportReasonsContextType = {
   data: ReportReason[];
-  loading: boolean;
-  error: string;
+  initialFetchComplete: boolean;
+  hasInitialFetchError: boolean;
   refetch: () => Promise<void>;
   refreshing: boolean;
 };
 
 const ReportReasonsContext = createContext<ReportReasonsContextType>({
   data: [],
-  loading: true,
-  error: "",
+  initialFetchComplete: false,
+  hasInitialFetchError: false,
   refetch: () => Promise.resolve(),
   refreshing: false,
 });
@@ -29,52 +28,36 @@ type Props = {
 const ReportReasonsContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
 
-  const [data, setData] = useState<ReportReason[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
+  const initialFetch = useCallback(async () => {
+    if (!authProfile.id) return { data: null, error: null };
+    return await getReportReasons();
+  }, [authProfile.id]);
 
-  // TODO: retry fetch if fails
-  const fetchReportReasons = useCallback(async () => {
-    if (authProfile?.id) {
-      setLoading(true);
-      setError("");
-      const { error, data } = await getReportReasons();
-      if (!error && data) {
-        const nonOtherReasons: ReportReason[] = [];
-        const otherReason: ReportReason[] = [];
+  const { data, initialFetchComplete, hasInitialFetchError, refresh, refreshing } = useDataFetch<ReportReason[]>(
+    initialFetch,
+    {
+      enabled: !!authProfile.id,
+    },
+  );
 
-        data.results.forEach((reason) => {
-          if (reason.name.toLowerCase() === "other") {
-            otherReason.push(reason);
-          } else {
-            nonOtherReasons.push(reason);
-          }
-        });
+  // Reorder report reasons so that "Other" is last
+  // The order of the reasons created here is the order they will be displayed in the UI
+  const nonOtherReasons: ReportReason[] = [];
+  const otherReason: ReportReason[] = [];
 
-        setData([...nonOtherReasons, ...otherReason]);
-      } else {
-        setError("There was an error fetching report reasons.");
-      }
+  data?.forEach((reason) => {
+    if (reason.name.toLowerCase() === "other") {
+      otherReason.push(reason);
+    } else {
+      nonOtherReasons.push(reason);
     }
-  }, [authProfile]);
-
-  useEffect(() => {
-    fetchReportReasons();
-  }, [authProfile, fetchReportReasons]);
-
-  const refreshReportReasons = async () => {
-    setRefreshing(true);
-    Haptics.impactAsync();
-    await fetchReportReasons();
-    setRefreshing(false);
-  };
+  });
 
   const value = {
-    data,
-    loading,
-    error,
-    refetch: refreshReportReasons,
+    data: [...nonOtherReasons, ...otherReason],
+    initialFetchComplete,
+    hasInitialFetchError,
+    refetch: refresh,
     refreshing,
   };
 
@@ -84,6 +67,6 @@ const ReportReasonsContextProvider = ({ children }: Props) => {
 export default ReportReasonsContextProvider;
 
 export const useReportReasonsContext = () => {
-  const { data, loading, error, refetch, refreshing } = useContext(ReportReasonsContext);
-  return { data, loading, error, refetch, refreshing };
+  const { data, initialFetchComplete, hasInitialFetchError, refetch, refreshing } = useContext(ReportReasonsContext);
+  return { data, initialFetchComplete, hasInitialFetchError, refetch, refreshing };
 };
