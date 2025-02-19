@@ -17,7 +17,6 @@ import { useColorMode } from "@/context/ColorModeContext";
 type Props = {
   setShowCamera: React.Dispatch<React.SetStateAction<boolean>>;
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal>;
-  editProfileModalRef: React.RefObject<RNBottomSheetModal>;
   changeProfileModalRef: React.RefObject<RNBottomSheetModal>;
   editUsernameModalRef: React.RefObject<RNBottomSheetModal>;
 };
@@ -25,7 +24,6 @@ type Props = {
 const ProfileOptionsModal = ({
   setShowCamera,
   profileOptionsModalRef,
-  editProfileModalRef,
   changeProfileModalRef,
   editUsernameModalRef,
 }: Props) => {
@@ -122,7 +120,7 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              editProfileModalRef.current?.present();
+              router.push("/(app)/profile/editProfile");
               profileOptionsModalRef.current?.dismiss();
             }}
           >

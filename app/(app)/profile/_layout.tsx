@@ -23,6 +23,7 @@ const ProfileStack = () => {
       <Stack.Screen name="add" options={{ title: "Add Profile" }} />
       <Stack.Screen name="guidelines" options={{ title: "" }} />
       <Stack.Screen name="about" options={{ title: "" }} />
+      <Stack.Screen name="editProfile" options={{ title: "Edit Profile" }} />
     </Stack>
   );
 };
