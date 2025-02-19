@@ -147,7 +147,7 @@ const AddPostScreen = () => {
       </View>
       <View style={{ marginBottom: 36 }}>
         {images.length ? (
-          <ImageSwiper images={images} imageHeight={screenWidth} imageWidth={screenWidth} />
+          <ImageSwiper images={images} />
         ) : (
           <Pressable onPress={() => setCameraVisible(true)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
             <View

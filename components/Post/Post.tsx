@@ -264,12 +264,7 @@ const Post = ({ post, onProfilePress }: Props) => {
                 width: screenWidth,
               }}
             >
-              <ImageSwiper
-                images={post.images}
-                imageHeight={screenWidth}
-                imageWidth={screenWidth}
-                imageStyle={{ height: screenWidth, width: screenWidth }}
-              />
+              <ImageSwiper images={post.images} />
             </View>
           </TapGestureHandler>
         </GestureHandlerRootView>
