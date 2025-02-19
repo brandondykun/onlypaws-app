@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { Dimensions, Platform, StyleSheet, View } from "react-native";
+import { Dimensions, Platform, StyleSheet, View, Text } from "react-native";
 
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -36,21 +36,27 @@ const PostsStack = () => {
         options={{
           title: "Followers",
           headerBackButtonDisplayMode: "minimal",
-          headerTitle: () => (
-            <View style={{ flex: 1 }}>
-              <TextInput
-                inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
-                returnKeyType="search"
-                value={followersCtx.searchText}
-                onChangeText={(text) => followersCtx.setSearchText(text)}
-                onSubmitEditing={followersCtx.searchProfiles}
-                placeholder="Search profiles..."
-                autoFocus={true}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          ),
+          headerTitle: () => {
+            if (Platform.OS === "ios") {
+              return (
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
+                    returnKeyType="search"
+                    value={followersCtx.searchText}
+                    onChangeText={(text) => followersCtx.setSearchText(text)}
+                    onSubmitEditing={followersCtx.searchProfiles}
+                    placeholder="Search followers..."
+                    autoFocus={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              );
+            } else {
+              return <Text style={{ fontSize: 20, fontWeight: "500" }}>Followers</Text>;
+            }
+          },
         }}
       />
       <Stack.Screen
@@ -58,21 +64,27 @@ const PostsStack = () => {
         options={{
           title: "Following",
           headerBackButtonDisplayMode: "minimal",
-          headerTitle: () => (
-            <View style={{ flex: 1 }}>
-              <TextInput
-                inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
-                returnKeyType="search"
-                value={followingCtx.searchText}
-                onChangeText={(text) => followingCtx.setSearchText(text)}
-                onSubmitEditing={followingCtx.searchProfiles}
-                placeholder="Search profiles..."
-                autoFocus={true}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          ),
+          headerTitle: () => {
+            if (Platform.OS === "ios") {
+              return (
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
+                    returnKeyType="search"
+                    value={followingCtx.searchText}
+                    onChangeText={(text) => followingCtx.setSearchText(text)}
+                    onSubmitEditing={followingCtx.searchProfiles}
+                    placeholder="Search following..."
+                    autoFocus={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              );
+            } else {
+              return <Text style={{ fontSize: 20, fontWeight: "500" }}>Following</Text>;
+            }
+          },
         }}
       />
       <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackButtonDisplayMode: "minimal" }} />

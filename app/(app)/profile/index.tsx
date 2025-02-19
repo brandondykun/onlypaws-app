@@ -55,7 +55,7 @@ const ProfileScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <Pressable
-          onPress={() => profileOptionsModalRef.current?.present()}
+          onPressOut={() => profileOptionsModalRef.current?.present()}
           style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
           hitSlop={20}
           testID="view-profile-options-button"

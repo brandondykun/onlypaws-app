@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { StyleSheet, View, Dimensions, Platform } from "react-native";
+import { StyleSheet, View, Platform, Text } from "react-native";
 
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -11,7 +11,6 @@ const platform = Platform.OS;
 const ExploreStack = () => {
   const { isDarkMode } = useColorMode();
   const search = useProfileSearchContext();
-  const screenWidth = Dimensions.get("window").width;
 
   return (
     <Stack
@@ -31,21 +30,27 @@ const ExploreStack = () => {
         name="profileSearch"
         options={{
           title: "Search",
-          headerTitle: () => (
-            <View style={{ flex: 1 }}>
-              <TextInput
-                inputStyle={[s.modalSearchInput, { width: screenWidth - 98 }]}
-                returnKeyType="search"
-                value={search.searchText}
-                onChangeText={search.setSearchText}
-                onSubmitEditing={search.search}
-                placeholder="Search profiles..."
-                autoFocus={true}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          ),
+          headerTitle: () => {
+            if (Platform.OS === "ios") {
+              return (
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    inputStyle={[s.modalSearchInput, { width: "100%" }]}
+                    returnKeyType="search"
+                    value={search.searchText}
+                    onChangeText={search.setSearchText}
+                    onSubmitEditing={search.search}
+                    placeholder="Search profiles..."
+                    autoFocus={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              );
+            } else {
+              return <Text style={{ fontSize: 20, fontWeight: "500" }}>Search Profiles</Text>;
+            }
+          },
         }}
       />
       <Stack.Screen name="list" options={{ title: "Posts" }} />

@@ -43,7 +43,7 @@ const AddPostScreen = () => {
   // add search button to header
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button onPress={resetState} variant="text" text="Clear" disabled={submitLoading} />,
+      headerRight: () => <Button onPressOut={resetState} variant="text" text="Clear" disabled={submitLoading} />,
     });
   });
 
@@ -116,7 +116,7 @@ const AddPostScreen = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight }}
+      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 24 }}
       automaticallyAdjustKeyboardInsets={true}
       showsVerticalScrollIndicator={false}
       scrollEnabled={!submitLoading}

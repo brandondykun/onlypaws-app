@@ -39,7 +39,7 @@ const ExploreScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <View style={{ width: screenWidth, marginLeft: -16, alignItems: "center" }}>
+        <View style={{ width: screenWidth, alignItems: "center" }}>
           <Button
             buttonStyle={[
               s.headerSearchButton,
@@ -49,7 +49,7 @@ const ExploreScreen = () => {
               },
             ]}
             textStyle={s.headerSearchButtonFont}
-            onPress={() => router.push("/(app)/explore/profileSearch")}
+            onPressOut={() => router.push("/(app)/explore/profileSearch")}
             text="Search profiles..."
           />
         </View>

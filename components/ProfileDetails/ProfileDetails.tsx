@@ -83,7 +83,7 @@ const ProfileDetails = ({
           // only show if user is looking at own profile
           return (
             <Pressable
-              onPress={() => optionsModalRef.current?.present()}
+              onPressOut={() => optionsModalRef.current?.present()}
               style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
               hitSlop={20}
               testID="profile-details-menu-button"

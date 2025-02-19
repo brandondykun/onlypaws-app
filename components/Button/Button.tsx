@@ -28,7 +28,7 @@ type Props = {
   text: string;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
-  onPress: (event: GestureResponderEvent) => void;
+  onPress?: (event: GestureResponderEvent) => void;
   loadingIconSize?: number;
   loadingIconScale?: number;
 } & PressableProps;
