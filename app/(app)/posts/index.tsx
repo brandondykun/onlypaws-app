@@ -21,7 +21,7 @@ const PostsScreen = () => {
       profileLoading={refreshing || loading}
       profileRefresh={refetch}
       profileRefreshing={refreshing}
-      profileError={""}
+      profileError={false}
       postsLoading={false}
       postsError={false}
       postsData={posts.data}
