@@ -49,7 +49,7 @@ const CustomImageSwiper = ({ images }: Props) => {
         showsHorizontalScrollIndicator={false}
         snapToInterval={WINDOW_WIDTH}
         snapToAlignment="center"
-        decelerationRate={0}
+        decelerationRate={"fast"}
         bounces={images.length > 1 ? true : false}
         keyExtractor={(_, index) => index.toString()}
         {...indexController}
