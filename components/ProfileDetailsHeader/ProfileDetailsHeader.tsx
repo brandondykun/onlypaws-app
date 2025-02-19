@@ -121,6 +121,7 @@ const ProfileDetailsHeader = ({
         <Pressable
           onPress={handleFollowersPress}
           style={({ pressed }) => [pressed && authProfile.id === profileData.id && { opacity: 0.6 }, { flex: 1 }]}
+          android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
           <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
             <Text style={{ fontSize: 18 }}>
@@ -132,6 +133,7 @@ const ProfileDetailsHeader = ({
         <Pressable
           onPress={handleFollowingPress}
           style={({ pressed }) => [pressed && authProfile.id === profileData.id && { opacity: 0.6 }, { flex: 1 }]}
+          android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
           <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
             <Text style={{ fontSize: 18 }}>
