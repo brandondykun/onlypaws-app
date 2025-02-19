@@ -19,7 +19,7 @@ const FeedStack = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Feed" }} />
+      <Stack.Screen name="index" options={{ title: "" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
       <Stack.Screen name="profileList" options={{ title: "Posts" }} />
     </Stack>
