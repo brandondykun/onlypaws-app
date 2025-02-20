@@ -35,7 +35,7 @@ const VerifyEmailScreen = () => {
     const { error, status } = await verifyEmail(verifyCode);
     if (!error && status === 200) {
       updateEmailVerified(true);
-      router.replace("/(app)");
+      router.replace("/(app)/(index)");
       Toast.show({
         type: "success",
         text1: "Verification Successful",

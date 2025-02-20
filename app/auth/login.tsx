@@ -58,7 +58,7 @@ const LoginScreen = () => {
         if (!myInfoData.is_email_verified) {
           router.push("/auth/verifyEmail");
         } else {
-          router.replace("/(app)/");
+          router.replace("/(app)/(index)");
         }
       } else {
         logOut();
