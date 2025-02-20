@@ -1,9 +1,10 @@
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import PawLogo from "@/svg/PawLogo";
@@ -12,6 +13,13 @@ const LandingScreen = () => {
   const router = useRouter();
 
   const { isDarkMode } = useColorMode();
+  const { isAuthenticated, user } = useAuthUserContext();
+
+  // when registering there is a screen bug that send navigation back to this root screen
+  // this check will redirect to verify email screen if user is authenticated and email is not verified
+  if (isAuthenticated && !user.is_email_verified) {
+    return <Redirect href="/auth/verifyEmail" />;
+  }
 
   return (
     <ScrollView contentContainerStyle={s.root}>
