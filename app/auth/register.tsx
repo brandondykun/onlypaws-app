@@ -54,6 +54,11 @@ const RegisterScreen = () => {
       hasErrors = true;
     }
 
+    if (password.length < 9) {
+      setPasswordError("Password must be at least 9 characters.");
+      hasErrors = true;
+    }
+
     if (!confirmPassword) {
       setConfirmPasswordError("Please confirm your password.");
       hasErrors = true;
@@ -82,9 +87,15 @@ const RegisterScreen = () => {
         if (!myInfoError && myInfoData) {
           authenticate(myInfoData);
           setSubmitLoading(false);
+          // router.push("/auth/verifyEmail");
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Your account was created, but there was an error logging you in. Please log in manually.",
+          });
+          router.replace("/auth/login");
         }
-
-        router.replace("/(app)/");
       } else {
         Toast.show({
           type: "error",
