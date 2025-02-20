@@ -3,7 +3,7 @@
     "name": "OnlyPaws",
     "slug": "only-paws-app",
     "version": "1.0.0",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
