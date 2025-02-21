@@ -3,11 +3,10 @@
     "name": "OnlyPaws",
     "slug": "only-paws-app",
     "version": "1.0.0",
-    "newArchEnabled": false,
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icons/ios-light.png",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/icons/splash-icon-dark.png",
       "resizeMode": "contain",
       "backgroundColor": "#f4f4f5"
     },
@@ -20,11 +19,7 @@
         "NSCameraUsageDescription": "OnlyPaws needs access to your Camera.",
         "NSMicrophoneUsageDescription": "OnlyPaws needs access to your Microphone."
       },
-      "icon": {
-        "dark": "./assets/icons/ios-dark.png",
-        "light": "./assets/icons/ios-light.png",
-        "tinted": "./assets/icons/ios-tinted.png"
-      }
+      "icon": "./assets/icons/ios-light.png"
     },
     "android": {
       "adaptiveIcon": {
