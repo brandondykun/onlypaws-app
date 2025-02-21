@@ -150,9 +150,7 @@ const Comment = ({
     <View style={[s.root]}>
       <View style={[s.commentRoot, { backgroundColor: bgColor }]}>
         <View style={s.header}>
-          <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[800]} style={s.username}>
-            {comment.profile.username}
-          </Text>
+          <Text style={s.username}>{comment.profile.username}</Text>
           <Text lightColor={COLORS.zinc[950]} style={s.comment}>
             {comment.text}
           </Text>
@@ -177,9 +175,15 @@ const Comment = ({
         </View>
       </View>
 
-      <View style={{ marginBottom: 6, paddingLeft: 12 }}>
+      <View style={{ marginBottom: 6, paddingLeft: 12, alignItems: "flex-start" }}>
         <Pressable
-          style={({ pressed }) => [pressed && { opacity: 0.6 }, { width: 60 }]}
+          style={({ pressed }) => [
+            s.replyButton,
+            pressed && { opacity: 0.6 },
+            {
+              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+            },
+          ]}
           onPress={() => {
             onReplyPress(comment, comment);
             setTimeout(() => {
@@ -189,7 +193,7 @@ const Comment = ({
           }}
           hitSlop={8}
         >
-          <Text lightColor={COLORS.zinc[500]} darkColor={COLORS.zinc[500]} style={s.replyButtonText}>
+          <Text lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[400]} style={s.replyButtonText}>
             Reply
           </Text>
         </Pressable>
@@ -205,9 +209,7 @@ const Comment = ({
                 <View style={{ marginVertical: 12 }} key={index}>
                   <View style={{ paddingLeft: 28, flexDirection: "row", backgroundColor: bgColor }}>
                     <View style={{ flex: 1 }}>
-                      <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[800]} style={s.username}>
-                        {replyComment.profile.username}
-                      </Text>
+                      <Text style={s.username}>{replyComment.profile.username}</Text>
                       <View style={{ marginBottom: 6 }}>
                         <Text style={s.comment}>
                           <Text darkColor={COLORS.sky[400]} lightColor={COLORS.sky[600]}>
@@ -246,9 +248,15 @@ const Comment = ({
                     </View>
                   </View>
 
-                  <View style={{ paddingLeft: 28 }}>
+                  <View style={{ paddingLeft: 28, alignItems: "flex-start" }}>
                     <Pressable
-                      style={({ pressed }) => [pressed && { opacity: 0.6 }, { width: 60 }]}
+                      style={({ pressed }) => [
+                        s.replyButton,
+                        pressed && { opacity: 0.6 },
+                        {
+                          backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+                        },
+                      ]}
                       onPress={() => {
                         onReplyPress(comment, replyComment);
                         setTimeout(() => {
@@ -258,7 +266,7 @@ const Comment = ({
                       }}
                       hitSlop={8}
                     >
-                      <Text lightColor={COLORS.zinc[500]} darkColor={COLORS.zinc[500]} style={s.replyButtonText}>
+                      <Text lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[400]} style={s.replyButtonText}>
                         Reply
                       </Text>
                     </Pressable>
@@ -348,6 +356,7 @@ const s = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 3,
     fontSize: 12,
+    color: COLORS.zinc[500],
   },
   likeContainer: {
     marginTop: 4,
@@ -363,10 +372,16 @@ const s = StyleSheet.create({
   likeCountText: {
     fontSize: 14,
   },
+  replyButton: {
+    borderRadius: 6,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    marginTop: 2,
+  },
   replyButtonText: {
-    textDecorationLine: "underline",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "500",
+    opacity: 0.8,
   },
   viewRepliesButtonText: {
     fontSize: 13,
