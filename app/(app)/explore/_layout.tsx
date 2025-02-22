@@ -30,26 +30,23 @@ const ExploreStack = () => {
         name="profileSearch"
         options={{
           title: "Search",
+          headerBackTitleVisible: false,
           headerTitle: () => {
-            if (Platform.OS === "ios") {
-              return (
-                <View style={{ flex: 1 }}>
-                  <TextInput
-                    inputStyle={[s.modalSearchInput, { width: "100%" }]}
-                    returnKeyType="search"
-                    value={search.searchText}
-                    onChangeText={search.setSearchText}
-                    onSubmitEditing={search.search}
-                    placeholder="Search profiles..."
-                    autoFocus={true}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-              );
-            } else {
-              return <Text style={{ fontSize: 20, fontWeight: "500" }}>Search Profiles</Text>;
-            }
+            return (
+              <View style={{ flexGrow: 1 }}>
+                <TextInput
+                  inputStyle={[s.modalSearchInput, { width: Platform.OS === "ios" ? "80%" : "70%" }]}
+                  returnKeyType="search"
+                  value={search.searchText}
+                  onChangeText={search.setSearchText}
+                  onSubmitEditing={search.search}
+                  placeholder="Search profiles..."
+                  autoFocus={true}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+            );
           },
         }}
       />

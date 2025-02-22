@@ -1,25 +1,20 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { View, ActivityIndicator, RefreshControl, StyleSheet, Platform, Pressable, Dimensions } from "react-native";
+import { View, ActivityIndicator, RefreshControl, StyleSheet, Platform, Pressable } from "react-native";
 
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
 import { usePostsProfileDetailsContext } from "@/context/PostsProfileDetailsContext";
-
-const platform = Platform.OS;
 
 const FollowingScreen = () => {
   const { setProfileId } = usePostsProfileDetailsContext();
   const followingCtx = useAuthProfileFollowingContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-
-  const screenWidth = Dimensions.get("window").width;
 
   let content = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
@@ -71,23 +66,6 @@ const FollowingScreen = () => {
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         onEndReachedThreshold={0.3} // Trigger when 30%
         onEndReached={followingCtx.searchResults ? searchOnEndReached : onEndReached}
-        ListHeaderComponent={
-          Platform.OS === "android" ? (
-            <View style={{ flex: 1, alignItems: "center" }}>
-              <TextInput
-                inputStyle={[s.modalSearchInput, { width: screenWidth - 48 }]}
-                returnKeyType="search"
-                value={followingCtx.searchText}
-                onChangeText={(text) => followingCtx.setSearchText(text)}
-                onSubmitEditing={followingCtx.searchProfiles}
-                placeholder="Search following..."
-                autoFocus={true}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          ) : null
-        }
         refreshControl={
           followingCtx.searchResults ? undefined : (
             <RefreshControl
@@ -127,7 +105,7 @@ const s = StyleSheet.create({
     paddingVertical: 7,
     fontSize: 16,
     height: 35,
-    marginTop: platform === "android" ? 4 : -3,
+    marginTop: Platform.OS === "android" ? 4 : -3,
   },
   emptyComponent: {
     flex: 1,

@@ -39,7 +39,7 @@ const ExploreScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <View style={{ width: screenWidth, alignItems: "center" }}>
+        <View style={{ width: screenWidth, marginLeft: -16, alignItems: "center" }}>
           <Button
             buttonStyle={[
               s.headerSearchButton,
