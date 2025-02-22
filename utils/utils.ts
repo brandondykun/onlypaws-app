@@ -3,7 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { ImagePickerAsset } from "expo-image-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostDetailed, ProfileDetails } from "@/types";
+import { PostDetailed, ProfileDetails, PostImage } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -152,17 +152,20 @@ export const abbreviateNumber = (num: number) => {
   }
 };
 
-export const isPhotoFile = (image: PhotoFile | ImagePickerAsset): image is PhotoFile => {
+export const isPhotoFile = (image: PhotoFile | ImagePickerAsset | PostImage): image is PhotoFile => {
   // Determine if image is a PhotoFile
   // PhotoFile has a path key, where ImagePickerAsset has a uri key
   return image.hasOwnProperty("path");
 };
 
-export const getImageUri = (image: PhotoFile | ImagePickerAsset) => {
-  // Return an image uri from a PhotoFile or ImagePickerAsset
+export const isPostImage = (image: PhotoFile | ImagePickerAsset | PostImage): image is PostImage => {
+  return image.hasOwnProperty("image");
+};
+
+export const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage) => {
+  // Return an image uri from a PhotoFile or ImagePickerAsset or PostImage
   // PhotoFile does not have a uri, it has a path that does not start with file://
-  if (isPhotoFile(image)) {
-    return `file://${image.path}`;
-  }
+  if (isPhotoFile(image)) return `file://${image.path}`;
+  if (isPostImage(image)) return image.image;
   return image.uri;
 };

@@ -191,7 +191,7 @@ const Post = ({ post, onProfilePress }: Props) => {
   };
 
   return (
-    <View key={post.id} style={{ minHeight: POST_HEIGHT }}>
+    <View style={{ minHeight: POST_HEIGHT }}>
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
