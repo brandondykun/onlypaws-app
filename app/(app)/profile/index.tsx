@@ -4,16 +4,15 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import React from "react";
 import { View, ScrollView, Pressable, StyleSheet, TextStyle } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { addProfileImage, editProfileImage, updateUsername as updateUsernameApi } from "@/api/profile";
+import { addProfileImage, editProfileImage } from "@/api/profile";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
-import EditUsernameModal from "@/components/EditUsernameModal/EditUsernameModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
 import Text from "@/components/Text/Text";
@@ -25,30 +24,20 @@ import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
   const { user } = useAuthUserContext();
-  const { updateProfileImage, authProfile, updateUsername } = useAuthProfileContext();
+  const { updateProfileImage, authProfile } = useAuthProfileContext();
 
   const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
-  const editUsernameModalRef = useRef<RNBottomSheetModal>(null);
 
   const [showCamera, setShowCamera] = useState(false);
   const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
 
-  const [username, setUsername] = useState(authProfile.username ? authProfile.username : "");
-  const [updateUsernameError, setUpdateUsernameError] = useState("");
-  const [updateUsernameLoading, setUpdateUsernameLoading] = useState(false);
   const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
 
   const navigation = useNavigation();
   const router = useRouter();
-
-  useEffect(() => {
-    if (authProfile) {
-      setUsername(authProfile.username);
-    }
-  }, [authProfile]);
 
   // add search button to header
   useLayoutEffect(() => {
@@ -119,31 +108,6 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleUpdateUsername = async () => {
-    setUpdateUsernameLoading(true);
-    setUpdateUsernameError("");
-
-    const { data, error } = await updateUsernameApi(authProfile.id, username);
-    if (!error && data) {
-      updateUsername(username);
-      editUsernameModalRef.current?.dismiss();
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Username updated successfully.",
-      });
-    } else {
-      setUpdateUsernameError(error);
-    }
-
-    setUpdateUsernameLoading(false);
-  };
-
-  const handleUsernameModalClose = () => {
-    setUsername(authProfile.username);
-    setUpdateUsernameError("");
-  };
-
   const handleAddProfilePress = () => {
     changeProfileModalRef?.current?.close();
     router.push("/(app)/profile/add");
@@ -191,18 +155,8 @@ const ProfileScreen = () => {
         setShowCamera={setShowCamera}
         profileOptionsModalRef={profileOptionsModalRef}
         changeProfileModalRef={changeProfileModalRef}
-        editUsernameModalRef={editUsernameModalRef}
       />
       <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
-      <EditUsernameModal
-        modalRef={editUsernameModalRef}
-        username={username}
-        setUsername={setUsername}
-        loading={updateUsernameLoading}
-        onSubmit={handleUpdateUsername}
-        onDismiss={handleUsernameModalClose}
-        error={updateUsernameError}
-      />
     </>
   );
 };

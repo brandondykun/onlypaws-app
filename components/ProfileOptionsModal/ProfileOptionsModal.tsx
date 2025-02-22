@@ -18,15 +18,9 @@ type Props = {
   setShowCamera: React.Dispatch<React.SetStateAction<boolean>>;
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal>;
   changeProfileModalRef: React.RefObject<RNBottomSheetModal>;
-  editUsernameModalRef: React.RefObject<RNBottomSheetModal>;
 };
 
-const ProfileOptionsModal = ({
-  setShowCamera,
-  profileOptionsModalRef,
-  changeProfileModalRef,
-  editUsernameModalRef,
-}: Props) => {
+const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProfileModalRef }: Props) => {
   const { logOut } = useAuthUserContext();
 
   const { isDarkMode, setLightOrDark } = useColorMode();
@@ -103,7 +97,7 @@ const ProfileOptionsModal = ({
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.7 }]}
             onPress={() => {
-              editUsernameModalRef.current?.present();
+              router.push("/(app)/profile/editUsername");
               profileOptionsModalRef.current?.dismiss();
             }}
           >
@@ -114,7 +108,7 @@ const ProfileOptionsModal = ({
               ]}
             >
               <Ionicons name="pencil" size={18} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
-              <Text style={{ textAlign: "center", fontSize: 18 }}>Change Username</Text>
+              <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Username</Text>
             </View>
           </Pressable>
           <Pressable
