@@ -54,3 +54,13 @@ export const resendVerifyEmail = async (userId: number) => {
   const url = "/v1/auth/resend-verify-email-token/";
   return await axiosPostCustomError(url, { userId });
 };
+
+export const requestResetPasswordToken = async (email: string) => {
+  const url = "/v1/auth/request-password-reset/";
+  return await axiosPostCustomError(url, { email });
+};
+
+export const resetPassword = async (email: string, token: string, password: string) => {
+  const url = "/v1/auth/reset-password/";
+  return await axiosPostCustomError(url, { email, token, password });
+};

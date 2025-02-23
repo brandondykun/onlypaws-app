@@ -64,6 +64,8 @@ const TabLayout = () => {
           }}
         />
         <Stack.Screen name="register" options={{ title: "Register" }} />
+        <Stack.Screen name="forgotPassword" options={{ title: "Forgot Password" }} />
+        <Stack.Screen name="resetPassword" options={{ title: "Reset Password" }} />
       </Stack>
     </>
   );

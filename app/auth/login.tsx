@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { login, getMyInfo } from "@/api/auth";
@@ -19,6 +20,7 @@ const LoginScreen = () => {
   const { authenticate, logOut } = useAuthUserContext();
   const { isDarkMode } = useColorMode();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -91,7 +93,7 @@ const LoginScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={s.root}>
-      <View>
+      <View style={{ flex: 1 }}>
         <View style={{ alignItems: "center", marginBottom: 24 }}>
           <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
         </View>
@@ -129,6 +131,9 @@ const LoginScreen = () => {
             Don't have an account?
           </Text>
           <Button text="Register" variant="text" onPress={() => router.replace("/auth/register")} />
+        </View>
+        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
+          <Button text="Reset Password" variant="text" onPress={() => router.push("/auth/forgotPassword")} />
         </View>
       </View>
     </ScrollView>
