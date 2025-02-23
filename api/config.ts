@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { Platform } from "react-native";
 
-export const BASE_URL = Platform.OS === "ios" ? "http://192.168.0.190:8000/api" : "http://192.168.0.190:8000/api";
+// export const BASE_URL = "http://192.168.0.190:80/api";
+export const BASE_URL = "http://143.198.18.50/api";
 
 export const axiosInstance = axios.create({ baseURL: BASE_URL });
 

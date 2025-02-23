@@ -28,7 +28,10 @@
         "backgroundColor": "#f4f4f5"
       },
       "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
-      "package": "com.bdykun.onlypawsapp"
+      "package": "com.bdykun.onlypawsapp",
+      "config": {
+        "cleartextTraffic": true
+      }
     },
     "web": {
       "bundler": "metro",
