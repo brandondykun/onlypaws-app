@@ -18,7 +18,7 @@ import PawLogo from "@/svg/PawLogo";
 
 const LoginScreen = () => {
   const { authenticate, logOut } = useAuthUserContext();
-  const { isDarkMode } = useColorMode();
+  const { isDarkMode, setLightOrDark } = useColorMode();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -108,7 +108,7 @@ const LoginScreen = () => {
             onChangeText={setEmail}
             error={emailError}
             placeholder="youremail@email.com"
-            icon={<Ionicons name="at-sharp" size={20} color={COLORS.zinc[500]} />}
+            icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
           />
           <TextInput
@@ -117,7 +117,7 @@ const LoginScreen = () => {
             onChangeText={setPassword}
             error={passwordError}
             placeholder="*********"
-            icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
+            icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
             secureTextEntry
             testID="login-password"

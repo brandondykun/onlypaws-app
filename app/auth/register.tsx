@@ -1,5 +1,5 @@
-import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
@@ -18,7 +18,7 @@ import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
-  const { isDarkMode } = useColorMode();
+  const { isDarkMode, setLightOrDark } = useColorMode();
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -138,7 +138,7 @@ const RegisterScreen = () => {
             onChangeText={setEmail}
             error={emailError}
             placeholder="youremail@email.com"
-            icon={<Ionicons name="at-sharp" size={20} color={COLORS.zinc[500]} />}
+            icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
           />
           <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
@@ -155,7 +155,7 @@ const RegisterScreen = () => {
           onChangeText={setPassword}
           error={passwordError}
           placeholder="*********"
-          icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
+          icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
           autoCapitalize="none"
           secureTextEntry
         />
@@ -166,7 +166,7 @@ const RegisterScreen = () => {
             onChangeText={setConfirmPassword}
             error={confirmPasswordError}
             placeholder="*********"
-            icon={<Ionicons name="key-outline" size={20} color={COLORS.zinc[500]} />}
+            icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
             secureTextEntry
           />
@@ -181,7 +181,7 @@ const RegisterScreen = () => {
             onChangeText={setUsername}
             error={usernameError}
             placeholder="AwesomeUsername"
-            icon={<Feather name="user" size={20} color={COLORS.zinc[500]} />}
+            icon={<MaterialIcons name="person" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
           />
           <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
