@@ -17,7 +17,10 @@
       "bundleIdentifier": "com.bdykun.onlypawsapp",
       "infoPlist": {
         "NSCameraUsageDescription": "OnlyPaws needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "OnlyPaws needs access to your Microphone."
+        "NSMicrophoneUsageDescription": "OnlyPaws needs access to your Microphone.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       },
       "icon": "./assets/icons/ios-light.png"
     },
@@ -29,9 +32,7 @@
       },
       "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       "package": "com.bdykun.onlypawsapp",
-      "config": {
-        "cleartextTraffic": true
-      }
+      "usesCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",
