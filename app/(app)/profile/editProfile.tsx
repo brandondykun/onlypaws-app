@@ -47,7 +47,7 @@ const EditProfileScreen = () => {
   }, [fetchPetTypeOptions]);
 
   const handleProfileUpdate = async () => {
-    if (aboutText && authProfile?.id) {
+    if (authProfile?.id) {
       setUpdateProfileLoading(true);
       const updatedData = {
         about: aboutText,
