@@ -4,8 +4,9 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import LottieView from "lottie-react-native";
 import React, { useState, useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet, ActivityIndicator } from "react-native";
+import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -14,6 +15,7 @@ import AiModal from "@/components/AiModal/AiModal";
 import Button from "@/components/Button/Button";
 import CameraModal from "@/components/CameraModal/CameraModal";
 import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
+import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -28,6 +30,7 @@ const AddPostScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const aiModalRef = useRef<RNBottomSheetModal>(null);
   const screenWidth = Dimensions.get("window").width;
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const { addPost } = usePostsContext();
   const { authProfile, updatePostsCount } = useAuthProfileContext();
@@ -103,6 +106,7 @@ const AddPostScreen = () => {
           text1: "Success",
           text2: "Post successfully created!",
         });
+        scrollViewRef.current?.scrollTo({ y: 0, animated: false });
       } else {
         Toast.show({
           type: "error",
@@ -120,26 +124,8 @@ const AddPostScreen = () => {
       automaticallyAdjustKeyboardInsets={true}
       showsVerticalScrollIndicator={false}
       scrollEnabled={!submitLoading}
+      ref={scrollViewRef}
     >
-      {submitLoading ? (
-        <View
-          style={[
-            s.loadingContainer,
-            {
-              backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)",
-            },
-          ]}
-        >
-          <Text
-            darkColor={COLORS.zinc[400]}
-            lightColor={COLORS.zinc[600]}
-            style={{ fontSize: 20, fontWeight: isDarkMode ? "300" : "400" }}
-          >
-            Uploading post...
-          </Text>
-          <ActivityIndicator color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]} />
-        </View>
-      ) : null}
       <View style={{ marginBottom: 4, paddingLeft: 12 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
           Add up to 5 images
@@ -231,6 +217,31 @@ const AddPostScreen = () => {
         hasNextButton
       />
       <AiModal ref={aiModalRef} />
+      <Modal visible={submitLoading} animationType="fade" withScroll={false} transparent={true} raw={true}>
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.9)",
+          }}
+        />
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <View>
+            <LottieView
+              style={{ height: 150, width: 150 }}
+              source={require("../../../assets/animations/upload.json")}
+              autoPlay
+              loop
+            />
+          </View>
+          <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={{ fontSize: 26, fontWeight: "300" }}>
+            Uploading Post
+          </Text>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
