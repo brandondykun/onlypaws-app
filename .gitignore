@@ -23,3 +23,5 @@ ios
 android
 
 *.ipa
+
+.env
