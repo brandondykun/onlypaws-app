@@ -20,7 +20,9 @@ import Text from "../Text/Text";
 import CameraBackground from "./CameraBackground";
 import FocusIcon from "./FocusIcon";
 import ImagePreviewModal from "./ImagePreviewModal";
+import MaxImagesMessage from "./MaxImagesMessage";
 import PreviewImages from "./PreviewImages";
+import ProfileImagePreview from "./ProfileImagePreview";
 
 type Props =
   | {
@@ -33,6 +35,7 @@ type Props =
       hasNextButton?: undefined;
       loading?: boolean;
       onBackButtonPress?: () => void;
+      isProfileImage?: boolean;
     }
   | {
       visible: boolean;
@@ -44,6 +47,7 @@ type Props =
       hasNextButton?: boolean;
       loading?: boolean;
       onBackButtonPress?: () => void;
+      isProfileImage?: boolean;
     };
 
 const CameraModal = ({
@@ -56,6 +60,7 @@ const CameraModal = ({
   hasNextButton = false,
   loading,
   onBackButtonPress,
+  isProfileImage = false,
 }: Props) => {
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
@@ -223,39 +228,24 @@ const CameraModal = ({
                 </TouchableOpacity>
               </View>
             </View>
-            <PreviewImages images={images} setPreviewModalVisible={setPreviewModalVisible} />
+            {isProfileImage ? (
+              <ProfileImagePreview images={images} setImages={setImages} />
+            ) : (
+              <PreviewImages images={images} setPreviewModalVisible={setPreviewModalVisible} />
+            )}
           </View>
 
           {/* Camera Square */}
 
           {/* Bottom */}
-          <View
-            style={{
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              left: 0,
-              height: (screenHeight - screenWidth) / 2,
-              zIndex: 1,
-            }}
-          >
+          <View style={[s.bottomContainer, { height: (screenHeight - screenWidth) / 2 }]}>
             {maxImages ? (
-              <>
-                <View style={{ paddingTop: 4, justifyContent: "center", flexDirection: "row" }}>
-                  <Text
-                    darkColor={maxImagesReached ? COLORS.red[600] : COLORS.zinc[300]}
-                    lightColor={COLORS.zinc[700]}
-                    style={{ textAlign: "center", minWidth: 100 }}
-                  >
-                    {images.length} of {maxImages}
-                  </Text>
-                </View>
-                <View>
-                  <Text darkColor={COLORS.zinc[400]} style={{ textAlign: "center", fontWeight: 200 }}>
-                    {maxImagesReached ? "Remove images above to add more." : ""}
-                  </Text>
-                </View>
-              </>
+              <MaxImagesMessage
+                isProfileImage={isProfileImage}
+                maxImagesReached={maxImagesReached}
+                maxImages={maxImages}
+                imagesCount={images.length}
+              />
             ) : null}
             <View style={{ flex: 1, justifyContent: "center", flexDirection: "row", marginTop: -32 }}>
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -418,5 +408,13 @@ const s = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+  },
+  bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    left: 0,
+    zIndex: 1,
+    paddingTop: 4,
   },
 });

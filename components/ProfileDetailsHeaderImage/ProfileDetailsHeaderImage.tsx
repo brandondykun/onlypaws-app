@@ -1,7 +1,9 @@
 import { BlurView } from "expo-blur";
+import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
 import { View, Dimensions, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileImage as TProfileImage } from "@/types";
@@ -10,7 +12,7 @@ import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {
-  image: TProfileImage | null;
+  image: TProfileImage | PhotoFile | ImagePickerAsset | null;
   size?: number;
 };
 const ProfileDetailsHeaderImage = ({ image, size }: Props) => {

@@ -150,6 +150,7 @@ const ProfileScreen = () => {
         onSavePress={handleSavePress}
         loading={updateProfileLoading}
         onBackButtonPress={() => setImage([])} // clear temp image if profile image was not updated
+        isProfileImage={true}
       />
       <ProfileOptionsModal
         setShowCamera={setShowCamera}

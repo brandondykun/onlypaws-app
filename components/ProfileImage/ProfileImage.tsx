@@ -1,14 +1,17 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
+import { ImagePickerAsset } from "expo-image-picker";
 import React from "react";
 import { View } from "react-native";
+import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileImage as ProfileImageType } from "@/types";
+import { getImageUri } from "@/utils/utils";
 
 type Props = {
-  image: ProfileImageType | null;
+  image: ProfileImageType | PhotoFile | ImagePickerAsset | null;
   size: number;
   iconSize?: number;
 };
@@ -16,14 +19,16 @@ type Props = {
 const ProfileImage = ({ image, iconSize, size }: Props) => {
   const { isDarkMode } = useColorMode();
 
-  const iconHeight = iconSize ? iconSize : Math.round(size * 0.75);
+  const iconHeight = iconSize ? iconSize : Math.round(size * 0.7);
   const imageSize = size ? size : 35;
+
+  const imageUri = image ? getImageUri(image) : null;
 
   return (
     <>
-      {image?.image ? (
+      {imageUri ? (
         <Image
-          source={{ uri: image.image }}
+          source={{ uri: imageUri }}
           style={{
             borderRadius: imageSize,
             height: imageSize,
