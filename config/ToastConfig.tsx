@@ -1,7 +1,7 @@
-// App.jsx
-import { ToastProps } from "react-native-toast-message";
+import { ToastProps, BaseToastProps } from "react-native-toast-message";
 
 import ErrorToast from "@/components/Toasts/ErrorToast/ErrorToast";
+import SavePostToast from "@/components/Toasts/SavePostToast/SavePostToast";
 import SuccessToast from "@/components/Toasts/SuccessToast/SuccessToast";
 
 type CustomToastProps = {
@@ -9,6 +9,10 @@ type CustomToastProps = {
   text1?: string;
   text2?: string;
 } & ToastProps;
+
+type SavePostToastProps = {
+  imageUri?: string;
+} & BaseToastProps;
 
 export const toastConfig = {
   /*
@@ -30,4 +34,5 @@ export const toastConfig = {
 
   error: ({ text1, text2 }: CustomToastProps) => <ErrorToast text1={text1} text2={text2} />,
   success: ({ text1, text2 }: CustomToastProps) => <SuccessToast text1={text1} text2={text2} />,
+  savePost: ({ imageUri, ...props }: SavePostToastProps) => <SavePostToast imageUri={imageUri} {...props} />,
 };

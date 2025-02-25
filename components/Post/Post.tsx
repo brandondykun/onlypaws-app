@@ -181,6 +181,14 @@ const Post = ({ post, onProfilePress }: Props) => {
           text1: "Error",
           text2: "Error saving that post.",
         });
+      } else {
+        Toast.show({
+          type: "savePost",
+          position: "bottom",
+          props: {
+            imageUri: post.images[0].image,
+          },
+        });
       }
     }
     setSaveLoading(false);
