@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
+import LottieView from "lottie-react-native";
 import { useRef, useState, useCallback } from "react";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View, Dimensions, Pressable, Platform, ActivityIndicator } from "react-native";
@@ -334,8 +335,23 @@ const CameraModal = ({
     <Modal withScroll={false} visible={visible} onRequestClose={() => setVisible(false)}>
       <View style={s.contentContainer}>{content}</View>
       {loading ? (
-        <View style={s.loadingView}>
-          <ActivityIndicator color={COLORS.zinc[500]} />
+        <View
+          style={[
+            s.loadingView,
+            { backgroundColor: setLightOrDark("rgba(255, 255, 255, 0.9)", "rgba(0, 0, 0, 0.85)") },
+          ]}
+        >
+          <View>
+            <LottieView
+              style={{ height: 150, width: 150 }}
+              source={require("../../assets/animations/upload.json")}
+              autoPlay
+              loop
+            />
+          </View>
+          <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={{ fontSize: 26, fontWeight: "300" }}>
+            Updating Profile Image
+          </Text>
         </View>
       ) : null}
       <ImagePreviewModal
@@ -403,8 +419,6 @@ const s = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: COLORS.zinc[900],
-    opacity: 0.7,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
