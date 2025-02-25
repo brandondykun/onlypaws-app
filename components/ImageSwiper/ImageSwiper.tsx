@@ -1,17 +1,17 @@
 import { ImagePickerAsset } from "expo-image-picker";
-import { PhotoFile } from "react-native-vision-camera";
-import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
-import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
-
-import { PostImage } from "@/types";
-
 import { useRef } from "react";
 import { View, Dimensions, StyleSheet } from "react-native";
-import { getImageUri } from "@/utils/utils";
-import ImageLoader from "../ImageLoader/ImageLoader";
+import { PanGesture } from "react-native-gesture-handler";
+import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
+import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
+import { PhotoFile } from "react-native-vision-camera";
+
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { PanGesture } from "react-native-gesture-handler";
+import { PostImage } from "@/types";
+import { getImageUri } from "@/utils/utils";
+
+import ImageLoader from "../ImageLoader/ImageLoader";
 
 type Props = {
   images: PostImage[] | (PhotoFile | ImagePickerAsset)[];
