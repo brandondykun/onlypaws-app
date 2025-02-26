@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { runOnJS } from "react-native-reanimated";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
@@ -37,6 +37,12 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages }: Props) =>
 
     runOnJS(Haptics.selectionAsync)();
   }, []);
+
+  useEffect(() => {
+    if (images.length === 0) {
+      setVisible(false);
+    }
+  }, [images, setVisible]);
 
   return (
     <Modal
