@@ -19,12 +19,16 @@ const ProfileStack = () => {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Your Profile" }} />
+      <Stack.Screen name="index" options={{ title: "Profile" }} />
       <Stack.Screen name="add" options={{ title: "Add Profile" }} />
       <Stack.Screen name="guidelines" options={{ title: "" }} />
       <Stack.Screen name="about" options={{ title: "" }} />
       <Stack.Screen name="editProfile" options={{ title: "Edit Profile" }} />
       <Stack.Screen name="editUsername" options={{ title: "Edit Username" }} />
+      <Stack.Screen name="accountOptions" options={{ title: "Account" }} />
+      <Stack.Screen name="changePassword" options={{ title: "Change Password" }} />
+      <Stack.Screen name="changeEmail" options={{ title: "Change Email" }} />
+      <Stack.Screen name="deleteProfile" options={{ title: "Delete Profile" }} />
     </Stack>
   );
 };

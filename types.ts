@@ -17,6 +17,8 @@ export type User = {
 export type ProfileOption = {
   id: number;
   username: string;
+  image: ProfileImage | null;
+  name: string;
 };
 
 export type ProfileImage = {

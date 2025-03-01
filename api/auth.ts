@@ -64,3 +64,23 @@ export const resetPassword = async (email: string, token: string, password: stri
   const url = "/v1/auth/reset-password/";
   return await axiosPostCustomError(url, { email, token, password });
 };
+
+interface CustomErrorResponse {
+  new_password?: string[];
+  old_password?: string[];
+}
+
+export const changePassword = async (old_password: string, new_password: string) => {
+  const url = "/v1/auth/change-password/";
+  try {
+    const res = await axiosInstance.patch<{ new_password?: string[]; old_password?: string[] }>(url, {
+      old_password,
+      new_password,
+    });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as CustomErrorResponse;
+    return { data: null, error: data, status: error.status };
+  }
+};

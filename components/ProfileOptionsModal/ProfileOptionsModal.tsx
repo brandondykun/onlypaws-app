@@ -1,4 +1,5 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Entypo from "@expo/vector-icons/Entypo";
 import Foundation from "@expo/vector-icons/Foundation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -31,9 +32,9 @@ const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProf
       ref={profileOptionsModalRef}
       handleTitle="Profile Options"
       enableDynamicSizing={true}
-      snapPoints={["60%"]}
+      snapPoints={[]}
     >
-      <BottomSheetView style={{ paddingTop: 24, paddingBottom: 88, paddingHorizontal: 36 }}>
+      <BottomSheetView style={{ paddingTop: 24, paddingBottom: 48, paddingHorizontal: 36 }}>
         <View style={{ marginBottom: 12, flexDirection: "row", gap: 12, height: 70 }}>
           <View style={{ flex: 1 }}>
             <Pressable
@@ -92,6 +93,7 @@ const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProf
             borderRadius: 8,
             overflow: "hidden",
             backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+            marginBottom: 24,
           }}
         >
           <Pressable
@@ -156,6 +158,28 @@ const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProf
               <MaterialIcons name="people" size={20} color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700]} />
               <Text style={{ textAlign: "center", fontSize: 18 }}>Switch Profile</Text>
             </View>
+          </Pressable>
+        </View>
+        <View>
+          <Pressable
+            style={({ pressed }) => [
+              pressed && { opacity: 0.7 },
+              {
+                backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+                padding: 16,
+                borderRadius: 12,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              },
+            ]}
+            onPress={() => {
+              router.push("/(app)/profile/accountOptions");
+              profileOptionsModalRef.current?.dismiss();
+            }}
+          >
+            <Text style={{ fontSize: 18 }}>Account Options</Text>
+            <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
           </Pressable>
         </View>
 

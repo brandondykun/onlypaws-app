@@ -60,7 +60,7 @@ const AddProfileScreen = () => {
 
     if (!error && data) {
       setActiveProfileId(data.id);
-      addProfileOption({ id: data.id, username: data.username });
+      addProfileOption({ id: data.id, username: data.username, image: null, name: "" });
       router.back();
       Toast.show({
         type: "success",

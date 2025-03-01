@@ -170,7 +170,7 @@ type LabelAndTextProps = {
   placeholder?: string;
 };
 
-const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProps) => {
+export const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProps) => {
   const { setLightOrDark } = useColorMode();
 
   return (
