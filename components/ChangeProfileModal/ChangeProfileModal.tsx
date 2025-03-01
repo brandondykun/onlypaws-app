@@ -22,7 +22,7 @@ const ChangeProfileModal = forwardRef(
       changeSelectedProfileId,
       selectedProfileId: authUserSelectedProfileId,
     } = useAuthUserContext();
-    const { authProfile, loading: authProfileLoading } = useAuthProfileContext();
+    const { authProfile, backgroundRefreshing: authProfileLoading } = useAuthProfileContext();
     const { isDarkMode } = useColorMode();
 
     const handleChangeProfile = async (profileId: number) => {
@@ -33,7 +33,8 @@ const ChangeProfileModal = forwardRef(
       <BottomSheetModal
         handleTitle="Change Profile"
         ref={ref}
-        snapPoints={["50%", "90%"]}
+        snapPoints={[]}
+        enableDynamicSizing={true}
         enableContentPanningGesture={true}
       >
         <BottomSheetScrollView

@@ -24,6 +24,7 @@ type AuthProfileContextType = {
   updateUsername: (username: string) => void;
   refetch: () => Promise<void>;
   refreshing: boolean;
+  backgroundRefreshing: boolean;
 };
 
 const AuthProfileContext = createContext<AuthProfileContextType>({
@@ -51,6 +52,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   updateUsername: (username: string) => {},
   refetch: () => Promise.resolve(),
   refreshing: false,
+  backgroundRefreshing: false,
 });
 
 type Props = {
@@ -75,20 +77,9 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   const [authProfile, setAuthProfile] = useState<ProfileDetailsType>(defaultProfile);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [backgroundRefreshing, setBackgroundRefreshing] = useState(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
-
-  const fetchProfileDetails = useCallback(async () => {
-    if (selectedProfileId && !authLoading) {
-      setLoading(true);
-      // the second argument is only necessary so the backend doesn't throw an error
-      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
-      if (!error && data) {
-        setAuthProfile(data);
-      }
-      setLoading(false);
-    }
-  }, [authLoading, selectedProfileId]);
 
   // refresh the profile details without setting the loading state.
   // setting the loading state to true will trigger the auth interceptor to
@@ -96,13 +87,32 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   // since the profile has been authenticated already, there's no need to set loading to true.
   const backgroundRefreshProfileDetails = useCallback(async () => {
     if (selectedProfileId && !authLoading) {
+      setBackgroundRefreshing(true);
       // the second argument is only necessary so the backend doesn't throw an error
       const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
       if (!error && data) {
         setAuthProfile(data);
       }
+      setBackgroundRefreshing(false);
     }
   }, [authLoading, selectedProfileId]);
+
+  const fetchProfileDetails = useCallback(async () => {
+    // if fetching a profile for the first time on app load
+    if (selectedProfileId && !authLoading && !authProfile.username) {
+      setLoading(true);
+      // the second argument is only necessary so the backend doesn't throw an error
+      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
+      if (!error && data) {
+        setAuthProfile(data);
+      }
+      setLoading(false);
+    } else if (selectedProfileId && !authLoading && authProfile.username) {
+      // if the user is already authenticated but the user changes profiles, refresh in the background
+      // without this check, any time a profile is changed, the app would redirect to the index route (feed screen)
+      backgroundRefreshProfileDetails();
+    }
+  }, [authLoading, selectedProfileId, authProfile.username, backgroundRefreshProfileDetails]);
 
   useEffect(() => {
     fetchProfileDetails();
@@ -199,6 +209,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updateUsername,
     refetch: refreshProfile,
     refreshing,
+    backgroundRefreshing,
   };
 
   return <AuthProfileContext.Provider value={value}>{children}</AuthProfileContext.Provider>;
@@ -220,6 +231,7 @@ export const useAuthProfileContext = () => {
     updateUsername,
     refetch,
     refreshing,
+    backgroundRefreshing,
   } = useContext(AuthProfileContext);
   return {
     authProfile,
@@ -234,5 +246,6 @@ export const useAuthProfileContext = () => {
     updateUsername,
     refetch,
     refreshing,
+    backgroundRefreshing,
   };
 };
