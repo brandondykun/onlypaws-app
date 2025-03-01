@@ -8,7 +8,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput";
 import { forwardRef, ForwardedRef, useMemo, RefObject, useState } from "react";
-import { Keyboard, Platform, Pressable, View } from "react-native";
+import { Keyboard, Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
@@ -85,9 +85,7 @@ const BottomSheetModal = forwardRef(
         }}
         {...props}
       >
-        <Pressable onPress={() => Keyboard.dismiss()} style={{ flex: 1 }} android_disableSound>
-          {children}
-        </Pressable>
+        {children}
       </RNBottomSheetModal>
     );
   },
