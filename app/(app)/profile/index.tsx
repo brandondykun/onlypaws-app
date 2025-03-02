@@ -116,7 +116,7 @@ const ProfileScreen = () => {
   return (
     <>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 36 }}
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight }}
         showsVerticalScrollIndicator={false}
       >
         <View>
