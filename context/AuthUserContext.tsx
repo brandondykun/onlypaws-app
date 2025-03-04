@@ -19,6 +19,7 @@ type AuthUserContextType = {
   addProfileOption: (option: ProfileOption) => void;
   changeSelectedProfileId: (profileId: number) => Promise<void>;
   updateEmailVerified: (value: boolean) => void;
+  removeProfileOption: (profileId: number) => void;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
@@ -33,6 +34,7 @@ const AuthUserContext = createContext<AuthUserContextType>({
   addProfileOption: (option: ProfileOption) => {},
   changeSelectedProfileId: (profileId: number) => Promise.resolve(),
   updateEmailVerified: (value: boolean) => {},
+  removeProfileOption: (profileId: number) => {},
 });
 
 type Props = {
@@ -128,6 +130,16 @@ const AuthUserContextProvider = ({ children }: Props) => {
     });
   };
 
+  // remove profile option if a profile if deleted
+  const removeProfileOption = (profileId: number) => {
+    setProfileOptions((prev) => {
+      if (prev) {
+        return prev?.filter((profile) => profile.id !== profileId);
+      }
+      return null;
+    });
+  };
+
   const value = {
     user,
     selectedProfileId,
@@ -140,6 +152,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    removeProfileOption,
   };
 
   return <AuthUserContext.Provider value={value}>{children}</AuthUserContext.Provider>;
@@ -160,6 +173,7 @@ export const useAuthUserContext = () => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    removeProfileOption,
   } = useContext(AuthUserContext);
   return {
     user,
@@ -173,5 +187,6 @@ export const useAuthUserContext = () => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    removeProfileOption,
   };
 };

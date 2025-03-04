@@ -113,3 +113,14 @@ export const getPetTypeOptions = async () => {
   const url = `/v1/auth/pet-type-options/`;
   return await axiosFetch<{ id: number; name: string }[]>(url);
 };
+
+export const deleteProfile = async (profileId: number) => {
+  const url = `/v1/auth/profile/${profileId}/`;
+  try {
+    const res = await axiosInstance.delete(url);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.response?.data, status: error.status };
+  }
+};
