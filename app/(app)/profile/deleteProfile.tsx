@@ -140,7 +140,7 @@ const DeleteProfileScreen = () => {
                   {profile?.name || "No name"}
                 </Text>
               </View>
-              <Checkbox value={selectedProfileId === profile.id} />
+              <Checkbox isChecked={selectedProfileId === profile.id} testID={`checkbox-${profile.username}`} />
             </View>
           </Pressable>
         ))}

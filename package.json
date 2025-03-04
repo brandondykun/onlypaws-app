@@ -61,8 +61,7 @@
     "react-native-uuid": "^2.0.3",
     "react-native-view-more-text": "^2.2.0",
     "react-native-vision-camera": "^4.6.1",
-    "react-native-web": "~0.19.13",
-    "expo-checkbox": "~3.0.0"
+    "react-native-web": "~0.19.13"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
