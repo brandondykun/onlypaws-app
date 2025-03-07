@@ -110,6 +110,8 @@ const LoginScreen = () => {
             placeholder="youremail@email.com"
             icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
           />
           <TextInput
             label="Password"
