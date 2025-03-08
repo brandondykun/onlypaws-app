@@ -35,9 +35,6 @@ export default {
       infoPlist: {
         NSCameraUsageDescription: "OnlyPaws needs access to your Camera.",
         NSMicrophoneUsageDescription: "OnlyPaws needs access to your Microphone.",
-        NSAppTransportSecurity: {
-          NSAllowsArbitraryLoads: true,
-        },
       },
       icon: "./assets/icons/ios-light.png",
     },
@@ -49,7 +46,6 @@ export default {
       },
       permissions: ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       package: BUNDLE_IDENTIFIER,
-      usesCleartextTraffic: true,
     },
     web: {
       bundler: "metro",
