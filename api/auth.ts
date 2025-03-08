@@ -84,3 +84,45 @@ export const changePassword = async (old_password: string, new_password: string)
     return { data: null, error: data, status: error.status };
   }
 };
+
+interface ReqEmailChangeResponse {
+  error?: { email?: string; other?: string };
+  message?: string;
+}
+
+export const requestEmailChange = async (newEmail: string) => {
+  const url = "/v1/auth/request-email-change/";
+  try {
+    const res = await axiosInstance.post<ReqEmailChangeResponse>(url, {
+      email: newEmail,
+    });
+    console.log("requestEmailChange res: ", res);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as ReqEmailChangeResponse;
+    console.log("requestEmailChange error data: ", data);
+    return { data: null, error: data, status: error.status };
+  }
+};
+
+interface VerifyEmailChangeResponse {
+  error?: { token?: string };
+  message?: string;
+}
+
+export const verifyEmailChange = async (token: string) => {
+  const url = "/v1/auth/verify-email-change/";
+  try {
+    const res = await axiosInstance.post<VerifyEmailChangeResponse>(url, {
+      token,
+    });
+    console.log("verifyEmailChange res: ", res);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as VerifyEmailChangeResponse;
+    console.log("verifyEmailChange error data: ", data);
+    return { data: null, error: data, status: error.status };
+  }
+};
