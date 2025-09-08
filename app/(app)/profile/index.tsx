@@ -1,17 +1,11 @@
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import React from "react";
 import { View, ScrollView, Pressable, StyleSheet, TextStyle } from "react-native";
-import Toast from "react-native-toast-message";
-import { PhotoFile } from "react-native-vision-camera";
 
-import { addProfileImage, editProfileImage } from "@/api/profile";
-import CameraModal from "@/components/CameraModal/CameraModal";
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
@@ -20,21 +14,15 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { getImageUri } from "@/utils/utils";
 
 const ProfileScreen = () => {
   const { user } = useAuthUserContext();
-  const { updateProfileImage, authProfile } = useAuthProfileContext();
+  const { authProfile } = useAuthProfileContext();
 
   const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
-
-  const [showCamera, setShowCamera] = useState(false);
-  const [image, setImage] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
-
-  const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
 
   const navigation = useNavigation();
   const router = useRouter();
@@ -54,59 +42,6 @@ const ProfileScreen = () => {
       ),
     });
   });
-
-  const handleSavePress = async () => {
-    const formData = new FormData();
-    formData.append("profileId", authProfile.id.toString());
-
-    formData.append("image", {
-      uri: getImageUri(image[0]),
-      name: `profile_image.jpeg`,
-      type: "image/jpeg",
-      mimeType: "multipart/form-data",
-    } as any);
-
-    const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
-    if (accessToken) {
-      setUpdateProfileLoading(true);
-      if (authProfile.image) {
-        // edit profile image
-        const { error, data } = await editProfileImage(authProfile.image.id, formData, accessToken);
-        if (!error && data) {
-          setImage([]);
-          setShowCamera(false);
-          updateProfileImage(data);
-        } else {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error updating your profile picture.",
-          });
-        }
-      } else {
-        // create new profile image
-        const { error, data } = await addProfileImage(formData, accessToken);
-        if (!error && data) {
-          setImage([]);
-          setShowCamera(false);
-          updateProfileImage(data);
-        } else {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error updating your profile picture.",
-          });
-        }
-      }
-      setUpdateProfileLoading(false);
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error updating your profile picture.",
-      });
-    }
-  };
 
   const handleAddProfilePress = () => {
     changeProfileModalRef?.current?.close();
@@ -141,19 +76,7 @@ const ProfileScreen = () => {
           </View>
         </View>
       </ScrollView>
-      <CameraModal
-        visible={showCamera}
-        setVisible={setShowCamera}
-        images={image}
-        setImages={setImage}
-        maxImages={1}
-        onSavePress={handleSavePress}
-        loading={updateProfileLoading}
-        onBackButtonPress={() => setImage([])} // clear temp image if profile image was not updated
-        isProfileImage={true}
-      />
       <ProfileOptionsModal
-        setShowCamera={setShowCamera}
         profileOptionsModalRef={profileOptionsModalRef}
         changeProfileModalRef={changeProfileModalRef}
       />

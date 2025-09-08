@@ -10,7 +10,7 @@ const CameraBackground = () => {
   return (
     <View style={s.root} pointerEvents="none">
       {/* Top */}
-      <View style={[s.top, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }]} />
+      <View style={[s.top, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]), opacity: 0.8 }]} />
 
       {/* Camera Square */}
       <View
@@ -22,7 +22,7 @@ const CameraBackground = () => {
       />
 
       {/* Bottom */}
-      <View style={[s.bottom, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }]} />
+      <View style={[s.bottom, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]), opacity: 0.8 }]} />
     </View>
   );
 };

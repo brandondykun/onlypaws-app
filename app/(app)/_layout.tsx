@@ -3,7 +3,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { BlurView } from "expo-blur";
-import { Tabs, Redirect } from "expo-router";
+import { Tabs, Redirect, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
@@ -30,6 +30,8 @@ const TabLayout = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
 
   const { authLoading, isAuthenticated, user } = useAuthUserContext();
+
+  const segment = useSegments();
 
   if (authLoading) {
     return (
@@ -66,18 +68,11 @@ const TabLayout = () => {
                             <ReportReasonsContextProvider>
                               <StatusBar style="auto" />
                               <Tabs
+                                backBehavior="history"
                                 screenOptions={{
                                   tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
                                   tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
-                                  tabBarStyle: {
-                                    borderTopWidth: 0,
-                                    elevation: 0,
-                                    position: "absolute",
-                                    right: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    backgroundColor: "transparent",
-                                  },
+                                  tabBarStyle: s.tabBarStyle,
                                   headerShadowVisible: false, // applied here
                                   tabBarBackground: () => {
                                     // only show blur view on ios
@@ -130,6 +125,9 @@ const TabLayout = () => {
                                       <Octicons name="diff-added" size={24} color={color} />
                                     ),
                                     headerShown: false,
+                                    tabBarStyle: {
+                                      display: "none",
+                                    },
                                   }}
                                 />
                                 <Tabs.Screen
@@ -150,6 +148,8 @@ const TabLayout = () => {
                                       <MaterialIcons name="person" size={24} color={color} />
                                     ),
                                     headerShown: false,
+                                    tabBarStyle:
+                                      segment[2] === "profileImageCamera" ? { display: "none" } : s.tabBarStyle,
                                   }}
                                 />
                               </Tabs>
@@ -182,5 +182,14 @@ const s = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "300",
+  },
+  tabBarStyle: {
+    borderTopWidth: 0,
+    elevation: 0,
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "transparent",
   },
 });

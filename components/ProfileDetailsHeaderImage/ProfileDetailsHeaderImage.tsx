@@ -3,6 +3,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
 import { View, Dimensions, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Image as CropperImage } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { useColorMode } from "@/context/ColorModeContext";
@@ -12,7 +13,7 @@ import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {
-  image: TProfileImage | PhotoFile | ImagePickerAsset | null;
+  image: TProfileImage | PhotoFile | ImagePickerAsset | CropperImage | null;
   size?: number;
 };
 const ProfileDetailsHeaderImage = ({ image, size }: Props) => {

@@ -2,6 +2,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useRef } from "react";
 import { View, Dimensions, StyleSheet } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
+import { Image as CropperImage } from "react-native-image-crop-picker";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { PhotoFile } from "react-native-vision-camera";
@@ -14,7 +15,7 @@ import { getImageUri } from "@/utils/utils";
 import ImageLoader from "../ImageLoader/ImageLoader";
 
 type Props = {
-  images: PostImage[] | (PhotoFile | ImagePickerAsset)[];
+  images: PostImage[] | (PhotoFile | ImagePickerAsset | CropperImage)[];
 };
 
 const { width } = Dimensions.get("window");
@@ -35,7 +36,7 @@ const ImageSwiper = ({ images }: Props) => {
 
   return (
     <View style={{ width: width }}>
-      <Carousel<PostImage | PhotoFile | ImagePickerAsset>
+      <Carousel<PostImage | PhotoFile | ImagePickerAsset | CropperImage>
         ref={ref}
         width={width}
         height={width}
@@ -60,7 +61,7 @@ const ImageSwiper = ({ images }: Props) => {
       />
       <View style={styles.paginationContainer}>
         {images.length > 1 && (
-          <Pagination.Custom<PostImage | PhotoFile | ImagePickerAsset>
+          <Pagination.Custom<PostImage | PhotoFile | ImagePickerAsset | CropperImage>
             progress={progress}
             data={images}
             dotStyle={{

@@ -1,0 +1,134 @@
+import Entypo from "@expo/vector-icons/Entypo";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
+import { ImagePickerAsset } from "expo-image-picker";
+import { View, Pressable, TouchableOpacity, StyleSheet } from "react-native";
+import { Image as CropperImage } from "react-native-image-crop-picker";
+import { PhotoFile } from "react-native-vision-camera";
+
+import MaxImagesMessage from "@/components/Camera/MaxImagesMessage/MaxImagesMessage";
+import Text from "@/components/Text/Text";
+import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
+import { getImageUri } from "@/utils/utils";
+
+type Props = {
+  screenHeight: number;
+  screenWidth: number;
+  maxImagesReached: boolean;
+  MAX_IMAGES: number;
+  images: (PhotoFile | ImagePickerAsset | CropperImage)[];
+  pickImage: () => void;
+  takePicture: () => void;
+  onNextButtonPress?: () => void;
+};
+
+const CameraFooter = ({
+  screenHeight,
+  screenWidth,
+  maxImagesReached,
+  MAX_IMAGES,
+  images,
+  pickImage,
+  takePicture,
+  onNextButtonPress,
+}: Props) => {
+  const { setLightOrDark } = useColorMode();
+
+  return (
+    <View style={[s.container, { height: (screenHeight - screenWidth) / 2 }]}>
+      <MaxImagesMessage
+        isProfileImage={false}
+        maxImagesReached={maxImagesReached}
+        maxImages={MAX_IMAGES}
+        imagesCount={images.length}
+      />
+      <View style={{ flex: 1, justifyContent: "center", flexDirection: "row", marginTop: -32 }}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Pressable
+            style={({ pressed }) => [
+              !maxImagesReached && pressed ? { opacity: 0.5 } : maxImagesReached ? { opacity: 0.3 } : null,
+              { justifyContent: "center", alignItems: "center" },
+            ]}
+            onPress={pickImage}
+            disabled={maxImagesReached}
+          >
+            <Ionicons name="images" size={36} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[200])} />
+            <Text style={{ fontSize: 10, fontWeight: "300", textAlign: "center", marginTop: 4 }}>Camera Roll</Text>
+          </Pressable>
+        </View>
+        <View style={{ justifyContent: "center", alignItems: "center", opacity: maxImagesReached ? 0.3 : 1 }}>
+          <TouchableOpacity onPress={takePicture} disabled={maxImagesReached ? true : false}>
+            <View
+              style={[s.takeImageButtonRing, { backgroundColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]) }]}
+            >
+              <View
+                style={[
+                  s.takeImageButton,
+                  {
+                    backgroundColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+                    borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                  },
+                ]}
+              >
+                <Ionicons name="paw" size={36} color={COLORS.zinc[400]} />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          {images.length && onNextButtonPress ? (
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.6 }, { paddingLeft: 24 }]}
+              onPress={onNextButtonPress}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={getImageUri(images[0])}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                    borderWidth: 2,
+                    borderColor: setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
+                  }}
+                />
+                <Entypo
+                  name="chevron-small-right"
+                  size={36}
+                  color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+                />
+              </View>
+            </Pressable>
+          ) : null}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default CameraFooter;
+
+const s = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    left: 0,
+    zIndex: 1,
+    paddingTop: 4,
+  },
+  takeImageButtonRing: {
+    padding: 4,
+    borderRadius: 50,
+  },
+  takeImageButton: {
+    height: 90,
+    width: 90,
+    borderRadius: 100,
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 1,
+  },
+});

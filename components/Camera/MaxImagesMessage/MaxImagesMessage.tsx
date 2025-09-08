@@ -1,9 +1,8 @@
 import { View } from "react-native";
 
+import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../Text/Text";
 
 type Props = {
   isProfileImage: boolean;
@@ -34,11 +33,7 @@ const MaxImagesMessage = ({ isProfileImage, maxImagesReached, maxImages, imagesC
           lightColor={COLORS.zinc[600]}
           style={{ textAlign: "center", fontWeight: isDarkMode ? 200 : 300, paddingHorizontal: 36 }}
         >
-          {maxImagesReached
-            ? isProfileImage
-              ? "Actual image quality will be slightly lower than the preview above."
-              : "Remove images above to add more."
-            : ""}
+          {maxImagesReached ? (isProfileImage ? "" : "Remove images to add more.") : ""}
         </Text>
       </View>
     </View>

@@ -1,24 +1,22 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { ImagePickerAsset } from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import LottieView from "lottie-react-native";
-import React, { useState, useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Pressable, Dimensions, Switch, StyleSheet } from "react-native";
+import React, { useLayoutEffect, useRef } from "react";
+import { ScrollView, View, Switch, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
-import { PhotoFile } from "react-native-vision-camera";
 
 import { createPost } from "@/api/post";
 import AiModal from "@/components/AiModal/AiModal";
 import Button from "@/components/Button/Button";
-import CameraModal from "@/components/CameraModal/CameraModal";
+import DiscardPostModal from "@/components/DiscardPostModal/DiscardPostModal";
 import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
 import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
+import { useAddPostContext } from "@/context/AddPostContext";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostsContext } from "@/context/PostsContext";
@@ -29,31 +27,45 @@ const AddPostScreen = () => {
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
   const aiModalRef = useRef<RNBottomSheetModal>(null);
-  const screenWidth = Dimensions.get("window").width;
+  const discardPostModalRef = useRef<RNBottomSheetModal>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { addPost } = usePostsContext();
   const { authProfile, updatePostsCount } = useAuthProfileContext();
   const { isDarkMode, setLightOrDark } = useColorMode();
-
-  const [caption, setCaption] = useState("");
-  const [captionError, setCaptionError] = useState("");
-  const [images, setImages] = useState<(PhotoFile | ImagePickerAsset)[]>([]);
-  const [cameraVisible, setCameraVisible] = useState(false);
-  const [aiGenerated, setAiGenerated] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
+  const {
+    setImages,
+    setCaption,
+    setCaptionError,
+    setAiGenerated,
+    setSubmitLoading,
+    images,
+    caption,
+    aiGenerated,
+    submitLoading,
+    captionError,
+    resetState,
+  } = useAddPostContext();
 
   // add search button to header
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button onPressOut={resetState} variant="text" text="Clear" disabled={submitLoading} />,
+      headerRight: () => (
+        <Button
+          onPressOut={() => discardPostModalRef.current?.present()}
+          variant="text"
+          text="Discard"
+          disabled={submitLoading}
+        />
+      ),
     });
   });
 
-  const resetState = () => {
-    setImages([]);
-    setCaption("");
-    setCaptionError("");
+  // handle discard post from discard post modal
+  const handleDiscardPost = () => {
+    resetState();
+    router.dismissAll();
+    router.back();
   };
 
   const handleAddPost = async () => {
@@ -120,49 +132,14 @@ const AddPostScreen = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 24 }}
+      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 48 }}
       automaticallyAdjustKeyboardInsets={true}
       showsVerticalScrollIndicator={false}
       scrollEnabled={!submitLoading}
       ref={scrollViewRef}
     >
-      <View style={{ marginBottom: 4, paddingLeft: 12 }}>
-        <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
-          Add up to 5 images
-        </Text>
-      </View>
       <View style={{ marginBottom: 36 }}>
-        {images.length ? (
-          <ImageSwiper images={images} />
-        ) : (
-          <Pressable onPress={() => setCameraVisible(true)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-            <View
-              style={{
-                height: screenWidth,
-                width: screenWidth,
-                backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <MaterialIcons
-                  name="add-circle-outline"
-                  size={28}
-                  color={setLightOrDark(COLORS.lime[600], COLORS.lime[500])}
-                />
-                <Text lightColor={COLORS.zinc[700]} darkColor={COLORS.zinc[200]} style={{ fontSize: 20 }}>
-                  Add Images
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-        )}
-        {images.length ? (
-          <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 16 }}>
-            <Button variant="text" text="Edit Images" onPress={() => setCameraVisible(true)} />
-          </View>
-        ) : null}
+        <ImageSwiper images={images} />
       </View>
       <View style={{ marginBottom: 12, paddingLeft: 16 }}>
         <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
@@ -208,14 +185,6 @@ const AddPostScreen = () => {
           <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
         </View>
       </View>
-      <CameraModal
-        images={images}
-        setImages={setImages}
-        visible={cameraVisible}
-        setVisible={setCameraVisible}
-        maxImages={5}
-        hasNextButton
-      />
       <AiModal ref={aiModalRef} />
       <Modal visible={submitLoading} animationType="fade" withScroll={false} transparent={true} raw={true}>
         <View
@@ -242,6 +211,7 @@ const AddPostScreen = () => {
           </Text>
         </View>
       </Modal>
+      <DiscardPostModal ref={discardPostModalRef} onDiscard={handleDiscardPost} />
     </ScrollView>
   );
 };
@@ -267,16 +237,5 @@ const s = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     textDecorationLine: "none",
-  },
-  loadingContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10,
-    gap: 12,
   },
 });

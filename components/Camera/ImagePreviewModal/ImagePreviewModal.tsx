@@ -3,25 +3,24 @@ import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useCallback, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { Image as CropperImage } from "react-native-image-crop-picker";
 import { runOnJS } from "react-native-reanimated";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
 import { PhotoFile } from "react-native-vision-camera";
 
+import Button from "@/components/Button/Button";
+import DraggableImage from "@/components/Camera/DraggableImage/DraggableImage";
+import Modal from "@/components/Modal/Modal";
+import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
-import Button from "../Button/Button";
-import Modal from "../Modal/Modal";
-import Text from "../Text/Text";
-
-import DraggableImage from "./DraggableImage";
-
 type Props = {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  images: (PhotoFile | ImagePickerAsset)[];
-  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset)[]>>;
+  images: (PhotoFile | ImagePickerAsset | CropperImage)[];
+  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset | CropperImage)[]>>;
 };
 
 const ImagePreviewModal = ({ visible, setVisible, images, setImages }: Props) => {
@@ -60,7 +59,7 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages }: Props) =>
             style={{
               color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600],
               fontSize: 18,
-              fontWeight: "200",
+              fontWeight: "400",
               paddingLeft: 12,
             }}
           >

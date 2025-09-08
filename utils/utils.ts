@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ImagePickerAsset } from "expo-image-picker";
+import { Image } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { PostDetailed, ProfileDetails, PostImage, ProfileImage } from "@/types";
@@ -168,8 +169,17 @@ export const isProfileImage = (
   return image.hasOwnProperty("image") && image.hasOwnProperty("profile");
 };
 
-export const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage | ProfileImage) => {
+export const isCropperImage = (
+  image: PhotoFile | ImagePickerAsset | PostImage | ProfileImage | Image,
+): image is Image => {
+  // Determine if image is a PhotoFile
+  // PhotoFile has a path key, where ImagePickerAsset has a uri key
+  return image.hasOwnProperty("path") && !image.hasOwnProperty("isRawPhoto");
+};
+
+export const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage | ProfileImage | Image) => {
   // Return an image uri from a PhotoFile or ImagePickerAsset or PostImage
+  if (isCropperImage(image)) return image.path;
   // PhotoFile does not have a uri, it has a path that does not start with file://
   if (isPhotoFile(image)) return `file://${image.path}`;
   if (isPostImage(image)) return image.image;

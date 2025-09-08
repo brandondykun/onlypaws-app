@@ -30,6 +30,7 @@ const ProfileStack = () => {
       <Stack.Screen name="changeEmail" options={{ title: "Change Email" }} />
       <Stack.Screen name="verifyEmail" options={{ title: "Verify Email" }} />
       <Stack.Screen name="deleteProfile" options={{ title: "Delete Profile" }} />
+      <Stack.Screen name="profileImageCamera" options={{ title: "Profile Image Camera", headerShown: false }} />
     </Stack>
   );
 };

@@ -16,12 +16,11 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 
 type Props = {
-  setShowCamera: React.Dispatch<React.SetStateAction<boolean>>;
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal>;
   changeProfileModalRef: React.RefObject<RNBottomSheetModal>;
 };
 
-const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProfileModalRef }: Props) => {
+const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: Props) => {
   const { logOut } = useAuthUserContext();
   const { setLightOrDark } = useColorMode();
   const router = useRouter();
@@ -43,8 +42,8 @@ const ProfileOptionsModal = ({ setShowCamera, profileOptionsModalRef, changeProf
   };
 
   const handleEditProfileImagePress = () => {
-    setShowCamera(true);
     profileOptionsModalRef.current?.dismiss();
+    router.push("/(app)/profile/profileImageCamera");
   };
 
   const handleSwitchProfilePress = () => {
