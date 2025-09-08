@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { followProfile, unfollowProfile } from "@/api/profile";
@@ -108,12 +108,3 @@ const ProfileSearchScreen = () => {
 };
 
 export default ProfileSearchScreen;
-
-const s = StyleSheet.create({
-  modalSearchInput: {
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    fontSize: 16,
-  },
-});

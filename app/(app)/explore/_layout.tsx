@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { StyleSheet, View, Platform, Text } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
