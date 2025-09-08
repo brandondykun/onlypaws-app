@@ -23,7 +23,7 @@ type Props = {
   setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset | CropperImage)[]>>;
 };
 
-const ImagePreviewModal = ({ visible, setVisible, images, setImages }: Props) => {
+const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) => {
   const { isDarkMode } = useColorMode();
 
   const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
@@ -88,7 +88,7 @@ const ImagePreviewModal = ({ visible, setVisible, images, setImages }: Props) =>
   );
 };
 
-export default ImagePreviewModal;
+export default ReorderImageModal;
 
 const s = StyleSheet.create({
   header: {

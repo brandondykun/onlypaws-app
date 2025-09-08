@@ -7,7 +7,7 @@ import { View, Dimensions, StyleSheet, ScrollView, Pressable } from "react-nativ
 import ImagePicker from "react-native-image-crop-picker";
 
 import Button from "@/components/Button/Button";
-import ImagePreviewModal from "@/components/Camera/ImagePreviewModal/ImagePreviewModal";
+import ReorderImageModal from "@/components/Camera/ReorderImageModal/ReorderImageModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAddPostContext } from "@/context/AddPostContext";
@@ -135,7 +135,7 @@ const EditImages = () => {
           />
         </View>
       </View>
-      <ImagePreviewModal
+      <ReorderImageModal
         visible={imagePreviewModalVisible}
         setVisible={setImagePreviewModalVisible}
         images={images}
