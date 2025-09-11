@@ -66,6 +66,11 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
     profileOptionsModalRef.current?.dismiss();
   };
 
+  const handleAppFeedbackPress = () => {
+    router.push("/(app)/profile/feedback");
+    profileOptionsModalRef.current?.dismiss();
+  };
+
   return (
     <BottomSheetModal ref={profileOptionsModalRef} handleTitle="Profile Options" enableDynamicSizing snapPoints={[]}>
       <BottomSheetView style={s.root}>
@@ -136,8 +141,19 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
             <Text style={s.buttonText}>Edit Profile</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
-          <Pressable style={({ pressed }) => [pressed && s.pressed, s.linkButton]} onPress={handleAccountOptionsPress}>
+          <Pressable
+            style={({ pressed }) => [
+              pressed && s.pressed,
+              s.linkButton,
+              { borderBottomWidth: 1, borderBottomColor: BORDER_COLOR },
+            ]}
+            onPress={handleAccountOptionsPress}
+          >
             <Text style={s.buttonText}>Account Options</Text>
+            <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
+          </Pressable>
+          <Pressable style={({ pressed }) => [pressed && s.pressed, s.linkButton]} onPress={handleAppFeedbackPress}>
+            <Text style={s.buttonText}>App Feedback</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
         </View>

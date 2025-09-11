@@ -31,6 +31,9 @@ const ProfileStack = () => {
       <Stack.Screen name="verifyEmail" options={{ title: "Verify Email" }} />
       <Stack.Screen name="deleteProfile" options={{ title: "Delete Profile" }} />
       <Stack.Screen name="profileImageCamera" options={{ title: "Profile Image Camera", headerShown: false }} />
+      <Stack.Screen name="feedback/createFeedback" options={{ title: "New Feedback" }} />
+      <Stack.Screen name="feedback/index" options={{ title: "Feedback" }} />
+      <Stack.Screen name="feedback/[id]" options={{ title: "Details" }} />
     </Stack>
   );
 };
