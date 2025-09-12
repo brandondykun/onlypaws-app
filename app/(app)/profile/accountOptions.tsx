@@ -2,14 +2,12 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, TextStyle, View } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import { LabelAndText } from "./index";
 
 const ICON_SIZE = 36;
 
@@ -172,6 +170,32 @@ const AccountOptions = () => {
 
 export default AccountOptions;
 
+type LabelAndTextProps = {
+  label: string;
+  text: string | undefined | null;
+  placeholder?: string;
+};
+
+export const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProps) => {
+  const { setLightOrDark } = useColorMode();
+
+  return (
+    <View style={{ padding: 12 }}>
+      <Text style={s.label}>{label}</Text>
+      <Text
+        style={{
+          fontSize: text ? 20 : 18,
+          color: text ? setLightOrDark(COLORS.zinc[900], COLORS.zinc[100]) : COLORS.zinc[500],
+          fontStyle: text ? "normal" : "italic",
+          fontWeight: text ? (setLightOrDark("400", "300") as TextStyle["fontWeight"]) : "300",
+        }}
+      >
+        {text ? text : placeholder}
+      </Text>
+    </View>
+  );
+};
+
 const s = StyleSheet.create({
   root: {
     padding: 16,
@@ -181,5 +205,12 @@ const s = StyleSheet.create({
     fontSize: 14,
     marginBottom: 12,
     fontWeight: "500",
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: COLORS.zinc[500],
+    letterSpacing: 0.5,
+    paddingBottom: 4,
   },
 });

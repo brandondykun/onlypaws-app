@@ -11,6 +11,7 @@ import { ProfileImage as TProfileImage } from "@/types";
 
 import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
+import { COLORS } from "@/constants/Colors";
 
 type Props = {
   image: TProfileImage | PhotoFile | ImagePickerAsset | CropperImage | null;
@@ -19,7 +20,7 @@ type Props = {
 const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
   const [visible, setVisible] = useState(false);
 
-  const { isDarkMode } = useColorMode();
+  const { isDarkMode, setLightOrDark } = useColorMode();
 
   const screenWidth = Dimensions.get("window").width;
   const imageSize = screenWidth - screenWidth / 5;
@@ -35,7 +36,13 @@ const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
   return (
     <View>
       <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]} onPress={handleOpen}>
-        <View>
+        <View
+          style={{
+            borderColor: setLightOrDark(COLORS.sky[500], COLORS.sky[500]),
+            borderWidth: 4,
+            borderRadius: 100,
+          }}
+        >
           <ProfileImage image={image} size={size ? size : 100} />
         </View>
       </Pressable>

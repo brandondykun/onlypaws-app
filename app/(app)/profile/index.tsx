@@ -4,7 +4,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef } from "react";
 import React from "react";
-import { View, ScrollView, Pressable, StyleSheet, TextStyle } from "react-native";
+import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
 
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
@@ -14,6 +15,8 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const ProfileScreen = () => {
   const { user } = useAuthUserContext();
@@ -48,32 +51,81 @@ const ProfileScreen = () => {
     router.push("/(app)/profile/add");
   };
 
+  // Create a string of 'pet type • breed'
+  const toJoin = [];
+  if (authProfile.pet_type) toJoin.push(authProfile.pet_type.name);
+  if (authProfile.breed) toJoin.push(authProfile.breed);
+  const petDetailsText = toJoin.join(" • ");
+
   return (
     <>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight }}
+        contentContainerStyle={[s.scrollViewContent, { paddingBottom: tabBarHeight }]}
         showsVerticalScrollIndicator={false}
       >
-        <View>
-          <View style={{ marginBottom: 48, alignItems: "center" }}>
-            <ProfileDetailsHeaderImage image={authProfile.image} size={150} />
+        <View style={s.headerImageContainer}>
+          <View style={s.relativeImageWrapper}>
+            <ProfileDetailsHeaderImage image={authProfile.image} size={125} />
+            <Pressable
+              style={({ pressed }) => [s.editProfileImagePressable, { opacity: pressed ? 0.8 : 1 }]}
+              onPress={() => router.push("/(app)/profile/profileImageCamera")}
+              hitSlop={10}
+            >
+              <View style={s.editProfileImageButton}>
+                <MaterialCommunityIcons name="pencil-outline" size={20} color={COLORS.zinc[200]} />
+              </View>
+            </Pressable>
           </View>
-          <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]} style={s.sectionHeader}>
-            ACCOUNT DETAILS
+        </View>
+        <View style={s.headerTextContainer}>
+          <Text style={s.headerName}>{authProfile.name}</Text>
+          <Text style={s.headerUsername} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+            @{authProfile.username}
           </Text>
-          <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[925]) }]}>
-            <LabelAndText label="EMAIL" text={user.email} />
-            <LabelAndText label="USERNAME" text={authProfile.username} />
-          </View>
-          <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]} style={s.sectionHeader}>
-            PROFILE DETAILS
+          <Text style={s.headerBreed} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+            {petDetailsText}
           </Text>
-          <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[925]) }]}>
-            <LabelAndText label="NAME" text={authProfile.name} placeholder="No name entered" />
-            <LabelAndText label="PET TYPE" text={authProfile.pet_type?.name} placeholder="No pet type selected" />
-            <LabelAndText label="BREED" text={authProfile.breed} placeholder="No breed entered" />
-            <LabelAndText label="ABOUT" text={authProfile.about} placeholder="No about text" />
+        </View>
+        <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) }]}>
+          <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
+            Account
+          </Text>
+          <View style={s.accountItems}>
+            <View style={s.accountItemContainer}>
+              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]) }]}>
+                <Feather name="mail" size={20} color={setLightOrDark(COLORS.sky[500], COLORS.sky[500])} />
+              </View>
+              <View>
+                <Text style={s.accountItemTitle} darkColor={COLORS.zinc[200]} lightColor={COLORS.zinc[800]}>
+                  Email
+                </Text>
+                <Text style={{ fontSize: 16 }} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[800]}>
+                  {user.email}
+                </Text>
+              </View>
+            </View>
+            <View style={s.accountItemContainer}>
+              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]) }]}>
+                <Ionicons name="at" size={24} color={setLightOrDark(COLORS.sky[500], COLORS.sky[500])} />
+              </View>
+              <View>
+                <Text style={s.accountItemTitle} darkColor={COLORS.zinc[200]} lightColor={COLORS.zinc[800]}>
+                  Username
+                </Text>
+                <Text style={{ fontSize: 16 }} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[800]}>
+                  @{authProfile.username}
+                </Text>
+              </View>
+            </View>
           </View>
+        </View>
+        <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) }]}>
+          <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
+            About
+          </Text>
+          <Text style={s.aboutText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[800]}>
+            {authProfile.about ? authProfile.about : "No about text"}
+          </Text>
         </View>
       </ScrollView>
       <ProfileOptionsModal
@@ -87,39 +139,17 @@ const ProfileScreen = () => {
 
 export default ProfileScreen;
 
-type LabelAndTextProps = {
-  label: string;
-  text: string | undefined | null;
-  placeholder?: string;
-};
-
-export const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProps) => {
-  const { setLightOrDark } = useColorMode();
-
-  return (
-    <View style={{ padding: 12 }}>
-      <Text style={s.label}>{label}</Text>
-      <Text
-        style={{
-          fontSize: text ? 20 : 18,
-          color: text ? setLightOrDark(COLORS.zinc[900], COLORS.zinc[100]) : COLORS.zinc[500],
-          fontStyle: text ? "normal" : "italic",
-          fontWeight: text ? (setLightOrDark("400", "300") as TextStyle["fontWeight"]) : "300",
-        }}
-      >
-        {text ? text : placeholder}
-      </Text>
-    </View>
-  );
-};
-
 const s = StyleSheet.create({
-  label: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.zinc[500],
-    letterSpacing: 0.5,
-    paddingBottom: 4,
+  scrollViewContent: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  headerImageContainer: {
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  relativeImageWrapper: {
+    position: "relative",
   },
   sectionHeader: {
     fontSize: 14,
@@ -128,8 +158,73 @@ const s = StyleSheet.create({
     fontWeight: "500",
   },
   card: {
+    borderRadius: 12,
+    marginBottom: 16,
+    padding: 20,
+  },
+  editProfileImagePressable: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+  },
+  editProfileImageButton: {
+    position: "absolute",
+    bottom: 4,
+    right: -2,
+    backgroundColor: COLORS.sky[500],
+    borderRadius: 100,
+    height: 34,
+    width: 34,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 2,
+  },
+  headerTextContainer: {
+    marginBottom: 28,
+  },
+  headerName: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 2,
+  },
+  headerUsername: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  headerBreed: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  cardTitle: {
+    fontSize: 19,
+    fontWeight: "bold",
+    marginBottom: 18,
+  },
+  iconContainer: {
     borderRadius: 8,
-    marginBottom: 48,
-    padding: 6,
+    height: 45,
+    width: 45,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  accountItemTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 2,
+  },
+  aboutText: {
+    fontSize: 18,
+    fontWeight: "300",
+    lineHeight: 24,
+  },
+  accountItems: {
+    gap: 16,
+  },
+  accountItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
   },
 });
