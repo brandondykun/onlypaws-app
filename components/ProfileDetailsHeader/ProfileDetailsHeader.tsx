@@ -1,7 +1,8 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import React from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
@@ -35,24 +36,24 @@ const ProfileDetailsHeader = ({
   followLoading,
   profileError,
 }: Props) => {
-  const { isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
   const { authProfile } = useAuthProfileContext();
 
+  const router = useRouter();
+
   const followButtons = (
-    <View style={{ flexDirection: "row" }}>
+    <View style={{ flex: 1 }}>
       {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
         <Button
-          text="unfollow"
-          textStyle={{ fontSize: 14, color: isDarkMode ? COLORS.sky[500] : COLORS.sky[600] }}
-          buttonStyle={{
-            paddingHorizontal: 0,
-            height: 30,
-            width: 75,
-            borderColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[600],
-            borderRadius: 4,
-            marginRight: 4,
-            marginTop: 2,
-          }}
+          text="Unfollow"
+          textStyle={s.followButtonText}
+          buttonStyle={[
+            s.headerButton,
+            {
+              borderColor: setLightOrDark(COLORS.sky[600], COLORS.sky[700]),
+              backgroundColor: `${COLORS.sky[500]}1A`,
+            },
+          ]}
           variant="outline"
           onPress={() => handleUnfollowPress(profileData.id)}
           loading={followLoading}
@@ -61,17 +62,9 @@ const ProfileDetailsHeader = ({
         />
       ) : profileData && profileData?.id !== authProfile.id ? (
         <Button
-          text="follow"
-          textStyle={{ fontSize: 14 }}
-          buttonStyle={{
-            paddingHorizontal: 0,
-            height: 30,
-            width: 75,
-            backgroundColor: isDarkMode ? COLORS.sky[500] : COLORS.sky[500],
-            borderRadius: 4,
-            marginRight: 4,
-            marginTop: 2,
-          }}
+          text="Follow"
+          textStyle={s.followButtonText}
+          buttonStyle={[s.headerButton, { backgroundColor: COLORS.sky[500] }]}
           onPress={() => handleFollowPress(profileData)}
           loading={followLoading}
           loadingIconSize={12}
@@ -81,53 +74,67 @@ const ProfileDetailsHeader = ({
     </View>
   );
 
+  const selfProfileButtons = (
+    <>
+      <View style={{ flex: 1 }}>
+        <Button
+          text="Saved Posts"
+          textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
+          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+          onPress={() => router.push("/(app)/posts/savedPosts")}
+        />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Button
+          text="Edit Profile"
+          textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
+          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+          onPress={() => router.push("/(app)/profile/editProfile")}
+        />
+      </View>
+    </>
+  );
+
   if (profileError) return <ProfileErrorMessage />;
 
+  // Create a string of 'pet type • breed'
+  const toJoin = [];
+  if (profileData?.pet_type) toJoin.push(profileData?.pet_type.name);
+  if (profileData?.breed) toJoin.push(profileData.breed);
+  const petDetailsText = toJoin.join(" • ");
+
   return (
-    <View style={{ padding: 16, backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50] }}>
-      <View style={{ flexDirection: "row", gap: 12, marginBottom: 8 }}>
-        <View style={{ gap: 16, flex: 1 }}>
-          {!profileLoading ? (
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>{profileData?.name}</Text>
-              <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 16 }}>
-                {profileData?.breed}
-              </Text>
-              <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 16, marginBottom: 4 }}>
-                {profileData?.pet_type?.name}
-              </Text>
-            </View>
-          ) : (
-            <Text style={{ fontSize: 24, color: COLORS.zinc[500] }}>Loading...</Text>
-          )}
+    <View style={{ backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }}>
+      <View style={s.profileInfoContainer}>
+        <View style={s.profileImageContainer}>
+          <ProfileDetailsHeaderImage size={120} image={(!profileLoading && profileData?.image) || null} />
         </View>
-        <ProfileDetailsHeaderImage image={(!profileLoading && profileData?.image) || null} />
-      </View>
-      <View style={{ paddingVertical: 24, gap: 24 }}>
-        <Text
-          style={{ fontSize: 16, fontWeight: "300", marginBottom: 12 }}
-          darkColor={COLORS.zinc[300]}
-          lightColor={COLORS.zinc[900]}
-        >
+        <Text style={s.nameText}>{profileLoading ? "Loading..." : profileData?.name}</Text>
+        <Text style={s.aboutText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]}>
           {profileData?.about ? profileData.about : "No about text"}
         </Text>
-        {profileData && profileData.id !== authProfile.id ? followButtons : null}
+        <Text style={s.petDetailsText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
+          {petDetailsText}
+        </Text>
+        <View style={s.profileButtonsRoot}>
+          {profileData && profileData.id !== authProfile.id ? followButtons : selfProfileButtons}
+        </View>
       </View>
-      <View style={{ flexDirection: "row", paddingTop: 12 }}>
-        <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
-          <Text style={{ fontSize: 18 }}>{!profileLoading ? abbreviateNumber(postsCount) : "-"}</Text>
-          <Text style={{ fontSize: 12, color: COLORS.zinc[600] }}>POSTS</Text>
+      <View style={s.profileNumbersSection}>
+        <View style={s.profileNumberGroup}>
+          <Text style={s.profileNumber}>{!profileLoading ? abbreviateNumber(postsCount) : "-"}</Text>
+          <Text style={s.profileNumberLabel}>POSTS</Text>
         </View>
         <Pressable
           onPress={handleFollowersPress}
           style={({ pressed }) => [pressed && authProfile.id === profileData.id && { opacity: 0.6 }, { flex: 1 }]}
           android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
-          <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
-            <Text style={{ fontSize: 18 }}>
+          <View style={s.profileNumberGroup}>
+            <Text style={s.profileNumber}>
               {!profileLoading ? abbreviateNumber(profileData?.followers_count) : "-"}
             </Text>
-            <Text style={{ fontSize: 12, color: COLORS.zinc[600] }}>FOLLOWERS</Text>
+            <Text style={s.profileNumberLabel}>FOLLOWERS</Text>
           </View>
         </Pressable>
         <Pressable
@@ -135,11 +142,11 @@ const ProfileDetailsHeader = ({
           style={({ pressed }) => [pressed && authProfile.id === profileData.id && { opacity: 0.6 }, { flex: 1 }]}
           android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
-          <View style={{ gap: 4, flex: 1, alignItems: "center" }}>
-            <Text style={{ fontSize: 18 }}>
+          <View style={s.profileNumberGroup}>
+            <Text style={s.profileNumber}>
               {!profileLoading ? abbreviateNumber(profileData?.following_count) : "-"}
             </Text>
-            <Text style={{ fontSize: 12, color: COLORS.zinc[600] }}>FOLLOWING</Text>
+            <Text style={s.profileNumberLabel}>FOLLOWING</Text>
           </View>
         </Pressable>
       </View>
@@ -171,3 +178,72 @@ const ProfileErrorMessage = () => {
     </View>
   );
 };
+
+const s = StyleSheet.create({
+  profileImageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  profileInfoContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 4,
+  },
+  profileNumbersSection: {
+    flexDirection: "row",
+    paddingBottom: 12,
+  },
+  profileNumberGroup: {
+    gap: 4,
+    flex: 1,
+    alignItems: "center",
+  },
+  profileNumber: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  profileNumberLabel: {
+    fontSize: 13,
+    color: COLORS.zinc[500],
+  },
+  profileButtonsRoot: {
+    flexDirection: "row",
+    paddingBottom: 24,
+    gap: 12,
+  },
+  profileButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  headerButton: {
+    paddingHorizontal: 0,
+    height: 36,
+    borderRadius: 8,
+    marginTop: 2,
+  },
+  followButtonText: {
+    fontSize: 16,
+    color: COLORS.zinc[50],
+    fontWeight: "600",
+  },
+  aboutText: {
+    fontSize: 16,
+    fontWeight: "400",
+    marginBottom: 14,
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  petDetailsText: {
+    fontSize: 16,
+    fontWeight: "400",
+    textAlign: "center",
+    paddingBottom: 24,
+  },
+  nameText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+});

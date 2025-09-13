@@ -77,7 +77,7 @@ const ProfileDetails = ({
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: profileData ? profileData.username : "",
+      title: profileData ? `@${profileData.username}` : "",
       headerRight: () => {
         if (profileData?.id === authProfile.id) {
           // only show if user is looking at own profile
@@ -210,7 +210,7 @@ const ProfileDetails = ({
         numColumns={3}
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.1} // Trigger when 10% from the bottom
+        onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={!fetchNextLoading ? () => fetchNext() : null}
         ListEmptyComponent={emptyComponent}
         estimatedItemSize={screenWidth / 3}
