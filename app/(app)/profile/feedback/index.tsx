@@ -71,7 +71,7 @@ const FeedbackScreen = () => {
   let content = <ActivityIndicator />;
 
   // initial fetch error state
-  if (initialFetchComplete && !hasInitialFetchError) {
+  if (initialFetchComplete && hasInitialFetchError) {
     content = (
       <ErrorMessageWithRefresh refresh={refresh} errorText="There was an error fetching your feedback tickets" />
     );
@@ -98,7 +98,7 @@ const FeedbackScreen = () => {
   ) : null;
 
   // initial fetch complete and data state
-  if (initialFetchComplete && !hasInitialFetchError && data.length) {
+  if (initialFetchComplete && !hasInitialFetchError) {
     content = (
       <View>
         <FlashList
