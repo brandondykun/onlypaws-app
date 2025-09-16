@@ -35,9 +35,9 @@ const TextInput = forwardRef(
     const [focused, setFocused] = useState(false);
     const [textHidden, setTextHidden] = useState(secureTextEntry ? true : false);
 
-    const { isDarkMode } = useColorMode();
+    const { setLightOrDark } = useColorMode();
 
-    const focusedBorderColor = isDarkMode ? COLORS.zinc[50] : COLORS.zinc[950];
+    const focusedBorderColor = setLightOrDark(COLORS.zinc[600], COLORS.zinc[400]);
 
     const handleChangeText = (text: string) => {
       if (onChangeText) {
@@ -58,10 +58,9 @@ const TextInput = forwardRef(
             style={[
               s.label,
               {
-                backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[500],
+                color: setLightOrDark(COLORS.zinc[600], COLORS.zinc[400]),
               },
-              focused && { color: focusedBorderColor },
+              focused && { color: setLightOrDark(COLORS.zinc[950], COLORS.zinc[300]) },
               error ? { color: error ? COLORS.red[600] : COLORS.zinc[600] } : null,
             ]}
           >
@@ -73,13 +72,17 @@ const TextInput = forwardRef(
           <RNTextInput
             ref={ref}
             value={value}
-            placeholderTextColor={isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400]}
+            placeholderTextColor={setLightOrDark(COLORS.zinc[500], COLORS.zinc[600])}
             {...rest}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             style={[
               s.input,
-              { color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900] },
+              {
+                color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
+                backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+                borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+              },
               focused && { borderColor: focusedBorderColor },
               error ? { borderColor: COLORS.red[600] } : null,
               inputStyle,
@@ -96,7 +99,7 @@ const TextInput = forwardRef(
                   onPress={() => setTextHidden((prev) => !prev)}
                   testID="input-show-text-button"
                 >
-                  <Feather name="eye" size={20} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
+                  <Feather name="eye" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])} />
                 </Pressable>
               ) : (
                 <Pressable
@@ -104,7 +107,7 @@ const TextInput = forwardRef(
                   onPress={() => setTextHidden((prev) => !prev)}
                   testID="input-hide-text-button"
                 >
-                  <Feather name="eye-off" size={20} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
+                  <Feather name="eye-off" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])} />
                 </Pressable>
               )}
             </View>
@@ -119,9 +122,7 @@ const TextInput = forwardRef(
                 color:
                   maxLength && value && value.length >= maxLength
                     ? COLORS.red[500]
-                    : isDarkMode
-                      ? COLORS.zinc[300]
-                      : COLORS.zinc[800],
+                    : setLightOrDark(COLORS.zinc[800], COLORS.zinc[300]),
               }}
             >
               {value ? value.length : 0}/{maxLength}
@@ -142,25 +143,24 @@ const s = StyleSheet.create({
     paddingTop: 6,
   },
   label: {
-    // color: COLORS.zinc[600],
     width: "auto",
-    position: "absolute",
-    top: 0,
-    left: 15,
+    paddingLeft: 6,
     zIndex: 2,
     paddingHorizontal: 4,
-    fontSize: 12,
+    fontSize: 13,
+    marginBottom: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   labelError: {
     color: COLORS.red[600],
   },
   input: {
-    borderColor: COLORS.zinc[500],
     borderWidth: 1,
     fontSize: 18,
     paddingHorizontal: 8,
     paddingVertical: 10,
-    borderRadius: 4,
+    borderRadius: 8,
   },
   inputFocused: {
     borderColor: COLORS.zinc[950],
@@ -184,6 +184,7 @@ const s = StyleSheet.create({
     width: 40,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 2,
   },
   eyeIconContainer: {
     position: "absolute",

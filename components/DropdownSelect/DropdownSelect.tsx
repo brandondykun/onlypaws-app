@@ -21,7 +21,7 @@ type Props = {
 
 const DropdownSelect = forwardRef(
   ({ data, defaultText, label, ...props }: Props, ref: LegacyRef<SelectDropdown> | undefined) => {
-    const { isDarkMode } = useColorMode();
+    const { setLightOrDark } = useColorMode();
 
     return (
       <View style={{ marginVertical: 4, position: "relative" }}>
@@ -30,8 +30,8 @@ const DropdownSelect = forwardRef(
             style={[
               s.label,
               {
-                backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[500],
+                backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                color: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]),
               },
             ]}
           >
@@ -43,18 +43,26 @@ const DropdownSelect = forwardRef(
           data={data}
           renderButton={(selectedItem: DropdownSelectOption, isOpened) => {
             return (
-              <View style={s.dropdownButtonStyle}>
+              <View
+                style={[
+                  s.dropdownButtonStyle,
+                  {
+                    backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+                    borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+                  },
+                ]}
+              >
                 {selectedItem && selectedItem.title ? (
                   <Text style={{ flex: 1, fontSize: 18 }}>{selectedItem.title}</Text>
                 ) : (
-                  <Text style={{ flex: 1, fontSize: 18, color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[700] }}>
+                  <Text style={{ flex: 1, fontSize: 18, color: setLightOrDark(COLORS.zinc[700], COLORS.zinc[400]) }}>
                     {defaultText}
                   </Text>
                 )}
                 <Entypo
                   name={isOpened ? "chevron-up" : "chevron-down"}
                   size={24}
-                  color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]}
+                  color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])}
                 />
               </View>
             );
@@ -64,7 +72,7 @@ const DropdownSelect = forwardRef(
               <View
                 style={{
                   ...s.dropdownItemStyle,
-                  ...(isSelected && { backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300] }),
+                  ...(isSelected && { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[700]) }),
                 }}
               >
                 <Text style={s.dropdownItemTxtStyle}>{item.title}</Text>
@@ -72,7 +80,7 @@ const DropdownSelect = forwardRef(
             );
           }}
           showsVerticalScrollIndicator={false}
-          dropdownStyle={{ borderRadius: 8, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] }}
+          dropdownStyle={{ borderRadius: 8, backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]) }}
           {...props}
         />
       </View>
@@ -86,7 +94,7 @@ export default DropdownSelect;
 const s = StyleSheet.create({
   dropdownButtonStyle: {
     width: "100%",
-    borderRadius: 4,
+    borderRadius: 8,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -94,7 +102,6 @@ const s = StyleSheet.create({
     paddingVertical: 8,
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: COLORS.zinc[500],
   },
   dropdownItemStyle: {
     width: "100%",
@@ -110,11 +117,11 @@ const s = StyleSheet.create({
   },
   label: {
     width: "auto",
-    position: "absolute",
-    top: -6,
-    left: 15,
     zIndex: 2,
     paddingHorizontal: 4,
-    fontSize: 12,
+    fontSize: 13,
+    marginBottom: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 });
