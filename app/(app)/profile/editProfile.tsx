@@ -74,7 +74,10 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}>
+    <ScrollView
+      contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
+      automaticallyAdjustKeyboardInsets
+    >
       <View style={{ flexGrow: 1 }}>
         <View style={{ flexGrow: 1, paddingTop: 12, gap: 12 }}>
           <View>
