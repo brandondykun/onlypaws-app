@@ -54,7 +54,11 @@ const ChangeEmailScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 24 }]}>
+    <ScrollView
+      contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 24 }]}
+      automaticallyAdjustKeyboardInsets
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ marginBottom: 32, marginTop: 12, flex: 1, gap: 24 }}>
         <View>
           <Text style={{ fontSize: 20, fontWeight: "400", marginBottom: 24 }}>Please enter your new email.</Text>

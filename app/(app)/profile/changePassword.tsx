@@ -70,7 +70,11 @@ const ChangePasswordScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 24 }]}>
+    <ScrollView
+      contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 24 }]}
+      automaticallyAdjustKeyboardInsets
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ marginBottom: 32, marginTop: 12 }}>
         <Text style={{ fontSize: 18, fontWeight: "300" }}>
           Please enter your current password, and your new password twice to confirm.

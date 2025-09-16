@@ -82,11 +82,12 @@ const AddProfileScreen = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 18 }}
+      contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 36 }}
       automaticallyAdjustKeyboardInsets
+      showsVerticalScrollIndicator={false}
     >
-      <View style={{ flex: 1 }}>
-        <View style={{ paddingTop: 24, paddingBottom: 48, gap: 24 }}>
+      <View style={{ flex: 1, marginBottom: 36 }}>
+        <View style={{ paddingTop: 24, paddingBottom: 36, gap: 24 }}>
           <Text style={{ fontSize: 18, fontWeight: "300" }} darkColor={COLORS.zinc[100]}>
             Awesome, having multiple pets is the best!
           </Text>
