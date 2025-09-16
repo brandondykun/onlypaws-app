@@ -1,3 +1,6 @@
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -47,27 +50,45 @@ const EditUsernameScreen = () => {
   return (
     <ScrollView contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}>
       <View style={{ flex: 1 }}>
-        <View
-          style={{
-            marginBottom: 24,
-            padding: 12,
-            borderRadius: 8,
-            backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-            gap: 18,
-          }}
-        >
-          <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 18, fontWeight: "300" }}>
-            *Username must be unique among all profiles on OnlyPaws.
-          </Text>
-          <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 18, fontWeight: "300" }}>
-            *This is the username visible to other users.
-          </Text>
-          <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 18, fontWeight: "300" }}>
-            *Other users can search for your profile by this username.
-          </Text>
+        <TextInput
+          value={username}
+          onChangeText={(val) => setUsername(val)}
+          error={error}
+          autoCapitalize="none"
+          label="Username"
+        />
+        <View style={{ gap: 16, marginTop: 16 }}>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={{ marginTop: 6, width: 25, alignItems: "center" }}>
+              <FontAwesome5 name="check-circle" size={21} color={setLightOrDark(COLORS.sky[600], COLORS.sky[500])} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "300", lineHeight: 24 }}>
+                Username must be unique among all profiles on OnlyPaws.
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={{ marginTop: 4, width: 25, alignItems: "center" }}>
+              <Feather name="eye" size={23} color={setLightOrDark(COLORS.sky[600], COLORS.sky[500])} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "300", lineHeight: 24 }}>
+                This is the username visible to other users.
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={{ marginTop: 5, width: 25, alignItems: "center" }}>
+              <Ionicons name="search-sharp" size={23} color={setLightOrDark(COLORS.sky[600], COLORS.sky[500])} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "300", lineHeight: 24 }}>
+                Other users can search for your profile by this username.
+              </Text>
+            </View>
+          </View>
         </View>
-        <Text>Username</Text>
-        <TextInput value={username} onChangeText={(val) => setUsername(val)} error={error} autoCapitalize="none" />
       </View>
       <View style={{ marginTop: 36 }}>
         <Button
