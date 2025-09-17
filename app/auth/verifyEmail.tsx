@@ -73,7 +73,11 @@ const VerifyEmailScreen = () => {
 
   return (
     <SafeAreaView style={s.safeArea}>
-      <ScrollView contentContainerStyle={s.scrollRoot}>
+      <ScrollView
+        contentContainerStyle={s.scrollRoot}
+        automaticallyAdjustKeyboardInsets
+        showsVerticalScrollIndicator={false}
+      >
         <View style={{ marginBottom: 24 }}>
           <Text style={s.header} darkColor={COLORS.sky[400]} lightColor={COLORS.sky[600]}>
             Email Verification

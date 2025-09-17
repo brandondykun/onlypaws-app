@@ -96,7 +96,6 @@ export const requestEmailChange = async (newEmail: string) => {
     const res = await axiosInstance.post<ReqEmailChangeResponse>(url, {
       email: newEmail,
     });
-    console.log("requestEmailChange res: ", res);
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
@@ -117,7 +116,6 @@ export const verifyEmailChange = async (token: string) => {
     const res = await axiosInstance.post<VerifyEmailChangeResponse>(url, {
       token,
     });
-    console.log("verifyEmailChange res: ", res);
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
