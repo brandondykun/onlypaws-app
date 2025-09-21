@@ -79,6 +79,7 @@ const PostsStack = () => {
       <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackTitleVisible: false }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
       <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
+      <Stack.Screen name="notifications" options={{ title: "Notifications" }} />
     </Stack>
   );
 };

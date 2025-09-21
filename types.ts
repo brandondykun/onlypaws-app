@@ -322,3 +322,85 @@ export type FeedbackTicketComment = {
   is_internal: boolean;
   created_at: string;
 };
+
+// Types - matching Django model
+export type NotificationType = "like_post" | "like_comment" | "comment" | "follow" | "mention" | "system";
+
+// base type for notifications fetched from relational database
+export interface DBBaseNotification {
+  id: number;
+  created_at: string;
+  is_read: boolean;
+  message: string;
+  title: string;
+  recipient: Profile;
+}
+
+// base websocket notification type
+// all ws notifications will have these fields
+export interface WSBaseNotification {
+  id: number;
+  created_at: string;
+  message: string;
+  post_id: number;
+  comment_id: number;
+  sender_avatar: string | null;
+  sender_username: string;
+  title: string;
+  is_read: boolean;
+}
+
+// Extra data for post like notifications
+// same for ws notification and db fetched notifications
+export interface PostLikeExtraData {
+  liker_id: number;
+  liker_username: string;
+  post_caption: string;
+  post_id: number;
+  post_preview_image: string | null;
+}
+
+// Post Like types
+export interface DBPostLikeNotification extends DBBaseNotification {
+  post: number; // Related post
+  notification_type: "like_post";
+  comment: null;
+  sender: Profile;
+  extra_data: PostLikeExtraData; // Additional data as JSON
+}
+
+// Post like notification will have specific type and extra data
+export interface WSPostLikeNotification extends WSBaseNotification {
+  notification_type: "like_post";
+  extra_data: PostLikeExtraData;
+}
+
+// full websocket message type
+export interface WSPostLikeMessage {
+  notification: WSPostLikeNotification;
+  type: "notification";
+}
+
+// Paginated notifications response fetched from relational database
+export interface PaginatedNotificationsResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: DBNotification[];
+}
+
+export interface WSCommentLikeNotification extends WSBaseNotification {
+  notification_type: "like_comment";
+  extra_data: {
+    liker_id: number;
+    liker_username: string;
+    comment_text: string;
+  };
+}
+
+// Notification from relational database
+// the notifications can be of different types, but they will all have the same base fields
+export type DBNotification = DBPostLikeNotification;
+
+// Notification from websocket
+export type WSNotification = WSPostLikeNotification;
