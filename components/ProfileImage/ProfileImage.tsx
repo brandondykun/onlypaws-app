@@ -12,7 +12,7 @@ import { ProfileImage as ProfileImageType } from "@/types";
 import { getImageUri } from "@/utils/utils";
 
 type Props = {
-  image: ProfileImageType | PhotoFile | ImagePickerAsset | CropperImage | null;
+  image: ProfileImageType | PhotoFile | ImagePickerAsset | CropperImage | string | null;
   size: number;
   iconSize?: number;
 };
@@ -23,7 +23,13 @@ const ProfileImage = ({ image, iconSize, size }: Props) => {
   const iconHeight = iconSize ? iconSize : Math.round(size * 0.7);
   const imageSize = size ? size : 35;
 
-  const imageUri = image ? getImageUri(image) : null;
+  let imageUri = undefined;
+
+  if (typeof image === "string") {
+    imageUri = image;
+  } else if (image) {
+    imageUri = getImageUri(image);
+  }
 
   return (
     <>
