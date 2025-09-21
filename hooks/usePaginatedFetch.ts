@@ -5,6 +5,9 @@ import { axiosFetch } from "@/api/config";
 interface PaginatedResponse<T> {
   results: T[];
   next: string | null;
+  previous: string | null;
+  count: number;
+  extra_data?: Record<string, any>;
 }
 
 interface UsePaginatedFetchResult<T> {
@@ -18,6 +21,8 @@ interface UsePaginatedFetchResult<T> {
   hasFetchNextError: boolean;
   refresh: () => Promise<void>;
   refreshing: boolean;
+  totalCount: number;
+  extraData: Record<string, any> | null;
 }
 
 interface FetchOptions {
@@ -63,6 +68,8 @@ export function usePaginatedFetch<T>(
   const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
+  const [totalCount, setTotalCount] = useState(0); // total items in the paginated response, not just per page
+  const [extraData, setExtraData] = useState<any>(null); // extra data to be used for the paginated fetch
 
   // Add reset effect when initialFetchFn changes
   useEffect(() => {
@@ -83,6 +90,8 @@ export function usePaginatedFetch<T>(
     if (responseData && !error) {
       setData(responseData.results);
       setFetchNextUrl(responseData.next);
+      setTotalCount(responseData.count);
+      setExtraData(responseData?.extra_data ?? null);
     } else {
       setHasInitialFetchError(true);
     }
@@ -137,5 +146,7 @@ export function usePaginatedFetch<T>(
     hasFetchNextError,
     refresh,
     refreshing,
+    totalCount,
+    extraData,
   };
 }
