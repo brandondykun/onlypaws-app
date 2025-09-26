@@ -1,241 +1,195 @@
-import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useNavigation, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import LottieView from "lottie-react-native";
-import React, { useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Switch, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
+import { useIsFocused } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import { useRef, useState, useCallback } from "react";
+import React from "react";
+import { StyleSheet, View, ActivityIndicator, useWindowDimensions } from "react-native";
+import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-reanimated";
+import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
 
-import { createPost } from "@/api/post";
-import AiModal from "@/components/AiModal/AiModal";
-import Button from "@/components/Button/Button";
-import DiscardPostModal from "@/components/DiscardPostModal/DiscardPostModal";
-import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
-import Modal from "@/components/Modal/Modal";
-import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
+import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
+import CameraFooter from "@/components/Camera/CameraFooter/CameraFooter";
+import CameraHeader from "@/components/Camera/CameraHeader/CameraHeader";
+import FocusIcon from "@/components/Camera/FocusIcon/FocusIcon";
+import NoCameraDevice from "@/components/Camera/NoCameraDevice/NoCameraDevice";
+import RequestCameraPermission from "@/components/Camera/RequestCameraPermission/RequestCameraPermission";
 import { COLORS } from "@/constants/Colors";
 import { useAddPostContext } from "@/context/AddPostContext";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useColorMode } from "@/context/ColorModeContext";
-import { usePostsContext } from "@/context/PostsContext";
-import { getImageUri } from "@/utils/utils";
 
-const AddPostScreen = () => {
-  const router = useRouter();
-  const navigation = useNavigation();
-  const tabBarHeight = useBottomTabBarHeight();
-  const aiModalRef = useRef<RNBottomSheetModal>(null);
-  const discardPostModalRef = useRef<RNBottomSheetModal>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
+// Max images for a post
+const MAX_IMAGES = 5;
 
-  const { addPost } = usePostsContext();
-  const { authProfile, updatePostsCount } = useAuthProfileContext();
-  const { isDarkMode, setLightOrDark } = useColorMode();
-  const {
-    setImages,
-    setCaption,
-    setCaptionError,
-    setAiGenerated,
-    setSubmitLoading,
-    images,
-    caption,
-    aiGenerated,
-    submitLoading,
-    captionError,
-    resetState,
-  } = useAddPostContext();
+const CameraScreen = () => {
+  const { images, setImages, resetState } = useAddPostContext();
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
-  // add search button to header
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPressOut={() => discardPostModalRef.current?.present()}
-          variant="text"
-          text="Discard"
-          disabled={submitLoading}
-        />
-      ),
+  const [facing, setFacing] = useState<"back" | "front">("back");
+  const [focusPoint, setFocusPoint] = useState<Point | null>(null);
+  const [flash, setFlash] = useState<"on" | "off">("off");
+
+  const isFocused = useIsFocused();
+  const cameraRef = useRef<Camera>(null!);
+  const device = useCameraDevice(facing);
+
+  const onNextButtonPress = () => {
+    router.push("/(app)/add/editImages");
+  };
+
+  const takePicture = async () => {
+    if (cameraRef?.current) {
+      if (images.length < MAX_IMAGES) {
+        const newImage = await cameraRef.current.takePhoto({
+          flash: flash,
+        });
+        if (newImage) {
+          setImages((prev) => [newImage, ...prev]);
+        }
+      }
+    }
+  };
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      aspect: [1, 1],
+      quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: MAX_IMAGES - images.length, // limit the number of images that can be selected
     });
+
+    if (!result.canceled) {
+      setImages((prev) => [...result.assets, ...prev]);
+    }
+  };
+
+  // focus camera on point
+  const focus = useCallback(
+    (point: Point) => {
+      const c = cameraRef.current;
+      if (c == null) return;
+      // prevent tap on screen outside of image from triggering focus
+      const topLimit = (screenHeight - screenWidth) / 2;
+      const bottomLimit = (screenHeight - screenWidth) / 2 + screenWidth;
+      if (point.y < topLimit || point.y > bottomLimit) return;
+
+      setFocusPoint({ x: point.x, y: point.y });
+      c.focus(point)
+        .catch(() => {
+          // this is to avoid development error if focus is called multiple times quickly
+        })
+        .finally(() => {
+          setFocusPoint(null);
+        });
+    },
+    [screenHeight, screenWidth],
+  );
+
+  // handle tap to focus
+  const gesture = Gesture.Tap().onEnd(({ x, y }) => {
+    runOnJS(focus)({ x, y });
   });
 
-  // handle discard post from discard post modal
-  const handleDiscardPost = () => {
+  let content = (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator color={COLORS.zinc[500]} />
+    </View>
+  );
+
+  if (device == null) {
+    // No camera device found
+    content = <NoCameraDevice onBackButtonPress={() => router.back()} />;
+  }
+
+  if (!hasPermission) {
+    // Camera permissions are not granted yet.
+    content = <RequestCameraPermission requestPermission={requestPermission} />;
+  }
+
+  const toggleCameraFacing = () => {
+    setFacing((prev) => (prev === "back" ? "front" : "back"));
+  };
+
+  const toggleFlash = () => {
+    setFlash((prev) => (prev === "on" ? "off" : "on"));
+  };
+
+  const handleBackButtonPress = () => {
     resetState();
-    router.dismissAll();
     router.back();
   };
 
-  const handleAddPost = async () => {
-    setCaptionError("");
+  if (device && hasPermission && isFocused) {
+    const maxImagesReached = images.length === MAX_IMAGES;
 
-    let hasErrors = false;
-    if (!caption) {
-      setCaptionError("Please enter a caption.");
-      hasErrors = true;
-    }
+    content = (
+      <GestureHandlerRootView>
+        <View style={{ flex: 1, position: "relative" }}>
+          <CameraBackground />
 
-    if (images.length === 0) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please add at least one image.",
-      });
-      hasErrors = true;
-    }
+          {/* Top */}
+          <CameraHeader
+            handleBackButtonPress={handleBackButtonPress}
+            toggleFlash={toggleFlash}
+            flash={flash}
+            toggleCameraFacing={toggleCameraFacing}
+          />
 
-    if (hasErrors) return;
+          {/* Camera Square */}
 
-    const formData = new FormData();
-    formData.append("caption", caption);
-    formData.append("profileId", authProfile.id.toString());
-    formData.append("aiGenerated", aiGenerated.toString());
-
-    images.forEach((image, i) => {
-      formData.append("images", {
-        uri: getImageUri(image),
-        name: `image_${i}.jpeg`,
-        type: "image/jpeg",
-        mimeType: "multipart/form-data",
-      } as any);
-    });
-
-    setSubmitLoading(true);
-    const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
-    if (accessToken) {
-      const { error, data } = await createPost(formData, accessToken);
-      if (data && !error) {
-        addPost(data);
-        updatePostsCount("add", 1);
-        setCaption("");
-        setImages([]);
-        setAiGenerated(false);
-        router.replace("/(app)/posts");
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Post successfully created!",
-        });
-        scrollViewRef.current?.scrollTo({ y: 0, animated: false });
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error creating that post. Please try again.",
-        });
-      }
-    }
-    setSubmitLoading(false);
-  };
+          {/* Bottom */}
+          <CameraFooter
+            screenHeight={screenHeight}
+            screenWidth={screenWidth}
+            maxImagesReached={maxImagesReached}
+            MAX_IMAGES={MAX_IMAGES}
+            images={images}
+            pickImage={pickImage}
+            takePicture={takePicture}
+            onNextButtonPress={onNextButtonPress}
+          />
+          {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
+          <View style={[s.cameraContainer, { width: screenWidth, height: screenWidth }]}>
+            <GestureDetector gesture={gesture}>
+              <Camera
+                style={s.camera}
+                ref={cameraRef}
+                device={device}
+                isActive={isFocused}
+                photo={true}
+                enableZoomGesture={true}
+                resizeMode="cover"
+              />
+            </GestureDetector>
+          </View>
+        </View>
+      </GestureHandlerRootView>
+    );
+  }
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 48 }}
-      automaticallyAdjustKeyboardInsets={true}
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={!submitLoading}
-      ref={scrollViewRef}
-    >
-      <View style={{ marginBottom: 36 }}>
-        <ImageSwiper images={images} />
-      </View>
-      <View style={{ marginBottom: 12, paddingLeft: 16 }}>
-        <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
-          Add a caption
-        </Text>
-      </View>
-      <View style={{ padding: 16, paddingTop: 0, flex: 1 }}>
-        <View style={{ marginBottom: 36 }}>
-          <TextInput
-            value={caption}
-            onChangeText={setCaption}
-            label="Caption"
-            multiline={true}
-            numberOfLines={3}
-            error={captionError}
-            showCharCount
-            maxLength={128}
-            textAlignVertical="top"
-          />
-        </View>
-        <View style={s.aiGeneratedContainer}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "400" }}>Contains AI Generated Content</Text>
-            <Text
-              darkColor={COLORS.zinc[400]}
-              lightColor={COLORS.zinc[600]}
-              style={{ fontSize: 14, fontWeight: "400" }}
-            >
-              Please identify if this post contains AI generated content.{" "}
-              <Button
-                buttonStyle={s.learnMoreButton}
-                textStyle={[s.learnMoreButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[400]) }]}
-                variant="text"
-                text="Learn More"
-                onPress={() => aiModalRef.current?.present()}
-                hitSlop={10}
-              />
-            </Text>
-          </View>
-          <Switch value={aiGenerated} onValueChange={() => setAiGenerated((prev) => !prev)} />
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
-        </View>
-      </View>
-      <AiModal ref={aiModalRef} />
-      <Modal visible={submitLoading} animationType="fade" withScroll={false} transparent={true} raw={true}>
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.9)",
-          }}
-        />
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <View>
-            <LottieView
-              style={{ height: 150, width: 150 }}
-              source={require("../../../assets/animations/upload.json")}
-              autoPlay
-              loop
-            />
-          </View>
-          <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={{ fontSize: 26, fontWeight: "300" }}>
-            Uploading Post
-          </Text>
-        </View>
-      </Modal>
-      <DiscardPostModal ref={discardPostModalRef} onDiscard={handleDiscardPost} />
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <View style={s.contentContainer}>{content}</View>
+    </View>
   );
 };
 
-export default AddPostScreen;
+export default CameraScreen;
 
 const s = StyleSheet.create({
-  aiGeneratedContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 64,
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
   },
-  learnMoreButton: {
-    padding: 0,
-    margin: 0,
-    paddingTop: 0,
-    height: "auto",
-    marginBottom: -3,
+  cameraContainer: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: "hidden",
   },
-  learnMoreButtonText: {
-    fontSize: 14,
-    fontWeight: "400",
-    textDecorationLine: "none",
+  camera: {
+    position: "relative",
+    flex: 1,
   },
 });

@@ -20,11 +20,10 @@ const AddStack = () => {
           },
           headerShadowVisible: false,
         }}
-        initialRouteName="cameraScreen"
       >
-        <Stack.Screen name="index" options={{ title: "Add Post" }} />
+        <Stack.Screen name="index" options={{ title: "Camera", headerShown: false }} />
         <Stack.Screen name="editImages" options={{ title: "Edit Images" }} />
-        <Stack.Screen name="cameraScreen" options={{ title: "Camera", headerShown: false }} />
+        <Stack.Screen name="upload" options={{ title: "Add Post" }} />
       </Stack>
     </AddPostContextProvider>
   );

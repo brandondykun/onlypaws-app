@@ -1,9 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { View, Dimensions, StyleSheet, ScrollView, Pressable } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Dimensions, StyleSheet, ScrollView, Pressable, Animated } from "react-native";
 import ImagePicker from "react-native-image-crop-picker";
 
 import Button from "@/components/Button/Button";
@@ -14,10 +13,28 @@ import { useAddPostContext } from "@/context/AddPostContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { getImageUri } from "@/utils/utils";
 
+// Animated Image Component with smooth scaling
+const AnimatedImageWithScale = ({ source, style, pressed }: { source: any; style: any; pressed: boolean }) => {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  React.useEffect(() => {
+    Animated.timing(scaleValue, {
+      toValue: pressed ? 0.95 : 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [pressed, scaleValue]);
+
+  return (
+    <Animated.View style={[style, { transform: [{ scale: scaleValue }] }]}>
+      <Image source={source} style={style} />
+    </Animated.View>
+  );
+};
+
 const EditImages = () => {
   const { setLightOrDark } = useColorMode();
   const { images, setImages } = useAddPostContext();
-  const tabBarHeight = useBottomTabBarHeight();
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -27,12 +44,20 @@ const EditImages = () => {
     setImages((prev) => prev.filter((image) => getImageUri(image) !== uri));
   };
 
+  // if user removes all images, go back to camera screen
+  useEffect(() => {
+    if (images.length === 0) {
+      router.back();
+    }
+  }, [images]);
+
   const handleImagePress = (uri: string) => {
     ImagePicker.openCropper({
       path: uri,
-      width: 400,
-      height: 400,
+      width: 1080,
+      height: 1080,
       mediaType: "photo",
+      compressImageQuality: 1,
     })
       .then((croppedImage) => {
         setImages((prev) => {
@@ -45,13 +70,13 @@ const EditImages = () => {
         });
       })
       .catch((error) => {
-        console.log(error);
+        console.log("Crop Error: ", error);
       });
   };
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 24 }}
+      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: 24 }}
       automaticallyAdjustKeyboardInsets={true}
       showsVerticalScrollIndicator={false}
     >
@@ -59,69 +84,106 @@ const EditImages = () => {
         <Text style={s.tapText} lightColor={COLORS.zinc[900]} darkColor={COLORS.zinc[100]}>
           Tap to Crop
         </Text>
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 12, height: screenWidth * 0.8 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ flexGrow: 0, marginTop: 24 }}
-        >
-          {images.map((image) => {
-            return (
-              <Pressable
-                style={[
-                  s.imageContainer,
-                  {
-                    width: screenWidth * 0.8,
-                    height: screenWidth * 0.8,
-                  },
-                ]}
-                key={getImageUri(image)}
-                onPress={() => handleImagePress(getImageUri(image))}
-              >
-                {({ pressed }) => (
-                  <>
-                    <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(image))}>
-                      <Ionicons name="close-outline" size={20} color="black" />
-                    </Pressable>
-                    <Image
-                      source={{ uri: getImageUri(image) }}
-                      style={[
-                        {
+        {images.length > 1 ? (
+          <ScrollView
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              gap: 12,
+              height: screenWidth * 0.8,
+            }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ flexGrow: 0, marginTop: 24 }}
+          >
+            {images.map((image) => {
+              return (
+                <Pressable
+                  style={[
+                    s.imageContainer,
+                    {
+                      width: screenWidth * 0.8,
+                      height: screenWidth * 0.8,
+                    },
+                  ]}
+                  key={getImageUri(image)}
+                  onPress={() => handleImagePress(getImageUri(image))}
+                >
+                  {({ pressed }) => (
+                    <>
+                      <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(image))}>
+                        <Ionicons name="close-outline" size={20} color="black" />
+                      </Pressable>
+                      <AnimatedImageWithScale
+                        source={{ uri: getImageUri(image) }}
+                        style={{
                           borderRadius: 6,
                           width: screenWidth * 0.8,
                           height: screenWidth * 0.8,
-                        },
-                        {
-                          transform: [{ scale: pressed ? 0.95 : 1 }],
-                        },
-                      ]}
-                    />
-                  </>
-                )}
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-        <View style={{ flex: 1, padding: 16, justifyContent: "center", alignItems: "center" }}>
-          <Pressable
-            onPress={() => setImagePreviewModalVisible(true)}
-            style={[
-              s.reorderButton,
-              {
-                backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
-              },
-            ]}
-          >
-            <Ionicons name="swap-horizontal" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[50])} />
-            <Text style={{ color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[50]), fontSize: 10, fontWeight: "600" }}>
-              Reorder
-            </Text>
-          </Pressable>
+                        }}
+                        pressed={pressed}
+                      />
+                    </>
+                  )}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        ) : images.length === 1 ? (
+          <View style={{ alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+            <Pressable
+              style={[
+                s.imageContainer,
+                {
+                  width: screenWidth * 0.8,
+                  height: screenWidth * 0.8,
+                },
+              ]}
+              key={getImageUri(images[0])}
+              onPress={() => handleImagePress(getImageUri(images[0]))}
+            >
+              {({ pressed }) => (
+                <>
+                  <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(images[0]))}>
+                    <Ionicons name="close-outline" size={20} color="black" />
+                  </Pressable>
+                  <AnimatedImageWithScale
+                    source={{ uri: getImageUri(images[0]) }}
+                    style={{
+                      borderRadius: 6,
+                      width: screenWidth * 0.8,
+                      height: screenWidth * 0.8,
+                    }}
+                    pressed={pressed}
+                  />
+                </>
+              )}
+            </Pressable>
+          </View>
+        ) : null}
+        <View style={{ padding: 16, justifyContent: "center", alignItems: "center", paddingTop: 48 }}>
+          {images.length > 1 ? (
+            <Pressable
+              onPress={() => setImagePreviewModalVisible(true)}
+              style={[
+                s.reorderButton,
+                {
+                  backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+                },
+              ]}
+            >
+              <Ionicons name="swap-horizontal" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[50])} />
+              <Text
+                style={{ color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[50]), fontSize: 10, fontWeight: "600" }}
+              >
+                Reorder
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
         <View style={s.nextButtonContainer}>
           <Button
             text="Next"
-            onPress={() => router.push("/(app)/add/")}
+            onPress={() => router.push("/(app)/add/upload")}
             textStyle={{ color: COLORS.sky[50], fontSize: 14, fontWeight: "600" }}
             buttonStyle={{
               paddingLeft: 12,
@@ -132,6 +194,7 @@ const EditImages = () => {
             }}
             icon={<Ionicons name="chevron-forward-outline" size={16} color={COLORS.sky[50]} />}
             iconPosition="right"
+            disabled={images.length === 0}
           />
         </View>
       </View>
@@ -170,8 +233,10 @@ const s = StyleSheet.create({
   nextButtonContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
+    alignItems: "flex-end",
     paddingHorizontal: 24,
     paddingBottom: 24,
+    flex: 1,
   },
   reorderButton: {
     alignItems: "center",
