@@ -60,7 +60,6 @@
     "react-native-svg": "15.2.0",
     "react-native-toast-message": "^2.2.1",
     "react-native-uuid": "^2.0.3",
-    "react-native-view-more-text": "^2.2.0",
     "react-native-vision-camera": "^4.6.1",
     "react-native-web": "~0.19.13"
   },

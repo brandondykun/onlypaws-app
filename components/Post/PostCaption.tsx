@@ -1,34 +1,114 @@
-import { Pressable, View } from "react-native";
-import ViewMoreText from "react-native-view-more-text";
-
-import { COLORS } from "@/constants/Colors";
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, StyleSheet, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 import Text from "../Text/Text";
+import { COLORS } from "@/constants/Colors";
 
 type Props = {
   caption: string;
+  numberOfLines?: number;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  moreTextStyle?: StyleProp<TextStyle>;
+  lessTextStyle?: StyleProp<TextStyle>;
 };
 
-const PostCaption = ({ caption }: Props) => {
+const PostCaption = ({ caption, numberOfLines = 1, style, textStyle, moreTextStyle, lessTextStyle }: Props) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showMoreButton, setShowMoreButton] = useState(false);
+  const [fullTextHeight, setFullTextHeight] = useState(0);
+  const [truncatedTextHeight, setTruncatedTextHeight] = useState(0);
+
+  // Check if text needs truncation by measuring both full and truncated text
+  const onFullTextLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setFullTextHeight(height);
+  };
+
+  const onTruncatedTextLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setTruncatedTextHeight(height);
+  };
+
+  // Show "more" button if full text is taller than truncated text
+  useEffect(() => {
+    if (fullTextHeight > 0 && truncatedTextHeight > 0) {
+      setShowMoreButton(fullTextHeight > truncatedTextHeight);
+    }
+  }, [fullTextHeight, truncatedTextHeight]);
+
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  if (!caption || caption.trim() === "") {
+    return null;
+  }
+
   return (
-    <View style={{ paddingHorizontal: 8, paddingTop: 18 }}>
-      <ViewMoreText
-        numberOfLines={1}
-        renderViewMore={(onPress) => (
-          <Pressable onPress={onPress} hitSlop={15} style={{ width: 80 }}>
-            <Text style={{ color: COLORS.zinc[500] }}>view more</Text>
-          </Pressable>
-        )}
-        renderViewLess={(onPress) => (
-          <Pressable onPress={onPress} hitSlop={15} style={{ width: 80 }}>
-            <Text style={{ color: COLORS.zinc[500] }}>view less</Text>
-          </Pressable>
-        )}
-      >
-        <Text>{caption}</Text>
-      </ViewMoreText>
+    <View style={[styles.container, style]}>
+      {/* Hidden text to measure full height */}
+      <Text style={[styles.hiddenText, textStyle]} onLayout={onFullTextLayout}>
+        {caption}
+      </Text>
+
+      {/* Hidden truncated text to measure truncated height */}
+      <Text style={[styles.hiddenText, textStyle]} numberOfLines={numberOfLines} onLayout={onTruncatedTextLayout}>
+        {caption}
+      </Text>
+
+      {/* Visible text - pressable to expand/collapse */}
+      <TouchableOpacity onPress={toggleExpansion} activeOpacity={0.8} style={styles.textTouchable}>
+        <Text style={[styles.text, textStyle]} numberOfLines={isExpanded ? 0 : numberOfLines}>
+          {caption}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Show more/less button */}
+      {showMoreButton && (
+        <TouchableOpacity
+          onPress={toggleExpansion}
+          style={styles.moreButton}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Text style={[styles.moreText, isExpanded ? lessTextStyle : moreTextStyle]}>
+            {isExpanded ? "show less" : "view more"}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
 export default PostCaption;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 8,
+    paddingTop: 12,
+  },
+  hiddenText: {
+    position: "absolute",
+    opacity: 0,
+    zIndex: -1,
+    left: 8,
+    right: 8,
+  },
+  textTouchable: {
+    alignSelf: "flex-start",
+  },
+  text: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  moreButton: {
+    marginTop: 4,
+    alignSelf: "flex-start",
+  },
+  moreText: {
+    fontSize: 14,
+    color: COLORS.zinc[500],
+    fontWeight: "500",
+  },
+});
