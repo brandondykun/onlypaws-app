@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import { ForwardedRef, forwardRef, useRef, useState } from "react";
 import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
@@ -173,6 +174,24 @@ const PostMenu = forwardRef(
             >
               {postProfileId === authProfile.id ? (
                 <>
+                  <Pressable
+                    style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+                    onPress={() => {
+                      router.push(`/(app)/posts/editPost?postId=${postId}`);
+                      if (typeof ref === "object") {
+                        ref?.current?.dismiss();
+                      }
+                    }}
+                  >
+                    <View
+                      style={[
+                        s.profileOption,
+                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                      ]}
+                    >
+                      <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Post</Text>
+                    </View>
+                  </Pressable>
                   <Pressable
                     style={({ pressed }) => [
                       pressed && !deleteLoading ? { opacity: 0.5 } : deleteLoading ? { opacity: 0.5 } : null,

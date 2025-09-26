@@ -112,6 +112,7 @@ const TabsComponent = () => {
             headerShown: false,
             tabBarBadge: notificationsCountFormatted,
             tabBarBadgeStyle: { fontSize: 12 },
+            tabBarStyle: segment[2] === "editPost" ? { display: "none" } : s.tabBarStyle,
           }}
         />
         <Tabs.Screen

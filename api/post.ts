@@ -10,7 +10,7 @@ import {
   SavedPost,
 } from "../types";
 
-import { axiosFetch, axiosPost, axiosDelete } from "./config";
+import { axiosFetch, axiosPost, axiosDelete, axiosPatch } from "./config";
 
 export const getProfilePosts = async (profileId: string | number) => {
   const url = `/v1/profile/${profileId}/posts/`;
@@ -26,6 +26,11 @@ export const createPost = async (postData: FormData, accessToken: string) => {
   };
   const url = "/v1/post/";
   return await axiosPost<PostDetailed>(url, postData, config);
+};
+
+export const updatePost = async (postId: number, caption: string) => {
+  const url = `/v1/post/${postId}`;
+  return await axiosPatch<PostDetailed>(url, { caption: caption });
 };
 
 export const deletePost = async (postId: number) => {
