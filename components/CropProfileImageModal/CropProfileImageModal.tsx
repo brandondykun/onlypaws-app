@@ -41,9 +41,10 @@ const CropProfileImageModal = ({ visible, setVisible, image, setImage, onSave, s
   const handleImagePress = (uri: string) => {
     ImageCropPicker.openCropper({
       path: uri,
-      width: 400,
-      height: 400,
+      width: 1080,
+      height: 1080,
       mediaType: "photo",
+      compressImageQuality: 1,
     })
       .then((croppedImage) => {
         setCropHistoryStack((prev) => [...prev, image as ImageCropPicker.Image | ImagePickerAsset | PhotoFile]);
@@ -106,10 +107,10 @@ const CropProfileImageModal = ({ visible, setVisible, image, setImage, onSave, s
         </View>
         <View style={[{ paddingBottom: insets.bottom + 24 }, s.bottomButtonsContainer]}>
           <View style={s.buttonContainer}>
-            <Button text="Save" onPress={onSave} />
+            <Button text="Cancel" buttonStyle={s.cancelButton} onPress={handleCancelPress} />
           </View>
           <View style={s.buttonContainer}>
-            <Button text="Cancel" buttonStyle={s.cancelButton} onPress={handleCancelPress} />
+            <Button text="Save" onPress={onSave} />
           </View>
         </View>
       </View>
