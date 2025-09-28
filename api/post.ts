@@ -110,3 +110,8 @@ export const deleteCommentLike = async (commentId: number, authProfileId: number
   const url = `/v1/comment/${commentId}/like/${authProfileId}/`;
   return await axiosDelete(url);
 };
+
+export const deletePostImage = async (id: number | string) => {
+  const url = `/v1/post/image/${id}/`;
+  return await axiosDelete(url);
+};

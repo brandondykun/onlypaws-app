@@ -21,6 +21,8 @@ type PostContextType = {
   initialFetchComplete: boolean;
   hasInitialFetchError: boolean;
   addToCommentCount: (postId: number) => void;
+  removeImageFromPost: (postId: number, imageId: number) => void;
+  updatePost: (postId: number, data: PostDetailed) => void;
 };
 
 const PostsContext = createContext<PostContextType>({
@@ -37,6 +39,8 @@ const PostsContext = createContext<PostContextType>({
   initialFetchComplete: false,
   hasInitialFetchError: false,
   addToCommentCount: (postId: number) => {},
+  removeImageFromPost: (postId: number, imageId: number) => {},
+  updatePost: (postId: number, data: PostDetailed) => {},
 });
 
 type Props = {
@@ -91,6 +95,28 @@ const PostsContextProvider = ({ children }: Props) => {
     );
   };
 
+  const removeImageFromPost = (postId: number, imageId: number) => {
+    setData((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          return { ...post, images: post.images.filter((image) => image.id !== imageId) };
+        }
+        return post;
+      }),
+    );
+  };
+
+  const updatePost = (postId: number, data: PostDetailed) => {
+    setData((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          return { ...data };
+        }
+        return post;
+      }),
+    );
+  };
+
   const value = {
     data,
     addPost,
@@ -105,6 +131,8 @@ const PostsContextProvider = ({ children }: Props) => {
     initialFetchComplete,
     hasInitialFetchError,
     addToCommentCount,
+    removeImageFromPost,
+    updatePost,
   };
 
   return <PostsContext.Provider value={value}>{children}</PostsContext.Provider>;
@@ -127,6 +155,8 @@ export const usePostsContext = () => {
     initialFetchComplete,
     hasInitialFetchError,
     addToCommentCount,
+    removeImageFromPost,
+    updatePost,
   } = useContext(PostsContext);
   return {
     data,
@@ -142,5 +172,7 @@ export const usePostsContext = () => {
     initialFetchComplete,
     hasInitialFetchError,
     addToCommentCount,
+    removeImageFromPost,
+    updatePost,
   };
 };

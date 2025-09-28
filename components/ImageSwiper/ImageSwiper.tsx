@@ -4,7 +4,7 @@ import { View, Dimensions, StyleSheet } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
-import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
+import Carousel, { CarouselRenderItem, ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
@@ -16,6 +16,7 @@ import ImageLoader from "../ImageLoader/ImageLoader";
 
 type Props = {
   images: PostImage[] | (PhotoFile | ImagePickerAsset | CropperImage)[];
+  renderItem?: CarouselRenderItem<PostImage | PhotoFile | ImagePickerAsset | CropperImage>;
 };
 
 const { width } = Dimensions.get("window");
@@ -29,10 +30,14 @@ const { width } = Dimensions.get("window");
 //   activeDotStyle={{ backgroundColor: setLightOrDark(COLORS.sky[500], COLORS.sky[600]), borderRadius: 50 }}
 // />
 
-const ImageSwiper = ({ images }: Props) => {
+const ImageSwiper = ({ images, renderItem }: Props) => {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const { setLightOrDark } = useColorMode();
+
+  const defaultRenderItem = ({ item }: { item: PostImage | PhotoFile | ImagePickerAsset | CropperImage }) => {
+    return <ImageLoader uri={getImageUri(item)} height={width} width={width} style={styles.image} />;
+  };
 
   return (
     <View style={{ width: width }}>
@@ -42,8 +47,8 @@ const ImageSwiper = ({ images }: Props) => {
         height={width}
         data={images}
         onProgressChange={progress}
-        renderItem={({ item }) => {
-          return <ImageLoader uri={getImageUri(item)} height={width} width={width} style={styles.image} />;
+        renderItem={(info) => {
+          return renderItem ? renderItem(info) : defaultRenderItem({ item: info.item });
         }}
         loop={false}
         onConfigurePanGesture={(panGesture: PanGesture) => {
