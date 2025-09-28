@@ -301,18 +301,18 @@ const PostMenu = forwardRef(
             <View style={{ flexDirection: "row", gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Button
-                  text="Delete"
-                  buttonStyle={{ backgroundColor: COLORS.red[500] }}
-                  onPress={handlePostDelete}
-                  loading={deleteLoading}
-                  testID="delete-post-button"
+                  text="Cancel"
+                  onPress={() => confirmDeleteModalRef.current?.dismiss()}
+                  disabled={deleteLoading}
                 />
               </View>
               <View style={{ flex: 1 }}>
                 <Button
-                  text="Cancel"
-                  onPress={() => confirmDeleteModalRef.current?.dismiss()}
-                  disabled={deleteLoading}
+                  text="Delete"
+                  buttonStyle={{ backgroundColor: COLORS.red[600] }}
+                  onPress={handlePostDelete}
+                  loading={deleteLoading}
+                  testID="delete-post-button"
                 />
               </View>
             </View>
