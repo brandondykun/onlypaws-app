@@ -1,26 +1,24 @@
 import { Stack } from "expo-router";
-import { StyleSheet, View, Platform } from "react-native";
+import { View } from "react-native";
 
-import TextInput from "@/components/TextInput/TextInput";
+import HeaderSearchInput from "@/components/HeaderSearchInput/HeaderSearchInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 
-const platform = Platform.OS;
-
 const ExploreStack = () => {
-  const { isDarkMode } = useColorMode();
   const search = useProfileSearchContext();
+  const { setLightOrDark } = useColorMode();
 
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
         },
-        headerTintColor: isDarkMode ? COLORS.zinc[50] : COLORS.zinc[950],
+        headerTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
         contentStyle: {
-          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
         },
         headerShadowVisible: false,
       }}
@@ -34,16 +32,11 @@ const ExploreStack = () => {
           headerTitle: () => {
             return (
               <View style={{ flexGrow: 1 }}>
-                <TextInput
-                  inputStyle={[s.modalSearchInput, { width: Platform.OS === "ios" ? "80%" : "70%" }]}
-                  returnKeyType="search"
+                <HeaderSearchInput
                   value={search.searchText}
                   onChangeText={search.setSearchText}
                   onSubmitEditing={search.search}
                   placeholder="Search profiles..."
-                  autoFocus={true}
-                  autoCapitalize="none"
-                  autoCorrect={false}
                 />
               </View>
             );
@@ -58,14 +51,3 @@ const ExploreStack = () => {
 };
 
 export default ExploreStack;
-
-const s = StyleSheet.create({
-  modalSearchInput: {
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    fontSize: 16,
-    height: 35,
-    marginTop: platform === "android" ? 4 : 0,
-  },
-});

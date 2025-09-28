@@ -1,27 +1,23 @@
 import { Stack } from "expo-router";
-import { Platform, StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-import TextInput from "@/components/TextInput/TextInput";
+import HeaderSearchInput from "@/components/HeaderSearchInput/HeaderSearchInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
 import { useColorMode } from "@/context/ColorModeContext";
 
 const PostsStack = () => {
-  const { isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
   const followingCtx = useAuthProfileFollowingContext();
   const followersCtx = useAuthProfileFollowersContext();
 
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-        },
-        headerTintColor: isDarkMode ? COLORS.zinc[50] : COLORS.zinc[950],
-        contentStyle: {
-          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-        },
+        headerStyle: { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) },
+        headerTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+        contentStyle: { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) },
         headerShadowVisible: false,
       }}
     >
@@ -35,16 +31,11 @@ const PostsStack = () => {
           headerTitle: () => {
             return (
               <View style={{ flexGrow: 1 }}>
-                <TextInput
-                  inputStyle={[s.modalSearchInput, { width: Platform.OS === "ios" ? "80%" : "70%" }]}
-                  returnKeyType="search"
+                <HeaderSearchInput
                   value={followersCtx.searchText}
                   onChangeText={(text) => followersCtx.setSearchText(text)}
                   onSubmitEditing={followersCtx.searchProfiles}
                   placeholder="Search followers..."
-                  autoFocus={true}
-                  autoCapitalize="none"
-                  autoCorrect={false}
                 />
               </View>
             );
@@ -59,16 +50,11 @@ const PostsStack = () => {
           headerTitle: () => {
             return (
               <View style={{ flexGrow: 1 }}>
-                <TextInput
-                  inputStyle={[s.modalSearchInput, { width: Platform.OS === "ios" ? "80%" : "70%" }]}
-                  returnKeyType="search"
+                <HeaderSearchInput
                   value={followingCtx.searchText}
                   onChangeText={(text) => followingCtx.setSearchText(text)}
                   onSubmitEditing={followingCtx.searchProfiles}
                   placeholder="Search following..."
-                  autoFocus={true}
-                  autoCapitalize="none"
-                  autoCorrect={false}
                 />
               </View>
             );
@@ -86,14 +72,3 @@ const PostsStack = () => {
 };
 
 export default PostsStack;
-
-const s = StyleSheet.create({
-  modalSearchInput: {
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    fontSize: 16,
-    height: 35,
-    marginTop: Platform.OS === "android" ? 4 : 0,
-  },
-});

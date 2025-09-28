@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation, useRouter } from "expo-router";
@@ -20,7 +21,7 @@ const ExploreScreen = () => {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const { isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
 
   const {
@@ -44,13 +45,14 @@ const ExploreScreen = () => {
             buttonStyle={[
               s.headerSearchButton,
               {
-                backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                borderColor: isDarkMode ? COLORS.zinc[600] : COLORS.zinc[400],
+                backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]),
+                borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
               },
             ]}
             textStyle={s.headerSearchButtonFont}
             onPressOut={() => router.push("/(app)/explore/profileSearch")}
             text="Search profiles..."
+            icon={<Ionicons name="search-outline" size={18} color={COLORS.zinc[500]} />}
           />
         </View>
       ),
@@ -133,16 +135,15 @@ export default ExploreScreen;
 const s = StyleSheet.create({
   headerSearchButton: {
     borderRadius: 100,
-    width: screenWidth - 50,
+    width: screenWidth - 32,
     borderWidth: 1,
     flex: 1,
     justifyContent: "flex-start",
-    paddingLeft: 9,
-    height: 35,
+    paddingLeft: 16,
+    height: 40,
   },
   headerSearchButtonFont: {
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.zinc[500],
-    textAlign: "left",
   },
 });
