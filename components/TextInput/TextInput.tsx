@@ -1,5 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
-import { useState, forwardRef, LegacyRef } from "react";
+import { useState, forwardRef, LegacyRef, useEffect, useRef } from "react";
 import {
   TextInput as RNTextInput,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
   StyleProp,
   TextStyle,
   Pressable,
+  ViewStyle,
+  Animated,
 } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -25,19 +27,69 @@ type Props = {
   maxLength?: number;
   onChangeText: ((text: string) => void) | undefined;
   secureTextEntry?: boolean;
+  withClearButton?: boolean;
+  rootStyle?: StyleProp<ViewStyle>;
 } & TextInputProps;
 
 const TextInput = forwardRef(
   (
-    { value, label, error, inputStyle, icon, showCharCount, maxLength, onChangeText, secureTextEntry, ...rest }: Props,
+    {
+      value,
+      label,
+      error,
+      inputStyle,
+      icon,
+      showCharCount,
+      maxLength,
+      onChangeText,
+      secureTextEntry,
+      rootStyle,
+      withClearButton = false,
+      ...rest
+    }: Props,
     ref: LegacyRef<RNTextInput> | undefined,
   ) => {
     const [focused, setFocused] = useState(false);
     const [textHidden, setTextHidden] = useState(secureTextEntry ? true : false);
 
+    // Animated value for clear button position
+    const clearButtonTranslateX = useRef(new Animated.Value(withClearButton && value ? 0 : 40)).current;
+
     const { setLightOrDark } = useColorMode();
 
     const focusedBorderColor = setLightOrDark(COLORS.zinc[600], COLORS.zinc[400]);
+
+    // Animate clear button based on input value
+    useEffect(() => {
+      if (withClearButton) {
+        const shouldShow = value && value.length > 0;
+
+        if (shouldShow) {
+          // Spring in animation - snappy and responsive
+          Animated.spring(clearButtonTranslateX, {
+            toValue: 0,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }).start();
+        } else {
+          // Spring out animation - first pull left, then spring out right
+          Animated.sequence([
+            Animated.timing(clearButtonTranslateX, {
+              toValue: -5, // Pull slightly to the left first
+              duration: 80,
+              useNativeDriver: true,
+            }),
+            Animated.spring(clearButtonTranslateX, {
+              toValue: 40, // Then spring out to the right (slower)
+              tension: 60,
+              friction: 10,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }
+      }
+    }, [value, withClearButton, clearButtonTranslateX]);
 
     const handleChangeText = (text: string) => {
       if (onChangeText) {
@@ -51,8 +103,15 @@ const TextInput = forwardRef(
       }
     };
 
+    // handle clear button press
+    const handleClear = () => {
+      if (onChangeText) {
+        onChangeText("");
+      }
+    };
+
     return (
-      <View style={s.root}>
+      <View style={[s.root, rootStyle]}>
         {label ? (
           <Text
             style={[
@@ -67,8 +126,30 @@ const TextInput = forwardRef(
             {label}
           </Text>
         ) : null}
-        <View style={{ position: "relative" }}>
+        <View style={{ position: "relative", overflow: "hidden" }}>
           {icon ? <View style={s.icon}>{icon}</View> : null}
+          {withClearButton ? (
+            <Animated.View
+              style={[
+                s.clearButtonContainer,
+                {
+                  transform: [{ translateX: clearButtonTranslateX }],
+                },
+              ]}
+            >
+              <Pressable
+                style={({ pressed }) => [
+                  s.clearButton,
+                  { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) },
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={handleClear}
+                testID="input-clear-button"
+              >
+                <Feather name="x" size={18} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])} />
+              </Pressable>
+            </Animated.View>
+          ) : null}
           <RNTextInput
             ref={ref}
             value={value}
@@ -87,6 +168,7 @@ const TextInput = forwardRef(
               error ? { borderColor: COLORS.red[600] } : null,
               inputStyle,
               icon ? { paddingLeft: 40 } : null,
+              withClearButton ? { paddingRight: 40 } : null,
             ]}
             onChangeText={handleChangeText}
             secureTextEntry={textHidden}
@@ -194,5 +276,19 @@ const s = StyleSheet.create({
     width: 40,
     justifyContent: "center",
     alignItems: "center",
+  },
+  clearButton: {
+    borderRadius: 100,
+    padding: 4,
+  },
+  clearButtonContainer: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 3,
   },
 });
