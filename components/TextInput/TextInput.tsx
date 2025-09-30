@@ -93,13 +93,7 @@ const TextInput = forwardRef(
 
     const handleChangeText = (text: string) => {
       if (onChangeText) {
-        if (maxLength) {
-          if (text.length <= maxLength) {
-            onChangeText(text);
-          }
-        } else {
-          onChangeText(text);
-        }
+        onChangeText(text);
       }
     };
 
@@ -157,6 +151,7 @@ const TextInput = forwardRef(
             {...rest}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
+            maxLength={maxLength}
             style={[
               s.input,
               {
