@@ -10,6 +10,8 @@ import {
   Pressable,
   ViewStyle,
   Animated,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -104,6 +106,18 @@ const TextInput = forwardRef(
       }
     };
 
+    // handle local focus for styling and any onFocus action passed as prop
+    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setFocused(true);
+      rest.onFocus && rest.onFocus(e);
+    };
+
+    // handle local blur for styling and any onBlur action passed as prop
+    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setFocused(false);
+      rest.onBlur && rest.onBlur(e);
+    };
+
     return (
       <View style={[s.root, rootStyle]}>
         {label ? (
@@ -149,8 +163,8 @@ const TextInput = forwardRef(
             value={value}
             placeholderTextColor={setLightOrDark(COLORS.zinc[500], COLORS.zinc[600])}
             {...rest}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             maxLength={maxLength}
             style={[
               s.input,
