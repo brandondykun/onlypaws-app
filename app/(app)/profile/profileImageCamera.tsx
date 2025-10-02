@@ -38,6 +38,7 @@ const ProfileImageCamera = () => {
   const [flash, setFlash] = useState<"on" | "off">("off");
   const [cropModalVisible, setCropModalVisible] = useState(false);
   const [saveImageLoading, setSaveImageLoading] = useState(false);
+  const [imageChangeLoading, setImageChangeLoading] = useState(false);
 
   const isFocused = useIsFocused();
   const cameraRef = useRef<Camera>(null!);
@@ -45,6 +46,7 @@ const ProfileImageCamera = () => {
 
   const takePicture = async () => {
     if (cameraRef?.current) {
+      setImageChangeLoading(true);
       const newImage = await cameraRef.current.takePhoto({
         flash: flash,
       });
@@ -52,12 +54,14 @@ const ProfileImageCamera = () => {
         setImage(newImage);
         setCropModalVisible(true);
       }
+      setImageChangeLoading(false);
     }
   };
 
   // handle choosing image from camera roll
   const handlePickImage = async () => {
     // No permissions request is necessary for launching the image library
+    setImageChangeLoading(true);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [1, 1],
@@ -66,9 +70,15 @@ const ProfileImageCamera = () => {
       selectionLimit: 1, // limit the number of images that can be selected
     });
 
+    if (result.canceled) {
+      setImageChangeLoading(false);
+      return;
+    }
+
     if (!result.canceled) {
       setImage(result.assets[0]);
       setCropModalVisible(true);
+      setImageChangeLoading(false);
     }
   };
 
@@ -213,6 +223,7 @@ const ProfileImageCamera = () => {
             pickImage={handlePickImage}
             takePicture={takePicture}
             onNextButtonPress={undefined} // don't have a next button for profile image (only one image)
+            imageChangeLoading={imageChangeLoading}
           />
           {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
           <View style={[s.cameraContainer, { width: screenWidth, height: screenWidth }]}>

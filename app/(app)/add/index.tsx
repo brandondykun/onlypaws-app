@@ -28,6 +28,7 @@ const CameraScreen = () => {
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [flash, setFlash] = useState<"on" | "off">("off");
+  const [imageChangeLoading, setImageChangeLoading] = useState(false);
 
   const isFocused = useIsFocused();
   const cameraRef = useRef<Camera>(null!);
@@ -40,18 +41,21 @@ const CameraScreen = () => {
   const takePicture = async () => {
     if (cameraRef?.current) {
       if (images.length < MAX_IMAGES) {
+        setImageChangeLoading(true);
         const newImage = await cameraRef.current.takePhoto({
           flash: flash,
         });
         if (newImage) {
           setImages((prev) => [newImage, ...prev]);
         }
+        setImageChangeLoading(false);
       }
     }
   };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
+    setImageChangeLoading(true);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [1, 1],
@@ -60,8 +64,14 @@ const CameraScreen = () => {
       selectionLimit: MAX_IMAGES - images.length, // limit the number of images that can be selected
     });
 
+    if (result.canceled) {
+      setImageChangeLoading(false);
+      return;
+    }
+
     if (!result.canceled) {
       setImages((prev) => [...result.assets, ...prev]);
+      setImageChangeLoading(false);
     }
   };
 
@@ -149,6 +159,7 @@ const CameraScreen = () => {
             pickImage={pickImage}
             takePicture={takePicture}
             onNextButtonPress={onNextButtonPress}
+            imageChangeLoading={imageChangeLoading}
           />
           {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
           <View style={[s.cameraContainer, { width: screenWidth, height: screenWidth }]}>

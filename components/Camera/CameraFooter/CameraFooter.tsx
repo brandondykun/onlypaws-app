@@ -2,7 +2,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
-import { View, Pressable, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Pressable, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -21,6 +21,7 @@ type Props = {
   pickImage: () => void;
   takePicture: () => void;
   onNextButtonPress?: () => void;
+  imageChangeLoading: boolean; // loading state for image change when image is loading after being taken or picked from camera roll
 };
 
 const CameraFooter = ({
@@ -32,6 +33,7 @@ const CameraFooter = ({
   pickImage,
   takePicture,
   onNextButtonPress,
+  imageChangeLoading,
 }: Props) => {
   const { setLightOrDark } = useColorMode();
 
@@ -77,6 +79,9 @@ const CameraFooter = ({
           </TouchableOpacity>
         </View>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          {!images.length && imageChangeLoading ? (
+            <ActivityIndicator size="small" color={COLORS.zinc[500]} testID="image-change-loading-spinner" />
+          ) : null}
           {images.length && onNextButtonPress ? (
             <Pressable
               style={({ pressed }) => [pressed && { opacity: 0.6 }, { paddingLeft: 24 }]}
