@@ -77,6 +77,11 @@ const AddPostScreen = () => {
       hasErrors = true;
     }
 
+    if (caption.trim().length > 1000) {
+      setCaptionError("Caption exceeds 1000 character limit.");
+      hasErrors = true;
+    }
+
     if (images.length === 0) {
       Toast.show({
         type: "error",
@@ -89,7 +94,7 @@ const AddPostScreen = () => {
     if (hasErrors) return;
 
     const formData = new FormData();
-    formData.append("caption", caption);
+    formData.append("caption", caption.trim());
     formData.append("profileId", authProfile.id.toString());
     formData.append("aiGenerated", aiGenerated.toString());
 
@@ -131,6 +136,13 @@ const AddPostScreen = () => {
     setSubmitLoading(false);
   };
 
+  // handle caption text input focus
+  const handleFocus = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd();
+    }, 10);
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 48 }}
@@ -157,8 +169,9 @@ const AddPostScreen = () => {
             numberOfLines={3}
             error={captionError}
             showCharCount
-            maxLength={128}
+            maxLength={1000}
             textAlignVertical="top"
+            onFocus={handleFocus}
           />
         </View>
         <View style={s.aiGeneratedContainer}>

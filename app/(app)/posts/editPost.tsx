@@ -27,7 +27,6 @@ const EditPost = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  const textInputRef = useRef<RNTextInput>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const confirmDeleteModalRef = useRef<RNBottomSheetModal>(null);
 
@@ -42,25 +41,26 @@ const EditPost = () => {
   const [imageToDelete, setImageToDelete] = useState<PostImage | null>(null);
   const [imageDeleteLoading, setImageDeleteLoading] = useState(false);
 
-  // focus input and bring up keyboard when screen loads
-  useEffect(() => {
-    if (textInputRef.current) {
-      textInputRef.current.focus();
-    }
-  }, [textInputRef]);
-
   // scroll down when screen loads so the text input is totally visible
+  // also auto scrolls as the user types
   useEffect(() => {
     if (scrollViewRef.current && textInputHeight > 0) {
       setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ x: 0, y: textInputHeight + 24, animated: true });
-      }, 100);
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 10);
     }
   }, [scrollViewRef, textInputHeight]);
 
   // handle updating post with api call and in local state
   const handleUpdate = useCallback(async () => {
     if (postToEdit) {
+      // if no Post changes were made, go back
+      if (caption.trim() === postToEdit.caption) {
+        router.back();
+        return;
+      }
+
+      // if Post changes were made, update the post
       setUpdateLoading(true);
       const { error, data } = await updatePostApi(postToEdit.id, caption);
       if (data && !error) {
@@ -129,6 +129,9 @@ const EditPost = () => {
     setImageDeleteLoading(false);
   };
 
+  // make the caption length color red if it is at max allowed length
+  const captionLengthColor = caption.length >= 1000 ? COLORS.red[500] : COLORS.zinc[500];
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: 24 }}
@@ -159,13 +162,19 @@ const EditPost = () => {
             }}
           />
           <RNTextInput
-            ref={textInputRef}
             value={caption}
             onChangeText={(text) => setCaption(text)}
             multiline
-            numberOfLines={3}
+            numberOfLines={undefined}
+            maxLength={1000}
             textAlignVertical="top"
             editable={!updateLoading}
+            scrollEnabled={false}
+            onFocus={() => {
+              setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+              }, 30);
+            }}
             onLayout={(event) => {
               const { height } = event.nativeEvent.layout;
               setTextInputHeight(height);
@@ -176,6 +185,7 @@ const EditPost = () => {
               color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
             }}
           />
+          <Text style={[s.captionLength, { color: captionLengthColor }]}>{caption.length}/1000</Text>
         </View>
       ) : null}
 
@@ -249,5 +259,11 @@ const s = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 48,
     paddingHorizontal: 16,
+  },
+  captionLength: {
+    fontSize: 12,
+    textAlign: "right",
+    paddingRight: 16,
+    paddingTop: 8,
   },
 });

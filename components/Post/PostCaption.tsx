@@ -5,6 +5,8 @@ import Text from "../Text/Text";
 import { COLORS } from "@/constants/Colors";
 
 type Props = {
+  isExpanded: boolean;
+  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
   caption: string;
   numberOfLines?: number;
   style?: StyleProp<ViewStyle>;
@@ -13,8 +15,16 @@ type Props = {
   lessTextStyle?: StyleProp<TextStyle>;
 };
 
-const PostCaption = ({ caption, numberOfLines = 1, style, textStyle, moreTextStyle, lessTextStyle }: Props) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const PostCaption = ({
+  caption,
+  numberOfLines = 2,
+  style,
+  textStyle,
+  moreTextStyle,
+  lessTextStyle,
+  isExpanded,
+  setIsExpanded,
+}: Props) => {
   const [showMoreButton, setShowMoreButton] = useState(false);
   const [fullTextHeight, setFullTextHeight] = useState(0);
   const [truncatedTextHeight, setTruncatedTextHeight] = useState(0);
@@ -46,20 +56,25 @@ const PostCaption = ({ caption, numberOfLines = 1, style, textStyle, moreTextSty
   }
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[s.container, style]}>
       {/* Hidden text to measure full height */}
-      <Text style={[styles.hiddenText, textStyle]} onLayout={onFullTextLayout}>
+      <Text style={[s.hiddenText, textStyle]} onLayout={onFullTextLayout}>
         {caption}
       </Text>
 
       {/* Hidden truncated text to measure truncated height */}
-      <Text style={[styles.hiddenText, textStyle]} numberOfLines={numberOfLines} onLayout={onTruncatedTextLayout}>
+      <Text
+        style={[s.hiddenText, textStyle]}
+        numberOfLines={numberOfLines}
+        onLayout={onTruncatedTextLayout}
+        testID="post-caption-hidden-text"
+      >
         {caption}
       </Text>
 
       {/* Visible text - pressable to expand/collapse */}
-      <TouchableOpacity onPress={toggleExpansion} activeOpacity={0.8} style={styles.textTouchable}>
-        <Text style={[styles.text, textStyle]} numberOfLines={isExpanded ? 0 : numberOfLines}>
+      <TouchableOpacity onPress={toggleExpansion} activeOpacity={0.8} style={s.textTouchable}>
+        <Text style={[s.text, textStyle]} numberOfLines={isExpanded ? 0 : numberOfLines}>
           {caption}
         </Text>
       </TouchableOpacity>
@@ -68,11 +83,12 @@ const PostCaption = ({ caption, numberOfLines = 1, style, textStyle, moreTextSty
       {showMoreButton && (
         <TouchableOpacity
           onPress={toggleExpansion}
-          style={styles.moreButton}
+          style={s.moreButton}
           activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          testID="post-caption-more-button"
         >
-          <Text style={[styles.moreText, isExpanded ? lessTextStyle : moreTextStyle]}>
+          <Text style={[s.moreText, isExpanded ? lessTextStyle : moreTextStyle]}>
             {isExpanded ? "show less" : "view more"}
           </Text>
         </TouchableOpacity>
@@ -83,7 +99,7 @@ const PostCaption = ({ caption, numberOfLines = 1, style, textStyle, moreTextSty
 
 export default PostCaption;
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: {
     paddingHorizontal: 8,
     paddingTop: 12,

@@ -38,6 +38,7 @@ type Props = {
 const Post = ({ post, onProfilePress }: Props) => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [captionIsExpanded, setCaptionIsExpanded] = useState(false);
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const screenWidth = Dimensions.get("window").width;
@@ -278,7 +279,7 @@ const Post = ({ post, onProfilePress }: Props) => {
         </GestureHandlerRootView>
       </View>
 
-      <View>
+      <View style={{ paddingBottom: captionIsExpanded ? 24 : 0 }}>
         <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8 }}>
           <View style={{ minWidth: 35 }}>
             <Pressable
@@ -372,7 +373,7 @@ const Post = ({ post, onProfilePress }: Props) => {
             ) : null}
           </View>
         </View>
-        <PostCaption caption={post.caption} />
+        <PostCaption isExpanded={captionIsExpanded} setIsExpanded={setCaptionIsExpanded} caption={post.caption} />
         <View style={{ paddingLeft: 8, paddingTop: 6 }}>
           <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 13 }}>
             {getTimeSince(post.created_at)}
