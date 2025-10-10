@@ -1,14 +1,15 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { OtpInputRef } from "react-native-otp-entry";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { verifyEmail, resendVerifyEmail } from "@/api/auth";
 import Button from "@/components/Button/Button";
+import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -17,10 +18,10 @@ const VerifyEmailScreen = () => {
   const { user, updateEmailVerified } = useAuthUserContext();
 
   const router = useRouter();
+  const otpInputRef = useRef<OtpInputRef>(null);
 
   const { setLightOrDark } = useColorMode();
-
-  const [verifyCode, setVerifyCode] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
@@ -28,11 +29,11 @@ const VerifyEmailScreen = () => {
   const [resendError, setResendError] = useState("");
 
   const handleSubmit = async () => {
-    if (verifyCode.length < 6) return;
+    if (otpCode.length < 6) return;
     setSubmitLoading(true);
     setSubmitError("");
 
-    const { error, status } = await verifyEmail(verifyCode);
+    const { error, status } = await verifyEmail(otpCode);
     if (!error && status === 200) {
       updateEmailVerified(true);
       router.replace("/(app)/(index)");
@@ -42,6 +43,7 @@ const VerifyEmailScreen = () => {
         text2: "Email verified. Welcome to OnlyPaws!",
         visibilityTime: 7000,
       });
+      otpInputRef.current?.clear();
     } else if (error) {
       setSubmitError(error);
     }
@@ -53,7 +55,8 @@ const VerifyEmailScreen = () => {
     setResendLoading(true);
     setResendError("");
     setSubmitError("");
-    setVerifyCode("");
+    setOtpCode("");
+    otpInputRef.current?.clear();
 
     if (user.id) {
       const { error, status } = await resendVerifyEmail(user.id);
@@ -100,21 +103,16 @@ const VerifyEmailScreen = () => {
           </Text>
         </View>
         <View style={s.inputContainer}>
-          <TextInput
-            value={verifyCode}
-            onChangeText={setVerifyCode}
-            label="Verification Code"
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect={false}
-          />
-          <Button text="Verify" onPress={handleSubmit} disabled={verifyCode.length < 6} loading={submitLoading} />
+          <OtpInput ref={otpInputRef} setOtpCode={setOtpCode} />
+          <View style={{ marginHorizontal: 36, marginTop: 24 }}>
+            <Button text="Submit" onPress={handleSubmit} disabled={otpCode.length < 6} loading={submitLoading} />
+          </View>
         </View>
         <View style={s.errorTextContainer}>
-          <Text darkColor={COLORS.red[500]} style={[s.errorText, { marginBottom: 12 }]}>
+          <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={[s.errorText, { marginBottom: 12 }]}>
             {submitError}
           </Text>
-          <Text darkColor={COLORS.red[500]} style={s.errorText}>
+          <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={s.errorText}>
             {resendError}
           </Text>
         </View>

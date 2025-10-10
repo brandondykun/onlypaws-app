@@ -1,12 +1,14 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { OtpInputRef } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { resetPassword } from "@/api/auth";
 import Button from "@/components/Button/Button";
+import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
@@ -18,6 +20,8 @@ const ResetPasswordScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { email } = useLocalSearchParams<{ email: string }>();
+
+  const otpInputRef = useRef<OtpInputRef>(null);
 
   const [confirmationCode, setConfirmationCode] = useState("");
   const [confirmationCodeError, setConfirmationCodeError] = useState("");
@@ -120,24 +124,19 @@ const ResetPasswordScreen = () => {
           lightColor={COLORS.zinc[700]}
           style={{ fontSize: 16, textAlign: "center", fontWeight: "300" }}
         >
-          Please enter the confirmation code and new password below.
+          Please enter the confirmation code.
         </Text>
         <View style={s.inputsContainer}>
-          <TextInput
-            label="Confirmation Code"
-            value={confirmationCode}
-            onChangeText={setConfirmationCode}
-            error={confirmationCodeError}
-            placeholder="ABC214"
-            icon={
-              <Ionicons
-                name="shield-checkmark-sharp"
-                size={20}
-                color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])}
-              />
-            }
-            autoCapitalize="none"
-          />
+          <View style={{ marginBottom: 24 }}>
+            <OtpInput
+              ref={otpInputRef}
+              setOtpCode={(val) => {
+                setConfirmationCodeError("");
+                setConfirmationCode(val);
+              }}
+              error={confirmationCodeError}
+            />
+          </View>
           <TextInput
             label="New Password"
             value={newPassword}
