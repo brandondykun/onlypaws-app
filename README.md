@@ -17,6 +17,7 @@ _The unapologetically pet friendly social media app._
 4. [Running Dev Client During Testing](#run-dev-client-during-testing)
 5. [Running Tests](#running-tests)
 6. [Creating EAS Development Build](#creating-eas-development-build)
+7. [Linting](#linting)
 
 ---
 
@@ -60,4 +61,10 @@ maestro studio
 ### Creating EAS Development Build
 ```bash
 eas build --profile development --platform ios --message "With react content loader."
+```
+
+### Linting
+To run linting on a specific file and automatically fix the errors, run the following command:
+```bash
+npx eslint path/to/file.tsx --fix
 ```
