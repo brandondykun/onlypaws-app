@@ -107,9 +107,9 @@ const ResetPasswordScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root}>
+    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets showsVerticalScrollIndicator={false}>
       <View style={{ flex: 1 }}>
-        <View style={{ alignItems: "center", marginBottom: 24 }}>
+        <View style={{ alignItems: "center", marginBottom: 8 }}>
           <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
         </View>
         <Text
@@ -159,7 +159,7 @@ const ResetPasswordScreen = () => {
           />
         </View>
 
-        <Button text="Reset Password" onPress={handleSubmit} loading={loading} testID="reset-password-button" />
+        <Button text="Submit" onPress={handleSubmit} loading={loading} testID="reset-password-button" />
 
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
           <Button text="Back" variant="text" onPress={() => router.back()} />
@@ -179,6 +179,7 @@ const s = StyleSheet.create({
   },
   inputsContainer: {
     gap: 8,
-    marginVertical: 24,
+    marginTop: 12,
+    marginBottom: 36,
   },
 });

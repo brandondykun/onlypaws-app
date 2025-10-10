@@ -129,7 +129,7 @@ const RegisterScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets>
+    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets showsVerticalScrollIndicator={false}>
       <View style={{ alignItems: "center" }}>
         <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
       </View>

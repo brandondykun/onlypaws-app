@@ -81,15 +81,15 @@ const VerifyEmailScreen = () => {
         automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ marginBottom: 24 }}>
-          <Text style={s.header} darkColor={COLORS.sky[400]} lightColor={COLORS.sky[600]}>
+        <View style={{ marginBottom: 12 }}>
+          <Text style={s.header} darkColor={COLORS.sky[400]} lightColor={COLORS.sky[500]}>
             Email Verification
           </Text>
           <View style={s.shieldIconContainer}>
             <Ionicons
               name="shield-checkmark-sharp"
-              size={64}
-              color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[200])}
+              size={54}
+              color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[200])}
             />
           </View>
           <Text style={s.subHeader} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]}>

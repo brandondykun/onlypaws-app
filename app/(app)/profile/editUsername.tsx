@@ -69,6 +69,8 @@ const EditUsernameScreen = () => {
           error={error}
           autoCapitalize="none"
           label="Username"
+          autoCorrect={false}
+          autoComplete="off"
         />
         <View style={{ gap: 16, marginTop: 16 }}>
           <View style={{ flexDirection: "row", gap: 8 }}>
