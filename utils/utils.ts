@@ -202,3 +202,20 @@ export const getReadableFeedbackType = (type: FeedbackTicketType): string => {
   if (type === "general") return "General Feedback";
   return "General Feedback";
 };
+
+// Verify a username is valid - naive verification for the front end
+export const verifyUsername = (username: string) => {
+  if (username.length < 3) {
+    return "Username must be at least 3 characters.";
+  }
+
+  if (username.length > 30) {
+    return "Username must be less than 30 characters.";
+  }
+
+  if (username.includes(" ")) {
+    return "Username cannot contain spaces.";
+  }
+  // If the username is valid, return null
+  return null;
+};

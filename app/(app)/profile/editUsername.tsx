@@ -15,6 +15,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { verifyUsername } from "@/utils/utils";
 
 const EditUsernameScreen = () => {
   const { authProfile, updateUsername } = useAuthProfileContext();
@@ -28,8 +29,20 @@ const EditUsernameScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const handleUpdateUsername = async () => {
-    setLoading(true);
     setError("");
+
+    let hasErrors = false;
+
+    const usernameError = verifyUsername(username);
+
+    if (usernameError) {
+      setError(usernameError);
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    setLoading(true);
 
     const { data, error } = await updateUsernameApi(authProfile.id, username);
     if (!error && data) {

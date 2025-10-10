@@ -15,6 +15,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import { verifyUsername } from "@/utils/utils";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
@@ -44,8 +45,10 @@ const RegisterScreen = () => {
       hasErrors = true;
     }
 
-    if (!username) {
-      setUsernameError("Please enter a username.");
+    const usernameError = verifyUsername(username);
+
+    if (usernameError) {
+      setUsernameError(usernameError);
       hasErrors = true;
     }
 
