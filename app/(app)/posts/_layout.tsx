@@ -27,7 +27,7 @@ const PostsStack = () => {
         name="followers"
         options={{
           title: "Followers",
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: "minimal",
           headerTitle: () => {
             return (
               <View style={{ flexGrow: 1 }}>
@@ -46,7 +46,7 @@ const PostsStack = () => {
         name="following"
         options={{
           title: "Following",
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: "minimal",
           headerTitle: () => {
             return (
               <View style={{ flexGrow: 1 }}>
@@ -61,8 +61,8 @@ const PostsStack = () => {
           },
         }}
       />
-      <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackTitleVisible: false }} />
-      <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackTitleVisible: false }} />
+      <Stack.Screen name="savedPosts" options={{ title: "Saved", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen name="savedPostsList" options={{ title: "Saved", headerBackButtonDisplayMode: "minimal" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
       <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
       <Stack.Screen name="notifications" options={{ title: "Notifications" }} />

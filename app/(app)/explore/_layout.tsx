@@ -28,10 +28,9 @@ const ExploreStack = () => {
         name="profileSearch"
         options={{
           title: "Search",
-          headerBackTitleVisible: false,
           headerTitle: () => {
             return (
-              <View style={{ flexGrow: 1 }}>
+              <View style={{ width: "100%" }}>
                 <HeaderSearchInput
                   value={search.searchText}
                   onChangeText={search.setSearchText}

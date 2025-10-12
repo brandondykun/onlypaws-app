@@ -18,6 +18,7 @@ const BUNDLE_IDENTIFIER =
 export default {
   expo: {
     name: APP_NAME,
+    newArchEnabled: true,
     slug: "only-paws-app",
     version: "1.0.0",
     orientation: "portrait",

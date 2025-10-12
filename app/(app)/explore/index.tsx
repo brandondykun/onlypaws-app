@@ -40,7 +40,7 @@ const ExploreScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <View style={{ width: screenWidth, marginLeft: -16, alignItems: "center" }}>
+        <View style={{ width: screenWidth, paddingHorizontal: 16 }}>
           <Button
             buttonStyle={[
               s.headerSearchButton,
@@ -135,7 +135,7 @@ export default ExploreScreen;
 const s = StyleSheet.create({
   headerSearchButton: {
     borderRadius: 100,
-    width: screenWidth - 32,
+    width: "100%",
     borderWidth: 1,
     flex: 1,
     justifyContent: "flex-start",

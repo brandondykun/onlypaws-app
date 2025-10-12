@@ -25,7 +25,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder }
           borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
         },
       ]}
-      rootStyle={{ width: Platform.OS === "ios" ? "80%" : "70%", marginTop: Platform.OS === "ios" ? -4 : 4 }}
+      rootStyle={{ width: Platform.OS === "ios" ? "100%" : "70%", marginTop: Platform.OS === "ios" ? -4 : 4 }}
       placeholderTextColor={COLORS.zinc[500]}
       value={value}
       onChangeText={onChangeText}
@@ -49,5 +49,6 @@ const s = StyleSheet.create({
     paddingVertical: 7,
     fontSize: 18,
     height: 40,
+    width: "100%",
   },
 });
