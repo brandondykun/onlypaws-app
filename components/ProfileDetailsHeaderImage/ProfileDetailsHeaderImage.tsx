@@ -6,12 +6,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
+import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileImage as TProfileImage } from "@/types";
 
 import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
-import { COLORS } from "@/constants/Colors";
 
 type Props = {
   image: TProfileImage | PhotoFile | ImagePickerAsset | CropperImage | null;

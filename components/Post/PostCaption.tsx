@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet, StyleProp, TextStyle, ViewStyle } from "react-native";
 
-import Text from "../Text/Text";
 import { COLORS } from "@/constants/Colors";
+
+import Text from "../Text/Text";
 
 type Props = {
   isExpanded: boolean;

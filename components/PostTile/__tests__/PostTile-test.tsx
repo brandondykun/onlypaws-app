@@ -1,8 +1,9 @@
 import "@testing-library/jest-native/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
-import PostTile from "../PostTile";
 import { PostDetailed } from "@/types";
+
+import PostTile from "../PostTile";
 
 describe("<PostTile />", () => {
   test("onPress is called when tile is pressed", () => {

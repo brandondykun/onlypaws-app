@@ -1,3 +1,6 @@
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -5,7 +8,6 @@ import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef } from "react";
 import React from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
 
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
@@ -15,8 +17,6 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const ProfileScreen = () => {
   const { user } = useAuthUserContext();

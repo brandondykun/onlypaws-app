@@ -1,9 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   text1?: string;
