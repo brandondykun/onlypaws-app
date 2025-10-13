@@ -10,8 +10,6 @@ import {
   Pressable,
   ViewStyle,
   Animated,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
 } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -107,13 +105,13 @@ const TextInput = forwardRef(
     };
 
     // handle local focus for styling and any onFocus action passed as prop
-    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    const handleFocus: TextInputProps["onFocus"] = (e) => {
       setFocused(true);
       rest.onFocus && rest.onFocus(e);
     };
 
     // handle local blur for styling and any onBlur action passed as prop
-    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    const handleBlur: TextInputProps["onBlur"] = (e) => {
       setFocused(false);
       rest.onBlur && rest.onBlur(e);
     };

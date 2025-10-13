@@ -98,7 +98,6 @@ const ExploreScreen = () => {
         showsVerticalScrollIndicator={false}
         data={explorePosts}
         numColumns={3}
-        estimatedItemSize={screenWidth / 3}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom

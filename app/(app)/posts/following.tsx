@@ -62,7 +62,6 @@ const FollowingScreen = () => {
         ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         refreshing={followingCtx.refreshing}
-        estimatedItemSize={62}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         onEndReachedThreshold={0.3} // Trigger when 30%
         onEndReached={followingCtx.searchResults ? searchOnEndReached : onEndReached}

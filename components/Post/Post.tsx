@@ -1,4 +1,3 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
@@ -280,8 +279,8 @@ const Post = ({ post, onProfilePress }: Props) => {
       </View>
 
       <View style={{ paddingBottom: captionIsExpanded ? 24 : 0 }}>
-        <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8 }}>
-          <View style={{ minWidth: 35 }}>
+        <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8, justifyContent: "center" }}>
+          <View style={{ minWidth: 38, justifyContent: "center" }}>
             <Pressable
               onPress={() => handleHeartPress(post.id, post.liked)}
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
@@ -291,9 +290,9 @@ const Post = ({ post, onProfilePress }: Props) => {
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                 <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-                  <AntDesign
-                    name={post.liked ? "heart" : "hearto"}
-                    size={20}
+                  <Ionicons
+                    name={post.liked ? "heart" : "heart-outline"}
+                    size={22}
                     color={post.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[900]}
                   />
                 </Animated.View>
@@ -310,7 +309,7 @@ const Post = ({ post, onProfilePress }: Props) => {
 
           <Pressable
             onPress={handlePresentModalPress}
-            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+            style={({ pressed }) => [pressed && { opacity: 0.5 }, { justifyContent: "center" }]}
             testID={`post-comment-button-${post.id}`}
             hitSlop={7}
             disabled={post.is_hidden}

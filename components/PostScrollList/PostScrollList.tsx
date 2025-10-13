@@ -1,11 +1,10 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { useRef } from "react";
 
 import { PostDetailed } from "@/types";
 
 import Post from "../Post/Post";
-import { POST_HEIGHT } from "../Post/Post";
 
 type Props = {
   posts: PostDetailed[];
@@ -14,7 +13,7 @@ type Props = {
 };
 
 const PostScrollList = ({ posts, initialIndex, onProfilePress }: Props) => {
-  const flatListRef = useRef<FlashList<PostDetailed>>(null);
+  const flatListRef = useRef<FlashListRef<PostDetailed>>(null);
   const tabBarHeight = useBottomTabBarHeight();
 
   return (
@@ -25,7 +24,6 @@ const PostScrollList = ({ posts, initialIndex, onProfilePress }: Props) => {
       renderItem={({ item }) => <Post post={item} onProfilePress={onProfilePress} />}
       keyExtractor={(item) => item.id.toString()}
       initialScrollIndex={initialIndex}
-      estimatedItemSize={POST_HEIGHT}
       showsVerticalScrollIndicator={false}
     />
   );

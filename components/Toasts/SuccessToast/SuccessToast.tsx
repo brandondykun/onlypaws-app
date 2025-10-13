@@ -1,9 +1,9 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { View } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   text1?: string;
@@ -35,7 +35,7 @@ const SuccessToast = ({ text1, text2 }: Props) => {
       }}
     >
       <View>
-        <AntDesign name="checkcircleo" size={24} color={ICON_COLOR} />
+        <Ionicons name="checkmark-circle-outline" size={24} color={ICON_COLOR} />
       </View>
       <View style={{ flex: 1 }}>
         <Text lightColor={LIGHT_TEXT_COLOR} style={{ fontSize: 20, marginBottom: 8, fontWeight: "bold" }}>

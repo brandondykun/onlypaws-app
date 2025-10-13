@@ -16,8 +16,8 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 
 type Props = {
-  profileOptionsModalRef: React.RefObject<RNBottomSheetModal>;
-  changeProfileModalRef: React.RefObject<RNBottomSheetModal>;
+  profileOptionsModalRef: React.RefObject<RNBottomSheetModal | null>;
+  changeProfileModalRef: React.RefObject<RNBottomSheetModal | null>;
 };
 
 const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: Props) => {
@@ -94,7 +94,7 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
             ]}
             onPress={handleAboutPress}
           >
-            <AntDesign name="questioncircle" size={18} color={ICON_COLOR} style={{ marginTop: 6 }} />
+            <AntDesign name="question-circle" size={18} color={ICON_COLOR} style={{ marginTop: 6 }} />
             <Text>About</Text>
           </Pressable>
         </View>

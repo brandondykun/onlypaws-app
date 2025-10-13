@@ -3,7 +3,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Dimensions, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
@@ -15,7 +15,6 @@ import { useSavedPostsContext } from "@/context/SavedPostsContext";
 
 const SavedPostsScreen = () => {
   const posts = useSavedPostsContext();
-  const screenWidth = Dimensions.get("window").width;
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
 
@@ -75,7 +74,6 @@ const SavedPostsScreen = () => {
       showsVerticalScrollIndicator={false}
       data={posts.data}
       numColumns={3}
-      estimatedItemSize={screenWidth / 3}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.3} // Trigger when 10% from the bottom

@@ -61,7 +61,6 @@ const FollowersScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={emptyComponent}
         refreshing={followersCtx.refreshing}
-        estimatedItemSize={62}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         onEndReachedThreshold={0.3} // Trigger when 30%

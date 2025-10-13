@@ -108,7 +108,6 @@ const NotificationsScreen = () => {
         showsVerticalScrollIndicator={false}
         data={allNotifications}
         numColumns={1}
-        estimatedItemSize={100}
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingHorizontal: 16 }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.5} // Trigger when 50% from the bottom

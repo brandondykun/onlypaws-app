@@ -8,7 +8,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef, useState } from "react";
 import React from "react";
-import { View, RefreshControl, Dimensions, Pressable, StyleSheet } from "react-native";
+import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { unfollowProfile, followProfile } from "@/api/profile";
@@ -66,7 +66,6 @@ const ProfileDetails = ({
   const navigation = useNavigation();
   const router = useRouter();
   const { isDarkMode } = useColorMode();
-  const screenWidth = Dimensions.get("window").width;
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
 
@@ -213,7 +212,6 @@ const ProfileDetails = ({
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={!fetchNextLoading ? () => fetchNext() : null}
         ListEmptyComponent={emptyComponent}
-        estimatedItemSize={screenWidth / 3}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         ListHeaderComponentStyle={{
           borderBottomWidth: 1,

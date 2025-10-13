@@ -55,6 +55,7 @@ export default {
     },
     plugins: [
       "expo-router",
+      "expo-web-browser",
       "expo-secure-store",
       [
         "expo-image-picker",

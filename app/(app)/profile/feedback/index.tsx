@@ -104,7 +104,6 @@ const FeedbackScreen = () => {
         <FlashList
           data={data}
           keyExtractor={(item) => item.id.toString()}
-          estimatedItemSize={62}
           ListEmptyComponent={emptyComponent}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.3} // Trigger when 30% from the bottom

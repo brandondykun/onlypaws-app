@@ -8,7 +8,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
-import { POST_HEIGHT } from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -128,7 +127,6 @@ const FeedScreen = () => {
           ) : null
         }
         ListEmptyComponent={emptyComponent}
-        estimatedItemSize={POST_HEIGHT}
         onScroll={(event) => {
           const offsetY = event.nativeEvent.contentOffset.y;
           scrollY.setValue(offsetY);

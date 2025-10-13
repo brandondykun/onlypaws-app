@@ -7,7 +7,6 @@ import { axiosInstance } from "@/api/config";
 import { getSimilarPosts } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
-import { POST_HEIGHT } from "@/components/Post/Post";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
@@ -91,7 +90,6 @@ const ExplorePostsListScreen = () => {
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? fetchNext : null}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={POST_HEIGHT}
       ListFooterComponent={
         hasInitialFetchError ? (
           <RetryFetchFooter

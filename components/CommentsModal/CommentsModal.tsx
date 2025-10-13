@@ -1,4 +1,3 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   BottomSheetFlatList,
@@ -8,7 +7,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { useState, useCallback, forwardRef, ForwardedRef, useRef } from "react";
 import { View, Pressable, ActivityIndicator, StyleSheet, RefreshControl, Platform, Keyboard } from "react-native";
-import { TextInput as RNGHTestInput } from "react-native-gesture-handler";
+import { TextInput as RNGHTextInput } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
 import { axiosFetch } from "@/api/config";
@@ -53,7 +52,7 @@ const CommentsModal = forwardRef(
 
     const { isDarkMode } = useColorMode();
     const { authProfile } = useAuthProfileContext();
-    const commentInputRef = useRef<RNGHTestInput>(null); // comment input component ref
+    const commentInputRef = useRef<RNGHTextInput>(null); // comment input component ref
     const inputValueRef = useRef(""); // comment text ref
     const flatListRef = useRef<BottomSheetFlatListMethods>(null); // ref to comments flat list
 
@@ -326,7 +325,7 @@ const CommentsModal = forwardRef(
           ref={flatListRef}
           data={comments}
           contentContainerStyle={{ paddingBottom: 24 }}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item: PostCommentDetailed) => item.id.toString()}
           onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
           onEndReached={!fetchNextLoading ? () => fetchNext() : null}
           ListEmptyComponent={emptyComponent}
@@ -340,7 +339,7 @@ const CommentsModal = forwardRef(
               colors={[COLORS.zinc[400]]}
             />
           }
-          renderItem={({ item, index }) => (
+          renderItem={({ item, index }: { item: PostCommentDetailed; index: number }) => (
             <Comment
               comment={item}
               onLike={handleLikeComment}
@@ -351,7 +350,7 @@ const CommentsModal = forwardRef(
               onLikeReply={handleLikeReply}
               onUnlikeReply={handleUnlikeReply}
               commentIndex={index}
-              listRef={flatListRef}
+              listRef={flatListRef as React.RefObject<BottomSheetFlatListMethods>}
               replyToCommentId={replyToComment?.id}
             />
           )}
@@ -397,7 +396,7 @@ const CommentsModal = forwardRef(
             >
               <View style={s.addCommentButton}>
                 {!addCommentLoading ? (
-                  <AntDesign name="arrowup" size={24} color={COLORS.zinc[100]} />
+                  <Ionicons name="arrow-up-outline" size={24} color={COLORS.zinc[100]} />
                 ) : (
                   <ActivityIndicator size="small" color={COLORS.zinc[200]} />
                 )}

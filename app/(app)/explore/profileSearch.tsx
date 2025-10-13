@@ -86,7 +86,6 @@ const ProfileSearchScreen = () => {
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: Platform.OS === "android" ? 0 : 24 }}
         data={search.data}
         keyExtractor={(item) => item.id.toString()}
-        estimatedItemSize={61}
         ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         renderItem={({ item: profile, index }) => (

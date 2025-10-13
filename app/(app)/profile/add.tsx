@@ -125,7 +125,7 @@ const AddProfileScreen = () => {
         text="Add New Profile"
         onPress={handleCreateProfile}
         loading={submitLoading}
-        icon={<AntDesign name="pluscircle" size={18} color={isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100]} />}
+        icon={<AntDesign name="plus-circle" size={18} color={isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100]} />}
       />
     </ScrollView>
   );

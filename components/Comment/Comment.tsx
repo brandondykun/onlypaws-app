@@ -1,4 +1,3 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
@@ -162,8 +161,8 @@ const Comment = ({
             testID={`comment-like-button-${comment.id}-${comment.liked}`}
           >
             <View style={s.buttonContainer}>
-              <AntDesign
-                name={comment.liked ? "heart" : "hearto"}
+              <Ionicons
+                name={comment.liked ? "heart" : "heart-outline"}
                 size={15}
                 color={comment.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]}
               />
@@ -233,8 +232,8 @@ const Comment = ({
                         }}
                       >
                         <View style={s.buttonContainer}>
-                          <AntDesign
-                            name={replyComment.liked ? "heart" : "hearto"}
+                          <Ionicons
+                            name={replyComment.liked ? "heart" : "heart-outline"}
                             size={15}
                             color={
                               replyComment.liked ? COLORS.red[600] : isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]

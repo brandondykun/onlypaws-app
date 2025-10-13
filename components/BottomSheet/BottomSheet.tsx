@@ -7,7 +7,7 @@ import {
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput";
-import { forwardRef, ForwardedRef, useMemo, RefObject, useState } from "react";
+import { forwardRef, ForwardedRef, useMemo, useState } from "react";
 import { Keyboard, Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
@@ -92,10 +92,7 @@ const BottomSheetModal = forwardRef(
 );
 
 export const BottomSheetTextInput = forwardRef(
-  (
-    { ...props }: BottomSheetTextInputProps,
-    ref: ((instance: TextInput | null) => void) | RefObject<TextInput> | null | undefined,
-  ) => {
+  ({ ...props }: BottomSheetTextInputProps, ref: ForwardedRef<TextInput>) => {
     const { isDarkMode, setLightOrDark } = useColorMode();
     const [isFocused, setIsFocused] = useState(false);
 
