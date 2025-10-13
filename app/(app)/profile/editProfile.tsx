@@ -1,6 +1,7 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { ScrollView } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -16,6 +17,7 @@ const EditProfileScreen = () => {
   const { authProfile, updateAuthProfile } = useAuthProfileContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+  const navigation = useNavigation();
 
   const [aboutText, setAboutText] = useState(authProfile.about ? authProfile.about : "");
   const [profileName, setProfileName] = useState(authProfile.name ? authProfile.name : "");
@@ -23,6 +25,25 @@ const EditProfileScreen = () => {
   const [petType, setPetType] = useState<PetTypeWithTitle | null>(null);
   const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
   const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Button
+          text="Cancel"
+          variant="text"
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.replace("/(app)/profile");
+              router.back();
+            } else {
+              router.replace("/(app)/profile");
+            }
+          }}
+        />
+      ),
+    });
+  }, [navigation, router]);
 
   const fetchPetTypeOptions = useCallback(async () => {
     const { error, data } = await getPetTypeOptions();
