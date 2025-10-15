@@ -119,7 +119,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
   // WebSocket connection refs
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const serverErrorCountRef = useRef(0);
   const maxReconnectAttempts = 10;
@@ -128,7 +128,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const maxReconnectDelay = 30000; // 30 seconds
 
   // Auto-refresh debounce ref to prevent too frequent DB refreshes
-  const autoRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoRefreshTimeoutRef = useRef<number | null>(null);
 
   // App state tracking
   const appStateRef = useRef(AppState.currentState);
