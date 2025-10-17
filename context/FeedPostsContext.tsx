@@ -42,7 +42,7 @@ const FeedPostsContextProvider = ({ children }: Props) => {
   const initialFetch = useCallback(async () => {
     const { data, error } = await getFeed(authProfile.id);
     return { data, error };
-  }, [authProfile]);
+  }, [authProfile.id, authProfile.following_count]); // Will auto refresh when profiles are followed/unfollowed
 
   const {
     data,
