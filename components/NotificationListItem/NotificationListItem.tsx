@@ -17,8 +17,17 @@ type Props = {
 const NotificationListItem = ({ item, index }: Props) => {
   const senderImage = "sender" in item ? item.sender.image?.image : item.sender_avatar;
   const senderUsername = "sender" in item ? item.sender.username : item.sender_username;
-  // if there is a preview image to display on the right side of the notification
-  const imagePreview = item.extra_data.post_preview_image ? item.extra_data.post_preview_image : null;
+
+  // Determine if the notification is a follow notification
+  const isFollowNotification = "notification_type" in item && item.notification_type === "follow";
+
+  // if there is a post preview image to display on the right side of the notification
+  // if it is a follow notification, there is no post preview image
+  const postImagePreview = isFollowNotification
+    ? null
+    : item.extra_data.post_preview_image
+      ? item.extra_data.post_preview_image
+      : null;
 
   return (
     <View style={s.root}>
@@ -50,8 +59,8 @@ const NotificationListItem = ({ item, index }: Props) => {
         </View>
       </View>
       <View>
-        {imagePreview ? (
-          <Image source={{ uri: imagePreview }} style={{ width: 50, height: 50, borderRadius: 6 }} />
+        {postImagePreview ? (
+          <Image source={{ uri: postImagePreview }} style={{ width: 50, height: 50, borderRadius: 6 }} />
         ) : null}
       </View>
     </View>
