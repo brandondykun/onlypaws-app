@@ -1,10 +1,10 @@
-import { PaginatedNotificationsResponse } from "../types";
+import { PaginatedDBNotificationsResponse } from "@/types/notifications/base";
 
 import { axiosFetch, axiosPatch, axiosPost } from "./config";
 
 export const getNotifications = async () => {
   const url = `/v1/notifications/`;
-  return await axiosFetch<PaginatedNotificationsResponse>(url);
+  return await axiosFetch<PaginatedDBNotificationsResponse>(url);
 };
 
 export const markNotificationAsRead = async (notificationId: string) => {

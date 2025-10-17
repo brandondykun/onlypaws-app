@@ -11,7 +11,7 @@ import {
 } from "@/api/notifications";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
-import { WSCommentLikeNotification, DBNotification, WSPostLikeNotification, WSNotification } from "@/types";
+import { DBNotification, WSNotification } from "@/types/notifications/base";
 
 export type NotificationContextType = {
   // WebSocket connection status
@@ -39,7 +39,7 @@ export type NotificationContextType = {
   clearNotifications: () => void;
 
   // Helper functions
-  formatNotificationMessage: (notification: WSPostLikeNotification) => string;
+  formatNotificationMessage: (notification: WSNotification) => string;
 
   wsNotifications: WSNotification[];
 };
@@ -130,6 +130,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // Auto-refresh debounce ref to prevent too frequent DB refreshes
   const autoRefreshTimeoutRef = useRef<number | null>(null);
 
+  // Ref to store the latest refresh function to avoid dependency issues
+  const refreshRef = useRef<(() => Promise<void>) | undefined>(undefined);
+
   // App state tracking
   const appStateRef = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appStateRef.current);
@@ -185,7 +188,10 @@ const NotificationsContextProvider = ({ children }: Props) => {
     });
   }, [refreshDbNotifications, dbNotifications]);
 
-  const formatNotificationMessage = useCallback((notification: WSPostLikeNotification | WSCommentLikeNotification) => {
+  // Store the latest refresh function in ref to avoid dependency chain issues
+  refreshRef.current = refresh;
+
+  const formatNotificationMessage = useCallback((notification: WSNotification) => {
     const senderName = notification.sender_username || "Someone";
 
     switch (notification.notification_type) {
@@ -239,7 +245,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
   // Show notification using toast
   const showNotification = useCallback(
-    (notification: WSPostLikeNotification) => {
+    (notification: WSNotification) => {
       // format the notification message for different notification types
       const formattedMessage = formatNotificationMessage(notification);
       Toast.show({
@@ -253,6 +259,48 @@ const NotificationsContextProvider = ({ children }: Props) => {
       });
     },
     [formatNotificationMessage],
+  );
+
+  // Helper function to handle incoming WebSocket notifications with deduplication and auto-cleanup
+  const handleIncomingNotification = useCallback(
+    (notificationData: WSNotification) => {
+      // Add to WebSocket notifications list (will be merged with DB notifications)
+      setWsNotifications((prev) => {
+        // Prevent duplicates by checking if notification already exists
+        const exists = prev.some((existingNotif) => existingNotif.id === notificationData.id);
+        if (exists) return prev;
+
+        // Add new notification at the beginning (newest first)
+        const newNotifications = [{ ...notificationData, is_read: false }, ...prev];
+
+        // Check if we've reached the 50-item limit for automatic cleanup
+        if (newNotifications.length >= 50) {
+          console.log(
+            `WebSocket notifications reached ${newNotifications.length} items, triggering automatic DB refresh for cleanup`,
+          );
+
+          // Clear any existing auto-refresh timeout to prevent multiple rapid refreshes
+          if (autoRefreshTimeoutRef.current) {
+            clearTimeout(autoRefreshTimeoutRef.current);
+          }
+
+          // Trigger DB refresh asynchronously with debounce to prevent too frequent refreshes
+          // This prevents memory buildup during long foreground sessions
+          autoRefreshTimeoutRef.current = setTimeout(() => {
+            refreshRef.current?.();
+            autoRefreshTimeoutRef.current = null;
+          }, 500); // 500ms delay to debounce rapid notifications and avoid blocking WebSocket processing
+        }
+
+        return newNotifications;
+      });
+
+      // Show toast notification only if app is in foreground
+      if (appStateVisible === "active") {
+        showNotification(notificationData);
+      }
+    },
+    [appStateVisible, showNotification],
   );
 
   // Connect to WebSocket
@@ -295,45 +343,8 @@ const NotificationsContextProvider = ({ children }: Props) => {
           const data = JSON.parse(event.data);
 
           if (data.type === "notification") {
-            const notificationData: WSPostLikeNotification = data.notification;
-
-            if (notificationData.notification_type === "like_post") {
-              // Add to WebSocket notifications list (will be merged with DB notifications)
-              setWsNotifications((prev) => {
-                // Prevent duplicates by checking if notification already exists
-                const exists = prev.some((existingNotif) => existingNotif.id === notificationData.id);
-                if (exists) return prev;
-
-                // Add new notification at the beginning (newest first)
-                const newNotifications = [{ ...notificationData, is_read: false }, ...prev];
-
-                // Check if we've reached the 50-item limit for automatic cleanup
-                if (newNotifications.length >= 50) {
-                  console.log(
-                    `WebSocket notifications reached ${newNotifications.length} items, triggering automatic DB refresh for cleanup`,
-                  );
-
-                  // Clear any existing auto-refresh timeout to prevent multiple rapid refreshes
-                  if (autoRefreshTimeoutRef.current) {
-                    clearTimeout(autoRefreshTimeoutRef.current);
-                  }
-
-                  // Trigger DB refresh asynchronously with debounce to prevent too frequent refreshes
-                  // This prevents memory buildup during long foreground sessions
-                  autoRefreshTimeoutRef.current = setTimeout(() => {
-                    refresh();
-                    autoRefreshTimeoutRef.current = null;
-                  }, 500); // 500ms delay to debounce rapid notifications and avoid blocking WebSocket processing
-                }
-
-                return newNotifications;
-              });
-
-              // Show toast notification only if app is in foreground
-              if (appStateVisible === "active") {
-                showNotification(notificationData);
-              }
-            }
+            const notificationData: WSNotification = data.notification;
+            handleIncomingNotification(notificationData);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
@@ -383,7 +394,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
       scheduleReconnect();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, selectedProfileId, appStateVisible, getWebSocketUrl, showNotification]);
+  }, [isAuthenticated, selectedProfileId, appStateVisible, getWebSocketUrl, handleIncomingNotification]);
 
   // Schedule reconnection with exponential backoff
   const scheduleReconnect = useCallback(
