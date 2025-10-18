@@ -4,7 +4,8 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Image } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostDetailed, ProfileDetails, PostImage, ProfileImage, FeedbackTicketType } from "@/types";
+import { PostDetailed, ProfileDetails, PostImage, ProfileImage } from "@/types";
+import { FeedbackTicketType } from "@/types/feedback/feedback";
 
 dayjs.extend(relativeTime);
 

@@ -17,7 +17,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
-import { FeedbackTicket } from "@/types";
+import { FeedbackTicket } from "@/types/feedback/feedback";
 
 const FeedbackScreen = () => {
   const { authProfile } = useAuthProfileContext();

@@ -4,7 +4,7 @@ import { View, StyleSheet, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { FeedbackTicket } from "@/types";
+import { FeedbackTicket } from "@/types/feedback/feedback";
 
 import Text from "../../Text/Text";
 import FeedbackCard from "../FeedbackCard/FeedbackCard";

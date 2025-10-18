@@ -11,7 +11,7 @@ import FeedbackComment from "@/components/Feedback/FeedbackComment/FeedbackComme
 import FeedbackTypeBubble from "@/components/Feedback/FeedbackTypeBubble/FeedbackTypeBubble";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { FeedbackTicketDetailed } from "@/types";
+import { FeedbackTicketDetailed } from "@/types/feedback/feedback";
 
 const FeedbackDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();

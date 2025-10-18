@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
-import { FeedbackTicketComment } from "@/types";
+import { FeedbackTicketComment } from "@/types/feedback/feedback";
 
 import Text from "../../Text/Text";
 import FeedbackCard from "../FeedbackCard/FeedbackCard";

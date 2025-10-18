@@ -3,7 +3,7 @@ import {
   CreateFeedbackTicket,
   FeedbackTicketDetailed,
   PaginatedFeedbackTicketsResponse,
-} from "../types";
+} from "@/types/feedback/feedback";
 
 import { axiosFetch, axiosPost } from "./config";
 
