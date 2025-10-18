@@ -14,6 +14,7 @@ type Props = {
   textStyle?: StyleProp<TextStyle>;
   moreTextStyle?: StyleProp<TextStyle>;
   lessTextStyle?: StyleProp<TextStyle>;
+  expandable?: boolean;
 };
 
 const PostCaption = ({
@@ -25,6 +26,7 @@ const PostCaption = ({
   lessTextStyle,
   isExpanded,
   setIsExpanded,
+  expandable = true,
 }: Props) => {
   const [showMoreButton, setShowMoreButton] = useState(false);
   const [fullTextHeight, setFullTextHeight] = useState(0);
@@ -54,6 +56,15 @@ const PostCaption = ({
 
   if (!caption || caption.trim() === "") {
     return null;
+  }
+
+  // If not expandable, just show the full caption without any interaction
+  if (!expandable) {
+    return (
+      <View style={[s.container, style]}>
+        <Text style={[s.text, textStyle]}>{caption}</Text>
+      </View>
+    );
   }
 
   return (

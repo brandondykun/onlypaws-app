@@ -31,17 +31,20 @@ export const POST_HEIGHT = Dimensions.get("window").width + 200;
 
 type Props = {
   post: PostDetailed;
-  onProfilePress: (profileId: number) => void;
+  onProfilePress?: (profileId: number) => void;
+  captionDefaultExpanded?: boolean;
+  captionExpandable?: boolean;
 };
 
-const Post = ({ post, onProfilePress }: Props) => {
-  const [likeLoading, setLikeLoading] = useState(false);
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [captionIsExpanded, setCaptionIsExpanded] = useState(false);
+const Post = ({ post, onProfilePress, captionDefaultExpanded = false, captionExpandable = true }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
-  const screenWidth = Dimensions.get("window").width;
   const { savePost, unSavePost, onLike, onUnlike, onComment, onToggleHidden } = usePostManagerContext();
+  const screenWidth = Dimensions.get("window").width;
+
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [captionIsExpanded, setCaptionIsExpanded] = useState(captionDefaultExpanded);
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
@@ -119,7 +122,7 @@ const Post = ({ post, onProfilePress }: Props) => {
 
   // function for post menu
   const handleProfilePress = () => {
-    onProfilePress(post.profile.id!);
+    onProfilePress && onProfilePress(post.profile.id!);
   };
 
   // function for post menu
@@ -205,7 +208,7 @@ const Post = ({ post, onProfilePress }: Props) => {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <ProfileImage image={post.profile.image} size={35} />
             <Pressable
-              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [pressed && onProfilePress && { opacity: 0.7 }]}
               onPress={handleProfilePress}
               hitSlop={10}
               testID={`post-username-button-${post.id}`}
@@ -372,7 +375,12 @@ const Post = ({ post, onProfilePress }: Props) => {
             ) : null}
           </View>
         </View>
-        <PostCaption isExpanded={captionIsExpanded} setIsExpanded={setCaptionIsExpanded} caption={post.caption} />
+        <PostCaption
+          isExpanded={captionIsExpanded}
+          setIsExpanded={setCaptionIsExpanded}
+          caption={post.caption}
+          expandable={captionExpandable}
+        />
         <View style={{ paddingLeft: 8, paddingTop: 6 }}>
           <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 13 }}>
             {getTimeSince(post.created_at)}
