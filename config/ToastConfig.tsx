@@ -4,6 +4,7 @@ import ErrorToast from "@/components/Toasts/ErrorToast/ErrorToast";
 import NotificationToast from "@/components/Toasts/NotificationToast/NotificationToast";
 import SavePostToast from "@/components/Toasts/SavePostToast/SavePostToast";
 import SuccessToast from "@/components/Toasts/SuccessToast/SuccessToast";
+import InfoToast from "@/components/Toasts/InfoToast/InfoToast";
 
 type CustomToastProps = {
   type: string;
@@ -44,4 +45,5 @@ export const toastConfig = {
   notification: ({ imageUri, text1, ...props }: NotificationToastProps) => (
     <NotificationToast imageUri={imageUri} text1={text1} {...props} />
   ),
+  info: ({ text1, text2 }: CustomToastProps) => <InfoToast text1={text1} text2={text2} />,
 };
