@@ -68,6 +68,7 @@ const PostsStack = () => {
       <Stack.Screen name="notifications" options={{ title: "Notifications" }} />
       <Stack.Screen name="editPost" options={{ title: "Edit Post" }} />
       <Stack.Screen name="postDetails" options={{ title: "Post Details" }} />
+      <Stack.Screen name="commentDetails" options={{ title: "Comment Details" }} />
     </Stack>
   );
 };

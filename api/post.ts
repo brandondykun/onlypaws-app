@@ -1,3 +1,5 @@
+import { CommentChainResponse } from "@/types/post/post";
+
 import {
   PaginatedExploreResponse,
   PaginatedPostCommentsResponse,
@@ -114,4 +116,9 @@ export const deleteCommentLike = async (commentId: number, authProfileId: number
 export const deletePostImage = async (id: number | string) => {
   const url = `/v1/post/image/${id}/`;
   return await axiosDelete(url);
+};
+
+export const getCommentChain = async (commentId: string | number) => {
+  const url = `/v1/comment/${commentId}/chain/`;
+  return await axiosFetch<CommentChainResponse>(url);
 };
