@@ -375,7 +375,7 @@ const CommentsModal = forwardRef(
           <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: 8, paddingTop: 12, alignItems: "center" }}>
             <View style={{ flex: 1 }}>
               <BottomSheetTextInput
-                placeholder={parentComment ? `Reply to @${parentComment.profile.username}...` : "Add comment..."}
+                placeholder={replyToComment ? `Reply to @${replyToComment.profile.username}...` : "Add comment..."}
                 ref={commentInputRef}
                 defaultValue={inputValueRef.current}
                 onChangeText={(text) => (inputValueRef.current = text)}
