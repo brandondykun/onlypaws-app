@@ -39,7 +39,7 @@ const ExplorePostsListScreen = () => {
   const fetchSimilar = useCallback(async () => {
     setHasInitialFetchError(false);
     setHasFetchNextError(false);
-    const { error, data } = await getSimilarPosts(Number(postId), authProfile.id);
+    const { error, data } = await getSimilarPosts(Number(postId));
 
     if (!error && data) {
       setSimilarPosts((prev) => [...prev, ...data.results]);
@@ -48,7 +48,7 @@ const ExplorePostsListScreen = () => {
       setHasInitialFetchError(true);
     }
     setInitialFetchComplete(true);
-  }, [authProfile.id, setSimilarPosts, postId]);
+  }, [setSimilarPosts, postId]);
 
   useEffect(() => {
     fetchSimilar();

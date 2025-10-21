@@ -88,8 +88,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   const backgroundRefreshProfileDetails = useCallback(async () => {
     if (selectedProfileId && !authLoading) {
       setBackgroundRefreshing(true);
-      // the second argument is only necessary so the backend doesn't throw an error
-      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
+      const { error, data } = await getProfileDetails(selectedProfileId);
       if (!error && data) {
         setAuthProfile(data);
       }
@@ -101,8 +100,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     // if fetching a profile for the first time on app load
     if (selectedProfileId && !authLoading && !authProfile.username) {
       setLoading(true);
-      // the second argument is only necessary so the backend doesn't throw an error
-      const { error, data } = await getProfileDetails(selectedProfileId, selectedProfileId);
+      const { error, data } = await getProfileDetails(selectedProfileId);
       if (!error && data) {
         setAuthProfile(data);
       }

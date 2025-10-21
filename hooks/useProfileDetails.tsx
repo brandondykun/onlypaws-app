@@ -11,7 +11,7 @@ const useProfileDetails = (profileId: number | string | null) => {
 
   const initialFetch = useCallback(async () => {
     if (!profileId) return { data: null, error: null };
-    return await getProfileDetails(profileId, authProfile.id);
+    return await getProfileDetails(profileId);
   }, [profileId, authProfile.id]);
 
   const { data, setData, initialFetchComplete, hasInitialFetchError, refresh, refreshing } =

@@ -13,8 +13,8 @@ import {
 
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
-export const getProfileDetails = async (profileId: number | string, authProfileId: number | undefined) => {
-  const url = `/v1/profile/${profileId}?profileId=${authProfileId}`;
+export const getProfileDetails = async (profileId: number | string) => {
+  const url = `/v1/profile/${profileId}`;
   return await axiosFetch<ProfileDetails>(url);
 };
 

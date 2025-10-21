@@ -97,8 +97,8 @@ export const getExplorePosts = async (profileId: number) => {
   return await axiosFetch<PaginatedExploreResponse>(url);
 };
 
-export const getSimilarPosts = async (postId: number, profileId: number) => {
-  const url = `/v1/post/${postId}/similar?profileId=${profileId}`;
+export const getSimilarPosts = async (postId: number) => {
+  const url = `/v1/post/${postId}/similar`;
   return await axiosFetch<PaginatedExploreResponse>(url);
 };
 
