@@ -4,7 +4,8 @@ import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-import { getMyInfo, refreshToken } from "@/api/auth";
+import { getMyInfo } from "@/api/auth";
+import * as tokenService from "@/services/tokenService";
 import { MyInfo, ProfileOption, User } from "@/types";
 
 type AuthUserContextType = {
@@ -76,8 +77,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     setUser({ id: null, email: null, profiles: null, is_email_verified: false });
     setSelectedProfileId(null);
     setIsAuthenticated(false);
-    await SecureStore.deleteItemAsync("REFRESH_TOKEN");
-    await SecureStore.deleteItemAsync("ACCESS_TOKEN");
+    await tokenService.clearTokens();
     router.replace("/auth/login");
   }, [router]);
 
@@ -97,12 +97,11 @@ const AuthUserContextProvider = ({ children }: Props) => {
     // check for stored refresh token on app load - if token present
     // use token to automatically log the user in
     const persistLogin = async () => {
-      const storedRefreshToken = await SecureStore.getItemAsync("REFRESH_TOKEN");
+      const storedRefreshToken = await tokenService.getRefreshToken();
 
       if (storedRefreshToken) {
-        const { error, data } = await refreshToken(storedRefreshToken);
-        if (data && !error) {
-          await SecureStore.setItemAsync("ACCESS_TOKEN", data.access);
+        const { success, accessToken } = await tokenService.refreshAccessToken(storedRefreshToken);
+        if (success && accessToken) {
           const { data: myInfoData, error: myInfoError } = await getMyInfo();
           if (myInfoData && !myInfoError) {
             authenticate(myInfoData);

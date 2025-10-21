@@ -23,6 +23,7 @@ export type NotificationContextType = {
   unreadCount: number;
 
   // Pagination controls (exposed from usePaginatedFetch)
+  fetch: () => Promise<void>;
   refresh: () => Promise<void>;
   refreshing: boolean;
   fetchNext: () => Promise<void>;
@@ -55,6 +56,7 @@ const NotificationsContext = createContext<NotificationContextType>({
   unreadCount: 0,
 
   // Pagination controls
+  fetch: async () => {},
   refresh: async () => {},
   refreshing: false,
   fetchNext: async () => {},
@@ -89,8 +91,23 @@ const NotificationsContextProvider = ({ children }: Props) => {
     return { data, error };
   }, []);
 
+  // Delay notifications fetch by 500ms to avoid racing with initial token refresh
+  const [enableNotificationsFetch, setEnableNotificationsFetch] = useState(false);
+
+  useEffect(() => {
+    if (selectedProfileId && isAuthenticated) {
+      const timer = setTimeout(() => {
+        setEnableNotificationsFetch(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setEnableNotificationsFetch(false);
+    }
+  }, [selectedProfileId, isAuthenticated]);
+
   // Use paginated fetch hook for DB notifications
   const {
+    fetchInitial,
     data: dbNotifications,
     setData: setDbNotifications,
     refresh: refreshDbNotifications,
@@ -102,7 +119,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
     fetchNextLoading: fetchNextLoadingDbNotifications,
     hasFetchNextError: hasFetchNextErrorDbNotifications,
   } = usePaginatedFetch<DBNotification>(initialFetch, {
-    enabled: !!selectedProfileId && isAuthenticated,
+    enabled: enableNotificationsFetch, // Delayed to avoid token refresh race
   });
 
   // WebSocket notifications state (recent notifications received while app is open)
@@ -568,6 +585,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
     unreadCount,
 
     // Pagination controls (exposed from usePaginatedFetch)
+    fetch: fetchInitial,
     refresh,
     refreshing: refreshingDbNotifications,
     fetchNext: fetchNextDbNotifications,

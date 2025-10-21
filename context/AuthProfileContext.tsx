@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { getProfileDetails } from "@/api/profile";
 import { PetType, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
@@ -78,6 +78,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [backgroundRefreshing, setBackgroundRefreshing] = useState(false);
+  const hasInitiallyFetchedRef = useRef(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
 
@@ -98,19 +99,20 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 
   const fetchProfileDetails = useCallback(async () => {
     // if fetching a profile for the first time on app load
-    if (selectedProfileId && !authLoading && !authProfile.username) {
+    if (selectedProfileId && !authLoading && !hasInitiallyFetchedRef.current) {
       setLoading(true);
       const { error, data } = await getProfileDetails(selectedProfileId);
       if (!error && data) {
         setAuthProfile(data);
+        hasInitiallyFetchedRef.current = true;
       }
       setLoading(false);
-    } else if (selectedProfileId && !authLoading && authProfile.username) {
+    } else if (selectedProfileId && !authLoading && hasInitiallyFetchedRef.current) {
       // if the user is already authenticated but the user changes profiles, refresh in the background
       // without this check, any time a profile is changed, the app would redirect to the index route (feed screen)
       backgroundRefreshProfileDetails();
     }
-  }, [authLoading, selectedProfileId, authProfile.username, backgroundRefreshProfileDetails]);
+  }, [authLoading, selectedProfileId, backgroundRefreshProfileDetails]);
 
   useEffect(() => {
     fetchProfileDetails();
@@ -119,7 +121,12 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   useEffect(() => {
     if (!selectedProfileId) {
       setAuthProfile(defaultProfile);
+      hasInitiallyFetchedRef.current = false;
     }
+    // NOTE: We don't reset hasInitiallyFetchedRef when switching profiles
+    // If we did, setLoading(true) would be called, causing AuthInterceptor
+    // to return null and unmount the app, resetting navigation to feed screen.
+    // Profile changes should use backgroundRefreshProfileDetails instead.
   }, [selectedProfileId]);
 
   // refresh profile if user swipes down

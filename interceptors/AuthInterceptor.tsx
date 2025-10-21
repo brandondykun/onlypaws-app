@@ -1,12 +1,10 @@
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
+import * as tokenService from "@/services/tokenService";
 
-import { refreshToken } from "../api/auth";
 import { axiosInstance } from "../api/config";
 
 type Props = {
@@ -14,82 +12,86 @@ type Props = {
 };
 
 const AuthInterceptor = ({ children }: Props) => {
-  const { isAuthenticated, logOut } = useAuthUserContext();
-  const { authProfile, loading } = useAuthProfileContext();
+  const { logOut, selectedProfileId } = useAuthUserContext();
+  const { loading } = useAuthProfileContext();
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // Add a response interceptor
-      const authInterceptor = axiosInstance.interceptors.response.use(
-        function (response) {
-          // Any status code that lie within the range of 2xx cause this function to trigger
-          // Do something with response data
-          return response;
-        },
-        async function (error) {
-          const config = error?.config;
-          // Any status codes that falls outside the range of 2xx cause this function to trigger
-          // Do something with response error
-          if (error.response.status === 401 && !config._retry) {
-            config._retry = true;
-            // access token is expired
-            // try to refresh the token
-            const storedRefreshToken = await SecureStore.getItemAsync("REFRESH_TOKEN");
+    // Set up interceptors immediately, regardless of auth status
+    // This ensures they're active before any requests from contexts fire
+    // Add a response interceptor
+    const responseInterceptor = axiosInstance.interceptors.response.use(
+      function (response) {
+        // Any status code that lie within the range of 2xx cause this function to trigger
+        // Do something with response data
+        return response;
+      },
+      async function (error) {
+        const config = error?.config;
+        // Any status codes that falls outside the range of 2xx cause this function to trigger
+        // Do something with response error
+        if (error.response.status === 401 && !config._retry) {
+          config._retry = true;
+
+          try {
+            // access token is expired - try to refresh the token
+            const storedRefreshToken = await tokenService.getRefreshToken();
             if (storedRefreshToken) {
-              const decodedToken = jwtDecode(storedRefreshToken);
-              const now = Date.now();
-              if (decodedToken?.exp && decodedToken.exp * 1000 < now) {
-                // if refresh token is expired, log user out
-                console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR 1");
-                logOut();
+              // refreshAccessToken handles queuing internally if a refresh is already in progress
+              // This prevents race conditions when multiple 401s happen simultaneously
+              const { success, accessToken } = await tokenService.refreshAccessToken(storedRefreshToken);
+              if (success && accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+                return axiosInstance(config);
               } else {
-                const { error, data } = await refreshToken(storedRefreshToken);
-                if (data && !error) {
-                  const newAccessToken = data.access;
-                  await SecureStore.setItemAsync("ACCESS_TOKEN", newAccessToken);
-                  config.headers.Authorization = `Bearer ${newAccessToken}`;
-                } else {
-                  console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR 2");
-                  logOut();
-                }
+                console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR");
+                logOut();
+                return Promise.reject(error);
               }
+            } else {
+              // No refresh token available
+              return Promise.reject(error);
             }
-            return axiosInstance(config);
+          } catch (err) {
+            // Handle any unexpected errors during refresh
+            return Promise.reject(err);
           }
+        }
 
-          return Promise.reject(error);
-        },
-      );
+        return Promise.reject(error);
+      },
+    );
 
-      return () => {
-        axiosInstance.interceptors.request.eject(authInterceptor);
-      };
-    }
-  }, [isAuthenticated, logOut, router]);
+    return () => {
+      axiosInstance.interceptors.response.eject(responseInterceptor);
+    };
+  }, [logOut, router]);
 
   useEffect(() => {
     const requestInterceptor = axiosInstance.interceptors.request.use(
       async function (config) {
-        // Do something before request is sent
-        const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
+        // Get token from cache or SecureStore (with automatic promise coordination)
+        const accessToken = await tokenService.getAccessToken();
+
+        // Attach token and profile ID to request
+        // Use selectedProfileId instead of authProfile.id to avoid stale profile ID
+        // during profile switches (selectedProfileId updates immediately, authProfile needs to be fetched)
         config.headers.Authorization = `Bearer ${accessToken}`;
-        // attach selected profile id to each request
-        config.headers["AUTH-PROFILE-ID"] = authProfile.id;
+        config.headers["AUTH-PROFILE-ID"] = selectedProfileId;
         return config;
       },
       function (error) {
-        // Do something with request error
         return Promise.reject(error);
       },
     );
     return () => {
       axiosInstance.interceptors.request.eject(requestInterceptor);
     };
-  }, [isAuthenticated, logOut, authProfile]);
+  }, [selectedProfileId]);
 
-  // without this check, requests will be made before the auth profile is set in the auth interceptor
-  // it will result in several 401's and cause multiple requests to be retried
+  // Block rendering until initial profile load completes
+  // This prevents requests from firing before the user's first profile is authenticated
+  // Note: Profile switches use backgroundRefresh so loading stays false
   if (loading) {
     return null;
   }
