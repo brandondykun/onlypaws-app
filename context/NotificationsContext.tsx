@@ -86,12 +86,14 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const { isAuthenticated, selectedProfileId } = useAuthUserContext();
 
   // Initialize paginated fetch for DB notifications
+  // Include selectedProfileId so fetch resets when profile changes
   const initialFetch = useCallback(async () => {
     const { data, error } = await getNotifications();
     return { data, error };
-  }, []);
+  }, [selectedProfileId]);
 
-  // Delay notifications fetch by 500ms to avoid racing with initial token refresh
+  // Delay notifications fetch by 500ms on initial load to avoid racing with initial token refresh
+  // The auth interceptor will handle 401s that occur during profile switches
   const [enableNotificationsFetch, setEnableNotificationsFetch] = useState(false);
 
   useEffect(() => {
@@ -119,11 +121,26 @@ const NotificationsContextProvider = ({ children }: Props) => {
     fetchNextLoading: fetchNextLoadingDbNotifications,
     hasFetchNextError: hasFetchNextErrorDbNotifications,
   } = usePaginatedFetch<DBNotification>(initialFetch, {
-    enabled: enableNotificationsFetch, // Delayed to avoid token refresh race
+    enabled: enableNotificationsFetch,
   });
 
   // WebSocket notifications state (recent notifications received while app is open)
   const [wsNotifications, setWsNotifications] = useState<WSNotification[]>([]);
+
+  // Track the previous profile ID to detect profile switches
+  const prevProfileIdRef = useRef<number | null>(null);
+
+  // Clear WebSocket notifications when profile changes
+  // DB notifications are automatically cleared by usePaginatedFetch when initialFetch changes
+  useEffect(() => {
+    const isProfileSwitch = prevProfileIdRef.current !== null && prevProfileIdRef.current !== selectedProfileId;
+
+    if (isProfileSwitch && selectedProfileId) {
+      setWsNotifications([]);
+    }
+
+    prevProfileIdRef.current = selectedProfileId;
+  }, [selectedProfileId]);
 
   // WebSocket connection state
   const [isConnected, setIsConnected] = useState(false);
