@@ -13,6 +13,7 @@ interface PaginatedResponse<T> {
 interface UsePaginatedFetchResult<T> {
   data: T[];
   setData: React.Dispatch<React.SetStateAction<T[]>>;
+  fetchInitial: () => Promise<void>;
   initialFetchComplete: boolean;
   hasInitialFetchError: boolean;
   fetchNext: () => Promise<void>;
@@ -138,6 +139,7 @@ export function usePaginatedFetch<T>(
   return {
     data,
     setData,
+    fetchInitial,
     initialFetchComplete,
     hasInitialFetchError,
     fetchNext,

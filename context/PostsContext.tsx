@@ -9,6 +9,7 @@ import { useAuthProfileContext } from "./AuthProfileContext";
 
 type PostContextType = {
   data: PostDetailed[];
+  fetch: () => Promise<void>;
   addPost: (data: PostDetailed) => void;
   deletePost: (id: number) => void;
   refetch: () => Promise<void>;
@@ -27,6 +28,7 @@ type PostContextType = {
 
 const PostsContext = createContext<PostContextType>({
   data: [],
+  fetch: () => Promise.resolve(),
   addPost: (data: PostDetailed) => {},
   deletePost: (id: number) => {},
   refetch: () => Promise.resolve(),
@@ -58,6 +60,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const {
     data,
     setData,
+    fetchInitial,
     refresh,
     refreshing,
     initialFetchComplete,
@@ -68,7 +71,7 @@ const PostsContextProvider = ({ children }: Props) => {
     hasFetchNextError,
   } = usePaginatedFetch<PostDetailed>(initialFetch, {
     onRefresh: () => Haptics.impactAsync(),
-    enabled: !!authProfile?.id,
+    enabled: false, // Lazy load - only fetch when posts tab is visited
   });
 
   const addPost = (data: PostDetailed) => {
@@ -119,6 +122,7 @@ const PostsContextProvider = ({ children }: Props) => {
 
   const value = {
     data,
+    fetch: fetchInitial,
     addPost,
     deletePost,
     refetch: refresh,
@@ -143,6 +147,7 @@ export default PostsContextProvider;
 export const usePostsContext = () => {
   const {
     data,
+    fetch,
     addPost,
     deletePost,
     refetch,
@@ -160,6 +165,7 @@ export const usePostsContext = () => {
   } = useContext(PostsContext);
   return {
     data,
+    fetch,
     addPost,
     deletePost,
     refetch,

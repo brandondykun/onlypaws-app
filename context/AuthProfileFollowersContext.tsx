@@ -14,6 +14,7 @@ import { useAuthProfileContext } from "./AuthProfileContext";
 // Also needed to share search function for performing search.
 
 type AuthProfileFollowersContextType = {
+  fetch: () => Promise<void>;
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   data: FollowProfile[];
@@ -40,6 +41,7 @@ type AuthProfileFollowersContextType = {
 };
 
 const AuthProfileFollowersContext = createContext<AuthProfileFollowersContextType>({
+  fetch: () => Promise.resolve(),
   searchText: "",
   setSearchText: () => {},
   data: [],
@@ -78,6 +80,7 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
   }, [authProfile]);
 
   const {
+    fetchInitial,
     data,
     setData,
     refresh,
@@ -90,7 +93,7 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
     hasFetchNextError,
   } = usePaginatedFetch<FollowProfile>(initialFetch, {
     onRefresh: () => Haptics.impactAsync(),
-    enabled: !!authProfile?.id,
+    enabled: false, // Lazy load - only fetch when followers screen is visited
   });
 
   const [searchText, setSearchText] = useState("");
@@ -149,6 +152,7 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
   };
 
   const value = {
+    fetch: fetchInitial,
     searchText,
     setSearchText,
     data,
@@ -181,6 +185,7 @@ export default AuthProfileFollowersContextProvider;
 
 export const useAuthProfileFollowersContext = () => {
   const {
+    fetch,
     searchText,
     setSearchText,
     data,
@@ -206,6 +211,7 @@ export const useAuthProfileFollowersContext = () => {
     hasSearchError,
   } = useContext(AuthProfileFollowersContext);
   return {
+    fetch,
     searchText,
     setSearchText,
     data,

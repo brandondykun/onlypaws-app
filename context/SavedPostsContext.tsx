@@ -5,9 +5,8 @@ import { getSavedPosts } from "@/api/post";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { PostDetailed } from "@/types";
 
-import { useAuthProfileContext } from "./AuthProfileContext";
-
 type SavedPostsContextType = {
+  fetch: () => Promise<void>;
   data: PostDetailed[];
   savePost: (data: PostDetailed) => void;
   unSavePost: (id: number) => void;
@@ -23,6 +22,7 @@ type SavedPostsContextType = {
 };
 
 const SavedPostsContext = createContext<SavedPostsContextType>({
+  fetch: () => Promise.resolve(),
   data: [],
   savePost: (data: PostDetailed) => {},
   unSavePost: (id: number) => {},
@@ -42,14 +42,13 @@ type Props = {
 };
 
 const SavedPostsContextProvider = ({ children }: Props) => {
-  const { authProfile } = useAuthProfileContext();
-
   const initialFetch = useCallback(async () => {
     const { data, error } = await getSavedPosts();
     return { data, error };
   }, []);
 
   const {
+    fetchInitial,
     data,
     setData,
     refresh,
@@ -62,7 +61,7 @@ const SavedPostsContextProvider = ({ children }: Props) => {
     hasFetchNextError,
   } = usePaginatedFetch<PostDetailed>(initialFetch, {
     onRefresh: () => Haptics.impactAsync(),
-    enabled: !!authProfile?.id,
+    enabled: false, // Lazy load - only fetch when screen is visited
   });
 
   const savePost = (postData: PostDetailed) => {
@@ -98,6 +97,7 @@ const SavedPostsContextProvider = ({ children }: Props) => {
   };
 
   const value = {
+    fetch: fetchInitial,
     data,
     savePost,
     unSavePost,
@@ -119,6 +119,7 @@ export default SavedPostsContextProvider;
 
 export const useSavedPostsContext = () => {
   const {
+    fetch,
     data,
     savePost,
     unSavePost,
@@ -133,6 +134,7 @@ export const useSavedPostsContext = () => {
     hasInitialFetchError,
   } = useContext(SavedPostsContext);
   return {
+    fetch,
     data,
     savePost,
     unSavePost,

@@ -20,6 +20,13 @@ const SavedPostsScreen = () => {
 
   const isFocused = useIsFocused();
 
+  // Lazy load saved posts when screen is visited
+  useEffect(() => {
+    if (!posts.initialFetchComplete && !posts.refreshing) {
+      posts.fetch();
+    }
+  }, [posts]);
+
   useEffect(() => {
     if (isFocused) {
       posts.setData((prev) => {

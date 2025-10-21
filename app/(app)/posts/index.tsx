@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
@@ -18,6 +18,13 @@ const PostsScreen = () => {
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
+
+  // Lazy load posts when tab is visited
+  useEffect(() => {
+    if (!posts.initialFetchComplete && !posts.refreshing) {
+      posts.fetch();
+    }
+  }, [posts]);
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });

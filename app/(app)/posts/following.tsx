@@ -1,6 +1,7 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { View, ActivityIndicator, RefreshControl, StyleSheet, Platform, Pressable } from "react-native";
 
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
@@ -15,6 +16,13 @@ const FollowingScreen = () => {
   const followingCtx = useAuthProfileFollowingContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+
+  // Lazy load following when screen is visited
+  useEffect(() => {
+    if (!followingCtx.initialFetchComplete && !followingCtx.refreshing) {
+      followingCtx.fetch();
+    }
+  }, [followingCtx]);
 
   let content = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
