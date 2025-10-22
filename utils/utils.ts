@@ -10,7 +10,10 @@ import { FeedbackTicketType } from "@/types/feedback/feedback";
 dayjs.extend(relativeTime);
 
 export const getTimeSince = (pastDate: string) => {
-  const output = dayjs().from(pastDate, true);
+  let output = dayjs().from(pastDate, true);
+  output = output.replace(/minutes/gi, "mins");
+  output = output.replace(/hours/gi, "hrs");
+  output = output.replace(/seconds/gi, "sec");
   return `${output} ago`;
 };
 
