@@ -107,6 +107,7 @@ export const BottomSheetTextInput = forwardRef(
           fontSize: 18,
           paddingVertical: 10,
           color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900],
+          overflow: "hidden",
         }}
         placeholderTextColor={COLORS.zinc[500]}
         onFocus={() => setIsFocused(true)}
