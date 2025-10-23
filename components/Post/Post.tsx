@@ -34,9 +34,16 @@ type Props = {
   onProfilePress?: (profileId: number) => void;
   captionDefaultExpanded?: boolean;
   captionExpandable?: boolean;
+  headerVisible?: boolean;
 };
 
-const Post = ({ post, onProfilePress, captionDefaultExpanded = false, captionExpandable = true }: Props) => {
+const Post = ({
+  post,
+  onProfilePress,
+  captionDefaultExpanded = false,
+  captionExpandable = true,
+  headerVisible = true,
+}: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const { savePost, unSavePost, onLike, onUnlike, onComment, onToggleHidden } = usePostManagerContext();
@@ -203,31 +210,33 @@ const Post = ({ post, onProfilePress, captionDefaultExpanded = false, captionExp
 
   return (
     <View style={{ minHeight: POST_HEIGHT }}>
-      <View style={{ padding: 8 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <ProfileImage image={post.profile.image} size={35} />
+      {headerVisible ? (
+        <View style={{ padding: 8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <ProfileImage image={post.profile.image} size={35} />
+              <Pressable
+                style={({ pressed }) => [pressed && onProfilePress && { opacity: 0.7 }]}
+                onPress={handleProfilePress}
+                hitSlop={10}
+                testID={`post-username-button-${post.id}`}
+              >
+                <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
+                  {post.profile.username}
+                </Text>
+              </Pressable>
+            </View>
             <Pressable
-              style={({ pressed }) => [pressed && onProfilePress && { opacity: 0.7 }]}
-              onPress={handleProfilePress}
-              hitSlop={10}
-              testID={`post-username-button-${post.id}`}
+              style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
+              hitSlop={8}
+              onPress={openMenu}
+              testID={`post-menu-button-${post.id}`}
             >
-              <Text darkColor={COLORS.zinc[300]} style={{ fontSize: 20, textDecorationLine: "underline" }}>
-                {post.profile.username}
-              </Text>
+              <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
             </Pressable>
           </View>
-          <Pressable
-            style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
-            hitSlop={8}
-            onPress={openMenu}
-            testID={`post-menu-button-${post.id}`}
-          >
-            <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
-          </Pressable>
         </View>
-      </View>
+      ) : null}
       <View style={{ position: "relative" }}>
         {post.is_hidden && post.profile.id !== authProfile.id ? (
           <BlurView

@@ -25,7 +25,7 @@ const PostDetailsScreen = () => {
       {loading ? (
         <PostSkeleton />
       ) : !error && post ? (
-        <Post post={post} captionDefaultExpanded={true} captionExpandable={false} />
+        <Post post={post} captionDefaultExpanded={true} captionExpandable={false} headerVisible={false} />
       ) : (
         <View style={{ paddingVertical: 64, alignItems: "center", paddingHorizontal: 24 }}>
           <ErrorText>We A-paw-logize!</ErrorText>
