@@ -8,7 +8,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput";
 import { forwardRef, ForwardedRef, useMemo, useState } from "react";
-import { Keyboard, Platform, View } from "react-native";
+import { Keyboard, Platform, StyleProp, TextStyle, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
@@ -30,7 +30,7 @@ const BottomSheetModal = forwardRef(
     { children, handleTitle, onChange, onDismiss, ...props }: Props,
     ref: ForwardedRef<RNBottomSheetModal<any>> | undefined,
   ) => {
-    const snapPoints = useMemo(() => ["90%"], []);
+    const snapPoints = useMemo(() => ["92%"], []);
     const { isDarkMode } = useColorMode();
 
     return (
@@ -92,23 +92,28 @@ const BottomSheetModal = forwardRef(
 );
 
 export const BottomSheetTextInput = forwardRef(
-  ({ ...props }: BottomSheetTextInputProps, ref: ForwardedRef<TextInput>) => {
+  ({ style, ...props }: BottomSheetTextInputProps & { style?: StyleProp<TextStyle> }, ref: ForwardedRef<TextInput>) => {
     const { isDarkMode, setLightOrDark } = useColorMode();
     const [isFocused, setIsFocused] = useState(false);
 
     return (
       <RNBottomSheetTextInput
         ref={ref}
-        style={{
-          borderRadius: 25,
-          paddingHorizontal: 16,
-          borderColor: isFocused ? setLightOrDark(COLORS.zinc[950], COLORS.zinc[400]) : COLORS.zinc[500],
-          borderWidth: 1,
-          fontSize: 18,
-          paddingVertical: 10,
-          color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900],
-          overflow: "hidden",
-        }}
+        style={[
+          {
+            borderRadius: 25,
+            paddingHorizontal: 12,
+            borderColor: isFocused
+              ? setLightOrDark(COLORS.zinc[950], COLORS.zinc[400])
+              : setLightOrDark(COLORS.zinc[400], COLORS.zinc[500]),
+            borderWidth: 1,
+            fontSize: 16,
+            paddingVertical: 12,
+            color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900],
+            overflow: "hidden",
+          },
+          style,
+        ]}
         placeholderTextColor={COLORS.zinc[500]}
         onFocus={() => setIsFocused(true)}
         {...props}
