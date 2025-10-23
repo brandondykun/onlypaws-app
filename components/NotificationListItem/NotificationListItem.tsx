@@ -54,6 +54,16 @@ const NotificationListItem = ({ item, index }: Props) => {
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the comment details
       router.push({ pathname: "/(app)/posts/commentDetails", params: { commentId: item.extra_data.comment_id } });
+    } else if (item.notification_type === "comment") {
+      // Mark the notification as read
+      if (!item.is_read) markAsRead(item.id.toString());
+      // Navigate to the comment details
+      router.push({ pathname: "/(app)/posts/commentDetails", params: { commentId: item.extra_data.comment_id } });
+    } else if (item.notification_type === "comment_reply") {
+      // Mark the notification as read
+      if (!item.is_read) markAsRead(item.id.toString());
+      // Navigate to the comment details
+      router.push({ pathname: "/(app)/posts/commentDetails", params: { commentId: item.extra_data.comment_id } });
     }
   };
 
@@ -61,27 +71,21 @@ const NotificationListItem = ({ item, index }: Props) => {
     <Pressable onPress={handlePress} style={({ pressed }) => [pressed && { opacity: 0.7 }]}>
       <View style={s.root}>
         {item.is_read ? null : <View style={s.notificationIndicator} />}
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, overflow: "hidden" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            {senderImage ? <ProfileImage image={senderImage} size={28} /> : null}
-            <Text style={{ fontSize: 22, fontWeight: "400" }}>{senderUsername}</Text>
+            <ProfileImage image={senderImage || null} size={28} />
+            <Text style={{ fontSize: 22, fontWeight: "400" }} numberOfLines={1}>
+              {senderUsername}
+            </Text>
           </View>
-          <View style={{ gap: 8, flexDirection: "row", alignItems: "flex-end" }}>
+          <View style={{ gap: 6, flexDirection: "row", alignItems: "flex-end" }}>
             <View>
-              <Text
-                style={{ fontSize: 16, fontWeight: "400" }}
-                darkColor={COLORS.zinc[400]}
-                lightColor={COLORS.zinc[700]}
-              >
+              <Text style={s.title} numberOfLines={1} darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[950]}>
                 {item.title}
               </Text>
             </View>
             <View>
-              <Text
-                darkColor={COLORS.zinc[500]}
-                lightColor={COLORS.zinc[600]}
-                style={{ fontSize: 16, fontWeight: "300" }}
-              >
+              <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
                 {getTimeSince(item.created_at)}
               </Text>
             </View>
@@ -116,5 +120,10 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.red[500],
     borderRadius: 100,
     zIndex: 10,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: "400",
+    wordWrap: "nowrap",
   },
 });

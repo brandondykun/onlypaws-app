@@ -235,6 +235,14 @@ const NotificationsContextProvider = ({ children }: Props) => {
         if (notification.comment_id) {
           return `${senderName} liked your comment`;
         }
+      case "comment":
+        if (notification.comment_id) {
+          return `${senderName} commented on your post`;
+        }
+      case "comment_reply":
+        if (notification.comment_id) {
+          return `${senderName} replied to your comment`;
+        }
       default:
         return notification.message;
     }
