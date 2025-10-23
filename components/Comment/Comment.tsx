@@ -179,10 +179,6 @@ const Comment = ({
                   <ReplyCommentReplyButton
                     onReplyPress={() => {
                       onReplyPress(comment, replyComment);
-                      setTimeout(() => {
-                        // needs timeout to allow the keyboard to open before scrolling
-                        listRef.current?.scrollToIndex({ index: commentIndex, animated: true });
-                      }, 250);
                     }}
                   />
                 </View>
