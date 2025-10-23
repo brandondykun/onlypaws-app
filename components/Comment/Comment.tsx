@@ -147,7 +147,7 @@ const Comment = ({
     }
   };
 
-  const bgColor = replyToCommentId === comment.id ? (isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200]) : undefined;
+  const bgColor = getCommentBgColor(replyToCommentId, comment.id, isDarkMode);
 
   return (
     <View style={[s.root]}>
@@ -165,8 +165,7 @@ const Comment = ({
         <>
           <View style={{ padding: 0 }}>
             {comment.replies?.map((replyComment, index) => {
-              const bgColor =
-                replyToCommentId === replyComment.id ? (isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200]) : undefined;
+              const bgColor = getCommentBgColor(replyToCommentId, replyComment.id, isDarkMode);
 
               return (
                 <View style={{ marginVertical: 6 }} key={index}>
@@ -223,3 +222,11 @@ const s = StyleSheet.create({
     marginBottom: 8,
   },
 });
+
+// get the background color to highlight a comment or reply comment if user is replying to that comment
+const getCommentBgColor = (replyToCommentId: number | undefined, commentId: number, isDarkMode: boolean) => {
+  if (replyToCommentId && replyToCommentId === commentId) {
+    return isDarkMode ? COLORS.sky[975] : COLORS.sky[100];
+  }
+  return undefined;
+};
