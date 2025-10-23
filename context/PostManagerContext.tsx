@@ -16,6 +16,7 @@ import { useExplorePostsContext } from "./ExplorePostsContext";
 import { useExploreProfileDetailsContext } from "./ExploreProfileDetailsContext";
 import { useFeedPostsContext } from "./FeedPostsContext";
 import { useFeedProfileDetailsContext } from "./FeedProfileDetailsContext";
+import { usePostsContext } from "./PostsContext";
 import { usePostsProfileDetailsContext } from "./PostsProfileDetailsContext";
 import { useSavedPostsContext } from "./SavedPostsContext";
 
@@ -54,7 +55,8 @@ const PostManagerContextProvider = ({ children }: Props) => {
   const savedPosts = useSavedPostsContext();
   const exploreProfile = useExploreProfileDetailsContext();
   const feedProfile = useFeedProfileDetailsContext();
-  const postsProfile = usePostsProfileDetailsContext();
+  const postsProfile = usePostsProfileDetailsContext(); // the profile being viewed's posts
+  const authProfilePosts = usePostsContext(); // the logged in user's posts
 
   const savePost = (postData: PostDetailed) => {
     // save post wherever it appears in the app
@@ -109,6 +111,7 @@ const PostManagerContextProvider = ({ children }: Props) => {
     addCommentInState(exploreProfile.posts.setData, postId);
     addCommentInState(feedProfile.posts.setData, postId);
     addCommentInState(postsProfile.posts.setData, postId);
+    addCommentInState(authProfilePosts.setData, postId);
   };
 
   const onToggleHidden = (postId: number) => {
