@@ -1,5 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
-import { useState, forwardRef, LegacyRef, useEffect, useRef } from "react";
+import { useState, forwardRef, ForwardedRef, useEffect, useRef } from "react";
 import {
   TextInput as RNTextInput,
   StyleSheet,
@@ -47,7 +47,7 @@ const TextInput = forwardRef(
       withClearButton = false,
       ...rest
     }: Props,
-    ref: LegacyRef<RNTextInput> | undefined,
+    ref: ForwardedRef<RNTextInput>,
   ) => {
     const [focused, setFocused] = useState(false);
     const [textHidden, setTextHidden] = useState(secureTextEntry ? true : false);

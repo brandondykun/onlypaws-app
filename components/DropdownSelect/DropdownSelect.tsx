@@ -1,5 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import { forwardRef, LegacyRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import { View, StyleSheet } from "react-native";
 import SelectDropdown, { SelectDropdownProps } from "react-native-select-dropdown";
 
@@ -20,7 +20,7 @@ type Props = {
 } & Omit<SelectDropdownProps, "renderButton" | "renderItem" | "data">;
 
 const DropdownSelect = forwardRef(
-  ({ data, defaultText, label, ...props }: Props, ref: LegacyRef<SelectDropdown> | undefined) => {
+  ({ data, defaultText, label, ...props }: Props, ref: ForwardedRef<SelectDropdown>) => {
     const { setLightOrDark } = useColorMode();
 
     return (
