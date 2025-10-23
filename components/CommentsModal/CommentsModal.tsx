@@ -50,11 +50,14 @@ const CommentsModal = forwardRef(
     // specific comment being replied to
     const [replyToComment, setReplyToComment] = useState<PostCommentDetailed | null>(null);
 
-    const { isDarkMode } = useColorMode();
+    const { isDarkMode, setLightOrDark } = useColorMode();
     const { authProfile } = useAuthProfileContext();
     const commentInputRef = useRef<RNGHTextInput>(null); // comment input component ref
     const inputValueRef = useRef(""); // comment text ref
     const flatListRef = useRef<BottomSheetFlatListMethods>(null); // ref to comments flat list
+
+    const [inputHasText, setInputHasText] = useState(false);
+    const [inputIsFocused, setInputIsFocused] = useState(false);
 
     // like a top level comment
     const handleLikeComment = (commentId: number) => {
@@ -372,36 +375,82 @@ const CommentsModal = forwardRef(
               </View>
             ) : null}
           </View>
-          <View style={{ paddingHorizontal: 16, flexDirection: "row", gap: 8, paddingTop: 12, alignItems: "center" }}>
+          <View style={[s.footerInputContainer, { paddingBottom: inputIsFocused ? 0 : 16 }]}>
             <View style={{ flex: 1 }}>
               <BottomSheetTextInput
                 placeholder={replyToComment ? `Reply to @${replyToComment.profile.username}...` : "Add comment..."}
                 ref={commentInputRef}
                 defaultValue={inputValueRef.current}
-                onChangeText={(text) => (inputValueRef.current = text)}
+                onChangeText={(text) => {
+                  inputValueRef.current = text;
+                  if (inputValueRef.current) {
+                    setInputHasText(true);
+                  } else {
+                    setInputHasText(false);
+                  }
+                }}
                 onBlur={() => {
                   if (!inputValueRef.current) {
                     // if input has text don't clear the parent and reply to comment
                     setParentComment(null);
                     setReplyToComment(null);
                   }
+                  setInputIsFocused(false);
+                }}
+                onFocus={() => setInputIsFocused(true)}
+                multiline={true}
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={1000}
+                style={{
+                  minHeight: inputIsFocused ? 110 : undefined,
+                  backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[800]),
+                  borderRadius: inputIsFocused ? 16 : 25,
                 }}
               />
             </View>
-            <Pressable
-              style={({ pressed }) => [{ opacity: pressed || addCommentLoading ? 0.5 : 1 }]}
-              onPress={handleAddComment}
-              disabled={addCommentLoading}
-              testID="add-comment-button"
-            >
-              <View style={s.addCommentButton}>
-                {!addCommentLoading ? (
-                  <Ionicons name="arrow-up-outline" size={24} color={COLORS.zinc[100]} />
-                ) : (
-                  <ActivityIndicator size="small" color={COLORS.zinc[200]} />
-                )}
+            <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-between" }}>
+              {inputIsFocused && inputHasText ? (
+                <Pressable
+                  style={({ pressed }) => [
+                    { opacity: pressed || addCommentLoading || !inputHasText ? 0.5 : 1, marginTop: 4 },
+                  ]}
+                  onPress={() => {
+                    commentInputRef.current?.clear();
+                    inputValueRef.current = "";
+                    setInputHasText(false);
+                  }}
+                  disabled={addCommentLoading || !inputHasText}
+                  testID="clear-comment-input-button"
+                >
+                  <View
+                    style={[s.clearButton, { backgroundColor: setLightOrDark(COLORS.zinc[600], COLORS.zinc[300]) }]}
+                  >
+                    <Ionicons
+                      name="backspace-outline"
+                      size={16}
+                      color={setLightOrDark(COLORS.zinc[100], COLORS.zinc[800])}
+                    />
+                  </View>
+                </Pressable>
+              ) : null}
+              <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <Pressable
+                  style={({ pressed }) => [{ opacity: pressed || addCommentLoading ? 0.5 : 1 }]}
+                  onPress={handleAddComment}
+                  disabled={addCommentLoading}
+                  testID="add-comment-button"
+                >
+                  <View style={s.addCommentButton}>
+                    {!addCommentLoading ? (
+                      <Ionicons name="arrow-up-outline" size={24} color={COLORS.zinc[100]} />
+                    ) : (
+                      <ActivityIndicator size="small" color={COLORS.zinc[200]} />
+                    )}
+                  </View>
+                </Pressable>
               </View>
-            </Pressable>
+            </View>
           </View>
         </View>
         <Toast config={toastConfig} />
@@ -449,5 +498,18 @@ const s = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 45,
+  },
+  footerInputContainer: {
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    gap: 8,
+    paddingTop: 12,
+  },
+  clearButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 26,
+    height: 26,
+    borderRadius: 25,
   },
 });
