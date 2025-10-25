@@ -4,7 +4,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { useCallback, useEffect } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { Image as CropperImage } from "react-native-image-crop-picker";
-import { runOnJS } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -34,7 +34,7 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
   const handleDragStart = useCallback(() => {
     "worklet";
 
-    runOnJS(Haptics.selectionAsync)();
+    scheduleOnRN(Haptics.selectionAsync);
   }, []);
 
   useEffect(() => {

@@ -2,10 +2,9 @@ import { useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useRef, useState, useCallback } from "react";
-import React from "react";
 import { StyleSheet, View, ActivityIndicator, useWindowDimensions } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import { runOnJS } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
 
 import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
@@ -99,7 +98,7 @@ const CameraScreen = () => {
 
   // handle tap to focus
   const gesture = Gesture.Tap().onEnd(({ x, y }) => {
-    runOnJS(focus)({ x, y });
+    scheduleOnRN(focus, { x, y });
   });
 
   let content = (

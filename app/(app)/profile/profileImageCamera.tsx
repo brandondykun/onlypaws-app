@@ -4,11 +4,10 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useRef, useState, useCallback } from "react";
-import React from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as ImageCropPicker from "react-native-image-crop-picker";
-import { runOnJS } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import Toast from "react-native-toast-message";
 import { Camera, useCameraDevice, useCameraPermission, Point, PhotoFile } from "react-native-vision-camera";
 
@@ -106,7 +105,7 @@ const ProfileImageCamera = () => {
 
   // handle tap to focus
   const gesture = Gesture.Tap().onEnd(({ x, y }) => {
-    runOnJS(focus)({ x, y });
+    scheduleOnRN(focus, { x, y });
   });
 
   const handleSavePress = async () => {
