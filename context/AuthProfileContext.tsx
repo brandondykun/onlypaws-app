@@ -40,6 +40,7 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
     following_count: 0,
     breed: "",
     pet_type: null,
+    profile_type: "regular",
   },
   loading: false,
   updateProfileImage: (image: ProfileImage) => {},
@@ -59,7 +60,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const defaultProfile = {
+const defaultProfile: ProfileDetailsType = {
   id: null!,
   username: "",
   name: "",
@@ -71,6 +72,7 @@ const defaultProfile = {
   following_count: 0,
   breed: "",
   pet_type: null,
+  profile_type: "regular",
 };
 
 const AuthProfileContextProvider = ({ children }: Props) => {

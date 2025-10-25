@@ -19,11 +19,14 @@ export type UserBasic = {
   email: null | string;
 };
 
+export type ProfileType = "regular" | "business";
+
 export type ProfileOption = {
   id: number;
   username: string;
   image: ProfileImage | null;
   name: string;
+  profile_type: ProfileType;
 };
 
 export type ProfileImage = {
@@ -158,6 +161,7 @@ export type ProfileDetails = {
   following_count: number;
   pet_type: PetType | null;
   breed: string | null;
+  profile_type: ProfileType;
 };
 
 export type PaginatedExploreResponse = {
