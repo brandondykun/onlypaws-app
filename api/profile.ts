@@ -14,7 +14,7 @@ import {
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
 export const getProfileDetails = async (profileId: number | string) => {
-  const url = `/v1/profile/${profileId}`;
+  const url = `/v1/profile/${profileId}/`;
   return await axiosFetch<ProfileDetails>(url);
 };
 
