@@ -1,10 +1,7 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React from "react";
-import { Dimensions, View, StyleSheet } from "react-native";
-import { Platform } from "react-native";
-import { TouchableOpacity } from "react-native";
+import { Dimensions, View, StyleSheet, Pressable, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
@@ -33,20 +30,20 @@ const CameraHeader = ({ handleBackButtonPress, toggleFlash, flash, toggleCameraF
       ]}
     >
       <View style={[s.topIconContainer, { marginTop: Platform.OS === "ios" ? insets.top + 24 : 12 + 24 }]}>
-        <TouchableOpacity onPress={handleBackButtonPress}>
+        <Pressable onPress={handleBackButtonPress} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
           <AntDesign name="close" size={28} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={toggleFlash} hitSlop={10}>
+        </Pressable>
+        <Pressable onPress={toggleFlash} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
           <Ionicons
             name={flash === "on" ? "flash" : "flash-off"}
             size={24}
             color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
           />
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity onPress={toggleCameraFacing} hitSlop={10}>
+        <Pressable onPress={toggleCameraFacing} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
           <MaterialIcons name="flip-camera-ios" size={30} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

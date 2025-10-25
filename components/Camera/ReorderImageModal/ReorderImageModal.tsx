@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useCallback, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { runOnJS } from "react-native-reanimated";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
@@ -52,9 +52,13 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
     >
       <View style={{ flex: 1, paddingTop: 54 }}>
         <View style={s.header}>
-          <TouchableOpacity onPress={() => setVisible(false)} hitSlop={10}>
+          <Pressable
+            onPress={() => setVisible(false)}
+            hitSlop={10}
+            style={({ pressed }) => [pressed && { opacity: 0.6 }]}
+          >
             <Ionicons name="chevron-back-outline" size={30} color={isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]} />
-          </TouchableOpacity>
+          </Pressable>
           <Text
             style={{
               color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600],

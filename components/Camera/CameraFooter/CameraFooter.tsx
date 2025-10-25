@@ -2,7 +2,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { ImagePickerAsset } from "expo-image-picker";
-import { View, Pressable, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
@@ -60,7 +60,11 @@ const CameraFooter = ({
           </Pressable>
         </View>
         <View style={{ justifyContent: "center", alignItems: "center", opacity: maxImagesReached ? 0.3 : 1 }}>
-          <TouchableOpacity onPress={takePicture} disabled={maxImagesReached ? true : false}>
+          <Pressable
+            onPress={takePicture}
+            disabled={maxImagesReached ? true : false}
+            style={({ pressed }) => [pressed && !maxImagesReached ? { opacity: 0.6 } : null]}
+          >
             <View
               style={[s.takeImageButtonRing, { backgroundColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]) }]}
             >
@@ -76,7 +80,7 @@ const CameraFooter = ({
                 <Ionicons name="paw" size={36} color={COLORS.zinc[400]} />
               </View>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           {!images.length && imageChangeLoading ? (

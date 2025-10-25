@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet, StyleProp, TextStyle, ViewStyle } from "react-native";
+import { View, StyleSheet, StyleProp, TextStyle, ViewStyle, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 
@@ -85,25 +85,28 @@ const PostCaption = ({
       </Text>
 
       {/* Visible text - pressable to expand/collapse */}
-      <TouchableOpacity onPress={toggleExpansion} activeOpacity={0.8} style={s.textTouchable}>
+      <Pressable
+        onPress={toggleExpansion}
+        style={({ pressed }) => [{ opacity: pressed && showMoreButton ? 0.6 : 1 }, s.textTouchable]}
+        hitSlop={10}
+      >
         <Text style={[s.text, textStyle]} numberOfLines={isExpanded ? 0 : numberOfLines}>
           {caption}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Show more/less button */}
       {showMoreButton && (
-        <TouchableOpacity
+        <Pressable
           onPress={toggleExpansion}
-          style={s.moreButton}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, s.moreButton]}
+          hitSlop={10}
           testID="post-caption-more-button"
         >
           <Text style={[s.moreText, isExpanded ? lessTextStyle : moreTextStyle]}>
             {isExpanded ? "show less" : "view more"}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
