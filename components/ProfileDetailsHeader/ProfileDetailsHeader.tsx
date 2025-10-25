@@ -13,6 +13,7 @@ import { abbreviateNumber } from "@/utils/utils";
 import Button from "../Button/Button";
 import ProfileDetailsHeaderImage from "../ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import Text from "../Text/Text";
+import ProfileDetailsHeaderSkeleton from "../LoadingSkeletons/ProfileDetailsHeaderSkeleton";
 
 type Props = {
   profileData: ProfileDetails;
@@ -25,6 +26,7 @@ type Props = {
   followLoading?: boolean;
   profileError: boolean;
 };
+
 const ProfileDetailsHeader = ({
   profileData,
   postsCount,
@@ -40,6 +42,9 @@ const ProfileDetailsHeader = ({
   const { authProfile } = useAuthProfileContext();
 
   const router = useRouter();
+
+  if (profileError) return <ProfileErrorMessage />;
+  if (profileLoading) return <ProfileDetailsHeaderSkeleton showTwoButtons={authProfile.id === profileData?.id} />;
 
   const followButtons = (
     <View style={{ flex: 1 }}>
@@ -95,8 +100,6 @@ const ProfileDetailsHeader = ({
     </>
   );
 
-  if (profileError) return <ProfileErrorMessage />;
-
   // Create a string of 'pet type • breed'
   const toJoin = [];
   if (profileData?.pet_type) toJoin.push(profileData?.pet_type.name);
@@ -104,12 +107,12 @@ const ProfileDetailsHeader = ({
   const petDetailsText = toJoin.join(" • ");
 
   return (
-    <View style={{ backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }}>
+    <View>
       <View style={s.profileInfoContainer}>
         <View style={s.profileImageContainer}>
-          <ProfileDetailsHeaderImage size={120} image={(!profileLoading && profileData?.image) || null} />
+          <ProfileDetailsHeaderImage size={120} image={profileData?.image || null} />
         </View>
-        <Text style={s.nameText}>{profileLoading ? "Loading..." : profileData?.name}</Text>
+        <Text style={s.nameText}>{profileData?.name}</Text>
         <Text style={s.aboutText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]}>
           {profileData?.about ? profileData.about : "No about text"}
         </Text>
@@ -122,7 +125,7 @@ const ProfileDetailsHeader = ({
       </View>
       <View style={s.profileNumbersSection}>
         <View style={s.profileNumberGroup}>
-          <Text style={s.profileNumber}>{!profileLoading ? abbreviateNumber(postsCount) : "-"}</Text>
+          <Text style={s.profileNumber}>{abbreviateNumber(postsCount)}</Text>
           <Text style={s.profileNumberLabel}>POSTS</Text>
         </View>
         <Pressable
@@ -131,9 +134,7 @@ const ProfileDetailsHeader = ({
           android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
           <View style={s.profileNumberGroup}>
-            <Text style={s.profileNumber}>
-              {!profileLoading ? abbreviateNumber(profileData?.followers_count) : "-"}
-            </Text>
+            <Text style={s.profileNumber}>{abbreviateNumber(profileData?.followers_count)}</Text>
             <Text style={s.profileNumberLabel}>FOLLOWERS</Text>
           </View>
         </Pressable>
@@ -143,9 +144,7 @@ const ProfileDetailsHeader = ({
           android_disableSound={profileData?.id !== authProfile.id ? true : false}
         >
           <View style={s.profileNumberGroup}>
-            <Text style={s.profileNumber}>
-              {!profileLoading ? abbreviateNumber(profileData?.following_count) : "-"}
-            </Text>
+            <Text style={s.profileNumber}>{abbreviateNumber(profileData?.following_count)}</Text>
             <Text style={s.profileNumberLabel}>FOLLOWING</Text>
           </View>
         </Pressable>
