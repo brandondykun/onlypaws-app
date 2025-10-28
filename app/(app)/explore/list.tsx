@@ -8,14 +8,13 @@ import { getSimilarPosts } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
-import { PaginatedExploreResponse } from "@/types";
+import { useAdsInList } from "@/hooks/useAdsInList";
+import { PaginatedExploreResponse, PostDetailed } from "@/types";
 
 const ExplorePostsListScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const { authProfile } = useAuthProfileContext();
   const { similarPosts, setSimilarPosts } = useExplorePostsContext();
   const tabBarHeight = useBottomTabBarHeight();
   const exploreProfile = useExploreProfileDetailsContext();
@@ -81,12 +80,24 @@ const ExplorePostsListScreen = () => {
     }
   }, [setSimilarPosts, fetchNextUrl]);
 
+  // Render function for posts
+  const renderPost = useCallback(
+    (post: PostDetailed) => <Post post={post} onProfilePress={onProfilePress} />,
+    [onProfilePress],
+  );
+
+  // Use the ads hook - handles everything automatically!
+  const { data, renderItem, keyExtractor } = useAdsInList({
+    items: similarPosts,
+    renderItem: renderPost,
+  });
+
   return (
     <FlashList
-      data={similarPosts}
+      data={data}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
-      renderItem={({ item }) => <Post post={item} onProfilePress={onProfilePress} />}
-      keyExtractor={(item) => item.id.toString()}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
       onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
       onEndReached={!fetchNextLoading ? fetchNext : null}
       showsVerticalScrollIndicator={false}

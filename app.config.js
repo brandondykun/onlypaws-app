@@ -58,6 +58,13 @@ export default {
       "expo-web-browser",
       "expo-secure-store",
       [
+        "react-native-google-mobile-ads",
+        {
+          androidAppId: "ca-app-pub-4419810431864546~3114070928",
+          iosAppId: "ca-app-pub-4419810431864546~9181889474",
+        },
+      ],
+      [
         "expo-image-picker",
         {
           photosPermission: "Allow OnlyPaws to access your camera roll.",

@@ -27,4 +27,5 @@ android
 .env
 scripts/
 e2e/
+docs/
 

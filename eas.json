@@ -8,7 +8,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "development",
+        "EXPO_PUBLIC_ADS_TEST_MODE": "true"
       }
     },
     "development-simulator": {
@@ -21,13 +22,15 @@
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "preview",
-        "EXPO_PUBLIC_API_URL": "https://api-staging.onlypawsapp.com/api"
+        "EXPO_PUBLIC_API_URL": "https://api-staging.onlypawsapp.com/api",
+        "EXPO_PUBLIC_ADS_TEST_MODE": "true"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "APP_VARIANT": "production"
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_ADS_TEST_MODE": "false"
       }
     }
   },
