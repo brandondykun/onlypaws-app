@@ -105,6 +105,9 @@ const AddPostScreen = () => {
         type: "image/jpeg",
         mimeType: "multipart/form-data",
       } as any);
+
+      // Add corresponding order value
+      formData.append("order", i.toString());
     });
 
     setSubmitLoading(true);

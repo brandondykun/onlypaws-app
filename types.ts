@@ -82,6 +82,7 @@ export type PostImage = {
   id: number;
   post: number;
   image: string;
+  order: number;
 };
 
 export type PostLike = {
