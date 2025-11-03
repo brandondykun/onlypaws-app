@@ -502,7 +502,12 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
       if (error) {
         console.error("Failed to mark notification as read:", error);
-        throw new Error("Failed to mark notification as read");
+        Toast.show({
+          type: "error",
+          text1: "Failed to mark notification as read",
+          visibilityTime: 5000,
+          autoHide: true,
+        });
       }
 
       // Update WebSocket notifications
