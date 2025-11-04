@@ -51,7 +51,7 @@ const ProfileDetailsHeader = ({
       {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
         <Button
           text="Unfollow"
-          textStyle={s.followButtonText}
+          textStyle={[s.followButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }]}
           buttonStyle={[
             s.headerButton,
             {
