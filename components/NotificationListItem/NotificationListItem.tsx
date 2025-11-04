@@ -70,7 +70,7 @@ const NotificationListItem = ({ item, index }: Props) => {
   return (
     <Pressable onPress={handlePress} style={({ pressed }) => [pressed && { opacity: 0.7 }]}>
       <View style={s.root}>
-        {item.is_read ? null : <View style={s.notificationIndicator} />}
+        {item.is_read ? null : <View style={s.notificationIndicator} testID={`notification-indicator-${item.id}`} />}
         <View style={{ flex: 1, overflow: "hidden" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <ProfileImage image={senderImage || null} size={28} />

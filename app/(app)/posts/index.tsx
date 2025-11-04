@@ -46,7 +46,10 @@ const PostsScreen = () => {
           >
             <Ionicons name="notifications" size={22} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
             {unreadCount > 0 ? (
-              <View style={[s.notificationsCountIcon, { backgroundColor: COLORS.red[500] }]}>
+              <View
+                style={[s.notificationsCountIcon, { backgroundColor: COLORS.red[500] }]}
+                testID={`notifications-count-icon-${unreadCount}`}
+              >
                 <Text style={{ fontSize: 12, fontWeight: "600" }} lightColor={COLORS.zinc[50]}>
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Text>

@@ -137,6 +137,7 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
               { borderBottomWidth: 1, borderBottomColor: BORDER_COLOR },
             ]}
             onPress={handleEditProfilePress}
+            testID="edit-profile-button"
           >
             <Text style={s.buttonText}>Edit Profile</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />

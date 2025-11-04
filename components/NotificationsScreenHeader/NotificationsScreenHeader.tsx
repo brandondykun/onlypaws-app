@@ -27,7 +27,11 @@ const NotificationsScreenHeader = ({ onMarkAllAsReadPress, unreadCount, markAllA
         />
         {unreadCount > 0 ? (
           <View style={s.notificationsCountIcon}>
-            <Text style={{ fontSize: 12, fontWeight: "600" }} lightColor={COLORS.zinc[100]}>
+            <Text
+              style={{ fontSize: 12, fontWeight: "600" }}
+              lightColor={COLORS.zinc[100]}
+              testID={`notifications-count-text-${unreadCount}`}
+            >
               {unreadCount > 999 ? "999+" : unreadCount}
             </Text>
           </View>

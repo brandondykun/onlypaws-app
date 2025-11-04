@@ -60,7 +60,7 @@ const AddProfileScreen = () => {
 
     if (!error && data) {
       setActiveProfileId(data.id);
-      addProfileOption({ id: data.id, username: data.username, image: null, name: "" });
+      addProfileOption({ id: data.id, username: data.username, image: null, name: data.name, profile_type: "regular" });
       router.back();
       Toast.show({
         type: "success",
@@ -102,8 +102,9 @@ const AddProfileScreen = () => {
             onChangeText={setUsername}
             error={usernameError}
             autoCapitalize="none"
+            placeholder="Username"
           />
-          <TextInput label="Pet Name" value={name} onChangeText={setName} />
+          <TextInput label="Pet Name" value={name} onChangeText={setName} placeholder="Name" />
           <View style={{ marginBottom: 12 }}>
             <DropdownSelect
               defaultText="Select a pet type"
@@ -117,8 +118,15 @@ const AddProfileScreen = () => {
               }}
             />
           </View>
-          <TextInput label="Breed" value={breed} onChangeText={setBreed} />
-          <TextInput label="About" value={about} onChangeText={setAbout} multiline numberOfLines={5} />
+          <TextInput label="Breed" value={breed} onChangeText={setBreed} placeholder="Breed" />
+          <TextInput
+            label="About"
+            value={about}
+            onChangeText={setAbout}
+            multiline
+            numberOfLines={5}
+            placeholder="About"
+          />
         </View>
       </View>
       <Button
