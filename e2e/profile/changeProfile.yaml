@@ -2,8 +2,8 @@
 
 # Test changing profile
 
-appId: com.bdykun.onlypawsapp
-name: Change Profile Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Change Profile Flow
 
 ---
 - launchApp
@@ -13,29 +13,37 @@ name: Change Profile Flow
 
 # assert correct starting state
 - assertVisible: "admin@email.com"
-- assertVisible: "admin_profile"
+- assertVisible: "@admin_profile"
 
 # change profile
 - tapOn:
     id: "view-profile-options-button"
 - tapOn: .*Switch Profile
 - assertVisible: "Change Profile"
-- tapOn: "LinusTheHighness"
-- tapOn:
-    point: "50%,15%"
+- tapOn: LinusTheHighness.*
+
+# Close the modal
+- swipe:
+    from:
+      text: Change Profile
+    direction: DOWN
 
 # assert profile changed
 - assertVisible: "admin@email.com"
-- assertVisible: "LinusTheHighness"
+- assertVisible: "@LinusTheHighness"
 
 # change profile
 - tapOn:
     id: "view-profile-options-button"
 - tapOn: .*Switch Profile
-- tapOn: "admin_profile"
-- tapOn:
-    point: "50%,15%"
+- tapOn: admin_profile.*
+
+# Close the modal
+- swipe:
+    from:
+      text: Change Profile
+    direction: DOWN
 
 # assert profile changed
-- assertVisible: "admin_profile"
+- assertVisible: "@admin_profile"
 - assertVisible: "Linus"

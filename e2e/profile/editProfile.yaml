@@ -2,60 +2,61 @@
 
 # Test editing a profile from profile screen
 
-appId: com.bdykun.onlypawsapp
-name: Edit Profile Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Edit Profile Flow
 
 ---
 - launchApp
 
-# navigate to profile screen
+# Navigate to profile screen
 - tapOn: "Profile, tab, 5 of 5"
 
-# assert correct initial state
+# Assert correct initial state
 - assertVisible: "Linus"
-- assertVisible: "No pet type selected"
-- assertVisible: "No breed entered"
 - scrollUntilVisible:
     element: "Admin profile."
     direction: DOWN
 
-# open profile menu
+# Open profile menu
 - tapOn:
     id: "view-profile-options-button"
 
-# open edit profile menu - wait for menu to open
-- runFlow:
-    when:
-      visible:
-        text: .*Edit Profile
-    commands:
-        - tapOn: .*Edit Profile
+# Open edit profile menu - wait for menu to open
+- tapOn:
+    id: edit-profile-button
 
-# TODO: need to test selecting pet type from the dropdown
-# edit inputs
-- runFlow:
-    when:
-      visible:
-        text: "Linus"
-    commands:
-        - tapOn: "Linus"
-# wait for input to focus (this was giving errors)
+# Edit name input
+- tapOn: Linus
+
+# Wait for input to focus (this was giving errors)
 - waitForAnimationToEnd:
     timeout: 5000
 - eraseText
-- inputText: "L"
+- inputText: "New name"
+- tapOn: Name # close keyboard
 
+# Select pet type from dropdown
+- tapOn: Select a pet type.*
+- tapOn: Dog
+
+# Edit breed
 - tapOn: "ex: Golden Retriever"
-- inputText: "C"
+- inputText: "New Breed"
 
+# Edit about
 - tapOn: "Admin profile."
 - eraseText
-- inputText: "A"
+- inputText: "New About"
 
-# submit changes
+# Hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# Submit changes
 - tapOn: "Submit"
 
-# assert that the profile is updated
-- assertVisible: "L"
-- assertVisible: "C"
-- assertVisible: "A"
+# Assert that the profile is updated
+- assertVisible: "New name"
+- assertVisible: .*New Breed.*
+- assertVisible: "New About"
+- assertVisible: .*Dog.*

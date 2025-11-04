@@ -2,8 +2,8 @@
 
 # Test liking a post comment
 
-appId: com.bdykun.onlypawsapp
-name: Add Post Comment Like Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Add Post Comment Like Flow
 
 ---
 - launchApp

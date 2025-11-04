@@ -1,0 +1,36 @@
+# Test that tapping on a Follow notification navigates
+# user to the follow profile details screen
+
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# Navigate to posts tab
+- tapOn:
+    text: Posts, tab, 4 of 5
+    retryTapIfNoChange: true
+
+# Press notification bell
+- tapOn:
+    id: notifications-menu-button
+
+# Assert that the notification shows unread
+- assertVisible:
+    id: notification-indicator-69
+
+# Tap on first follow notfication in the list
+- tapOn: userone, started following you.*
+
+# Assert that app navigated to the profile details of userone
+- assertVisible: "@userone"
+- assertVisible: Follow
+- assertVisible: .*POSTS.*
+- assertVisible: .*FOLLOWERS.*
+- assertVisible: .*FOLLOWING.*
+
+# Navigate back to notifications screen
+- tapOn: Notifications
+
+# Assert that the notification now shows read
+- assertNotVisible:
+    id: notification-indicator-69

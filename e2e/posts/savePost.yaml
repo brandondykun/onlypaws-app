@@ -2,25 +2,49 @@
 
 # Test saving an explore post should then display the post in the saved posts list. Un-saving the post should then remove it from the saved posts list.
 
-appId: com.bdykun.onlypawsapp
-name: Save Post
+appId: com.bdykun.onlypawsapp.dev
+# name: Save Post
 
 ---
 - launchApp
 
+# Navigate to Explore tab
 - tapOn: "Explore, tab, 2 of 5"
+
+# Press on Post
 - tapOn:
     id: "post-tile-pressable-51"
+
+# Save Post
 - tapOn:
     id: "post-save-button-51"
+
+# Assert the notification appears
+- assertVisible: "Post Saved!"
+
+# Navigate to Posts tab
 - tapOn: "Posts, tab, 4 of 5"
+
+# Open menu
 - tapOn:
     id: "profile-details-menu-button"
+
+# Tap View Saved Posts button
 - tapOn: .*View Saved Posts
+
+# Assert that the Post shows up in saved Posts
 - assertVisible:
     id: "post-tile-pressable-51"
+
+# Navigate back to Explore tab
 - tapOn: "Explore, tab, 2 of 5"
+
+# Unsave the Post
 - tapOn:
     id: "post-save-button-51"
+
+# Navigate back to Posts tab
 - tapOn: "Posts, tab, 4 of 5"
+
+# Assert that the Post no longer shows up in saved Posts
 - tapOn: "You haven't saved any posts yet."

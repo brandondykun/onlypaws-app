@@ -2,8 +2,8 @@
 
 # Test navigating to Profile and following/un-following profile
 
-appId: com.bdykun.onlypawsapp
-name: Explore Follow Profile Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Explore Follow Profile Flow
 
 ---
 - launchApp
@@ -17,10 +17,10 @@ name: Explore Follow Profile Flow
 # top on first post username
 - tapOn:
     point: "23%,14%"
-- assertVisible: "1 FOLLOWERS"
+- assertVisible: 1, FOLLOWERS
 - tapOn: "follow"
-- assertVisible: "2 FOLLOWERS"
+- assertVisible: 2, FOLLOWERS
 - assertVisible: "unfollow"
 - tapOn: "unfollow"
-- assertVisible: "1 FOLLOWERS"
+- assertVisible: 1, FOLLOWERS
 - assertVisible: "follow"

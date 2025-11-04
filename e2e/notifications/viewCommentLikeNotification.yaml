@@ -1,0 +1,58 @@
+# Test that tapping on a Comment Like notification navigates
+# user to the comment like details screen
+
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# Navigate to posts tab
+- tapOn: Posts, tab, 4 of 5
+
+# Assert notification count is displayed
+- assertVisible:
+    id: notifications-count-icon-9
+
+# Press notification bell
+- doubleTapOn:
+    id: notifications-menu-button
+    delay: 100
+
+# Assert correct initial number of notifications
+- assertVisible:
+    id: notifications-count-text-9
+
+# Assert that the notification shows unread
+- assertVisible:
+    id: notification-indicator-71
+
+# Tap on top notification (comment like notification)
+- tapOn:
+    text: .*userone.*
+    index: 0
+
+# Assert correct notification details are displayed
+- assertVisible: Comment Details
+- assertVisible:
+    id: __CAROUSEL_ITEM_0__
+- assertVisible: What a good boy!
+- assertVisible: .*1.*
+
+# Navigate back to notifications screen
+- tapOn: Notifications
+
+# Assert that the notification count has decreased
+- assertVisible:
+    id: notifications-count-text-8
+
+# Assert that the unread notification icon is gone for this notification
+- assertNotVisible:
+    id: notification-indicator-71
+
+# Navigate back to posts screen
+- tapOn:
+    text: Posts
+    retryTapIfNoChange: true
+
+# Assert notification count has been updated
+- assertVisible:
+    id: notifications-count-icon-8

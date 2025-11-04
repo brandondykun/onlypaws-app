@@ -1,0 +1,141 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+  # clearState: true
+
+# Navigate to the Profile tab
+- tapOn: Profile, tab, 5 of 5
+
+# Open menu
+- tapOn:
+    id: view-profile-options-button
+
+- waitForAnimationToEnd
+
+# Navigate to account options
+- tapOn: Account Options.*
+
+# Assert that the correct number of profiles is displayed
+- assertVisible: Profiles (2)
+
+# Navigate to add profile
+- tapOn: Add Profile.*
+- assertVisible: Awesome, having multiple pets is the best!
+
+# Scroll down to submit button
+- swipe:
+    from:
+      text: You can create multiple profiles and manage them here, through the same OnlyPaws account.
+    direction: UP
+- tapOn: .*Add New Profile
+
+# Scroll back up to top
+- swipe:
+    from:
+      text: You can create multiple profiles and manage them here, through the same OnlyPaws account.
+    direction: DOWN
+
+# Assert username error
+- assertVisible: Please enter a username.
+
+# Enter a username
+- tapOn:
+    text: Username
+    index: 1
+- inputText: "LucyGoosey"
+# Close the keyboard
+- tapOn: Awesome, having multiple pets is the best!
+- waitForAnimationToEnd
+
+# Enter a pet name
+- tapOn: Name
+- inputText: "Lucy"
+# Close the keyboard
+- tapOn: Awesome, having multiple pets is the best!
+- waitForAnimationToEnd
+
+# TODO: Select pet type
+# The dropdown is not opening
+- tapOn: Select a pet type.*
+- tapOn: Dog
+
+# Enter breed
+- tapOn:
+    text: Breed
+    index: 1
+- inputText: "Pitbull"
+# Close the keyboard
+- tapOn: You can create multiple profiles and manage them here, through the same OnlyPaws account.
+- waitForAnimationToEnd
+
+# Enter about text
+- tapOn:
+    text: About
+    index: 1
+- inputText: "I am the creator of OnlyPaws."
+# Close the keyboard
+- tapOn: PET NAME # tap on label just to close the keyboard - this is more reliable than using tap coordinates
+- waitForAnimationToEnd
+
+# Scroll down to submit button
+- scrollUntilVisible:
+    direction: DOWN
+    element:
+      id: button-pressable
+- tapOn: .*Add New Profile
+
+# Assert toast notification
+- assertVisible: .*New Profile Created.*
+
+# Assert user is back on account screen
+- assertVisible: Account
+
+# Wait for toast notification to disappear
+- extendedWaitUntil:
+    notVisible: .*New Profile Created.*
+    timeout: 10000
+
+# Assert that the number of profiles has been updated
+- assertVisible: Profiles (3)
+
+# Assert that the new profile is listed in the profiles list
+- assertVisible: LucyGoosey
+- assertVisible: Lucy
+
+# Navigate back to Profile screen
+- tapOn: Profile
+
+# Assert user is back on account screen and has been auto switched to newly created profile
+- assertVisible: Lucy
+- assertVisible: "@LucyGoosey"
+- assertVisible: ".*Dog.*"
+- assertVisible: ".*Pitbull.*"
+
+# Open menu
+- tapOn:
+    id: view-profile-options-button
+
+# Open switch profile menu
+- tapOn: .*Switch Profile
+
+# Assert that the new profile is an option
+- assertVisible: .*LucyGoosey, Lucy.*
+
+# Close the chnage profile modal
+- swipe:
+    from:
+      text: Change Profile
+    direction: DOWN
+
+# Navigate to the Posts tab
+- tapOn: Posts, tab, 4 of 5
+
+# Assert that the Posts tab has been swtiched to newly created profile
+- assertVisible: "@LucyGoosey"
+- assertVisible: Lucy
+- assertVisible: I am the creator of OnlyPaws.
+- assertVisible: ".*Dog.*"
+- assertVisible: .*Pitbull.*
+- assertVisible: 0, FOLLOWERS
+- assertVisible: 0, FOLLOWING
+- assertVisible: You don't have any posts yet! Add a post to see it here.

@@ -2,21 +2,22 @@
 
 # Test logging out of the app
 
-appId: com.bdykun.onlypawsapp
-name: Log Out Flow
-
+appId: com.bdykun.onlypawsapp.dev
+# name: Log Out Flow
 
 ---
 - launchApp
 
-- runFlow:
-    when:
-      visible:
-        text: "Profile, tab, 5 of 5"
-    commands:
-        - tapOn: "Profile, tab, 5 of 5"
+# Navigate to the Profile tab
+- tapOn: Profile, tab, 5 of 5
 
-- tapOn: 
+# Open menu
+- tapOn:
     id: "view-profile-options-button"
+
+# Tap Log Out button
 - tapOn: "Log Out"
-- assertVisible: "Create an Account"
+
+# Assert Log In button is visible - now logged out
+- assertVisible:
+    id: login-button

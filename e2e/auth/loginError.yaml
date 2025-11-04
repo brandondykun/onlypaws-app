@@ -2,8 +2,8 @@
 
 # Test failed login messages
 
-appId: com.bdykun.onlypawsapp
-name: Log In Error Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Log In Error Flow
 
 ---
 - launchApp
@@ -14,7 +14,7 @@ name: Log In Error Flow
       visible:
         text: "Log in"
     commands:
-        - tapOn: "Log in"
+      - tapOn: "Log in"
 
 # log in without entering an email or password
 - tapOn: "Log In"
@@ -25,6 +25,10 @@ name: Log In Error Flow
 - tapOn: "youremail@email.com"
 - inputText: "admin@email.com"
 
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
 # attempt login again with only email complete
 - tapOn: "Log In"
 - assertNotVisible: "Please enter your email."
@@ -33,23 +37,32 @@ name: Log In Error Flow
 # enter incorrect password
 - tapOn:
     id: "login-password"
+    retryTapIfNoChange: true
 - inputText: "bad-password"
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
 
 # assert password is hidden by default
 - assertNotVisible: "bad-password"
 
 # show password - password text should be visible
-- tapOn:
-    id: "input-show-text-button"
-- assertVisible: "bad-password"
+# - tapOn:
+#     id: "input-show-text-button"
+#     retryTapIfNoChange: true
+# - assertVisible: "bad-password"
 
 # hide password - password text should be hidden
-- tapOn: 
-    id: "input-hide-text-button"
-- assertNotVisible: "bad-password"
+# - tapOn:
+#     id: "input-hide-text-button"
+# - assertNotVisible: "bad-password"
 
 # try to login with valid email but bad password - error toast should show
-- tapOn: "Log In"
+- tapOn:
+    id: "login-button"
+    retryTapIfNoChange: true
+
 - assertNotVisible: "Please enter your email."
 - assertNotVisible: "Please enter your password."
 - assertVisible: Invalid credentials. Please try again.

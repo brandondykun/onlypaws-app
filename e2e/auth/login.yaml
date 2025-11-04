@@ -2,21 +2,51 @@
 
 # Test logging into the app
 
-appId: com.bdykun.onlypawsapp
-name: Log In Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Log In Flow
 
 ---
 - launchApp
 
+# navigate to the login screen
 - tapOn: "Log in"
+
+# try to login with empty fields
 - tapOn: "Log In"
 
+# assert error states
 - assertVisible: "Please enter your email."
 - assertVisible: "Please enter your password."
+
+# enter email
 - tapOn: "youremail@email.com"
 - inputText: "admin@email.com"
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# enter password
 - tapOn:
     id: "login-password"
 - inputText: "password"
-- tapOn: "Log In"
-- assertVisible: "Feed"
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# wait for keyboard to close before tapping login button
+# this was flaky - uses 2 methods to help
+- extendedWaitUntil:
+    visible: "Log In"
+    timeout: 5000
+- waitForAnimationToEnd
+
+# tap on login button
+- tapOn:
+    text: "Log In"
+    id: "login-button"
+    retryTapIfNoChange: true
+
+# assert app is logged in and on the Feed Screen
+- assertVisible: Oh no! Your feed is empty. Follow some users to see their posts here!

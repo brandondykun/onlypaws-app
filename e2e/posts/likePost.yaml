@@ -3,8 +3,8 @@
 # Test liking and un-liking a post.
 # Test that liking/un-liking propagates through the app.
 
-appId: com.bdykun.onlypawsapp
-name: Like Post
+appId: com.bdykun.onlypawsapp.dev
+# name: Like Post
 
 ---
 - launchApp
@@ -50,4 +50,3 @@ name: Like Post
     id: "post-like-button-33-true"
 - assertVisible:
     id: "post-like-button-33-false"
-

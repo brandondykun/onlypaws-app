@@ -2,15 +2,15 @@
 
 # Test searching for a profile and following/un-following
 
-appId: com.bdykun.onlypawsapp
-name: Search and Follow Profile Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Search and Follow Profile Flow
 
 ---
 - launchApp
 
 - tapOn: "Explore, tab, 2 of 5"
 
-- tapOn: "Search profiles..."
+- tapOn: Explore
 - tapOn: "Search profiles..."
 - inputText: "user"
 - pressKey: enter

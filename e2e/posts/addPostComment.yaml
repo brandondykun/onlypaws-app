@@ -1,32 +1,46 @@
-# exploreFollowProfile.yaml
+# addPostComment.yaml
 
-# Test navigating to Profile and following/un-following profile
+# Test adding a comment to a post
 
-appId: com.bdykun.onlypawsapp
-name: Add Post Comment Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Add Post Comment Flow
 
 # TODO: check comment count before and after adding comment
 ---
 - launchApp
 
+# Navigate to explore tab
 - tapOn: "Explore, tab, 2 of 5"
 
+# Tap on Post
 - tapOn:
     id: "post-tile-pressable-51"
+
+# Tap on Post comment button
 - tapOn:
     id: "post-comment-button-51"
+
+# Comments modal should be empty with no comments
 - assertVisible: "No comments yet."
+
+# Tap on comment input text box
 - tapOn: "Add comment..."
+
+# Add comment
 - inputText: "Wow what a dog!"
 - tapOn:
     id: "add-comment-button"
+
+# Assert comment is added in UI
 - assertNotVisible: "No comments yet"
 - assertVisible: "Add comment..."
 - assertVisible: "Wow what a dog!"
 
 # close the modal
+- swipe:
+    from:
+      text: Comments
+    direction: DOWN
 
-- tapOn:
-    point: 10%, 10%
-
+# Assert modal was closed
 - assertNotVisible: "Wow what a dog!"

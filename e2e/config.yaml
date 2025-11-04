@@ -1,19 +1,27 @@
 # config.yaml
+appId: com.bdykun.onlypawsapp.dev
+
 executionOrder:
-    continueOnFailure: false # default is true
-    flowsOrder:
-        - Log In Error Flow
-        - Log In Flow
-        - Search and Follow Profile Flow
-        - Explore Follow Profile Flow
-        - Search Profile And View Page Flow
-        - Add Post Comment Flow
-        - Save Post
-        - Like Post
-        - Add Post Comment Like Flow
-        - Add Post Comment Reply Flow
-        - Own Posts Show Reports Flow
-        - Change Profile Flow
-        - Edit Profile Flow
-        - Feed Reported Post Hidden Flow
-        - Log Out Flow
+  continueOnFailure: false # default is true
+  flowsOrder:
+    - loginError
+    - login
+    - searchAndFollowProfile
+    - exploreFollowProfile
+    - searchProfileAndViewPage
+    - addPostComment
+    - savePost
+    - likePost
+    - addPostCommentLike
+    - addPostCommentReply
+    - ownPostsShowReports
+    - viewCommentLikeNotification # this has to be first in notification tests
+    - viewCommentReplyNotification
+    - viewFollowNotification
+    - viewCommentNestedReply
+    - createFeedback
+    - changeProfile
+    - editProfile
+    - feedReportedPostHidden
+    - createNewProfile
+    - logOut

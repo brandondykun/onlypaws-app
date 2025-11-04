@@ -1,0 +1,85 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# Navigate to the profile tab
+- assertVisible: Profile, tab, 5 of 5
+- tapOn: Profile, tab, 5 of 5
+
+# Open the menu
+- tapOn:
+    id: view-profile-options-button
+
+# Press the app feedback option
+- tapOn: App Feedback.*
+
+# Assert no feedback tickets
+- assertVisible: No feedback tickets found
+
+# Tap on create button to create feedback ticket
+- tapOn: Create
+
+# Try an empty submit to test error handling
+# Tap submit button
+- tapOn: Submit
+
+# Assert error toast displays
+- assertVisible: Feedback type is required.
+
+# Wait for toast notification to disappear
+- extendedWaitUntil:
+    notVisible: Feedback type is required.
+    timeout: 10000
+
+# Selecet a feedback type from the dropdown
+- tapOn: Select a feedback type.*
+- tapOn: Bug
+
+# Enter a title
+- tapOn: Enter a brief title
+- inputText: "Bug Found"
+
+# Enter a description
+- tapOn: Describe the issue or suggestion in detail
+- inputText: "I found a bug!"
+- tapOn: DESCRIPTION # to close the keyboard
+
+# Assert that the input text count has been updated
+- assertVisible: 14/1000
+
+# Tap submit button
+- tapOn: Submit
+
+# Assert success toast displays
+- assertVisible: .*Success.*
+- assertVisible: Your feedback ticket has been created!.*
+
+# Wait for toast notification to disappear
+- extendedWaitUntil:
+    notVisible: Your feedback ticket has been created!.*
+    timeout: 10000
+
+# Assert that the no feedback tickets message is gone
+- assertNotVisible: No feedback tickets found
+
+# Assert that the newly created feedback ticket is displayed
+- assertVisible: Bug Found.*
+- assertVisible: .*Bug Report.*
+- assertVisible: .*I found a bug!.*
+- assertVisible: .*Submitted on.*
+
+# Tap on the feedback ticket item
+- tapOn: Bug Found.*
+
+# Assert app navigated to details screen
+- assertVisible: Details
+
+# Assert that the developer comments section is visible
+- assertVisible: Developer Comments
+- assertVisible: There are no comments on this feedback yet.*
+
+# Assert that the feedback ticket details are displayed
+- assertVisible: Bug Found.*
+- assertVisible: .*Bug Report.*
+- assertVisible: .*I found a bug!.*
+- assertVisible: .*Submitted on.*

@@ -2,23 +2,22 @@
 
 # Test searching for a profile and then tapping on their profile preview and viewing their profile page
 
-appId: com.bdykun.onlypawsapp
-name: Search Profile And View Page Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Search Profile And View Page Flow
 
 ---
 - launchApp
 
 - tapOn: "Explore, tab, 2 of 5"
 
-- tapOn: "Search profiles..."
+- tapOn: Explore
 - tapOn: "Search profiles..."
 - inputText: "user"
 - pressKey: enter
 
-- tapOn:
-    point: 39%,15%
-- assertVisible: "usereight"
+- tapOn: usereight, Idk why everyone thinks I'm scary. My ears are pretty awesome.
+
+- assertVisible: "@usereight"
 - assertVisible: "POSTS"
 - assertVisible: .*FOLLOWERS
 - assertVisible: .*FOLLOWING
-

@@ -1,0 +1,43 @@
+# Test that tapping on a Comment reply notification navigates
+# user to the comment reply details screen
+
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# Navigate to the posts tab
+- tapOn:
+    text: Posts, tab, 4 of 5
+    retryTapIfNoChange: true
+
+# Navigate to notifications screen
+- tapOn:
+    id: notifications-menu-button
+
+# Assert notification is displayed
+- assertVisible: .*usertwo, replied to your comment.*
+
+# Assert notification displays as unread
+- assertVisible:
+    id: notification-indicator-72
+
+# Tap on notification
+- tapOn:
+    text: .*usertwo, replied to your comment.*
+    index: 1
+
+# Assert that user was navigated to comment details screen
+- assertVisible: Comment Details
+- assertVisible:
+    id: __CAROUSEL_ITEM_0__
+- assertVisible: Always keep one eye open.
+- assertVisible: "@admin_profile I thought that same thing"
+- assertVisible:
+    id: comment-like-button-1-false
+
+# Navigate back to notifications screen
+- tapOn: Notifications
+
+# Assert notification now displays as read
+- assertNotVisible:
+    id: notification-indicator-72

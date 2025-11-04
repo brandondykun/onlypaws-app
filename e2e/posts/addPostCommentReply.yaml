@@ -3,8 +3,8 @@
 # Test adding a reply to a post comment
 # Test hiding replies to the comment and then displaying them again
 
-appId: com.bdykun.onlypawsapp
-name: Add Post Comment Reply Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Add Post Comment Reply Flow
 
 ---
 - launchApp

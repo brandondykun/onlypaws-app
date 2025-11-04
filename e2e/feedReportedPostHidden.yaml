@@ -2,8 +2,8 @@
 
 # Test that reported posts images are initially hidden in the feed
 
-appId: com.bdykun.onlypawsapp
-name: Feed Reported Post Hidden Flow
+appId: com.bdykun.onlypawsapp.dev
+# name: Feed Reported Post Hidden Flow
 
 ---
 - launchApp
@@ -15,18 +15,18 @@ name: Feed Reported Post Hidden Flow
 - tapOn:
     id: view-profile-options-button
 - tapOn: .*Switch Profile
-- tapOn: "LinusTheHighness"
+- tapOn: LinusTheHighness.*
 
 # close modal
 - tapOn:
     point: 50%,10%
 
 # assert profile has been changed
-- assertVisible: "LinusTheHighness"
+- assertVisible: "@LinusTheHighness"
 
 # follow admin_profile that has reported posts
 - tapOn: "Explore, tab, 2 of 5"
-- tapOn: "Search profiles..."
+- tapOn: Explore # Search Profile... button at the top - not sure why it shows up as Explore
 - tapOn: "Search profiles..."
 - inputText: "admin"
 - pressKey: "enter"
@@ -36,20 +36,28 @@ name: Feed Reported Post Hidden Flow
 # navigate to feed screen
 - tapOn: Feed, tab, 1 of 5
 
+- scrollUntilVisible:
+    direction: DOWN
+    element:
+      id: post-55-hidden-view
+
 # assert that post images are initially hidden
 - assertVisible:
-    id: "post-55-hidden-view"
+    id: post-55-hidden-view
+
+# assert that the show post button is visible
+- assertVisible:
+    id: post-55-show-post-button
 
 # show the post
 - tapOn:
-    id: "post-55-show-post-button"
+    id: post-55-show-post-button
 
 # assert that post images are now shown
 - assertNotVisible:
     id: "post-55-hidden-view"
 
-
-# open post menu 
+# open post menu
 - tapOn:
     id: "post-menu-button-55"
 
@@ -89,11 +97,13 @@ name: Feed Reported Post Hidden Flow
 - tapOn:
     id: view-profile-options-button
 - tapOn: .*Switch Profile
-- tapOn: "admin_profile"
+- tapOn: admin_profile.*
 
 # close modal
-- tapOn:
-    point: 50%,10%
+- swipe:
+    from:
+      text: Change Profile
+    direction: DOWN
 
 # assert profile has been changed
-- assertVisible: "admin_profile"
+- assertVisible: "@admin_profile"
