@@ -74,6 +74,8 @@ const DropdownSelect = forwardRef(
                   ...s.dropdownItemStyle,
                   ...(isSelected && { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[700]) }),
                 }}
+                accessible={true}
+                accessibilityLabel={item.title}
               >
                 <Text style={s.dropdownItemTxtStyle}>{item.title}</Text>
               </View>
