@@ -167,6 +167,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // Ref to store the latest refresh function to avoid dependency issues
   const refreshRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
+  // Ref to track if a notification toast is currently showing
+  const isShowingNotificationRef = useRef(false);
+
   // App state tracking
   const appStateRef = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appStateRef.current);
@@ -288,6 +291,15 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // Show notification using toast
   const showNotification = useCallback(
     (notification: WSNotification) => {
+      // Don't show notification if one is already being displayed
+      if (isShowingNotificationRef.current) {
+        console.log("Notification already showing, skipping new notification");
+        return;
+      }
+
+      // Set flag to indicate we're showing a notification
+      isShowingNotificationRef.current = true;
+
       // format the notification message for different notification types
       const formattedMessage = formatNotificationMessage(notification);
       Toast.show({
@@ -295,6 +307,10 @@ const NotificationsContextProvider = ({ children }: Props) => {
         text1: formattedMessage,
         visibilityTime: 3000,
         autoHide: true,
+        onHide: () => {
+          // Reset flag when notification is hidden
+          isShowingNotificationRef.current = false;
+        },
         props: {
           imageUri: notification.sender_avatar,
         },
