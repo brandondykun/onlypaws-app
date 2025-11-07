@@ -156,6 +156,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const serverErrorCountRef = useRef(0);
+  const wsConnectedProfileIdRef = useRef<number | null>(null); // Track which profile the WebSocket is connected for
+  const selectedProfileIdRef = useRef<number | null>(selectedProfileId); // Track current selected profile to avoid closure issues
+  const connectionIdRef = useRef(0); // Unique ID for each connection to prevent old connections from processing messages
   const maxReconnectAttempts = 10;
   const maxServerErrors = 5; // Disable after 5 consecutive server errors
   const baseReconnectDelay = 1000; // 1 second
@@ -175,26 +178,29 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const [appStateVisible, setAppStateVisible] = useState(appStateRef.current);
 
   // Smart merge of DB and WebSocket notifications with deduplication
+  // WebSocket notifications are real-time but ephemeral (stored in memory)
+  // DB notifications are persistent but fetched with pagination
+  // We merge both to provide a seamless UX
   const allNotifications = useMemo(() => {
-    // Only show recent WebSocket notifications (last 50 to avoid performance issues)
+    // Only show recent WebSocket notifications (last 50) to avoid performance issues
     const recentWsNotifications = wsNotifications.slice(0, 50);
 
-    // Create a Map to handle deduplication efficiently
+    // Use Map for efficient deduplication by notification ID
     const notificationMap = new Map<number, DBNotification | WSNotification>();
 
-    // Add WebSocket notifications first (they are more recent and should take precedence)
+    // Add WebSocket notifications first (most recent, should take precedence)
     recentWsNotifications.forEach((wsNotif) => {
       notificationMap.set(wsNotif.id, wsNotif);
     });
 
-    // Add DB notifications (won't override existing WebSocket notifications due to Map behavior)
+    // Add DB notifications (won't override existing WS notifications due to Map behavior)
     dbNotifications.forEach((dbNotif) => {
       if (!notificationMap.has(dbNotif.id)) {
         notificationMap.set(dbNotif.id, dbNotif);
       }
     });
 
-    // Convert Map values to array and sort by creation date (newest first)
+    // Convert to array and sort by creation date (newest first)
     return Array.from(notificationMap.values()).sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
@@ -207,22 +213,10 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const refresh = useCallback(async () => {
     await refreshDbNotifications();
 
-    // After refreshing DB notifications, remove WebSocket notifications that are now persisted in DB
-    // This prevents duplicates and keeps the WebSocket array lean
-    setWsNotifications((prev) => {
-      const beforeCount = prev.length;
-      const filtered = prev.filter((wsNotif) => !dbNotifications.some((dbNotif) => dbNotif.id === wsNotif.id));
-      const afterCount = filtered.length;
-      const cleanedUp = beforeCount - afterCount;
-
-      if (cleanedUp > 0) {
-        console.log(
-          `Cleaned up ${cleanedUp} WebSocket notifications that are now in DB (${beforeCount} → ${afterCount})`,
-        );
-      }
-
-      return filtered;
-    });
+    // Remove WebSocket notifications that are now persisted in DB
+    setWsNotifications((prev) =>
+      prev.filter((wsNotif) => !dbNotifications.some((dbNotif) => dbNotif.id === wsNotif.id)),
+    );
   }, [refreshDbNotifications, dbNotifications]);
 
   // Store the latest refresh function in ref to avoid dependency chain issues
@@ -253,35 +247,24 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
   // Get WebSocket URL
   const getWebSocketUrl = useCallback(async () => {
-    if (!selectedProfileId) {
-      console.log("No selected profile ID available for WebSocket connection");
-      return null;
-    }
+    if (!selectedProfileId) return null;
 
     try {
       const token = await SecureStore.getItemAsync("ACCESS_TOKEN");
-      if (!token) {
-        console.log("No access token available for WebSocket connection");
-        return null;
-      }
+      if (!token) return null;
 
-      // Validate token format (basic JWT check)
       const tokenParts = token.split(".");
       if (tokenParts.length !== 3) {
-        console.error("Invalid token format - not a valid JWT");
+        console.error("Invalid token format");
         return null;
       }
 
-      // Convert HTTP URL to WebSocket URL and remove /api suffix if present
       let wsBaseUrl = BASE_URL?.replace("http://", "ws://").replace("https://", "wss://");
       if (wsBaseUrl?.endsWith("/api")) {
-        wsBaseUrl = wsBaseUrl.slice(0, -4); // Remove '/api' suffix
+        wsBaseUrl = wsBaseUrl.slice(0, -4);
       }
 
-      const wsUrl = `${wsBaseUrl}/ws/notifications/${selectedProfileId}/?token=${token}`;
-      console.log("Generated WebSocket URL:", wsUrl.replace(token, "[TOKEN_HIDDEN]"));
-
-      return wsUrl;
+      return `${wsBaseUrl}/ws/notifications/${selectedProfileId}/?token=${token}`;
     } catch (error) {
       console.error("Error getting WebSocket URL:", error);
       return null;
@@ -293,14 +276,11 @@ const NotificationsContextProvider = ({ children }: Props) => {
     (notification: WSNotification) => {
       // Don't show notification if one is already being displayed
       if (isShowingNotificationRef.current) {
-        console.log("Notification already showing, skipping new notification");
         return;
       }
 
-      // Set flag to indicate we're showing a notification
       isShowingNotificationRef.current = true;
 
-      // format the notification message for different notification types
       const formattedMessage = formatNotificationMessage(notification);
       Toast.show({
         type: "notification",
@@ -308,7 +288,6 @@ const NotificationsContextProvider = ({ children }: Props) => {
         visibilityTime: 3000,
         autoHide: true,
         onHide: () => {
-          // Reset flag when notification is hidden
           isShowingNotificationRef.current = false;
         },
         props: {
@@ -319,41 +298,33 @@ const NotificationsContextProvider = ({ children }: Props) => {
     [formatNotificationMessage],
   );
 
-  // Helper function to handle incoming WebSocket notifications with deduplication and auto-cleanup
+  // Handle incoming WebSocket notifications with deduplication and auto-cleanup
   const handleIncomingNotification = useCallback(
     (notificationData: WSNotification) => {
-      // Add to WebSocket notifications list (will be merged with DB notifications)
       setWsNotifications((prev) => {
-        // Prevent duplicates by checking if notification already exists
+        // Prevent duplicates
         const exists = prev.some((existingNotif) => existingNotif.id === notificationData.id);
         if (exists) return prev;
 
-        // Add new notification at the beginning (newest first)
         const newNotifications = [{ ...notificationData, is_read: false }, ...prev];
 
-        // Check if we've reached the 50-item limit for automatic cleanup
+        // Auto-cleanup when reaching 50 items to prevent memory buildup during long sessions
+        // Trigger DB refresh with debounce to move WS notifications to persistent storage
         if (newNotifications.length >= 50) {
-          console.log(
-            `WebSocket notifications reached ${newNotifications.length} items, triggering automatic DB refresh for cleanup`,
-          );
-
-          // Clear any existing auto-refresh timeout to prevent multiple rapid refreshes
           if (autoRefreshTimeoutRef.current) {
             clearTimeout(autoRefreshTimeoutRef.current);
           }
 
-          // Trigger DB refresh asynchronously with debounce to prevent too frequent refreshes
-          // This prevents memory buildup during long foreground sessions
           autoRefreshTimeoutRef.current = setTimeout(() => {
             refreshRef.current?.();
             autoRefreshTimeoutRef.current = null;
-          }, 500); // 500ms delay to debounce rapid notifications and avoid blocking WebSocket processing
+          }, 500); // 500ms debounce to prevent rapid refreshes
         }
 
         return newNotifications;
       });
 
-      // Show toast notification only if app is in foreground
+      // Show toast notification only when app is in foreground
       if (appStateVisible === "active") {
         showNotification(notificationData);
       }
@@ -362,34 +333,41 @@ const NotificationsContextProvider = ({ children }: Props) => {
   );
 
   // Connect to WebSocket
+  // This function only creates NEW connections - cleanup is handled by the effect
   const connect = useCallback(async () => {
     if (!isAuthenticated || !selectedProfileId || appStateVisible !== "active") {
       return;
     }
 
-    if (wsRef.current?.readyState === WebSocket.CONNECTING || wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
     const wsUrl = await getWebSocketUrl();
-    if (!wsUrl) {
-      console.log("No WebSocket URL available");
-      return;
-    }
+    if (!wsUrl) return;
 
     try {
+      connectionIdRef.current += 1;
+      const thisConnectionId = connectionIdRef.current;
+
       setConnectionStatus("connecting");
+
+      // CRITICAL: Set profile ref IMMEDIATELY (before WebSocket opens)
+      // This prevents duplicate connections when the effect runs multiple times
+      // The effect's guard checks this ref, so it must be set synchronously
+      wsConnectedProfileIdRef.current = selectedProfileId;
+
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log("WebSocket connected successfully");
+        // Ignore stale connections (connectionId was incremented after this connection started)
+        if (thisConnectionId !== connectionIdRef.current) {
+          ws.close(1000, "Stale connection");
+          return;
+        }
+
         setIsConnected(true);
         setConnectionStatus("connected");
-        reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
-        serverErrorCountRef.current = 0; // Reset server error count on successful connection
+        reconnectAttemptsRef.current = 0;
+        serverErrorCountRef.current = 0;
 
-        // Clear any pending reconnect timeout
         if (reconnectTimeoutRef.current) {
           clearTimeout(reconnectTimeoutRef.current);
           reconnectTimeoutRef.current = null;
@@ -397,12 +375,15 @@ const NotificationsContextProvider = ({ children }: Props) => {
       };
 
       ws.onmessage = (event) => {
+        // Ignore messages from old connections
+        if (thisConnectionId !== connectionIdRef.current) {
+          return;
+        }
+
         try {
           const data = JSON.parse(event.data);
-
           if (data.type === "notification") {
-            const notificationData: WSNotification = data.notification;
-            handleIncomingNotification(notificationData);
+            handleIncomingNotification(data.notification);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
@@ -410,40 +391,44 @@ const NotificationsContextProvider = ({ children }: Props) => {
       };
 
       ws.onerror = (error) => {
+        // Only process errors from current connection
+        if (thisConnectionId !== connectionIdRef.current) {
+          return;
+        }
+
         console.error("WebSocket error:", error);
-        console.error("Connection status:", connectionStatus);
         setConnectionStatus("error");
       };
 
       ws.onclose = (event) => {
-        console.log("WebSocket closed:", event.code, event.reason);
+        // Only process close events from current connection
+        if (thisConnectionId !== connectionIdRef.current) {
+          return;
+        }
 
         setIsConnected(false);
         setConnectionStatus("disconnected");
         wsRef.current = null;
+        wsConnectedProfileIdRef.current = null;
 
-        // Handle specific error codes
+        // Handle abnormal closures and reconnection
+        // 1006 = abnormal closure (usually server error or network issue)
+        // 1000 = normal closure (intentional disconnect)
         if (event.code === 1006) {
-          console.error("WebSocket connection failed - likely server error (500)");
           serverErrorCountRef.current += 1;
 
-          // Check if we've hit too many server errors
+          // Disable reconnection after too many consecutive server errors
           if (serverErrorCountRef.current >= maxServerErrors) {
-            console.error(`Too many server errors (${serverErrorCountRef.current}). Disabling WebSocket reconnection.`);
+            console.error(`Too many server errors, disabling reconnection`);
             setConnectionStatus("error");
             return;
           }
 
-          // For 500 errors, wait longer before reconnecting
           if (isAuthenticated && selectedProfileId && appStateVisible === "active") {
-            console.log(
-              `Server error detected (${serverErrorCountRef.current}/${maxServerErrors}), scheduling reconnect with longer delay`,
-            );
-            scheduleReconnect(true); // Pass true to indicate server error
+            scheduleReconnect(true); // Use longer delays for server errors
           }
         } else if (event.code !== 1000 && isAuthenticated && selectedProfileId && appStateVisible === "active") {
-          // Attempt reconnection if not a normal closure and user is still authenticated
-          scheduleReconnect(false);
+          scheduleReconnect(false); // Use normal delays for other errors
         }
       };
     } catch (error) {
@@ -458,7 +443,6 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const scheduleReconnect = useCallback(
     (isServerError: boolean = false) => {
       if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-        console.log("Max reconnection attempts reached");
         setConnectionStatus("error");
         return;
       }
@@ -467,16 +451,12 @@ const NotificationsContextProvider = ({ children }: Props) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
 
-      // For server errors (500), use longer delays
+      // Use longer delays for server errors (3x base delay, 2x max delay)
       const baseDelay = isServerError ? baseReconnectDelay * 3 : baseReconnectDelay;
       const maxDelay = isServerError ? maxReconnectDelay * 2 : maxReconnectDelay;
 
-      // Exponential backoff with jitter
+      // Exponential backoff: 1s, 2s, 4s, 8s... + random jitter to prevent thundering herd
       const delay = Math.min(baseDelay * Math.pow(2, reconnectAttemptsRef.current) + Math.random() * 1000, maxDelay);
-
-      console.log(
-        `Scheduling reconnect attempt ${reconnectAttemptsRef.current + 1} in ${delay}ms${isServerError ? " (server error detected)" : ""}`,
-      );
 
       reconnectTimeoutRef.current = setTimeout(() => {
         reconnectAttemptsRef.current += 1;
@@ -486,8 +466,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
     [connect],
   );
 
-  // Disconnect WebSocket
+  // Disconnect WebSocket and clean up all related state
   const disconnect = useCallback(() => {
+    // Clear all pending timers
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -498,15 +479,18 @@ const NotificationsContextProvider = ({ children }: Props) => {
       autoRefreshTimeoutRef.current = null;
     }
 
+    // Close WebSocket connection
     if (wsRef.current) {
       wsRef.current.close(1000, "Manual disconnect");
       wsRef.current = null;
     }
 
+    // Reset all connection state
     setIsConnected(false);
     setConnectionStatus("disconnected");
     reconnectAttemptsRef.current = 0;
-    serverErrorCountRef.current = 0; // Reset server error count on manual disconnect
+    serverErrorCountRef.current = 0;
+    wsConnectedProfileIdRef.current = null;
   }, []);
 
   // Mark notification as read (works on both DB and WebSocket notifications)
@@ -541,17 +525,11 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
   // Mark all notifications as read (both DB and WebSocket) with API call
   const markAllAsRead = useCallback(async () => {
-    // Prevent multiple simultaneous requests
-    if (markAllAsReadLoading) {
-      console.log("Mark all as read already in progress, skipping...");
-      return;
-    }
+    if (markAllAsReadLoading) return;
 
     try {
       setMarkAllAsReadLoading(true);
-      console.log("Marking all notifications as read via API...");
 
-      // Make API call to mark all notifications as read on the server
       const { error } = await markAllAsReadAPI();
 
       if (error) {
@@ -559,15 +537,10 @@ const NotificationsContextProvider = ({ children }: Props) => {
         throw new Error("Failed to mark notifications as read");
       }
 
-      // Only update local state after successful API call
-      // Mark all WebSocket notifications as read
       setWsNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
-
-      // Mark all DB notifications as read
       setDbNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
     } catch (error) {
-      throw error; // Re-throw so calling component can handle the error
-      // child component should handle the error and show toast notification
+      throw error;
     } finally {
       setMarkAllAsReadLoading(false);
     }
@@ -579,23 +552,19 @@ const NotificationsContextProvider = ({ children }: Props) => {
     setDbNotifications([]);
   }, [setDbNotifications]);
 
-  // Handle app state changes
+  // Handle app state changes (foreground/background)
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       appStateRef.current = nextAppState;
       setAppStateVisible(nextAppState);
 
       if (nextAppState === "active") {
-        // App came to foreground - connect WebSocket and refresh DB notifications
-        connect();
-
-        // Refresh DB notifications to get any notifications that arrived while app was in background
-        // This will also trigger cleanup of WebSocket notifications via the refresh callback
+        // App came to foreground
+        // Refresh DB notifications to catch any that arrived during background
+        // The main effect (line 557) will handle WebSocket reconnection
         refresh();
-      } else if (nextAppState === "background" || nextAppState === "inactive") {
-        // App went to background - disconnect WebSocket
-        disconnect();
       }
+      // Disconnection is handled by main effect when appStateVisible !== "active"
     };
 
     const subscription = AppState.addEventListener("change", handleAppStateChange);
@@ -603,23 +572,76 @@ const NotificationsContextProvider = ({ children }: Props) => {
     return () => {
       subscription?.remove();
     };
-  }, [connect, disconnect, refresh]);
+  }, [refresh]);
 
-  // Connect when authenticated and profile selected
+  // Handle profile switches and connection state
+  // This effect manages the WebSocket lifecycle based on auth state, profile, and app visibility
   useEffect(() => {
-    if (isAuthenticated && selectedProfileId && appStateVisible === "active") {
-      // Only connect WebSocket here - don't refresh DB as usePaginatedFetch handles initial fetch
-      // The app state change handler will handle refresh on foreground transitions
+    selectedProfileIdRef.current = selectedProfileId;
+
+    // Clear any pending reconnection attempts when state changes
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+      reconnectAttemptsRef.current = 0;
+    }
+
+    const needsConnection = isAuthenticated && selectedProfileId && appStateVisible === "active";
+    const alreadyConnectedToProfile = wsRef.current && wsConnectedProfileIdRef.current === selectedProfileId;
+
+    if (needsConnection) {
+      // Guard: Skip if already connected to the correct profile
+      if (alreadyConnectedToProfile) {
+        return;
+      }
+
+      // Close existing connection SYNCHRONOUSLY before connecting to new profile
+      // This prevents cross-profile notifications and race conditions
+      if (wsRef.current) {
+        const oldWs = wsRef.current;
+
+        // CRITICAL: Increment connection ID BEFORE clearing refs
+        // This immediately invalidates any in-flight messages from the old connection
+        connectionIdRef.current += 1;
+
+        // Clear refs synchronously to stop all message processing immediately
+        wsRef.current = null;
+        wsConnectedProfileIdRef.current = null;
+        setIsConnected(false);
+        setConnectionStatus("disconnected");
+
+        // Close the old WebSocket connection (async, but already invalidated by ID increment)
+        try {
+          oldWs.close(1000, "Profile changed");
+        } catch (e) {
+          console.error("Error closing WebSocket:", e);
+        }
+      }
+
       connect();
     } else {
+      // Disconnect if auth/profile/app state doesn't allow connection
       disconnect();
     }
 
-    // Cleanup on unmount or when dependencies change
+    // Cleanup on unmount
     return () => {
-      disconnect();
+      if (wsRef.current) {
+        try {
+          wsRef.current.close(1000, "Component unmount");
+        } catch (e) {
+          console.log("Error during WebSocket cleanup:", e);
+        }
+        wsRef.current = null;
+        wsConnectedProfileIdRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
     };
-  }, [isAuthenticated, selectedProfileId, connect, disconnect, appStateVisible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, selectedProfileId, appStateVisible]);
 
   const value: NotificationContextType = {
     // WebSocket connection status
