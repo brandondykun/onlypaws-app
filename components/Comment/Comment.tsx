@@ -76,7 +76,7 @@ const Comment = ({
   const handleUnlike = async (commentId: number) => {
     Haptics.selectionAsync();
     onUnlike(commentId); // optimistic unlike
-    const { error } = await deleteCommentLike(commentId, authProfile.id);
+    const { error } = await deleteCommentLike(commentId);
     if (error) {
       onLike(commentId); // revert unlike on error
       Toast.show({
@@ -141,7 +141,7 @@ const Comment = ({
   const handleUnlikeReply = async (id: number) => {
     Haptics.selectionAsync();
     onUnlikeReply(comment.id, id);
-    const { error } = await deleteCommentLike(id, authProfile.id);
+    const { error } = await deleteCommentLike(id);
     if (error) {
       onLikeReply(comment.id, id);
     }

@@ -104,7 +104,7 @@ const ProfileDetails = ({
   const handleUnfollowPress = async (profileId: number) => {
     if (setProfileData) {
       setFollowLoading(true);
-      const { error } = await unfollowProfile(profileId, authProfile.id);
+      const { error } = await unfollowProfile(profileId);
       if (!error) {
         profileDetailsManager.onUnfollow(profileId);
       } else {
@@ -121,7 +121,7 @@ const ProfileDetails = ({
   const handleFollowPress = async (profile: ProfileDetailsType) => {
     if (setProfileData) {
       setFollowLoading(true);
-      const { error, data } = await followProfile(profile.id, authProfile.id);
+      const { error, data } = await followProfile(profile.id);
       if (!error && data) {
         profileDetailsManager.onFollow(profile.id);
       } else {

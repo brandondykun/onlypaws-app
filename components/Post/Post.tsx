@@ -101,7 +101,7 @@ const Post = ({
         }),
       ]).start();
       onUnlike(postId); // optimistic un-like
-      const { error } = await removeLike(postId, authProfile.id);
+      const { error } = await removeLike(postId);
       if (error) {
         onLike(postId); // roll back if error
         Toast.show({

@@ -38,7 +38,7 @@ interface FetchOptions {
 // Example implementation:
 
 // const initialFetch = useCallback(async () => {
-//   const { data, error } = await getFeed(authProfile.id);
+//   const { data, error } = await getFeed();
 //   return { data, error };
 // }, [authProfile.id]);
 

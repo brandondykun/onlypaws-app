@@ -45,7 +45,7 @@ const ExplorePostsContextProvider = ({ children }: Props) => {
 
   const initialFetch = useCallback(async () => {
     if (!authProfile.id) return { data: null, error: null };
-    return await getExplorePosts(authProfile.id);
+    return await getExplorePosts();
   }, [authProfile.id]);
 
   const {

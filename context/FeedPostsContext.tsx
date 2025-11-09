@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext } from "react";
 
-import { getFeed } from "@/api/profile";
+import { getFeed } from "@/api/post";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { PostDetailed } from "@/types";
 
@@ -40,7 +40,7 @@ type Props = {
 const FeedPostsContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
   const initialFetch = useCallback(async () => {
-    const { data, error } = await getFeed(authProfile.id);
+    const { data, error } = await getFeed();
     return { data, error };
   }, [authProfile.id, authProfile.following_count]); // Will auto refresh when profiles are followed/unfollowed
 

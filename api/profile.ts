@@ -5,10 +5,10 @@ import {
   ProfileImage,
   Profile,
   PaginatedSearchedProfileResponse,
-  PaginatedFeedResponse,
   Follow,
   CreateProfileResponse,
   PaginatedProfileResponse,
+  PaginatedProfilePostsResponse,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
@@ -18,23 +18,23 @@ export const getProfileDetails = async (profileId: number | string) => {
   return await axiosFetch<ProfileDetails>(url);
 };
 
-export const getFeed = async (profileId: number) => {
-  const url = `/v1/profile/${profileId}/feed/`;
-  return await axiosFetch<PaginatedFeedResponse>(url);
+export const getProfilePosts = async (profileId: string | number) => {
+  const url = `/v1/profile/${profileId}/posts/`;
+  return await axiosFetch<PaginatedProfilePostsResponse>(url);
 };
 
 export const searchProfiles = async (username: string, profileId: number) => {
-  const url = `/v1/profile/${profileId}/search?username=${username}`;
+  const url = `/v1/profile/search/?username=${username}`;
   return await axiosFetch<PaginatedSearchedProfileResponse>(url);
 };
 
-export const followProfile = async (profileId: number, authProfileId: number) => {
-  const url = `/v1/profile/${authProfileId}/follow/`;
+export const followProfile = async (profileId: number) => {
+  const url = `/v1/profile/follow/`;
   return await axiosPost<Follow>(url, { profileId });
 };
 
-export const unfollowProfile = async (profileId: number, authProfileId: number) => {
-  const url = `/v1/profile/${authProfileId}/follow/${profileId}/`;
+export const unfollowProfile = async (profileId: number) => {
+  const url = `/v1/profile/follow/${profileId}/`;
   return await axiosDelete(url);
 };
 
@@ -45,7 +45,7 @@ export const addProfileImage = async (postData: FormData, accessToken: string) =
       Authorization: `Bearer ${accessToken}`,
     },
   };
-  const url = "/v1/auth/profile-image/";
+  const url = "/v1/profile/image/";
   return await axiosPost<ProfileImage>(url, postData, config);
 };
 
@@ -56,17 +56,17 @@ export const editProfileImage = async (imageId: number, postData: FormData, acce
       Authorization: `Bearer ${accessToken}`,
     },
   };
-  const url = `/v1/auth/profile-image/${imageId}/`;
+  const url = `/v1/profile/image/${imageId}/`;
   return await axiosPatch<ProfileImage>(url, postData, config);
 };
 
 export const updateProfile = async (data: any, profileId: number) => {
-  const url = `/v1/auth/profile/${profileId}/`;
+  const url = `/v1/profile/${profileId}/`;
   return await axiosPatch<Profile>(url, data);
 };
 
 export const updateUsername = async (profileId: number, username: string) => {
-  const url = `/v1/auth/profile/${profileId}/`;
+  const url = `/v1/profile/${profileId}/`;
   return await axiosPatchCustomError<Profile>(url, { username });
 };
 
@@ -78,7 +78,7 @@ export const createProfile = async (
   breed: string,
   pet_type?: number,
 ) => {
-  const url = "/v1/auth/profile/";
+  const url = "/v1/profile/";
   try {
     const res = await axiosInstance.post<CreateProfileResponse>(url, { username, about, name, breed, pet_type });
     return { data: res.data, error: null, status: res.status };
@@ -110,12 +110,12 @@ export const searchFollowing = async (profileId: number, username: string) => {
 };
 
 export const getPetTypeOptions = async () => {
-  const url = `/v1/auth/pet-type-options/`;
+  const url = `/v1/profile/pet-types/`;
   return await axiosFetch<{ id: number; name: string }[]>(url);
 };
 
 export const deleteProfile = async (profileId: number) => {
-  const url = `/v1/auth/profile/${profileId}/`;
+  const url = `/v1/profile/${profileId}/`;
   try {
     const res = await axiosInstance.delete(url);
     return { data: res.data, error: null, status: res.status };

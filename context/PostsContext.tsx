@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext } from "react";
 
-import { getProfilePosts } from "@/api/post";
+import { getProfilePosts } from "@/api/profile";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { PostDetailed } from "@/types";
 

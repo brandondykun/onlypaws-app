@@ -3,20 +3,20 @@ import { CommentChainResponse } from "@/types/post/post";
 import {
   PaginatedExploreResponse,
   PaginatedPostCommentsResponse,
-  PaginatedProfilePostsResponse,
   PaginatedSavedPostsResponse,
   PostDetailed,
   PostCommentDetailed,
   PostLike,
   CommentLike,
   SavedPost,
+  PaginatedFeedResponse,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch } from "./config";
 
-export const getProfilePosts = async (profileId: string | number) => {
-  const url = `/v1/profile/${profileId}/posts/`;
-  return await axiosFetch<PaginatedProfilePostsResponse>(url);
+export const getFeed = async () => {
+  const url = `/v1/post/feed/`;
+  return await axiosFetch<PaginatedFeedResponse>(url);
 };
 
 export const createPost = async (postData: FormData, accessToken: string) => {
@@ -31,12 +31,12 @@ export const createPost = async (postData: FormData, accessToken: string) => {
 };
 
 export const updatePost = async (postId: number, caption: string) => {
-  const url = `/v1/post/${postId}`;
+  const url = `/v1/post/${postId}/`;
   return await axiosPatch<PostDetailed>(url, { caption: caption });
 };
 
 export const deletePost = async (postId: number) => {
-  const url = `/v1/post/${postId}`;
+  const url = `/v1/post/${postId}/`;
   return await axiosDelete(url);
 };
 
@@ -60,9 +60,8 @@ export const addLike = async (postId: number, profileId: number) => {
   return await axiosPost<PostLike>(url, { profileId });
 };
 
-// profile id is the profile requesting the delete
-export const removeLike = async (postId: number, profileId: number) => {
-  const url = `/v1/post/${postId}/like/${profileId}`;
+export const removeLike = async (postId: number) => {
+  const url = `/v1/post/${postId}/like/`;
   return await axiosDelete(url);
 };
 
@@ -88,17 +87,17 @@ export const getCommentReplies = async (postId: number, commentId: number) => {
 };
 
 export const getPost = async (postId: number | string) => {
-  const url = `/v1/post/${postId}`;
+  const url = `/v1/post/${postId}/`;
   return await axiosFetch<PostDetailed>(url);
 };
 
-export const getExplorePosts = async (profileId: number) => {
-  const url = `/v1/profile/${profileId}/explore/`;
+export const getExplorePosts = async () => {
+  const url = `/v1/post/explore/`;
   return await axiosFetch<PaginatedExploreResponse>(url);
 };
 
 export const getSimilarPosts = async (postId: number) => {
-  const url = `/v1/post/${postId}/similar`;
+  const url = `/v1/post/${postId}/similar/`;
   return await axiosFetch<PaginatedExploreResponse>(url);
 };
 
@@ -108,8 +107,8 @@ export const likeComment = async (commentId: number, profileId: number) => {
 };
 
 // authProfileId is the profile requesting the delete
-export const deleteCommentLike = async (commentId: number, authProfileId: number) => {
-  const url = `/v1/comment/${commentId}/like/${authProfileId}/`;
+export const deleteCommentLike = async (commentId: number) => {
+  const url = `/v1/comment/${commentId}/like/`;
   return await axiosDelete(url);
 };
 

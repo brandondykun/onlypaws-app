@@ -20,7 +20,7 @@ const ProfileSearchScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
 
   const handleUnfollowPress = async (profileId: number) => {
-    const { error } = await unfollowProfile(profileId, authProfile.id);
+    const { error } = await unfollowProfile(profileId);
     if (!error) {
       profileDetailsManager.onUnfollow(profileId);
     } else {
@@ -33,7 +33,7 @@ const ProfileSearchScreen = () => {
   };
 
   const handleFollowPress = async (searchedProfile: SearchedProfile) => {
-    const { error, data } = await followProfile(searchedProfile.id, authProfile.id);
+    const { error, data } = await followProfile(searchedProfile.id);
     if (!error && data) {
       profileDetailsManager.onFollow(searchedProfile.id);
     } else {
