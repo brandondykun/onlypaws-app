@@ -3,19 +3,17 @@ import { FlashList } from "@shopify/flash-list";
 import { View, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { followProfile, unfollowProfile } from "@/api/profile";
+import { followProfile, unfollowProfile } from "@/api/interactions";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
 
 const ProfileSearchScreen = () => {
   const search = useProfileSearchContext();
-  const { authProfile } = useAuthProfileContext();
   const profileDetailsManager = useProfileDetailsManagerContext();
   const tabBarHeight = useBottomTabBarHeight();
 

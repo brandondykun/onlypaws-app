@@ -5,13 +5,12 @@ import {
   ProfileImage,
   Profile,
   PaginatedSearchedProfileResponse,
-  Follow,
   CreateProfileResponse,
   PaginatedProfileResponse,
   PaginatedProfilePostsResponse,
 } from "../types";
 
-import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
+import { axiosFetch, axiosPost, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
 export const getProfileDetails = async (profileId: number | string) => {
   const url = `/v1/profile/${profileId}/`;
@@ -26,16 +25,6 @@ export const getProfilePosts = async (profileId: string | number) => {
 export const searchProfiles = async (username: string, profileId: number) => {
   const url = `/v1/profile/search/?username=${username}`;
   return await axiosFetch<PaginatedSearchedProfileResponse>(url);
-};
-
-export const followProfile = async (profileId: number) => {
-  const url = `/v1/profile/follow/`;
-  return await axiosPost<Follow>(url, { profileId });
-};
-
-export const unfollowProfile = async (profileId: number) => {
-  const url = `/v1/profile/follow/${profileId}/`;
-  return await axiosDelete(url);
 };
 
 export const addProfileImage = async (postData: FormData, accessToken: string) => {
@@ -87,16 +76,6 @@ export const createProfile = async (
     const data = error.response?.data as { username?: string[] };
     return { data: null, error: data, status: error.status };
   }
-};
-
-export const getFollowers = async (profileId: number) => {
-  const url = `/v1/profile/${profileId}/followers/`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
-};
-
-export const getFollowing = async (profileId: number) => {
-  const url = `/v1/profile/${profileId}/following/`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
 };
 
 export const searchFollowers = async (profileId: number, username: string) => {

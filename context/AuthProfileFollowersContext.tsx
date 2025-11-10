@@ -3,7 +3,8 @@ import { debounce, DebouncedFunc } from "lodash";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
-import { getFollowers, searchFollowers } from "@/api/profile";
+import { searchFollowers } from "@/api/profile";
+import { getFollowers } from "@/api/interactions";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { FollowProfile, PaginatedProfileResponse } from "@/types";
 

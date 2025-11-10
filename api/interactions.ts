@@ -1,0 +1,78 @@
+import { CommentChainResponse } from "@/types/post/post";
+
+import {
+  PaginatedPostCommentsResponse,
+  PostCommentDetailed,
+  PostLike,
+  CommentLike,
+  Follow,
+  PaginatedProfileResponse,
+} from "../types";
+
+import { axiosFetch, axiosPost, axiosDelete } from "./config";
+
+export const addLike = async (postId: number, profileId: number) => {
+  const url = `/v1/interactions/like/post/${postId}/`;
+  return await axiosPost<PostLike>(url, { profileId });
+};
+
+export const removeLike = async (postId: number) => {
+  const url = `/v1/interactions/like/post/${postId}/`;
+  return await axiosDelete(url);
+};
+
+export const addComment = async (
+  post: number,
+  text: string,
+  profileId: number,
+  parent_comment: number | null,
+  reply_to_comment: number | null,
+) => {
+  const url = `/v1/interactions/comment/post/${post}/`;
+  return await axiosPost<PostCommentDetailed>(url, { text, profileId, parent_comment, reply_to_comment });
+};
+
+export const getPostComments = async (postId: number) => {
+  const url = `/v1/interactions/comment/post/${postId}/list/`;
+  return await axiosFetch<PaginatedPostCommentsResponse>(url);
+};
+
+export const getCommentReplies = async (commentId: number) => {
+  const url = `/v1/interactions/comment/${commentId}/replies/`;
+  return await axiosFetch<PaginatedPostCommentsResponse>(url);
+};
+
+export const getCommentChain = async (commentId: string | number) => {
+  const url = `/v1/interactions/comment/${commentId}/chain/`;
+  return await axiosFetch<CommentChainResponse>(url);
+};
+
+export const likeComment = async (commentId: number, profileId: number) => {
+  const url = `/v1/interactions/like/comment/${commentId}/`;
+  return await axiosPost<CommentLike>(url, { profileId });
+};
+
+export const deleteCommentLike = async (commentId: number) => {
+  const url = `/v1/interactions/like/comment/${commentId}/`;
+  return await axiosDelete(url);
+};
+
+export const followProfile = async (profileId: number) => {
+  const url = "/v1/interactions/follow/";
+  return await axiosPost<Follow>(url, { profileId });
+};
+
+export const unfollowProfile = async (profileId: number) => {
+  const url = `/v1/interactions/follow/${profileId}/`;
+  return await axiosDelete(url);
+};
+
+export const getFollowers = async (profileId: number) => {
+  const url = `/v1/interactions/followers/${profileId}/`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
+};
+
+export const getFollowing = async (profileId: number) => {
+  const url = `/v1/interactions/following/${profileId}/`;
+  return await axiosFetch<PaginatedProfileResponse>(url);
+};

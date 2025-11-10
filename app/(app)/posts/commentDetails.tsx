@@ -4,7 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, ScrollView, ActivityIndicator } from "react-native";
 
-import { getCommentChain } from "@/api/post";
+import { getCommentChain } from "@/api/interactions";
 import Button from "@/components/Button/Button";
 import MainComment from "@/components/Comment/MainComment";
 import ReplyComment from "@/components/Comment/ReplyComment";

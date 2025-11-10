@@ -1,13 +1,7 @@
-import { CommentChainResponse } from "@/types/post/post";
-
 import {
   PaginatedExploreResponse,
-  PaginatedPostCommentsResponse,
   PaginatedSavedPostsResponse,
   PostDetailed,
-  PostCommentDetailed,
-  PostLike,
-  CommentLike,
   SavedPost,
   PaginatedFeedResponse,
 } from "../types";
@@ -55,37 +49,6 @@ export const unSavePost = async (postId: number) => {
   return await axiosDelete(url);
 };
 
-export const addLike = async (postId: number, profileId: number) => {
-  const url = `/v1/post/${postId}/like/`;
-  return await axiosPost<PostLike>(url, { profileId });
-};
-
-export const removeLike = async (postId: number) => {
-  const url = `/v1/post/${postId}/like/`;
-  return await axiosDelete(url);
-};
-
-export const addComment = async (
-  post: number,
-  text: string,
-  profileId: number,
-  parent_comment: number | null,
-  reply_to_comment: number | null,
-) => {
-  const url = `/v1/post/${post}/comment/`;
-  return await axiosPost<PostCommentDetailed>(url, { text, profileId, parent_comment, reply_to_comment });
-};
-
-export const getPostComments = async (postId: number) => {
-  const url = `/v1/post/${postId}/comments/`;
-  return await axiosFetch<PaginatedPostCommentsResponse>(url);
-};
-
-export const getCommentReplies = async (postId: number, commentId: number) => {
-  const url = `/v1/post/${postId}/comments/${commentId}/reply/`;
-  return await axiosFetch<PaginatedPostCommentsResponse>(url);
-};
-
 export const getPost = async (postId: number | string) => {
   const url = `/v1/post/${postId}/`;
   return await axiosFetch<PostDetailed>(url);
@@ -101,23 +64,7 @@ export const getSimilarPosts = async (postId: number) => {
   return await axiosFetch<PaginatedExploreResponse>(url);
 };
 
-export const likeComment = async (commentId: number, profileId: number) => {
-  const url = `/v1/comment/${commentId}/like/`;
-  return await axiosPost<CommentLike>(url, { profileId });
-};
-
-// authProfileId is the profile requesting the delete
-export const deleteCommentLike = async (commentId: number) => {
-  const url = `/v1/comment/${commentId}/like/`;
-  return await axiosDelete(url);
-};
-
 export const deletePostImage = async (id: number | string) => {
   const url = `/v1/post/image/${id}/`;
   return await axiosDelete(url);
-};
-
-export const getCommentChain = async (commentId: string | number) => {
-  const url = `/v1/comment/${commentId}/chain/`;
-  return await axiosFetch<CommentChainResponse>(url);
 };

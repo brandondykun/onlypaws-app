@@ -9,7 +9,8 @@ import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native"
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
-import { addLike, removeLike, savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
+import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
+import { addLike, removeLike } from "@/api/interactions";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";

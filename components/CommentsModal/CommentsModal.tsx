@@ -11,7 +11,7 @@ import { TextInput as RNGHTextInput } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
 import { axiosFetch } from "@/api/config";
-import { addComment, getPostComments } from "@/api/post";
+import { addComment, getPostComments } from "@/api/interactions";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";

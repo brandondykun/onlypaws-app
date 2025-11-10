@@ -11,7 +11,7 @@ import React from "react";
 import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { unfollowProfile, followProfile } from "@/api/profile";
+import { unfollowProfile, followProfile } from "@/api/interactions";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";

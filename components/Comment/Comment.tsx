@@ -6,7 +6,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { axiosFetch } from "@/api/config";
-import { deleteCommentLike, getCommentReplies, likeComment } from "@/api/post";
+import { deleteCommentLike, getCommentReplies, likeComment } from "@/api/interactions";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -100,7 +100,7 @@ const Comment = ({
   const fetchReplies = async () => {
     setFetchRepliesLoading(true);
     setHasFetchRepliesError(false);
-    const { error, data } = await getCommentReplies(comment.post, comment.id);
+    const { error, data } = await getCommentReplies(comment.id);
     if (!error && data) {
       setFetchNextUrl(data.next);
       handleAddReplies(comment.id, data.results);
