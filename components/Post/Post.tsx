@@ -4,9 +4,10 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native";
-import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
+import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
+import { scheduleOnRN } from "react-native-worklets";
 import Toast from "react-native-toast-message";
 
 import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
@@ -60,60 +61,63 @@ const Post = ({
   const postMenuRef = useRef<BottomSheetModal>(null);
   const aiMenuRef = useRef<BottomSheetModal>(null);
 
-  const handleHeartPress = async (postId: number, liked: boolean) => {
-    if (post.is_hidden) return;
-    setLikeLoading(true);
-    if (!liked) {
-      Haptics.impactAsync();
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 1.5,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]).start();
-      onLike(postId); // optimistic like
-      const { error } = await addLike(postId, authProfile.id);
-      if (error) {
-        onUnlike(postId); // roll back if error
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error liking that post.",
-        });
+  const handleHeartPress = useCallback(
+    async (postId: number, liked: boolean) => {
+      if (post.is_hidden) return;
+      setLikeLoading(true);
+      if (!liked) {
+        Haptics.impactAsync();
+        Animated.sequence([
+          Animated.timing(scaleValue, {
+            toValue: 1.5,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+        ]).start();
+        onLike(postId); // optimistic like
+        const { error } = await addLike(postId, authProfile.id);
+        if (error) {
+          onUnlike(postId); // roll back if error
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "There was an error liking that post.",
+          });
+        }
+      } else {
+        Haptics.selectionAsync();
+        Animated.sequence([
+          Animated.timing(scaleValue, {
+            toValue: 0.7,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+        ]).start();
+        onUnlike(postId); // optimistic un-like
+        const { error } = await removeLike(postId);
+        if (error) {
+          onLike(postId); // roll back if error
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "There was an error removing that like.",
+          });
+        }
       }
-    } else {
-      Haptics.selectionAsync();
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 0.7,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]).start();
-      onUnlike(postId); // optimistic un-like
-      const { error } = await removeLike(postId);
-      if (error) {
-        onLike(postId); // roll back if error
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error removing that like.",
-        });
-      }
-    }
-    setLikeLoading(false);
-  };
+      setLikeLoading(false);
+    },
+    [post.is_hidden, scaleValue, onLike, authProfile.id, onUnlike],
+  );
 
   const addComment = () => {
     onComment && onComment(post.id);
@@ -209,6 +213,18 @@ const Post = ({
     aiMenuRef.current?.present();
   };
 
+  const doubleTapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd(() => {
+          if (post.profile.id !== authProfile.id && !likeLoading) {
+            scheduleOnRN(handleHeartPress, post.id, post.liked);
+          }
+        }),
+    [post.profile.id, authProfile.id, likeLoading, post.id, post.liked, handleHeartPress],
+  );
+
   return (
     <View style={{ minHeight: POST_HEIGHT }}>
       {headerVisible ? (
@@ -271,14 +287,7 @@ const Post = ({
           </View>
         ) : null}
         <GestureHandlerRootView>
-          <TapGestureHandler
-            numberOfTaps={2}
-            onActivated={
-              post.profile.id === authProfile.id || likeLoading
-                ? undefined
-                : () => handleHeartPress(post.id, post.liked)
-            }
-          >
+          <GestureDetector gesture={doubleTapGesture}>
             <View
               style={{
                 minHeight: screenWidth,
@@ -287,7 +296,7 @@ const Post = ({
             >
               <ImageSwiper images={post.images} />
             </View>
-          </TapGestureHandler>
+          </GestureDetector>
         </GestureHandlerRootView>
       </View>
 
