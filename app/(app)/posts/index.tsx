@@ -69,13 +69,13 @@ const PostsScreen = () => {
       profileLoading={refreshing || loading}
       profileRefresh={refetch}
       profileRefreshing={refreshing}
-      profileError={false}
-      postsLoading={false}
-      postsError={false}
+      profileError={false} // this will be false for the users own profile, the data is already fetched in the AuthProfileContext
+      postsLoading={!posts.initialFetchComplete}
+      postsError={posts.hasInitialFetchError}
       postsData={posts.data}
       postsRefresh={posts.refetch}
       postsRefreshing={posts.refreshing}
-      setProfileData={undefined}
+      setProfileData={undefined} // this will be undefined for the users own profile, the data is modified in the AuthProfileContext
       fetchNext={posts.fetchNext}
       fetchNextLoading={posts.fetchNextLoading}
       hasFetchNextError={posts.hasFetchNextError}
