@@ -1,9 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetModal as RNBottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import { ForwardedRef, forwardRef, useRef, useState } from "react";
 import React from "react";
-import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, Easing, Pressable, StyleSheet, TextInput as RNTextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { deletePost as deletePostApiCall } from "@/api/post";
@@ -19,6 +19,7 @@ import { PostReportPreview } from "@/types";
 import BottomSheetModal from "../BottomSheet/BottomSheet";
 import Button from "../Button/Button";
 import Text from "../Text/Text";
+import TextInput from "../TextInput/TextInput";
 
 type Props = {
   onViewProfilePress: () => void;
@@ -42,13 +43,20 @@ const PostMenu = forwardRef(
     const { deletePost } = usePostsContext();
     const { data: reportReasons } = useReportReasonsContext();
     const { onReportPost, onToggleHidden } = usePostManagerContext();
+
     const confirmDeleteModalRef = useRef<RNBottomSheetModal>(null);
     const confirmReportModalRef = useRef<RNBottomSheetModal>(null);
+    const reportDetailsInputRef = useRef<RNTextInput>(null);
+    const reportDetailsValueRef = useRef("");
 
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [reportLoading, setReportLoading] = useState(false);
-    const [reportLoadingReasonId, setReportLoadingReasonId] = useState<number | null>(null);
     const [isInappropriateContent, setIsInappropriateContent] = useState(false);
+    const [reportReasonId, setReportReasonId] = useState<number | null>(null);
+    const [reportPostError, setReportPostError] = useState<string | null>(null);
+    const [reportDetailsLength, setReportDetailsLength] = useState(0);
+
+    const slideAnim = useRef(new Animated.Value(0)).current;
 
     const handlePostDelete = async () => {
       setDeleteLoading(true);
@@ -92,31 +100,66 @@ const PostMenu = forwardRef(
       }
     };
 
-    const handleReportPost = async (reasonId: number) => {
-      setReportLoading(true);
-      setReportLoadingReasonId(reasonId);
+    const handleReportPost = async () => {
+      if (!reportReasonId) return;
 
-      const { error, data } = await reportPost(postId, reasonId, "");
+      setReportLoading(true);
+      setReportPostError(null);
+
+      const { error, data } = await reportPost(postId, reportReasonId, reportDetailsValueRef.current);
       if (!error && data) {
-        const is_inappropriate_content = reasonId === 1;
+        const is_inappropriate_content = reportReasonId === 1;
         // set post is_reported and is_hidden to true
         onReportPost(postId, is_inappropriate_content);
-        confirmReportModalRef.current?.dismiss();
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "This post has been reported. Thank you!",
-          visibilityTime: 10000,
-        });
+        // slight delay to allow the post to be updated in the state
+        setTimeout(() => {
+          confirmReportModalRef.current?.dismiss();
+          setReportLoading(false);
+        }, 300);
+        // another longer delay to allow the modal to be dismissed
+        // this makes the ux smoother and more natural
+        setTimeout(() => {
+          resetReportState();
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "That post has been reported. Thank you!",
+            visibilityTime: 7000,
+          });
+        }, 500);
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error reporting that post.",
-        });
+        setReportPostError("There was an error reporting that post. Please try again.");
+        setReportLoading(false);
       }
-      setReportLoading(false);
-      setReportLoadingReasonId(null);
+    };
+
+    const handleReportReasonSelect = (reasonId: number) => {
+      setReportReasonId(reasonId);
+
+      // Animate slide transition
+      Animated.timing(slideAnim, {
+        toValue: -100,
+        duration: 500,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+      }).start();
+    };
+
+    const resetReportState = () => {
+      setReportReasonId(null);
+      reportDetailsInputRef.current?.clear();
+      reportDetailsValueRef.current = "";
+      setReportDetailsLength(0);
+      setReportPostError(null);
+      slideAnim.setValue(0);
+    };
+
+    const handleCancelReport = () => {
+      confirmReportModalRef.current?.dismiss();
+      // Reset after animation completes
+      setTimeout(() => {
+        resetReportState();
+      }, 300);
     };
 
     const reportReasonsArray: string[] = [];
@@ -133,7 +176,7 @@ const PostMenu = forwardRef(
     return (
       <>
         <BottomSheetModal handleTitle="Post Options" ref={ref} enableDynamicSizing={true} snapPoints={[]}>
-          <BottomSheetView style={s.bottomSheetView}>
+          <BottomSheetView style={[s.bottomSheetView, { paddingHorizontal: 36 }]}>
             {reports.length ? (
               <View style={{ marginBottom: authProfile.id === postProfileId ? 36 : 0 }}>
                 <View style={{ marginBottom: 16, alignItems: "center" }}>
@@ -293,7 +336,7 @@ const PostMenu = forwardRef(
           enableDynamicSizing={true}
           snapPoints={[]}
         >
-          <BottomSheetView style={s.bottomSheetView}>
+          <BottomSheetView style={[s.bottomSheetView, { paddingHorizontal: 36 }]}>
             <Text style={{ marginBottom: 8, fontSize: 18 }}>Are you sure you want to delete this post?</Text>
             <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={{ marginBottom: 24, fontSize: 16 }}>
               This action cannot be undone.
@@ -322,60 +365,167 @@ const PostMenu = forwardRef(
         <BottomSheetModal
           handleTitle="Report Post"
           ref={confirmReportModalRef}
-          enableDynamicSizing={true}
-          snapPoints={[]}
+          snapPoints={["80%"]}
+          onDismiss={resetReportState}
+          keyboardBehavior="interactive"
+          android_keyboardInputMode="adjustResize"
+          enableDynamicSizing={false}
         >
-          <BottomSheetView style={s.bottomSheetView}>
-            <Text
-              style={{ marginBottom: 24, fontSize: 18, paddingHorizontal: 12, textAlign: "center", fontWeight: 300 }}
-            >
-              Why would you like to report this post?
-            </Text>
+          <BottomSheetScrollView
+            style={s.bottomSheetView}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flex: 1 }}
+          >
+            <View style={{ overflow: "hidden" }}>
+              <Animated.View
+                style={{
+                  flexDirection: "row",
+                  transform: [
+                    {
+                      translateX: slideAnim.interpolate({
+                        inputRange: [-100, 0],
+                        outputRange: [-Dimensions.get("window").width, 0],
+                      }),
+                    },
+                  ],
+                }}
+              >
+                {/* Reasons View */}
+                <View style={{ width: Dimensions.get("window").width, paddingHorizontal: 36 }}>
+                  <Text
+                    style={{
+                      marginBottom: 24,
+                      fontSize: 18,
+                      paddingHorizontal: 12,
+                      textAlign: "center",
+                      fontWeight: "300",
+                    }}
+                  >
+                    Why would you like to report this post?
+                  </Text>
+                  <View
+                    style={{
+                      borderRadius: 8,
+                      overflow: "hidden",
+                      backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+                      width: "100%",
+                    }}
+                  >
+                    {reportReasons.map((reason, i) => {
+                      return (
+                        <Pressable
+                          style={({ pressed }) => [(pressed || reportLoading) && { opacity: 0.7 }]}
+                          onPress={() => handleReportReasonSelect(reason.id)}
+                          disabled={reportLoading}
+                          key={i}
+                        >
+                          <View
+                            style={[
+                              s.profileOption,
+                              {
+                                borderBottomWidth: i === reportReasons.length - 1 ? 0 : 1,
+                                borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400],
+                              },
+                            ]}
+                          >
+                            <Text style={{ textAlign: "center", fontSize: 18 }}>{reason.name}</Text>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Details View */}
+                <View style={{ width: Dimensions.get("window").width, paddingHorizontal: 36 }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      paddingHorizontal: 12,
+                      textAlign: "center",
+                      fontWeight: "300",
+                    }}
+                  >
+                    Why would you like to report this post?
+                  </Text>
+                  <Text
+                    style={{
+                      marginBottom: 24,
+                      fontSize: 18,
+                      paddingHorizontal: 12,
+                      textAlign: "center",
+                      fontWeight: "300",
+                    }}
+                    darkColor={COLORS.zinc[400]}
+                    lightColor={COLORS.zinc[600]}
+                  >
+                    (optional)
+                  </Text>
+                  <TextInput
+                    ref={reportDetailsInputRef}
+                    inputStyle={[
+                      s.textInput,
+                      {
+                        backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[125],
+                        color: isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900],
+                        borderColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400],
+                      },
+                    ]}
+                    placeholder="Please provide more details..."
+                    placeholderTextColor={COLORS.zinc[500]}
+                    defaultValue={reportDetailsValueRef.current}
+                    onChangeText={(text) => {
+                      reportDetailsValueRef.current = text;
+                      setReportDetailsLength(text.length);
+                    }}
+                    multiline
+                    numberOfLines={8}
+                    textAlignVertical="top"
+                    maxLength={1000}
+                    editable={!reportLoading}
+                    autoComplete="off"
+                  />
+                  <View style={{ marginTop: -10 }}>
+                    <Text
+                      style={{
+                        textAlign: "right",
+                        paddingRight: 2,
+                        color:
+                          reportDetailsLength >= 1000
+                            ? COLORS.red[500]
+                            : setLightOrDark(COLORS.zinc[800], COLORS.zinc[300]),
+                      }}
+                    >
+                      {Math.min(reportDetailsLength, 1000)}/1000
+                    </Text>
+                  </View>
+                  {reportPostError ? (
+                    <Text style={{ marginTop: 24, fontSize: 16, color: COLORS.red[600], textAlign: "center" }}>
+                      {reportPostError}
+                    </Text>
+                  ) : null}
+                  <View style={{ marginTop: 24 }}>
+                    <Button
+                      text="Submit Report"
+                      onPress={handleReportPost}
+                      loading={reportLoading}
+                      disabled={reportLoading}
+                    />
+                  </View>
+                </View>
+              </Animated.View>
+            </View>
             <View
               style={{
-                borderRadius: 8,
-                overflow: "hidden",
-                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+                alignItems: "center",
+                paddingHorizontal: 36,
+                flex: 1,
+                justifyContent: "flex-end",
               }}
             >
-              {reportReasons.map((reason, i) => {
-                return (
-                  <Pressable
-                    style={({ pressed }) => [(pressed || reportLoading) && { opacity: 0.7 }]}
-                    onPress={() => handleReportPost(reason.id)}
-                    disabled={reportLoading}
-                    key={i}
-                  >
-                    <View
-                      style={[
-                        s.profileOption,
-                        {
-                          borderBottomWidth: i === reportReasons.length - 1 ? 0 : 1,
-                          borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400],
-                        },
-                      ]}
-                    >
-                      {reportLoadingReasonId === reason.id ? (
-                        <View style={{ justifyContent: "center", alignItems: "center" }}>
-                          <ActivityIndicator size={20} />
-                        </View>
-                      ) : (
-                        <Text style={{ textAlign: "center", fontSize: 18 }}>{reason.name}</Text>
-                      )}
-                    </View>
-                  </Pressable>
-                );
-              })}
+              <Button text="Cancel" variant="text" onPress={handleCancelReport} disabled={reportLoading} />
             </View>
-            <View style={{ marginTop: 24 }}>
-              <Button
-                text="Cancel"
-                variant="secondary"
-                buttonStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300] }}
-                onPress={() => confirmReportModalRef.current?.dismiss()}
-              />
-            </View>
-          </BottomSheetView>
+          </BottomSheetScrollView>
         </BottomSheetModal>
       </>
     );
@@ -391,7 +541,10 @@ const s = StyleSheet.create({
   },
   bottomSheetView: {
     paddingTop: 24,
-    paddingBottom: 48,
-    paddingHorizontal: 36,
+    paddingBottom: 56,
+  },
+  textInput: {
+    fontSize: 16,
+    minHeight: 120,
   },
 });

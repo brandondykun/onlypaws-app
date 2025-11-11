@@ -171,9 +171,9 @@ const TextInput = forwardRef(
                 backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
                 borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
               },
-              focused && { borderColor: focusedBorderColor },
               error ? { borderColor: COLORS.red[600] } : null,
               inputStyle,
+              focused && { borderColor: focusedBorderColor },
               icon ? { paddingLeft: 40 } : null,
               withClearButton ? { paddingRight: 40 } : null,
             ]}
