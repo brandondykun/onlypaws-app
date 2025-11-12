@@ -10,6 +10,7 @@ import React from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 
 import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileModal";
+import MissingProfileInfoMessage from "@/components/MissingProfileInfoMessage/MissingProfileInfoMessage";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
 import Text from "@/components/Text/Text";
@@ -57,6 +58,9 @@ const ProfileScreen = () => {
   if (authProfile.breed) toJoin.push(authProfile.breed);
   const petDetailsText = toJoin.join(" • ");
 
+  const missingProfileInfo =
+    !authProfile.name || !petDetailsText || !authProfile.about || !authProfile.pet_type || !authProfile.breed;
+
   return (
     <>
       <ScrollView
@@ -78,14 +82,17 @@ const ProfileScreen = () => {
           </View>
         </View>
         <View style={s.headerTextContainer}>
-          <Text style={s.headerName}>{authProfile.name}</Text>
+          {authProfile.name && <Text style={s.headerName}>{authProfile.name}</Text>}
           <Text style={s.headerUsername} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
             @{authProfile.username}
           </Text>
-          <Text style={s.headerBreed} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-            {petDetailsText}
-          </Text>
+          {petDetailsText && (
+            <Text style={s.headerBreed} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+              {petDetailsText}
+            </Text>
+          )}
         </View>
+        {missingProfileInfo && <MissingProfileInfoMessage />}
         <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) }]}>
           <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
             Account
@@ -150,12 +157,6 @@ const s = StyleSheet.create({
   },
   relativeImageWrapper: {
     position: "relative",
-  },
-  sectionHeader: {
-    fontSize: 14,
-    marginBottom: 12,
-    paddingLeft: 8,
-    fontWeight: "500",
   },
   card: {
     borderRadius: 12,

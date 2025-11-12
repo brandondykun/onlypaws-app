@@ -11,9 +11,9 @@ import { ProfileDetails } from "@/types";
 import { abbreviateNumber } from "@/utils/utils";
 
 import Button from "../Button/Button";
+import ProfileDetailsHeaderSkeleton from "../LoadingSkeletons/ProfileDetailsHeaderSkeleton";
 import ProfileDetailsHeaderImage from "../ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import Text from "../Text/Text";
-import ProfileDetailsHeaderSkeleton from "../LoadingSkeletons/ProfileDetailsHeaderSkeleton";
 
 type Props = {
   profileData: ProfileDetails;
@@ -112,13 +112,17 @@ const ProfileDetailsHeader = ({
         <View style={s.profileImageContainer}>
           <ProfileDetailsHeaderImage size={120} image={profileData?.image || null} />
         </View>
-        <Text style={s.nameText}>{profileData?.name}</Text>
-        <Text style={s.aboutText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]}>
-          {profileData?.about ? profileData.about : "No about text"}
-        </Text>
-        <Text style={s.petDetailsText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
-          {petDetailsText}
-        </Text>
+        {profileData?.name && <Text style={s.nameText}>{profileData?.name}</Text>}
+        {profileData?.about && (
+          <Text style={s.aboutText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[700]}>
+            {profileData.about}
+          </Text>
+        )}
+        {petDetailsText && (
+          <Text style={s.petDetailsText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
+            {petDetailsText}
+          </Text>
+        )}
         <View style={s.profileButtonsRoot}>
           {profileData && profileData.id !== authProfile.id ? followButtons : selfProfileButtons}
         </View>
