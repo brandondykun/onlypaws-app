@@ -29,17 +29,17 @@ export const getMyInfo = async () => {
 };
 
 // register api call that can handle returning specific field errors
-export const registerUser = async (email: string, password: string, username: string) => {
+export const registerUser = async (email: string, password: string) => {
   const url = "/v1/auth/create-user/";
   try {
-    const res = await axiosInstance.post<UserProfile>(url, { email, password, username });
+    const res = await axiosInstance.post<UserProfile>(url, { email, password });
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
     const data = error.response?.data as any;
     return {
       data: null,
-      error: data as { email?: string[]; username?: string[]; password?: string[] },
+      error: data as { email?: string[]; password?: string[] },
       status: error.status,
     };
   }

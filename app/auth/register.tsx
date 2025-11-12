@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
@@ -15,15 +14,12 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
-import { verifyUsername } from "@/utils/utils";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
   const { isDarkMode, setLightOrDark } = useColorMode();
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState("");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +29,6 @@ const RegisterScreen = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const handleCreateAccount = async () => {
-    setUsernameError("");
     setEmailError("");
     setPasswordError("");
     setConfirmPasswordError("");
@@ -42,13 +37,6 @@ const RegisterScreen = () => {
 
     if (!email) {
       setEmailError("Please enter an email.");
-      hasErrors = true;
-    }
-
-    const usernameError = verifyUsername(username);
-
-    if (usernameError) {
-      setUsernameError(usernameError);
       hasErrors = true;
     }
 
@@ -77,7 +65,7 @@ const RegisterScreen = () => {
 
     setSubmitLoading(true);
 
-    const { error, data } = await registerUser(email, password, username);
+    const { error, data } = await registerUser(email, password);
 
     if (!error && data) {
       const { error: loginError, data: loginData } = await login(email, password);
@@ -90,7 +78,8 @@ const RegisterScreen = () => {
         if (!myInfoError && myInfoData) {
           authenticate(myInfoData);
           setSubmitLoading(false);
-          // router.push("/auth/verifyEmail");
+          // Navigate to email verification
+          router.replace("/auth/verifyEmail");
         } else {
           Toast.show({
             type: "error",
@@ -109,13 +98,10 @@ const RegisterScreen = () => {
       }
     } else {
       // handle errors here
-      if (error.email) {
+      if (error?.email) {
         setEmailError(error.email[0]);
       }
-      if (error.username) {
-        setUsernameError(error.username[0]);
-      }
-      if (error.password) {
+      if (error?.password) {
         setPasswordError(error.password[0]);
       }
 
@@ -134,7 +120,7 @@ const RegisterScreen = () => {
         <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
       </View>
       <View style={s.inputsContainer}>
-        <View style={{ marginBottom: 36 }}>
+        <View style={{ marginBottom: 24 }}>
           <TextInput
             label="Email"
             value={email}
@@ -177,23 +163,6 @@ const RegisterScreen = () => {
           />
           <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
             * Password must be at least 9 characters.
-          </Text>
-        </View>
-        <View style={{ marginBottom: 36 }}>
-          <TextInput
-            label="Username"
-            value={username}
-            onChangeText={setUsername}
-            error={usernameError}
-            placeholder="AwesomeUsername"
-            icon={<MaterialIcons name="person" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-          />
-          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
-            * Username must be unique from all other profiles.
-          </Text>
-          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
-            * You can change your username later.
           </Text>
         </View>
       </View>

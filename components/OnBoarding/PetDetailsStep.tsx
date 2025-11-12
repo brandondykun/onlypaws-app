@@ -1,0 +1,147 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { View, StyleSheet, Animated } from "react-native";
+import Toast from "react-native-toast-message";
+
+import { getPetTypeOptions } from "@/api/profile";
+import Button from "@/components/Button/Button";
+import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
+import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
+import Text from "@/components/Text/Text";
+import TextInput from "@/components/TextInput/TextInput";
+import { COLORS } from "@/constants/Colors";
+import { useColorMode } from "@/context/ColorModeContext";
+
+type PetDetailsStepProps = {
+  onNext: () => Promise<void>;
+  loading: boolean;
+  name: string;
+  setName: (name: string) => void;
+  petType: DropdownSelectOption | null;
+  setPetType: (petType: DropdownSelectOption) => void;
+  breed: string;
+  setBreed: (breed: string) => void;
+};
+
+const PetDetailsStep = ({
+  onNext,
+  loading,
+  name,
+  setName,
+  petType,
+  setPetType,
+  breed,
+  setBreed,
+}: PetDetailsStepProps) => {
+  const { isDarkMode, setLightOrDark } = useColorMode();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
+
+  const fetchPetTypeOptions = useCallback(async () => {
+    const { error, data } = await getPetTypeOptions();
+    if (!error && data) {
+      const formatted = data.map((item) => {
+        return { ...item, title: item.name };
+      });
+      setPetTypeOptions(formatted);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!petTypeOptions) {
+      fetchPetTypeOptions();
+    }
+  }, [fetchPetTypeOptions, petTypeOptions]);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
+  const fadeOut = useCallback(() => {
+    return new Promise<void>((resolve) => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => resolve());
+    });
+  }, [fadeAnim]);
+
+  const handleNext = async () => {
+    if (!name) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter your pet's name.",
+      });
+      return;
+    }
+
+    // Disable button during fade out to prevent re-clicking
+    setIsTransitioning(true);
+    await fadeOut();
+    await onNext();
+  };
+
+  return (
+    <Animated.View style={[s.container, { opacity: fadeAnim }]}>
+      <View style={{ paddingBottom: 24, gap: 16 }}>
+        <Text
+          style={{ fontSize: 24, fontWeight: "600", textAlign: "center" }}
+          darkColor={COLORS.sky[400]}
+          lightColor={COLORS.sky[500]}
+        >
+          Tell Us About Your Pet
+        </Text>
+        <Text
+          style={{ fontSize: 16, fontWeight: "300", textAlign: "center" }}
+          darkColor={COLORS.zinc[300]}
+          lightColor={COLORS.zinc[700]}
+        >
+          Help others get to know your furry friend
+        </Text>
+      </View>
+
+      <View style={{ flex: 1, gap: 12 }}>
+        <TextInput
+          label="Pet Name"
+          value={name}
+          onChangeText={setName}
+          placeholder="ex: Charlie"
+          icon={<Ionicons name="paw" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
+        />
+        <View style={{ marginBottom: 12 }}>
+          <DropdownSelect
+            defaultText="Select a pet type (optional)"
+            data={petTypeOptions || []}
+            onSelect={(selectedItem) => setPetType(selectedItem)}
+            label="Pet Type"
+            defaultValue={petType}
+            dropdownStyle={{
+              borderRadius: 8,
+              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+              height: 300,
+            }}
+          />
+        </View>
+        <TextInput label="Breed (optional)" value={breed} onChangeText={setBreed} placeholder="ex: Golden Retriever" />
+      </View>
+      <Button text="Next" onPress={handleNext} loading={loading || isTransitioning} />
+    </Animated.View>
+  );
+};
+
+export default PetDetailsStep;
+
+const s = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingVertical: 16,
+  },
+});

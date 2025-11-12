@@ -36,14 +36,14 @@ const VerifyEmailScreen = () => {
     const { error, status } = await verifyEmail(otpCode);
     if (!error && status === 200) {
       updateEmailVerified(true);
-      router.replace("/(app)/(index)");
-      Toast.show({
-        type: "success",
-        text1: "Verification Successful",
-        text2: "Email verified. Welcome to OnlyPaws!",
-        visibilityTime: 7000,
-      });
       otpInputRef.current?.clear();
+
+      // Navigate based on whether user has profiles
+      if (!user.profiles || user.profiles.length === 0) {
+        router.replace("../onboarding/");
+      } else {
+        router.replace("/(app)/(index)");
+      }
     } else if (error) {
       setSubmitError(error);
     }

@@ -136,7 +136,7 @@ const TabLayout = () => {
 
   if (authLoading) {
     return (
-      <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100] }]}>
+      <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[100] }]}>
         <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={s.loadingViewText}>
           Loading
         </Text>
@@ -151,6 +151,11 @@ const TabLayout = () => {
 
   if (!user.is_email_verified) {
     return <Redirect href="/auth/verifyEmail" />;
+  }
+
+  // Check if user has at least one profile
+  if (!user.profiles || user.profiles.length === 0) {
+    return <Redirect href="../onboarding/" />;
   }
 
   return (

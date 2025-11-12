@@ -72,8 +72,9 @@ const RootLayout = () => {
                       },
                     }}
                   >
-                    <Stack.Screen name="auth" options={{ title: "", headerShown: false }} />
-                    <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false }} />
+                    <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
+                    <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
+                    <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
                   </Stack>
                   <Toast config={toastConfig} />
                 </BottomSheetModalProvider>

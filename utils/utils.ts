@@ -207,6 +207,15 @@ export const getReadableFeedbackType = (type: FeedbackTicketType): string => {
   return "General Feedback";
 };
 
+export const isValidCharacters = (str: string): boolean => {
+  // Using regex: ^ means start, $ means end, so entire string must match
+  // \w matches alphanumeric characters and underscores [a-zA-Z0-9_]
+  // \. matches a literal period
+  // + means one or more characters
+  const regex = /^[\w.]+$/;
+  return regex.test(str);
+};
+
 // Verify a username is valid - naive verification for the front end
 export const verifyUsername = (username: string) => {
   if (username.length < 3) {
@@ -217,9 +226,10 @@ export const verifyUsername = (username: string) => {
     return "Username must be less than 30 characters.";
   }
 
-  if (username.includes(" ")) {
-    return "Username cannot contain spaces.";
+  if (!isValidCharacters(username)) {
+    return "Username can only contain letters, numbers, periods, and underscores.";
   }
+
   // If the username is valid, return null
   return null;
 };

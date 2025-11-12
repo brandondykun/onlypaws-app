@@ -1,4 +1,3 @@
-// import { Redirect } from "expo-router";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
@@ -63,13 +62,17 @@ const AuthUserContextProvider = ({ children }: Props) => {
     setUser(user);
     setProfileOptions(user.profiles);
     setIsAuthenticated(true);
-    // fetch last active profile id and set as the current active profile - persist last profile
-    const selectedId = await SecureStore.getItemAsync("SELECTED_PROFILE_ID");
-    if (selectedId && user.profiles.find((profile) => profile.id === Number(selectedId))) {
-      setSelectedProfileId(Number(selectedId));
-    } else {
-      // as a default, set first profile as active
-      setSelectedProfileId(user.profiles[0].id);
+
+    // Only set profile if user has profiles
+    if (user.profiles && user.profiles.length > 0) {
+      // fetch last active profile id and set as the current active profile - persist last profile
+      const selectedId = await SecureStore.getItemAsync("SELECTED_PROFILE_ID");
+      if (selectedId && user.profiles.find((profile) => profile.id === Number(selectedId))) {
+        setSelectedProfileId(Number(selectedId));
+      } else {
+        // as a default, set first profile as active
+        setSelectedProfileId(user.profiles[0].id);
+      }
     }
   }, []);
 
@@ -110,7 +113,6 @@ const AuthUserContextProvider = ({ children }: Props) => {
         } else {
           console.log("CALLING LOGOUT FROM AUTH USER CONTEXT PROVIDER");
           logOut();
-          // return <Redirect href="/auth/" />;
         }
       }
       setAuthLoading(false);
@@ -129,6 +131,11 @@ const AuthUserContextProvider = ({ children }: Props) => {
       }
       return [option];
     });
+    // Also update the user.profiles array so layout checks work correctly
+    setUser((prev) => {
+      const currentProfiles = prev.profiles || [];
+      return { ...prev, profiles: [...currentProfiles, option] };
+    });
   };
 
   // remove profile option if a profile if deleted
@@ -138,6 +145,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
         return prev?.filter((profile) => profile.id !== profileId);
       }
       return null;
+    });
+    // Also update the user.profiles array to keep in sync
+    setUser((prev) => {
+      const currentProfiles = prev.profiles || [];
+      const filtered = currentProfiles.filter((profile) => profile.id !== profileId);
+      return { ...prev, profiles: filtered.length > 0 ? filtered : null };
     });
   };
 
