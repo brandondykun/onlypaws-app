@@ -47,18 +47,18 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps)
     <Animated.View style={[s.container, { opacity: fadeAnim }]}>
       <View style={{ paddingBottom: 24, gap: 16 }}>
         <Text
-          style={{ fontSize: 24, fontWeight: "600", textAlign: "center" }}
+          style={{ fontSize: 26, fontWeight: "600", textAlign: "center" }}
           darkColor={COLORS.sky[400]}
           lightColor={COLORS.sky[500]}
         >
           One Last Thing...
         </Text>
         <Text
-          style={{ fontSize: 16, fontWeight: "300", textAlign: "center" }}
-          darkColor={COLORS.zinc[300]}
-          lightColor={COLORS.zinc[700]}
+          style={{ fontSize: 18, fontWeight: "300", textAlign: "center" }}
+          darkColor={COLORS.zinc[400]}
+          lightColor={COLORS.zinc[600]}
         >
-          Tell everyone a bit about {name || "your pet"}
+          Tell everyone a bit about {name || "your pet"}!
         </Text>
       </View>
 
@@ -69,7 +69,7 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps)
           onChangeText={setAbout}
           multiline
           numberOfLines={8}
-          placeholder="Tell us about your pet..."
+          placeholder="I am a great dog and I really love cheese..."
           textAlignVertical="top"
           maxLength={1000}
           showCharCount

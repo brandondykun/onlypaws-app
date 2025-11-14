@@ -93,18 +93,18 @@ const PetDetailsStep = ({
     <Animated.View style={[s.container, { opacity: fadeAnim }]}>
       <View style={{ paddingBottom: 24, gap: 16 }}>
         <Text
-          style={{ fontSize: 24, fontWeight: "600", textAlign: "center" }}
+          style={{ fontSize: 26, fontWeight: "600", textAlign: "center" }}
           darkColor={COLORS.sky[400]}
           lightColor={COLORS.sky[500]}
         >
           Tell Us About Your Pet
         </Text>
         <Text
-          style={{ fontSize: 16, fontWeight: "300", textAlign: "center" }}
-          darkColor={COLORS.zinc[300]}
-          lightColor={COLORS.zinc[700]}
+          style={{ fontSize: 18, fontWeight: "300", textAlign: "center" }}
+          darkColor={COLORS.zinc[400]}
+          lightColor={COLORS.zinc[600]}
         >
-          Help others get to know your furry friend
+          Help others get to know your furry friend!
         </Text>
       </View>
 
@@ -113,10 +113,10 @@ const PetDetailsStep = ({
           label="Pet Name"
           value={name}
           onChangeText={setName}
-          placeholder="ex: Charlie"
+          placeholder="Fido"
           icon={<Ionicons name="paw" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
         />
-        <View style={{ marginBottom: 12 }}>
+        <View style={{ marginBottom: 16 }}>
           <DropdownSelect
             defaultText="Select a pet type (optional)"
             data={petTypeOptions || []}
@@ -130,7 +130,7 @@ const PetDetailsStep = ({
             }}
           />
         </View>
-        <TextInput label="Breed (optional)" value={breed} onChangeText={setBreed} placeholder="ex: Golden Retriever" />
+        <TextInput label="Breed (optional)" value={breed} onChangeText={setBreed} placeholder="Golden Retriever" />
       </View>
       <Button text="Next" onPress={handleNext} loading={loading || isTransitioning} />
     </Animated.View>

@@ -34,6 +34,7 @@ const UsernameStep = ({
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
+      delay: 300,
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
@@ -81,18 +82,18 @@ const UsernameStep = ({
     <Animated.View style={[s.container, { opacity: fadeAnim }]}>
       <View style={{ paddingBottom: 24, gap: 16 }}>
         <Text
-          style={{ fontSize: 26, fontWeight: "500", textAlign: "center" }}
-          darkColor={COLORS.zinc[100]}
-          lightColor={COLORS.zinc[500]}
+          style={{ fontSize: 26, fontWeight: "600", textAlign: "center" }}
+          darkColor={COLORS.sky[400]}
+          lightColor={COLORS.sky[500]}
         >
           Choose your username
         </Text>
         <Text
           style={{ fontSize: 18, fontWeight: "300", textAlign: "center" }}
           darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[700]}
+          lightColor={COLORS.zinc[600]}
         >
-          This will be your unique identifier on OnlyPaws
+          This will be your unique identifier on OnlyPaws!
         </Text>
       </View>
 

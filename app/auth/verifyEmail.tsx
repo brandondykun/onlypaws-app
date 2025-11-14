@@ -104,17 +104,18 @@ const VerifyEmailScreen = () => {
         </View>
         <View style={s.inputContainer}>
           <OtpInput ref={otpInputRef} setOtpCode={setOtpCode} />
-          <View style={{ marginHorizontal: 36, marginTop: 24 }}>
-            <Button text="Submit" onPress={handleSubmit} disabled={otpCode.length < 6} loading={submitLoading} />
-          </View>
         </View>
-        <View style={s.errorTextContainer}>
-          <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={[s.errorText, { marginBottom: 12 }]}>
-            {submitError}
-          </Text>
-          <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={s.errorText}>
-            {resendError}
-          </Text>
+        <View>
+          {submitError && (
+            <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={[s.errorText, { marginBottom: 12 }]}>
+              {submitError}
+            </Text>
+          )}
+          {resendError && (
+            <Text darkColor={COLORS.red[500]} lightColor={COLORS.red[500]} style={s.errorText}>
+              {resendError}
+            </Text>
+          )}
         </View>
         <View style={s.resendButtonContainer}>
           <Button
@@ -124,6 +125,9 @@ const VerifyEmailScreen = () => {
             onPress={handleResendCode}
             loading={resendLoading}
           />
+        </View>
+        <View style={{ paddingHorizontal: 4, marginTop: 24 }}>
+          <Button text="Submit" onPress={handleSubmit} disabled={otpCode.length < 6} loading={submitLoading} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -137,12 +141,14 @@ const s = StyleSheet.create({
     flex: 1,
   },
   scrollRoot: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     flex: 1,
-    paddingVertical: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
   },
   header: {
-    fontSize: 28,
+    fontSize: 26,
+    fontWeight: "600",
     textAlign: "center",
     marginBottom: 24,
   },
@@ -159,20 +165,18 @@ const s = StyleSheet.create({
     marginBottom: 24,
   },
   inputContainer: {
-    marginBottom: 48,
     gap: 12,
   },
   resendButtonContainer: {
-    justifyContent: "flex-end",
+    paddingBottom: 48,
     alignItems: "center",
+    justifyContent: "flex-end",
     flex: 1,
   },
   errorText: {
     textAlign: "center",
-    fontSize: 20,
-  },
-  errorTextContainer: {
-    height: 100,
+    fontSize: 18,
+    paddingHorizontal: 12,
   },
   shieldIconContainer: {
     alignItems: "center",
