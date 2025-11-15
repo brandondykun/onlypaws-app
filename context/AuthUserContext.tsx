@@ -7,6 +7,15 @@ import { getMyInfo } from "@/api/auth";
 import * as tokenService from "@/services/tokenService";
 import { MyInfo, ProfileOption, User } from "@/types";
 
+const DEFAULT_USER: User = {
+  id: null,
+  email: null,
+  profiles: null,
+  is_email_verified: false,
+  regular_profile_onboarding_completed: false,
+  business_profile_onboarding_completed: false,
+};
+
 type AuthUserContextType = {
   user: User;
   selectedProfileId: number | null;
@@ -19,12 +28,13 @@ type AuthUserContextType = {
   addProfileOption: (option: ProfileOption) => void;
   changeSelectedProfileId: (profileId: number) => Promise<void>;
   updateEmailVerified: (value: boolean) => void;
+  updateOnboardingCompleted: (profileType: "regular" | "business") => void;
   removeProfileOption: (profileId: number) => void;
   changeEmail: (newEmail: string) => void;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
-  user: { id: null, email: null, profiles: null, is_email_verified: false },
+  user: DEFAULT_USER,
   selectedProfileId: null,
   authenticate: (user: MyInfo) => {},
   isAuthenticated: false,
@@ -35,6 +45,7 @@ const AuthUserContext = createContext<AuthUserContextType>({
   addProfileOption: (option: ProfileOption) => {},
   changeSelectedProfileId: (profileId: number) => Promise.resolve(),
   updateEmailVerified: (value: boolean) => {},
+  updateOnboardingCompleted: (profileType: "regular" | "business") => {},
   removeProfileOption: (profileId: number) => {},
   changeEmail: (newEmail: string) => {},
 });
@@ -46,7 +57,7 @@ type Props = {
 const AuthUserContextProvider = ({ children }: Props) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
-  const [user, setUser] = useState<User>({ id: null, email: null, profiles: null, is_email_verified: false });
+  const [user, setUser] = useState<User>(DEFAULT_USER);
   const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
@@ -77,7 +88,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
   }, []);
 
   const logOut = useCallback(async () => {
-    setUser({ id: null, email: null, profiles: null, is_email_verified: false });
+    setUser(DEFAULT_USER);
     setSelectedProfileId(null);
     setIsAuthenticated(false);
     await tokenService.clearTokens();
@@ -93,6 +104,18 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const updateEmailVerified = (value: boolean) => {
     setUser((prev) => {
       return { ...prev, is_email_verified: value };
+    });
+  };
+
+  const updateOnboardingCompleted = (profileType: "regular" | "business") => {
+    setUser((prev) => {
+      return {
+        ...prev,
+        regular_profile_onboarding_completed:
+          profileType === "regular" ? true : prev.regular_profile_onboarding_completed,
+        business_profile_onboarding_completed:
+          profileType === "business" ? true : prev.business_profile_onboarding_completed,
+      };
     });
   };
 
@@ -172,6 +195,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    updateOnboardingCompleted,
     removeProfileOption,
     changeEmail,
   };
@@ -194,6 +218,7 @@ export const useAuthUserContext = () => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    updateOnboardingCompleted,
     removeProfileOption,
     changeEmail,
   } = useContext(AuthUserContext);
@@ -209,6 +234,7 @@ export const useAuthUserContext = () => {
     addProfileOption,
     changeSelectedProfileId,
     updateEmailVerified,
+    updateOnboardingCompleted,
     removeProfileOption,
     changeEmail,
   };

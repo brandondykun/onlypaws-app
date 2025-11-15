@@ -124,3 +124,16 @@ export const verifyEmailChange = async (token: string) => {
     return { data: null, error: data, status: error.status };
   }
 };
+
+export const completeOnboarding = async (profileType: "regular" | "business") => {
+  const url = "/v1/auth/complete-onboarding/";
+  try {
+    const res = await axiosInstance.post<MyInfo>(url, {
+      profile_type: profileType,
+    });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message, status: error.status };
+  }
+};

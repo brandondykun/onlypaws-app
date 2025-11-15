@@ -12,6 +12,8 @@ export type User = {
   email: null | string;
   profiles: ProfileOption[] | null;
   is_email_verified: boolean;
+  regular_profile_onboarding_completed: boolean;
+  business_profile_onboarding_completed: boolean;
 };
 
 export type UserBasic = {
@@ -70,6 +72,8 @@ export type MyInfo = {
   id: number;
   profiles: ProfileOption[];
   is_email_verified: boolean;
+  regular_profile_onboarding_completed: boolean;
+  business_profile_onboarding_completed: boolean;
 };
 
 export type UserProfile = {

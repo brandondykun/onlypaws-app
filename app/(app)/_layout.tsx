@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
+import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import AuthProfileFollowersContextProvider from "@/context/AuthProfileFollowersContext";
@@ -47,8 +48,8 @@ const TabsComponent = () => {
       <Tabs
         backBehavior="history"
         screenOptions={{
-          tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-          tabBarInactiveTintColor: isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500],
+          tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.sky[500]),
+          tabBarInactiveTintColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]),
           tabBarStyle: s.tabBarStyle,
           headerShadowVisible: false, // applied here
           tabBarBackground: () => {
@@ -125,6 +126,7 @@ const TabsComponent = () => {
           }}
         />
       </Tabs>
+      <OnboardingModal />
     </>
   );
 };
