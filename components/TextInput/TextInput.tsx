@@ -29,6 +29,8 @@ type Props = {
   secureTextEntry?: boolean;
   withClearButton?: boolean;
   rootStyle?: StyleProp<ViewStyle>;
+  focusedBorderColor?: string;
+  charCountPaddingRight?: number;
 } & TextInputProps;
 
 const TextInput = forwardRef(
@@ -44,6 +46,8 @@ const TextInput = forwardRef(
       onChangeText,
       secureTextEntry,
       rootStyle,
+      focusedBorderColor,
+      charCountPaddingRight = 0,
       withClearButton = false,
       ...rest
     }: Props,
@@ -57,7 +61,7 @@ const TextInput = forwardRef(
 
     const { setLightOrDark } = useColorMode();
 
-    const focusedBorderColor = setLightOrDark(COLORS.zinc[600], COLORS.zinc[400]);
+    const borderColorWhenFocused = focusedBorderColor || setLightOrDark(COLORS.zinc[600], COLORS.zinc[400]);
 
     // Animate clear button based on input value
     useEffect(() => {
@@ -173,7 +177,7 @@ const TextInput = forwardRef(
               },
               error ? { borderColor: COLORS.red[600] } : null,
               inputStyle,
-              focused && { borderColor: focusedBorderColor },
+              focused && { borderColor: borderColorWhenFocused },
               icon ? { paddingLeft: 40 } : null,
               withClearButton ? { paddingRight: 40 } : null,
             ]}
@@ -212,6 +216,7 @@ const TextInput = forwardRef(
                   maxLength && value && value.length >= maxLength
                     ? COLORS.red[500]
                     : setLightOrDark(COLORS.zinc[800], COLORS.zinc[300]),
+                paddingRight: charCountPaddingRight,
               }}
             >
               {value ? value.length : 0}/{maxLength}

@@ -4,7 +4,7 @@ import { useNavigation, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import LottieView from "lottie-react-native";
 import React, { useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Switch, StyleSheet } from "react-native";
+import { ScrollView, View, Switch, StyleSheet, TextInput as RNTextInput, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { createPost } from "@/api/post";
@@ -29,6 +29,7 @@ const AddPostScreen = () => {
   const aiModalRef = useRef<RNBottomSheetModal>(null);
   const discardPostModalRef = useRef<RNBottomSheetModal>(null);
   const scrollViewRef = useRef<ScrollView>(null);
+  const textInputRef = useRef<RNTextInput>(null);
 
   const { addPost } = usePostsContext();
   const { authProfile, updatePostsCount } = useAuthProfileContext();
@@ -64,8 +65,11 @@ const AddPostScreen = () => {
   // handle discard post from discard post modal
   const handleDiscardPost = () => {
     resetState();
-    router.dismissAll();
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.dismissAll();
+    }
   };
 
   const handleAddPost = async () => {
@@ -121,7 +125,11 @@ const AddPostScreen = () => {
         setImages([]);
         setAiGenerated(false);
         router.dismissAll();
-        router.replace("/(app)/posts");
+        router.back(); // Navigate back to add tab index (camera screen)
+        // Use setTimeout to ensure navigation to posts tab happens after returning to add index
+        setTimeout(() => {
+          router.navigate("/(app)/posts");
+        }, 100);
         Toast.show({
           type: "success",
           text1: "Success",
@@ -154,52 +162,61 @@ const AddPostScreen = () => {
       scrollEnabled={!submitLoading}
       ref={scrollViewRef}
     >
-      <View style={{ marginBottom: 36 }}>
-        <ImageSwiper images={images} />
-      </View>
-      <View style={{ marginBottom: 12, paddingLeft: 16 }}>
-        <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18, fontWeight: "400", fontStyle: "italic" }}>
-          Add a caption
-        </Text>
-      </View>
-      <View style={{ padding: 16, paddingTop: 0, flex: 1 }}>
+      <ImageSwiper images={images} />
+      <View style={{ paddingVertical: 16, paddingTop: 0, flex: 1 }}>
         <View style={{ marginBottom: 36 }}>
           <TextInput
+            ref={textInputRef}
             value={caption}
             onChangeText={setCaption}
-            label="Caption"
             multiline={true}
-            numberOfLines={3}
+            placeholder="Paw-some caption goes here..."
+            numberOfLines={Platform.OS === "ios" ? 100 : 10}
             error={captionError}
             showCharCount
             maxLength={1000}
             textAlignVertical="top"
             onFocus={handleFocus}
+            inputStyle={{
+              minHeight: 140,
+              maxHeight: 800,
+              backgroundColor: "transparent",
+              borderColor: "transparent",
+              borderRadius: 4,
+              fontSize: 16,
+              marginBottom: 6,
+              paddingHorizontal: 16,
+            }}
+            focusedBorderColor={"transparent"}
+            charCountPaddingRight={8}
+            scrollEnabled={false}
           />
         </View>
-        <View style={s.aiGeneratedContainer}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "400" }}>Contains AI Generated Content</Text>
-            <Text
-              darkColor={COLORS.zinc[400]}
-              lightColor={COLORS.zinc[600]}
-              style={{ fontSize: 14, fontWeight: "400" }}
-            >
-              Please identify if this post contains AI generated content.{" "}
-              <Button
-                buttonStyle={s.learnMoreButton}
-                textStyle={[s.learnMoreButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[400]) }]}
-                variant="text"
-                text="Learn More"
-                onPress={() => aiModalRef.current?.present()}
-                hitSlop={10}
-              />
-            </Text>
+        <View style={{ paddingHorizontal: 16 }}>
+          <View style={s.aiGeneratedContainer}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 18, fontWeight: "400" }}>Contains AI Generated Content</Text>
+              <Text
+                darkColor={COLORS.zinc[400]}
+                lightColor={COLORS.zinc[600]}
+                style={{ fontSize: 14, fontWeight: "400" }}
+              >
+                Please identify if this post contains AI generated content.{" "}
+                <Button
+                  buttonStyle={s.learnMoreButton}
+                  textStyle={[s.learnMoreButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[400]) }]}
+                  variant="text"
+                  text="Learn More"
+                  onPress={() => aiModalRef.current?.present()}
+                  hitSlop={10}
+                />
+              </Text>
+            </View>
+            <Switch value={aiGenerated} onValueChange={() => setAiGenerated((prev) => !prev)} />
           </View>
-          <Switch value={aiGenerated} onValueChange={() => setAiGenerated((prev) => !prev)} />
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
+          </View>
         </View>
       </View>
       <AiModal ref={aiModalRef} />
