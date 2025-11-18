@@ -60,7 +60,7 @@ const PostTile = ({ post, index, onPress }: Props) => {
             </Text>
           </View>
         ) : (
-          <Image source={{ uri: post.images[0].image }} style={{ height: itemSize, width: width }} />
+          <Image key={post.id} source={{ uri: post.images[0].image }} style={{ height: itemSize, width: width }} />
         )}
       </Pressable>
     </View>
