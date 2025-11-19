@@ -7,11 +7,11 @@ import * as Haptics from "expo-haptics";
 import { useState, useRef, useCallback, useMemo } from "react";
 import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import { scheduleOnRN } from "react-native-worklets";
 import Toast from "react-native-toast-message";
+import { scheduleOnRN } from "react-native-worklets";
 
-import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
 import { addLike, removeLike } from "@/api/interactions";
+import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";

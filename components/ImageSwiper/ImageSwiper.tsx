@@ -1,6 +1,6 @@
 import { ImagePickerAsset } from "expo-image-picker";
 import { useRef } from "react";
-import { View, Dimensions, StyleSheet } from "react-native";
+import { View, Dimensions, StyleSheet, useWindowDimensions } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
@@ -19,8 +19,6 @@ type Props = {
   renderItem?: CarouselRenderItem<PostImage | PhotoFile | ImagePickerAsset | CropperImage>;
 };
 
-const { width } = Dimensions.get("window");
-
 // Basic pagination example if custom pagination causes issues
 // <Pagination.Basic
 //   progress={progress}
@@ -34,6 +32,7 @@ const ImageSwiper = ({ images, renderItem }: Props) => {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const { setLightOrDark } = useColorMode();
+  const width = useWindowDimensions().width;
 
   const defaultRenderItem = ({ item }: { item: PostImage | PhotoFile | ImagePickerAsset | CropperImage }) => {
     return <ImageLoader uri={getImageUri(item)} height={width} width={width} style={styles.image} />;
@@ -107,10 +106,12 @@ const ImageSwiper = ({ images, renderItem }: Props) => {
 
 export default ImageSwiper;
 
+const windowWidth = Dimensions.get("window").width;
+
 const styles = StyleSheet.create({
   image: {
-    width: width,
-    height: width,
+    width: windowWidth,
+    height: windowWidth,
     resizeMode: "cover",
   },
   paginationContainer: {
