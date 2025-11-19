@@ -29,7 +29,6 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
   const [nativeAd, setNativeAd] = useState<NativeAd | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const pulseAnim = useRef(new Animated.Value(0.5)).current;
-  const nativeAdRef = useRef<NativeAd | null>(null);
 
   useEffect(() => {
     // Start pulsing animation for skeleton
@@ -55,7 +54,6 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
         const ad = await adManager.getAd(adId);
 
         if (ad) {
-          nativeAdRef.current = ad;
           setNativeAd(ad);
           setIsLoading(false);
           pulseAnimation.stop();
@@ -79,12 +77,10 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
 
     loadAd();
 
-    // Cleanup function to destroy the ad when component unmounts
+    // Cleanup function - only stop animation
+    // Don't destroy the ad - let the AdManager handle cleanup when list unmounts
     return () => {
       pulseAnimation.stop();
-      if (nativeAdRef.current) {
-        nativeAdRef.current.destroy();
-      }
     };
   }, [adId, onAdLoaded, onAdFailedToLoad, pulseAnim]);
 

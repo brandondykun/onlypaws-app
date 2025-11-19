@@ -111,8 +111,7 @@ class AdManager {
       const age = Date.now() - cached.timestamp;
       if (age < this.MAX_AD_AGE_MS) {
         console.log(`Using cached ad: ${adId}`);
-        // Remove from cache so it's not reused
-        this.adCache.delete(adId);
+        // Keep in cache so it can be reused when scrolling back
         return cached.ad;
       } else {
         // Ad is too old, destroy it
@@ -138,7 +137,15 @@ class AdManager {
       const ad = await NativeAd.createForAdRequest(adService.getNativeAdUnitId(), {
         requestNonPersonalizedAdsOnly: false,
         keywords: AD_KEYWORDS,
+        aspectRatio: NativeMediaAspectRatio.SQUARE,
       });
+
+      // Cache the ad so it can be reused when scrolling
+      this.adCache.set(adId, {
+        ad,
+        timestamp: Date.now(),
+      });
+
       return ad;
     } catch (error) {
       console.warn(`Failed to load ad ${adId}:`, error);
