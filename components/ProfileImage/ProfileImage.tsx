@@ -35,6 +35,7 @@ const ProfileImage = ({ image, iconSize, size }: Props) => {
     <>
       {imageUri ? (
         <Image
+          key={imageUri}
           source={{ uri: imageUri }}
           style={{
             borderRadius: imageSize,
