@@ -1,17 +1,16 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
-import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import * as ImageCropPicker from "react-native-image-crop-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { PhotoFile } from "react-native-vision-camera";
 
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { ImageAsset } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
 import Button from "../Button/Button";
@@ -22,8 +21,8 @@ import Text from "../Text/Text";
 type Props = {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  image: ImagePickerAsset | PhotoFile | ImageCropPicker.Image | null;
-  setImage: React.Dispatch<React.SetStateAction<ImagePickerAsset | PhotoFile | ImageCropPicker.Image | null>>;
+  image: ImageAsset | null;
+  setImage: React.Dispatch<React.SetStateAction<ImageAsset | null>>;
   onSave: () => Promise<void>;
   saveImageLoading: boolean;
 };
@@ -33,9 +32,7 @@ const CropProfileImageModal = ({ visible, setVisible, image, setImage, onSave, s
   const insets = useSafeAreaInsets();
 
   // maintain a stack of images that have been cropped to allow for undo
-  const [cropHistoryStack, setCropHistoryStack] = useState<(ImagePickerAsset | PhotoFile | ImageCropPicker.Image)[]>(
-    [],
-  );
+  const [cropHistoryStack, setCropHistoryStack] = useState<ImageAsset[]>([]);
 
   // handle image press that initiates the crop process
   const handleImagePress = (uri: string) => {
@@ -47,7 +44,7 @@ const CropProfileImageModal = ({ visible, setVisible, image, setImage, onSave, s
       compressImageQuality: 1,
     })
       .then((croppedImage) => {
-        setCropHistoryStack((prev) => [...prev, image as ImageCropPicker.Image | ImagePickerAsset | PhotoFile]);
+        setCropHistoryStack((prev) => [...prev, image as ImageAsset]);
         setImage(croppedImage);
       })
       .catch((error) => {

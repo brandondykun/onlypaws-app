@@ -65,6 +65,7 @@ export type SearchedProfile = {
   is_following: boolean;
   image: ProfileImage | null;
   name: string;
+  profile_type: ProfileType;
 };
 
 export type MyInfo = {
@@ -82,11 +83,21 @@ export type UserProfile = {
   profile: Profile;
 };
 
+export type PostImageTag = {
+  id: number;
+  tagged_profile: SearchedProfile;
+  tagged_by_profile: SearchedProfile;
+  x_position: string;
+  y_position: string;
+  created_at: string;
+};
+
 export type PostImage = {
   id: number;
   post: number;
   image: string;
   order: number;
+  tags: PostImageTag[];
 };
 
 export type PostLike = {
@@ -152,6 +163,14 @@ export type PostDetailed = {
   is_hidden: boolean;
   is_reported: boolean; // has current profile already reported the post
   contains_ai: boolean;
+  tagged_profiles: SearchedProfile[];
+};
+
+// Define the shape of a page in your infinite query
+export type PostsDetailedPage = {
+  results: PostDetailed[] | null;
+  next: string | null;
+  previous: string | null;
 };
 
 export type ProfileDetails = {
@@ -167,6 +186,14 @@ export type ProfileDetails = {
   pet_type: PetType | null;
   breed: string | null;
   profile_type: ProfileType;
+};
+
+// Paginated response for posts - can work for any request fetching posts
+export type PaginatedPostsResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PostDetailed[];
 };
 
 export type PaginatedExploreResponse = {

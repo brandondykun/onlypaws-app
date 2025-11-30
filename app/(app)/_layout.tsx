@@ -16,18 +16,13 @@ import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingC
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
-import ExploreProfileDetailsContextProvider from "@/context/ExploreProfileDetailsContext";
-import FeedPostsContextProvider from "@/context/FeedPostsContext";
-import FeedProfileDetailsContextProvider from "@/context/FeedProfileDetailsContext";
 import NotificationsContextProvider from "@/context/NotificationsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import PostManagerContextProvider from "@/context/PostManagerContext";
 import PostsContextProvider from "@/context/PostsContext";
-import PostsProfileDetailsContextProvider from "@/context/PostsProfileDetailsContext";
 import ProfileDetailsManagerContextProvider from "@/context/ProfileDetailsManagerContext";
 import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
-import SavedPostsContextProvider from "@/context/SavedPostsContext";
 
 const TabsComponent = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
@@ -162,33 +157,23 @@ const TabLayout = () => {
 
   return (
     <PostsContextProvider>
-      <FeedPostsContextProvider>
-        <ExplorePostsContextProvider>
-          <SavedPostsContextProvider>
-            <FeedProfileDetailsContextProvider>
-              <ExploreProfileDetailsContextProvider>
-                <PostsProfileDetailsContextProvider>
-                  <ProfileSearchContextProvider>
-                    <AuthProfileFollowingContextProvider>
-                      <AuthProfileFollowersContextProvider>
-                        <PostManagerContextProvider>
-                          <ProfileDetailsManagerContextProvider>
-                            <NotificationsContextProvider>
-                              <ReportReasonsContextProvider>
-                                <TabsComponent />
-                              </ReportReasonsContextProvider>
-                            </NotificationsContextProvider>
-                          </ProfileDetailsManagerContextProvider>
-                        </PostManagerContextProvider>
-                      </AuthProfileFollowersContextProvider>
-                    </AuthProfileFollowingContextProvider>
-                  </ProfileSearchContextProvider>
-                </PostsProfileDetailsContextProvider>
-              </ExploreProfileDetailsContextProvider>
-            </FeedProfileDetailsContextProvider>
-          </SavedPostsContextProvider>
-        </ExplorePostsContextProvider>
-      </FeedPostsContextProvider>
+      <ExplorePostsContextProvider>
+        <ProfileSearchContextProvider>
+          <AuthProfileFollowingContextProvider>
+            <AuthProfileFollowersContextProvider>
+              <PostManagerContextProvider>
+                <ProfileDetailsManagerContextProvider>
+                  <NotificationsContextProvider>
+                    <ReportReasonsContextProvider>
+                      <TabsComponent />
+                    </ReportReasonsContextProvider>
+                  </NotificationsContextProvider>
+                </ProfileDetailsManagerContextProvider>
+              </PostManagerContextProvider>
+            </AuthProfileFollowersContextProvider>
+          </AuthProfileFollowingContextProvider>
+        </ProfileSearchContextProvider>
+      </ExplorePostsContextProvider>
     </PostsContextProvider>
   );
 };

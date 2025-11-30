@@ -1,53 +1,79 @@
-import { ImagePickerAsset } from "expo-image-picker";
 import { useRef } from "react";
-import { View, Dimensions, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
-import { Image as CropperImage } from "react-native-image-crop-picker";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
-import Carousel, { CarouselRenderItem, ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
-import { PhotoFile } from "react-native-vision-camera";
+import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostImage } from "@/types";
-import { getImageUri } from "@/utils/utils";
+import { ImageAsset, ImageAssetWithTags } from "@/types/post/post";
 
-import ImageLoader from "../ImageLoader/ImageLoader";
+import PostImageWithTags from "../PostImageWithTags/PostImageWithTags";
 
-type Props = {
-  images: PostImage[] | (PhotoFile | ImagePickerAsset | CropperImage)[];
-  renderItem?: CarouselRenderItem<PostImage | PhotoFile | ImagePickerAsset | CropperImage>;
-};
+type Props =
+  | {
+      images: PostImage[] | ImageAssetWithTags[];
+      renderItem: (info: { item: PostImage | ImageAssetWithTags; index: number }) => React.ReactElement;
+      onIndexChange?: (index: number) => void;
+      showTagPopovers?: undefined;
+      setShowTagPopovers?: undefined;
+      onTagsButtonPress?: undefined;
+    }
+  | {
+      images: PostImage[] | ImageAssetWithTags[];
+      renderItem?: undefined;
+      onIndexChange?: (index: number) => void;
+      showTagPopovers: boolean;
+      setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
+      onTagsButtonPress?: () => void;
+    };
 
 // Basic pagination example if custom pagination causes issues
 // <Pagination.Basic
 //   progress={progress}
-//   data={images as PhotoFile[]}
+//   data={images as ImageAsset[]}
 //   dotStyle={{ backgroundColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[500]), borderRadius: 50 }}
 //   containerStyle={{ gap: 5 }}
 //   activeDotStyle={{ backgroundColor: setLightOrDark(COLORS.sky[500], COLORS.sky[600]), borderRadius: 50 }}
 // />
 
-const ImageSwiper = ({ images, renderItem }: Props) => {
+const ImageSwiper = ({
+  images,
+  renderItem,
+  onIndexChange,
+  showTagPopovers,
+  setShowTagPopovers,
+  onTagsButtonPress,
+}: Props) => {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const { setLightOrDark } = useColorMode();
   const width = useWindowDimensions().width;
 
-  const defaultRenderItem = ({ item }: { item: PostImage | PhotoFile | ImagePickerAsset | CropperImage }) => {
-    return <ImageLoader uri={getImageUri(item)} height={width} width={width} style={styles.image} />;
-  };
+  console.log("RERENDERED IMAGE SWIPER");
 
   return (
     <View style={{ width: width }}>
-      <Carousel<PostImage | PhotoFile | ImagePickerAsset | CropperImage>
+      <Carousel<PostImage | ImageAssetWithTags>
+        key={images[0]?.id}
         ref={ref}
         width={width}
         height={width}
         data={images}
         onProgressChange={progress}
-        renderItem={(info) => {
-          return renderItem ? renderItem(info) : defaultRenderItem({ item: info.item });
+        renderItem={({ item, index }) => {
+          if (renderItem) {
+            return renderItem({ item, index });
+          }
+          return (
+            <PostImageWithTags
+              item={item}
+              showTagPopovers={showTagPopovers}
+              setShowTagPopovers={setShowTagPopovers!}
+              onTagsButtonPress={onTagsButtonPress}
+            />
+          );
         }}
         loop={false}
         onConfigurePanGesture={(panGesture: PanGesture) => {
@@ -62,10 +88,11 @@ const ImageSwiper = ({ images, renderItem }: Props) => {
         overscrollEnabled={false}
         enabled={images.length > 1}
         scrollAnimationDuration={350}
+        onSnapToItem={onIndexChange}
       />
       <View style={styles.paginationContainer}>
         {images.length > 1 && (
-          <Pagination.Custom<PostImage | PhotoFile | ImagePickerAsset | CropperImage>
+          <Pagination.Custom<PostImage | ImageAsset | ImageAssetWithTags>
             progress={progress}
             data={images}
             dotStyle={{
@@ -106,14 +133,7 @@ const ImageSwiper = ({ images, renderItem }: Props) => {
 
 export default ImageSwiper;
 
-const windowWidth = Dimensions.get("window").width;
-
 const styles = StyleSheet.create({
-  image: {
-    width: windowWidth,
-    height: windowWidth,
-    resizeMode: "cover",
-  },
   paginationContainer: {
     flexDirection: "row",
     justifyContent: "center",

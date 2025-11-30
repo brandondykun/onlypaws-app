@@ -1,42 +1,68 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { useExploreProfileDetailsContext } from "@/context/ExploreProfileDetailsContext";
 import { SearchedProfile } from "@/types";
 
 import Button from "../Button/Button";
 import Text from "../Text/Text";
 
-type Props = {
-  profile: SearchedProfile;
-  handleFollowPress: (searchedProfile: SearchedProfile) => Promise<void>;
-  handleUnfollowPress: (profileId: number) => Promise<void>;
-};
+type Props =
+  | {
+      profile: SearchedProfile;
+      handleFollowPress: (searchedProfile: SearchedProfile) => Promise<void>;
+      handleUnfollowPress: (profileId: number) => Promise<void>;
+      onPress?: ((profileId: number) => void) | undefined;
+      showFollowButtons?: true;
+    }
+  | {
+      profile: SearchedProfile;
+      handleFollowPress?: undefined;
+      handleUnfollowPress?: undefined;
+      onPress?: ((profileId: number) => void) | undefined;
+      showFollowButtons?: false;
+    };
 
 const ICON_SIZE = 42;
 
-const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPress }: Props) => {
-  const router = useRouter();
-  const exploreProfileDetails = useExploreProfileDetailsContext();
+const SearchedProfilePreview = ({
+  profile,
+  handleFollowPress,
+  handleUnfollowPress,
+  onPress,
+  showFollowButtons = true,
+}: Props) => {
+  const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
   const [followLoading, setFollowLoading] = useState(false);
 
   const handleFollow = async (searchedProfile: SearchedProfile) => {
     setFollowLoading(true);
-    await handleFollowPress(searchedProfile);
+    if (handleFollowPress) {
+      await handleFollowPress(searchedProfile);
+    }
     setFollowLoading(false);
   };
 
   const handleUnfollow = async (profileId: number) => {
     setFollowLoading(true);
-    await handleUnfollowPress(profileId);
+    if (handleUnfollowPress) {
+      await handleUnfollowPress(profileId);
+    }
     setFollowLoading(false);
   };
+
+  const handlePress = () => {
+    if (onPress && !isOwnProfile) {
+      onPress(profile.id);
+    }
+  };
+
+  const isOwnProfile = authProfile.id === profile.id;
 
   return (
     <View
@@ -50,11 +76,8 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
       }}
     >
       <Pressable
-        style={({ pressed }) => [pressed && { opacity: 0.6 }, { flex: 1 }]}
-        onPress={() => {
-          exploreProfileDetails.setProfileId(profile.id);
-          router.push({ pathname: "/(app)/explore/profile", params: { profileId: profile.id } });
-        }}
+        style={({ pressed }) => [pressed && onPress && !isOwnProfile && { opacity: 0.6 }, { flex: 1 }]}
+        onPress={handlePress}
       >
         <View style={{ flexDirection: "row", gap: 8, flex: 1 }}>
           <View>
@@ -79,7 +102,7 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
             )}
           </View>
           <View style={{ flex: 1, justifyContent: "center" }}>
-            <Text style={{ fontWeight: "700", fontSize: 14 }}>{profile.username}</Text>
+            <Text style={{ fontWeight: "700", fontSize: 14 }}>{isOwnProfile ? "You" : profile.username}</Text>
             <Text
               style={{
                 color: COLORS.zinc[500],
@@ -93,32 +116,34 @@ const SearchedProfilePreview = ({ profile, handleFollowPress, handleUnfollowPres
           </View>
         </View>
       </Pressable>
-      <View>
-        {profile.is_following ? (
-          <Button
-            text="unfollow"
-            textStyle={{ fontSize: 12 }}
-            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
-            variant="outline"
-            onPress={() => handleUnfollow(profile.id)}
-            testID={`${profile.username}-unfollow`}
-            loading={followLoading}
-            loadingIconSize={12}
-            loadingIconScale={0.7}
-          />
-        ) : (
-          <Button
-            text="follow"
-            textStyle={{ fontSize: 12 }}
-            buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
-            onPress={() => handleFollow(profile)}
-            testID={`${profile.username}-follow`}
-            loading={followLoading}
-            loadingIconSize={12}
-            loadingIconScale={0.7}
-          />
-        )}
-      </View>
+      {showFollowButtons && !isOwnProfile && (
+        <View>
+          {profile.is_following ? (
+            <Button
+              text="unfollow"
+              textStyle={{ fontSize: 12 }}
+              buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+              variant="outline"
+              onPress={() => handleUnfollow(profile.id)}
+              testID={`${profile.username}-unfollow`}
+              loading={followLoading}
+              loadingIconSize={12}
+              loadingIconScale={0.7}
+            />
+          ) : (
+            <Button
+              text="follow"
+              textStyle={{ fontSize: 12 }}
+              buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+              onPress={() => handleFollow(profile)}
+              testID={`${profile.username}-follow`}
+              loading={followLoading}
+              loadingIconSize={12}
+              loadingIconScale={0.7}
+            />
+          )}
+        </View>
+      )}
     </View>
   );
 };

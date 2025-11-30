@@ -1,4 +1,8 @@
-import { PostDetailed, Profile } from "@/types";
+import { ImagePickerAsset } from "expo-image-picker";
+import { Image as CropperImage } from "react-native-image-crop-picker";
+import { PhotoFile } from "react-native-vision-camera";
+
+import { PostDetailed, Profile, SearchedProfile } from "@/types";
 
 export interface ChainComment {
   id: number;
@@ -21,3 +25,33 @@ export interface CommentChainResponse {
   omitted_count: number;
   post: PostDetailed;
 }
+
+export type CreatePostImageTag = {
+  tagged_profile: SearchedProfile;
+  x_position: number;
+  y_position: number;
+  positioningMode: "pixel" | "percentage";
+  id: string;
+};
+
+// When creating a post, the tags are stored inside of the image asset object
+export type PhotoFileWithTags = PhotoFile & {
+  id: string;
+  tags: CreatePostImageTag[];
+};
+
+// When creating a post, the tags are stored inside of the image asset object
+export type ImagePickerAssetWithTags = ImagePickerAsset & {
+  id: string;
+  tags: CreatePostImageTag[];
+};
+
+// When creating a post, the tags are stored inside of the image asset object
+export type CropperImageWithTags = CropperImage & {
+  id: string;
+  tags: CreatePostImageTag[];
+};
+
+export type ImageAssetWithTags = PhotoFileWithTags | ImagePickerAssetWithTags | CropperImageWithTags;
+
+export type ImageAsset = PhotoFile | ImagePickerAsset | CropperImage;

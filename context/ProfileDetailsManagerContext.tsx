@@ -1,11 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
-import { followProfileInState, unFollowProfileInState } from "@/utils/utils";
+import { ProfileDetails } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useExploreProfileDetailsContext } from "./ExploreProfileDetailsContext";
-import { useFeedProfileDetailsContext } from "./FeedProfileDetailsContext";
-import { usePostsProfileDetailsContext } from "./PostsProfileDetailsContext";
 import { useProfileSearchContext } from "./ProfileSearchContext";
 
 // Profile details manager for profiles throughout the app.
@@ -30,17 +28,20 @@ type Props = { children: React.ReactNode };
 const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
   const { addFollowing, removeFollowing } = useAuthProfileContext();
 
-  const exploreProfile = useExploreProfileDetailsContext();
-  const feedProfile = useFeedProfileDetailsContext();
-  const postsProfile = usePostsProfileDetailsContext();
+  const queryClient = useQueryClient();
+
   const profileSearch = useProfileSearchContext();
 
   const onFollow = (profileId: number) => {
     addFollowing();
     // follow profile wherever it appears in the app
-    followProfileInState(exploreProfile.profile.setData);
-    followProfileInState(feedProfile.profile.setData);
-    followProfileInState(postsProfile.profile.setData);
+    queryClient.setQueryData(["profile", profileId.toString()], (oldData: ProfileDetails) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        is_following: true,
+      };
+    });
     // handle updating the follow/un-follow button in the profile search screen in Explore tab
     profileSearch.setData((prev) =>
       prev?.map((profile) => {
@@ -50,14 +51,20 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
         return profile;
       }),
     );
+    // refresh the feed posts query to add the followed profile to the feed
+    queryClient.refetchQueries({ queryKey: ["posts", "feed"] });
   };
 
   const onUnfollow = (profileId: number) => {
     removeFollowing();
     // unfollow profile wherever it appears in the app
-    unFollowProfileInState(exploreProfile.profile.setData);
-    unFollowProfileInState(feedProfile.profile.setData);
-    unFollowProfileInState(postsProfile.profile.setData);
+    queryClient.setQueryData(["profile", profileId.toString()], (oldData: ProfileDetails) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        is_following: false,
+      };
+    });
     // handle updating the follow/un-follow button in the profile search screen in Explore tab
     profileSearch.setData((prev) =>
       prev?.map((profile) => {
@@ -67,6 +74,8 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
         return profile;
       }),
     );
+    // refresh the feed posts query to remove the unfollowed profile from the feed
+    queryClient.refetchQueries({ queryKey: ["posts", "feed"] });
   };
 
   const value = { onFollow, onUnfollow };
@@ -77,6 +86,9 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 export default ProfileDetailsManagerContextProvider;
 
 export const useProfileDetailsManagerContext = () => {
-  const { onFollow, onUnfollow } = useContext(ProfileDetailsManagerContext);
-  return { onFollow, onUnfollow };
+  const context = useContext(ProfileDetailsManagerContext);
+  if (!context) {
+    throw new Error("useProfileDetailsManagerContext must be used within ProfileDetailsManagerContextProvider");
+  }
+  return context;
 };

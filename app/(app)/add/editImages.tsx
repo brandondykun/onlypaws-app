@@ -51,9 +51,15 @@ const EditImages = () => {
     }
   }, [images]);
 
-  const handleImagePress = (uri: string) => {
+  const handleImagePress = (imageId: string) => {
+    // Find the current image to get its latest URI
+    const imageToEdit = images.find((img) => img.id === imageId);
+    if (!imageToEdit) return;
+
+    const currentUri = getImageUri(imageToEdit);
+
     ImagePicker.openCropper({
-      path: uri,
+      path: currentUri,
       width: 1080,
       height: 1080,
       mediaType: "photo",
@@ -61,11 +67,12 @@ const EditImages = () => {
     })
       .then((croppedImage) => {
         setImages((prev) => {
-          return prev.map((image) => {
-            if (getImageUri(image) === uri) {
-              return croppedImage;
+          return prev.map((img) => {
+            if (img.id === imageId) {
+              // Preserve id and tags from the original image
+              return { ...croppedImage, id: img.id, tags: img.tags };
             }
-            return image;
+            return img;
           });
         });
       })
@@ -105,8 +112,8 @@ const EditImages = () => {
                       height: screenWidth * 0.8,
                     },
                   ]}
-                  key={getImageUri(image)}
-                  onPress={() => handleImagePress(getImageUri(image))}
+                  key={image.id}
+                  onPress={() => handleImagePress(image.id)}
                 >
                   {({ pressed }) => (
                     <>
@@ -138,8 +145,8 @@ const EditImages = () => {
                   height: screenWidth * 0.8,
                 },
               ]}
-              key={getImageUri(images[0])}
-              onPress={() => handleImagePress(getImageUri(images[0]))}
+              key={images[0].id}
+              onPress={() => handleImagePress(images[0].id)}
             >
               {({ pressed }) => (
                 <>

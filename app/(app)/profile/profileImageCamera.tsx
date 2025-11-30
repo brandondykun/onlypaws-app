@@ -1,15 +1,13 @@
 import { useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { ImagePickerAsset } from "expo-image-picker";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import * as ImageCropPicker from "react-native-image-crop-picker";
-import { scheduleOnRN } from "react-native-worklets";
 import Toast from "react-native-toast-message";
-import { Camera, useCameraDevice, useCameraPermission, Point, PhotoFile } from "react-native-vision-camera";
+import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { addProfileImage, editProfileImage } from "@/api/profile";
 import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
@@ -21,6 +19,7 @@ import RequestCameraPermission from "@/components/Camera/RequestCameraPermission
 import CropProfileImageModal from "@/components/CropProfileImageModal/CropProfileImageModal";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { ImageAsset } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
 // Max images for a post
@@ -31,7 +30,7 @@ const ProfileImageCamera = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { authProfile, updateProfileImage } = useAuthProfileContext();
 
-  const [image, setImage] = useState<PhotoFile | ImagePickerAsset | ImageCropPicker.Image | null>(null);
+  const [image, setImage] = useState<ImageAsset | null>(null);
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
   const [flash, setFlash] = useState<"on" | "off">("off");

@@ -1,15 +1,13 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { ImagePickerAsset } from "expo-image-picker";
 import { View, Pressable, StyleSheet, ActivityIndicator } from "react-native";
-import { Image as CropperImage } from "react-native-image-crop-picker";
-import { PhotoFile } from "react-native-vision-camera";
 
 import MaxImagesMessage from "@/components/Camera/MaxImagesMessage/MaxImagesMessage";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { ImageAssetWithTags } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
 type Props = {
@@ -17,7 +15,7 @@ type Props = {
   screenWidth: number;
   maxImagesReached: boolean;
   MAX_IMAGES: number;
-  images: (PhotoFile | ImagePickerAsset | CropperImage)[];
+  images: ImageAssetWithTags[];
   pickImage: () => void;
   takePicture: () => void;
   onNextButtonPress?: () => void;

@@ -1,64 +1,61 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useIsFocused } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { RefreshControl, View } from "react-native";
 
+import { getSavedPostsForQuery } from "@/api/post";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useSavedPostsContext } from "@/context/SavedPostsContext";
+import { getNextPageParam } from "@/utils/utils";
 
 const SavedPostsScreen = () => {
-  const posts = useSavedPostsContext();
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
 
-  const isFocused = useIsFocused();
+  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getSavedPostsForQuery(pageParam);
+    return res.data;
+  };
 
-  // Lazy load saved posts when screen is visited
-  useEffect(() => {
-    if (!posts.initialFetchComplete && !posts.refreshing) {
-      posts.fetch();
-    }
-  }, [posts]);
+  const posts = useInfiniteQuery({
+    queryKey: ["posts", "saved"],
+    queryFn: fetchPosts,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+  });
 
-  useEffect(() => {
-    if (isFocused) {
-      posts.setData((prev) => {
-        return prev.filter((prevPost) => {
-          return prevPost.is_saved;
-        });
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused]);
+  // Memoize the flattened posts data
+  const postsData = useMemo(() => {
+    return posts.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [posts.data]);
 
   // content to be displayed in the footer
-  const footerComponent = posts.fetchNextLoading ? (
+  const footerComponent = posts.isFetchingNextPage ? (
     <LoadingFooter />
-  ) : posts.hasFetchNextError ? (
+  ) : posts.isFetchNextPageError ? (
     <RetryFetchFooter
-      fetchFn={posts.fetchNext}
+      fetchFn={posts.fetchNextPage}
       message="Oh no! There was an error fetching more posts!"
       buttonText="Retry"
     />
   ) : null;
 
   const emptyComponent =
-    !posts.initialFetchComplete || (posts.hasInitialFetchError && posts.refreshing) ? (
+    posts.isLoading || (posts.isError && posts.isRefetching) ? (
       <PostTileSkeleton />
-    ) : posts.hasInitialFetchError ? (
+    ) : posts.isError ? (
       <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
         <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
           There was an error fetching your saved posts. Swipe down to try again.
         </Text>
       </View>
-    ) : !posts.refreshing ? (
+    ) : !posts.isRefetching ? (
       <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
         <Text
           style={{
@@ -79,21 +76,19 @@ const SavedPostsScreen = () => {
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
-      data={posts.data}
+      data={postsData ?? []}
       numColumns={3}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
       onEndReached={
-        !posts.fetchNextLoading && !posts.hasFetchNextError && !posts.hasInitialFetchError
-          ? () => posts.fetchNext()
-          : null
+        !posts.isFetchingNextPage && !posts.isFetchNextPageError && !posts.isError ? () => posts.fetchNextPage() : null
       }
       ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
-      refreshing={posts.refreshing}
+      refreshing={posts.isRefetching}
       refreshControl={
         <RefreshControl
-          refreshing={posts.refreshing}
+          refreshing={posts.isRefetching}
           onRefresh={posts.refetch}
           tintColor={COLORS.zinc[400]}
           colors={[COLORS.zinc[400]]}

@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
@@ -62,6 +63,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!authLoading) {
@@ -92,8 +94,10 @@ const AuthUserContextProvider = ({ children }: Props) => {
     setSelectedProfileId(null);
     setIsAuthenticated(false);
     await tokenService.clearTokens();
+    // clear the query client to remove all queries
+    queryClient.clear();
     router.replace("/auth/login");
-  }, [router]);
+  }, [router, queryClient]);
 
   const changeSelectedProfileId = async (profileId: number) => {
     // save new selected profile id to persist profile selection between sessions
@@ -206,36 +210,9 @@ const AuthUserContextProvider = ({ children }: Props) => {
 export default AuthUserContextProvider;
 
 export const useAuthUserContext = () => {
-  const {
-    user,
-    authenticate,
-    selectedProfileId,
-    isAuthenticated,
-    authLoading,
-    logOut,
-    setActiveProfileId,
-    profileOptions,
-    addProfileOption,
-    changeSelectedProfileId,
-    updateEmailVerified,
-    updateOnboardingCompleted,
-    removeProfileOption,
-    changeEmail,
-  } = useContext(AuthUserContext);
-  return {
-    user,
-    authenticate,
-    selectedProfileId,
-    isAuthenticated,
-    authLoading,
-    logOut,
-    setActiveProfileId,
-    profileOptions,
-    addProfileOption,
-    changeSelectedProfileId,
-    updateEmailVerified,
-    updateOnboardingCompleted,
-    removeProfileOption,
-    changeEmail,
-  };
+  const context = useContext(AuthUserContext);
+  if (!context) {
+    throw new Error("useAuthUserContext must be used within AuthUserContextProvider");
+  }
+  return context;
 };

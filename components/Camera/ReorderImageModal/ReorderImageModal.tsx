@@ -1,12 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
-import { ImagePickerAsset } from "expo-image-picker";
 import { useCallback, useEffect } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
-import { Image as CropperImage } from "react-native-image-crop-picker";
-import { scheduleOnRN } from "react-native-worklets";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
-import { PhotoFile } from "react-native-vision-camera";
+import { scheduleOnRN } from "react-native-worklets";
 
 import Button from "@/components/Button/Button";
 import DraggableImage from "@/components/Camera/DraggableImage/DraggableImage";
@@ -14,13 +11,13 @@ import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { getImageUri } from "@/utils/utils";
+import { ImageAssetWithTags } from "@/types/post/post";
 
 type Props = {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  images: (PhotoFile | ImagePickerAsset | CropperImage)[];
-  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset | CropperImage)[]>>;
+  images: ImageAssetWithTags[];
+  setImages: React.Dispatch<React.SetStateAction<ImageAssetWithTags[]>>;
 };
 
 const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) => {
@@ -81,7 +78,7 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
           data={images}
           onReorder={handleReorder}
           renderItem={({ item, index }) => <DraggableImage item={item} index={index} setImages={setImages} />}
-          keyExtractor={(item) => getImageUri(item)}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 48, paddingTop: 4 }}
           showsVerticalScrollIndicator={false}
           onDragStart={handleDragStart}

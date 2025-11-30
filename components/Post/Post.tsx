@@ -8,7 +8,6 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { View, Pressable, Dimensions, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
-import { scheduleOnRN } from "react-native-worklets";
 
 import { addLike, removeLike } from "@/api/interactions";
 import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
@@ -28,6 +27,7 @@ import Text from "../Text/Text";
 
 import PostCaption from "./PostCaption";
 import PostMenu from "./PostMenu";
+import PostTagsModal from "./PostTagsModal";
 
 export const POST_HEIGHT = Dimensions.get("window").width + 200;
 
@@ -54,12 +54,14 @@ const Post = ({
   const [likeLoading, setLikeLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [captionIsExpanded, setCaptionIsExpanded] = useState(captionDefaultExpanded);
+  const [showTagPopovers, setShowTagPopovers] = useState(false);
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const saveButtonScaleValue = useRef(new Animated.Value(1)).current;
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const postMenuRef = useRef<BottomSheetModal>(null);
   const aiMenuRef = useRef<BottomSheetModal>(null);
+  const taggedProfilesModalRef = useRef<BottomSheetModal>(null);
 
   const handleHeartPress = useCallback(
     async (postId: number, liked: boolean) => {
@@ -127,8 +129,8 @@ const Post = ({
     bottomSheetModalRef.current?.present();
   }, []);
 
-  // function for post menu
-  const openMenu = () => {
+  // open the main post menu
+  const openPostMenu = () => {
     postMenuRef.current?.present();
   };
 
@@ -147,6 +149,7 @@ const Post = ({
     handleHeartPress(post.id, post.liked);
   };
 
+  // handle saving or un-saving the post
   const handleBookmarkPress = async () => {
     setSaveLoading(true);
     if (post.is_saved) {
@@ -213,16 +216,53 @@ const Post = ({
     aiMenuRef.current?.present();
   };
 
+  // handle tagged profile press to navigate to the profile details screen
+  const handleTaggedProfilePress = (profileId: number) => {
+    onProfilePress && onProfilePress(profileId);
+    taggedProfilesModalRef.current?.dismiss();
+  };
+
+  // handle tags button press to show the tags modal
+  const handleTagsButtonPress = useCallback(() => {
+    taggedProfilesModalRef.current?.present();
+  }, []);
+
+  // toggle the tag popovers state (not the model just the tags on the post)
+  const toggleTagPopovers = useCallback(() => {
+    setShowTagPopovers((prev) => !prev);
+  }, []);
+
+  // define double tap gesture action to like the post
   const doubleTapGesture = useMemo(
     () =>
       Gesture.Tap()
         .numberOfTaps(2)
+        .runOnJS(true)
         .onEnd(() => {
           if (post.profile.id !== authProfile.id && !likeLoading) {
-            scheduleOnRN(handleHeartPress, post.id, post.liked);
+            handleHeartPress(post.id, post.liked);
           }
         }),
     [post.profile.id, authProfile.id, likeLoading, post.id, post.liked, handleHeartPress],
+  );
+
+  // define single tap gesture action to show the tag popovers
+  const singleTapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(1)
+        .maxDuration(250)
+        .runOnJS(true)
+        .onEnd(() => {
+          toggleTagPopovers();
+        }),
+    [toggleTagPopovers],
+  );
+
+  // define composed gesture to handle both double tap and single tap actions
+  const composedGesture = useMemo(
+    () => Gesture.Exclusive(doubleTapGesture, singleTapGesture),
+    [doubleTapGesture, singleTapGesture],
   );
 
   return (
@@ -246,7 +286,7 @@ const Post = ({
             <Pressable
               style={({ pressed }) => [pressed && { opacity: 0.6 }, s.menuButton]}
               hitSlop={8}
-              onPress={openMenu}
+              onPress={openPostMenu}
               testID={`post-menu-button-${post.id}`}
             >
               <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]} />
@@ -287,14 +327,19 @@ const Post = ({
           </View>
         ) : null}
         <GestureHandlerRootView>
-          <GestureDetector gesture={doubleTapGesture}>
+          <GestureDetector gesture={composedGesture}>
             <View
               style={{
                 minHeight: screenWidth,
                 width: screenWidth,
               }}
             >
-              <ImageSwiper images={post.images} />
+              <ImageSwiper
+                images={post.images}
+                showTagPopovers={showTagPopovers}
+                setShowTagPopovers={setShowTagPopovers}
+                onTagsButtonPress={handleTagsButtonPress}
+              />
             </View>
           </GestureDetector>
         </GestureHandlerRootView>
@@ -420,6 +465,11 @@ const Post = ({
         reports={post.reports}
       />
       <PostAiModal ref={aiMenuRef} />
+      <PostTagsModal
+        ref={taggedProfilesModalRef}
+        taggedProfiles={post.tagged_profiles}
+        onProfilePress={handleTaggedProfilePress}
+      />
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo, useCallback } from "react";
 import { useColorScheme } from "react-native";
 
 type ColorModeContextType = {
@@ -19,14 +19,17 @@ const ColorModeContextProvider = ({ children }: Props) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
-  const setLightOrDark = (lightModeColor: string, darkModeColor: string) => {
-    if (isDarkMode) {
-      return darkModeColor;
-    }
-    return lightModeColor;
-  };
+  const setLightOrDark = useCallback(
+    (lightModeColor: string, darkModeColor: string) => {
+      if (isDarkMode) {
+        return darkModeColor;
+      }
+      return lightModeColor;
+    },
+    [isDarkMode],
+  );
 
-  const value = { isDarkMode, setLightOrDark };
+  const value = useMemo(() => ({ isDarkMode, setLightOrDark }), [isDarkMode, setLightOrDark]);
 
   return <ColorModeContext.Provider value={value}>{children}</ColorModeContext.Provider>;
 };

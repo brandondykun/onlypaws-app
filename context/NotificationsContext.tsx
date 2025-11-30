@@ -90,6 +90,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const initialFetch = useCallback(async () => {
     const { data, error } = await getNotifications();
     return { data, error };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProfileId]);
 
   // Delay notifications fetch by 500ms on initial load to avoid racing with initial token refresh

@@ -5,8 +5,6 @@ import { axiosFetch } from "@/api/config";
 import { searchProfiles } from "@/api/profile";
 import { SearchedProfile, PaginatedSearchedProfileResponse } from "@/types";
 
-import { useAuthProfileContext } from "./AuthProfileContext";
-
 type ProfileSearchContextType = {
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
@@ -60,13 +58,11 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
   const [fetchNextLoading, setFetchNextLoading] = useState(false);
   const [hasFetchNextError, setHasFetchNextError] = useState(false);
 
-  const { authProfile } = useAuthProfileContext();
-
   const handleSearch = useCallback(async () => {
     if (searchText) {
       setHasInitialFetchError(false);
       setHasFetchNextError(false);
-      const { error, data } = await searchProfiles(searchText, authProfile.id);
+      const { error, data } = await searchProfiles(searchText);
       if (!error && data) {
         setData(data.results);
         setFetchNextUrl(data.next);
@@ -76,7 +72,7 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
       setInitialFetchComplete(true);
       setRefreshing(false);
     }
-  }, [searchText, authProfile.id]);
+  }, [searchText]);
 
   // refresh feed fetch if user swipes down
   const refreshSearch = async () => {
@@ -154,40 +150,9 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
 export default ProfileSearchContextProvider;
 
 export const useProfileSearchContext = () => {
-  const {
-    searchText,
-    setSearchText,
-    search,
-    data,
-    setData,
-    refetch,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextUrl,
-    fetchNextLoading,
-    hasFetchNextError,
-    refresh,
-    refreshing,
-    onFollow,
-    onUnfollow,
-  } = useContext(ProfileSearchContext);
-  return {
-    searchText,
-    setSearchText,
-    search,
-    data,
-    setData,
-    refetch,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextUrl,
-    fetchNextLoading,
-    hasFetchNextError,
-    refresh,
-    refreshing,
-    onFollow,
-    onUnfollow,
-  };
+  const context = useContext(ProfileSearchContext);
+  if (!context) {
+    throw new Error("useProfileSearchContext must be used within ProfileSearchContextProvider");
+  }
+  return context;
 };

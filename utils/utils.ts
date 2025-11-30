@@ -4,8 +4,9 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Image } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostDetailed, ProfileDetails, PostImage, ProfileImage } from "@/types";
+import { PostImage, ProfileImage, PostImageTag, PaginatedPostsResponse } from "@/types";
 import { FeedbackTicketType } from "@/types/feedback/feedback";
+import { CreatePostImageTag } from "@/types/post/post";
 
 dayjs.extend(relativeTime);
 
@@ -15,128 +16,6 @@ export const getTimeSince = (pastDate: string) => {
   output = output.replace(/hours/gi, "hrs");
   output = output.replace(/seconds/gi, "sec");
   return `${output} ago`;
-};
-
-export const likePostInState = (stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>, postId: number) => {
-  stateSetter((prev) => {
-    return prev.map((post) => {
-      if (post.id === postId) {
-        return { ...post, likes_count: post.likes_count + 1, liked: true };
-      }
-      return post;
-    });
-  });
-};
-
-export const unlikePostInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.map((prevPost) => {
-      if (prevPost.id === postId) {
-        return {
-          ...prevPost,
-          likes_count: prevPost.likes_count - 1,
-          liked: false,
-        };
-      }
-      return prevPost;
-    });
-  });
-};
-
-export const addCommentInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.map((prevPost) => {
-      if (prevPost.id === postId) {
-        return {
-          ...prevPost,
-          comments_count: prevPost.comments_count + 1,
-        };
-      }
-      return prevPost;
-    });
-  });
-};
-
-export const savePostInState = (stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>, postId: number) => {
-  stateSetter((prev) => {
-    return prev.map((post) => {
-      if (post.id === postId) {
-        return { ...post, is_saved: true };
-      }
-      return post;
-    });
-  });
-};
-
-export const unSavePostInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.map((post) => {
-      if (post.id === postId) {
-        return { ...post, is_saved: false };
-      }
-      return post;
-    });
-  });
-};
-
-export const togglePostHiddenInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.map((prevPost) => {
-      if (prevPost.id === postId) {
-        return { ...prevPost, is_hidden: !prevPost.is_hidden };
-      }
-      return prevPost;
-    });
-  });
-};
-
-export const addPostReportedInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.map((prevPost) => {
-      if (prevPost.id === postId) {
-        return { ...prevPost, is_reported: true, is_hidden: true };
-      }
-      return prevPost;
-    });
-  });
-};
-
-export const removePostInState = (
-  stateSetter: React.Dispatch<React.SetStateAction<PostDetailed[]>>,
-  postId: number,
-) => {
-  stateSetter((prev) => {
-    return prev.filter((prevPost) => prevPost.id !== postId);
-  });
-};
-
-export const followProfileInState = (stateSetter: React.Dispatch<React.SetStateAction<ProfileDetails | null>>) => {
-  stateSetter((prev) => {
-    if (!prev) return null;
-    return { ...prev, is_following: true, followers_count: prev.followers_count + 1 };
-  });
-};
-
-export const unFollowProfileInState = (stateSetter: React.Dispatch<React.SetStateAction<ProfileDetails | null>>) => {
-  stateSetter((prev) => {
-    if (!prev) return null;
-    return { ...prev, is_following: false, followers_count: prev.followers_count - 1 };
-  });
 };
 
 export const abbreviateNumber = (num: number) => {
@@ -232,4 +111,13 @@ export const verifyUsername = (username: string) => {
 
   // If the username is valid, return null
   return null;
+};
+
+export const isCreatePostImageTag = (tag: CreatePostImageTag | PostImageTag): tag is CreatePostImageTag => {
+  return tag.hasOwnProperty("positioningMode");
+};
+
+// get the next page parameter from a paginated response
+export const getNextPageParam = (lastPage: PaginatedPostsResponse) => {
+  return lastPage?.next?.split("page=")[1] ?? null;
 };

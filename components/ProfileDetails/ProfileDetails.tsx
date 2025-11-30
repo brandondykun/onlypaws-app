@@ -31,16 +31,15 @@ type Props = {
   onPostPreviewPress: (index: number) => void;
   profileData: ProfileDetailsType | null;
   profileLoading: boolean;
-  profileRefresh: () => Promise<void>;
+  profileRefresh: () => void;
   profileRefreshing: boolean;
   profileError: boolean;
   postsLoading: boolean;
   postsError: boolean;
   postsData: PostDetailed[] | null;
-  setProfileData?: React.Dispatch<React.SetStateAction<ProfileDetailsType | null>>;
-  postsRefresh: () => Promise<void>;
+  postsRefresh: () => void;
   postsRefreshing: boolean;
-  fetchNext: () => Promise<void>;
+  fetchNext: () => void;
   fetchNextLoading: boolean;
   hasFetchNextError: boolean;
 };
@@ -56,7 +55,6 @@ const ProfileDetails = ({
   postsLoading,
   postsError,
   postsData,
-  setProfileData,
   postsRefresh,
   postsRefreshing,
   fetchNext,
@@ -102,37 +100,37 @@ const ProfileDetails = ({
   };
 
   const handleUnfollowPress = async (profileId: number) => {
-    if (setProfileData) {
-      setFollowLoading(true);
-      const { error } = await unfollowProfile(profileId);
-      if (!error) {
-        profileDetailsManager.onUnfollow(profileId);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error unfollowing that account.",
-        });
-      }
-      setFollowLoading(false);
+    setFollowLoading(true);
+    const { error } = await unfollowProfile(profileId);
+    if (!error) {
+      profileDetailsManager.onUnfollow(profileId);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "There was an error unfollowing that account.",
+      });
     }
+    setTimeout(() => {
+      setFollowLoading(false);
+    }, 100);
   };
 
   const handleFollowPress = async (profile: ProfileDetailsType) => {
-    if (setProfileData) {
-      setFollowLoading(true);
-      const { error, data } = await followProfile(profile.id);
-      if (!error && data) {
-        profileDetailsManager.onFollow(profile.id);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error following that account.",
-        });
-      }
-      setFollowLoading(false);
+    setFollowLoading(true);
+    const { error, data } = await followProfile(profile.id);
+    if (!error && data) {
+      profileDetailsManager.onFollow(profile.id);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "There was an error following that account.",
+      });
     }
+    setTimeout(() => {
+      setFollowLoading(false);
+    }, 100);
   };
 
   const handleFollowersPress = () => {
@@ -210,7 +208,9 @@ const ProfileDetails = ({
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={!fetchNextLoading ? () => fetchNext() : null}
+        onEndReached={
+          !fetchNextLoading && !postsLoading && !postsError && !hasFetchNextError ? () => fetchNext() : null
+        }
         ListEmptyComponent={emptyComponent}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         ListHeaderComponentStyle={{

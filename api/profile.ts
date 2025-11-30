@@ -17,14 +17,29 @@ export const getProfileDetails = async (profileId: number | string) => {
   return await axiosFetch<ProfileDetails>(url);
 };
 
+export const getProfileDetailsForQuery = async (profileId: number | string) => {
+  const url = `/v1/profile/${profileId}/`;
+  return await axiosInstance.get<ProfileDetails>(url);
+};
+
 export const getProfilePosts = async (profileId: string | number) => {
   const url = `/v1/profile/${profileId}/posts/`;
   return await axiosFetch<PaginatedProfilePostsResponse>(url);
 };
 
-export const searchProfiles = async (username: string, profileId: number) => {
-  const url = `/v1/profile/search/?username=${username}`;
+export const getProfilePostsForQuery = async (profileId: string | number, pageParam: number | string) => {
+  const url = `/v1/profile/${profileId}/posts/?page=${pageParam}`;
+  return await axiosInstance.get<PaginatedProfilePostsResponse>(url);
+};
+
+export const searchProfiles = async (username: string) => {
+  const url = `/v1/profile/search/?username=${encodeURIComponent(username)}`;
   return await axiosFetch<PaginatedSearchedProfileResponse>(url);
+};
+
+export const searchProfilesForQuery = async (username: string, pageParam: number | string) => {
+  const url = `/v1/profile/search/?username=${encodeURIComponent(username)}&page=${pageParam}`;
+  return await axiosInstance.get<PaginatedSearchedProfileResponse>(url);
 };
 
 export const addProfileImage = async (postData: FormData, accessToken: string) => {

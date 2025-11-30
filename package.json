@@ -15,12 +15,14 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@dev-plugins/react-query": "^0.4.0",
     "@expo/vector-icons": "^15.0.2",
     "@gorhom/bottom-sheet": "^5.2.6",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/native": "^7.1.8",
     "@shopify/flash-list": "2.0.2",
+    "@tanstack/react-query": "^5.90.11",
     "@types/react": "19.1.17",
     "axios": "^1.12.2",
     "dayjs": "^1.11.18",
@@ -51,6 +53,7 @@
     "react-native-google-mobile-ads": "^15.8.3",
     "react-native-image-crop-picker": "^0.51.0",
     "react-native-otp-entry": "^1.8.5",
+    "react-native-popover-view": "^6.1.0",
     "react-native-progress-steps": "^2.0.3",
     "react-native-reanimated": "~4.1.1",
     "react-native-reanimated-carousel": "^4.0.3",
@@ -67,6 +70,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@tanstack/eslint-plugin-query": "^5.91.2",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^12.8.1",
     "@types/babel__core": "^7.20.5",

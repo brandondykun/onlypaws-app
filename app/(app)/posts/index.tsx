@@ -1,30 +1,41 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 
+import { getProfilePostsForQuery } from "@/api/profile";
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
-import { usePostsContext } from "@/context/PostsContext";
+import { getNextPageParam } from "@/utils/utils";
 
 const PostsScreen = () => {
-  const posts = usePostsContext();
   const { authProfile, refetch, refreshing, loading } = useAuthProfileContext();
   const router = useRouter();
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
 
-  // Lazy load posts when tab is visited
-  useEffect(() => {
-    if (!posts.initialFetchComplete && !posts.refreshing) {
-      posts.fetch();
-    }
-  }, [posts]);
+  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getProfilePostsForQuery(authProfile.id, pageParam);
+    return res.data;
+  };
+
+  const posts = useInfiniteQuery({
+    queryKey: ["posts", "authProfile", authProfile.id],
+    queryFn: fetchPosts,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+  });
+
+  // Memoize the flattened posts data
+  const dataToRender = useMemo(() => {
+    return posts.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [posts.data]);
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });
@@ -67,18 +78,17 @@ const PostsScreen = () => {
       onPostPreviewPress={handlePostPreviewPress}
       profileData={authProfile}
       profileLoading={refreshing || loading}
-      profileRefresh={refetch}
+      profileRefresh={() => refetch()}
       profileRefreshing={refreshing}
       profileError={false} // this will be false for the users own profile, the data is already fetched in the AuthProfileContext
-      postsLoading={!posts.initialFetchComplete}
-      postsError={posts.hasInitialFetchError}
-      postsData={posts.data}
-      postsRefresh={posts.refetch}
-      postsRefreshing={posts.refreshing}
-      setProfileData={undefined} // this will be undefined for the users own profile, the data is modified in the AuthProfileContext
-      fetchNext={posts.fetchNext}
-      fetchNextLoading={posts.fetchNextLoading}
-      hasFetchNextError={posts.hasFetchNextError}
+      postsLoading={posts.isLoading}
+      postsError={posts.isError}
+      postsData={dataToRender}
+      postsRefresh={() => posts.refetch()}
+      postsRefreshing={posts.isRefetching}
+      fetchNext={() => posts.fetchNextPage()}
+      fetchNextLoading={posts.isFetchingNextPage}
+      hasFetchNextError={posts.isFetchNextPageError}
     />
   );
 };

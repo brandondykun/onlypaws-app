@@ -1,5 +1,6 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
+import { useRouter } from "expo-router";
 import { View, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -16,6 +17,7 @@ const ProfileSearchScreen = () => {
   const search = useProfileSearchContext();
   const profileDetailsManager = useProfileDetailsManagerContext();
   const tabBarHeight = useBottomTabBarHeight();
+  const router = useRouter();
 
   const handleUnfollowPress = async (profileId: number) => {
     const { error } = await unfollowProfile(profileId);
@@ -41,6 +43,10 @@ const ProfileSearchScreen = () => {
         text2: "There was an error following that account.",
       });
     }
+  };
+
+  const handleProfilePress = (profileId: number) => {
+    router.push({ pathname: "/(app)/explore/profile", params: { profileId: profileId } });
   };
 
   let content = (
@@ -92,6 +98,7 @@ const ProfileSearchScreen = () => {
             handleFollowPress={handleFollowPress}
             handleUnfollowPress={handleUnfollowPress}
             key={profile.id}
+            onPress={handleProfilePress}
           />
         )}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom

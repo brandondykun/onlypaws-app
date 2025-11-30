@@ -1,29 +1,40 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { View, RefreshControl, Animated, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { getFeedForQuery } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { useFeedPostsContext } from "@/context/FeedPostsContext";
-import { useFeedProfileDetailsContext } from "@/context/FeedProfileDetailsContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import { getNextPageParam } from "@/utils/utils";
 
 const HEADER_HEIGHT = 90;
 
 const FeedScreen = () => {
-  const feed = useFeedPostsContext();
-  const profile = useFeedProfileDetailsContext(); // selected profile in this stack
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
   const insets = useSafeAreaInsets();
+
+  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getFeedForQuery(pageParam);
+    return res.data;
+  };
+
+  const feedPosts = useInfiniteQuery({
+    queryKey: ["posts", "feed"],
+    queryFn: fetchPosts,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+  });
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -80,11 +91,10 @@ const FeedScreen = () => {
   }, [navigation, isDarkMode, headerTranslateY, headerLogoOpacity, insets.top, borderColor, headerLogoScale]);
 
   const handleProfilePress = (profileId: number | string) => {
-    profile.setProfileId(Number(profileId));
     router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId } });
   };
 
-  const emptyComponent = !feed.initialFetchComplete ? (
+  const emptyComponent = feedPosts.isFetching ? (
     <>
       <PostSkeleton />
       <PostSkeleton />
@@ -97,17 +107,22 @@ const FeedScreen = () => {
     </View>
   );
 
+  // Memoize the flattened posts data
+  const dataToRender = useMemo(() => {
+    return feedPosts.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [feedPosts.data]);
+
   return (
     <View style={{ flex: 1 }}>
       <FlashList
-        data={feed.data}
+        data={dataToRender}
         showsVerticalScrollIndicator={false}
-        refreshing={feed.refreshing}
+        refreshing={feedPosts.isRefetching}
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: insets.top + HEADER_HEIGHT - 20 }}
         refreshControl={
           <RefreshControl
-            refreshing={feed.refreshing}
-            onRefresh={feed.refresh}
+            refreshing={feedPosts.isRefetching}
+            onRefresh={feedPosts.refetch}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
             progressViewOffset={insets.top + HEADER_HEIGHT}
@@ -117,13 +132,13 @@ const FeedScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
         onEndReached={
-          !feed.fetchNextLoading && !feed.hasFetchNextError && !feed.hasInitialFetchError
-            ? () => feed.fetchNext()
+          !feedPosts.isFetchingNextPage && !feedPosts.isFetching && feedPosts.hasNextPage
+            ? feedPosts.fetchNextPage
             : null
         }
         ListFooterComponent={
-          feed.data.length > 0 ? (
-            <FlatListLoadingFooter nextUrl={feed.fetchNextUrl} fetchNextLoading={feed.fetchNextLoading} />
+          dataToRender.length > 0 ? (
+            <FlatListLoadingFooter nextUrl={feedPosts.hasNextPage} fetchNextLoading={feedPosts.isFetchingNextPage} />
           ) : null
         }
         ListEmptyComponent={emptyComponent}

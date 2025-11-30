@@ -1,18 +1,16 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
-import { ImagePickerAsset } from "expo-image-picker";
 import React from "react";
 import { View } from "react-native";
-import { Image as CropperImage } from "react-native-image-crop-picker";
-import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileImage as ProfileImageType } from "@/types";
+import { ImageAsset } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
 type Props = {
-  image: ProfileImageType | PhotoFile | ImagePickerAsset | CropperImage | string | null;
+  image: ProfileImageType | ImageAsset | string | null;
   size: number;
   iconSize?: number;
 };

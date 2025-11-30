@@ -9,10 +9,8 @@ import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
-import { usePostsProfileDetailsContext } from "@/context/PostsProfileDetailsContext";
 
 const FollowingScreen = () => {
-  const { setProfileId } = usePostsProfileDetailsContext();
   const followingCtx = useAuthProfileFollowingContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
@@ -86,7 +84,6 @@ const FollowingScreen = () => {
         renderItem={({ item: profile }) => (
           <Pressable
             onPress={() => {
-              setProfileId(profile.id);
               router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: profile.id } });
             }}
           >

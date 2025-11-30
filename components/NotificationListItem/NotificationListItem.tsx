@@ -7,7 +7,6 @@ import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useNotificationsContext } from "@/context/NotificationsContext";
-import { usePostsProfileDetailsContext } from "@/context/PostsProfileDetailsContext";
 import { DBNotification, WSNotification } from "@/types/notifications/base";
 import { getTimeSince } from "@/utils/utils";
 
@@ -18,7 +17,6 @@ type Props = {
 
 const NotificationListItem = ({ item, index }: Props) => {
   const router = useRouter();
-  const { setProfileId } = usePostsProfileDetailsContext();
   const { markAsRead } = useNotificationsContext();
 
   const senderImage = "sender" in item ? item.sender.image?.image : item.sender_avatar;
@@ -38,8 +36,6 @@ const NotificationListItem = ({ item, index }: Props) => {
   // Handle notification press
   const handlePress = () => {
     if (isFollowNotification) {
-      // Set the profile id to load the follower's profile
-      setProfileId(item.extra_data.follower_id);
       // Mark the notification as read
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the follower's profile

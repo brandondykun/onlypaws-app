@@ -4,8 +4,8 @@ import { router } from "expo-router";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, View, ActivityIndicator, useWindowDimensions } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import { scheduleOnRN } from "react-native-worklets";
 import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
+import { scheduleOnRN } from "react-native-worklets";
 
 import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
 import CameraFooter from "@/components/Camera/CameraFooter/CameraFooter";
@@ -45,7 +45,8 @@ const CameraScreen = () => {
           flash: flash,
         });
         if (newImage) {
-          setImages((prev) => [newImage, ...prev]);
+          // Initialize the image asset object with an empty tags array
+          setImages((prev) => [{ ...newImage, id: `${Date.now()}-0`, tags: [] }, ...prev]);
         }
         setImageChangeLoading(false);
       }
@@ -69,7 +70,12 @@ const CameraScreen = () => {
     }
 
     if (!result.canceled) {
-      setImages((prev) => [...result.assets, ...prev]);
+      const newAddPostImages = result.assets.map((asset, index) => ({
+        ...asset,
+        id: `${Date.now()}-${index}`,
+        tags: [], // Initialize the image asset object with an empty tags array
+      }));
+      setImages((prev) => [...newAddPostImages, ...prev]);
       setImageChangeLoading(false);
     }
   };

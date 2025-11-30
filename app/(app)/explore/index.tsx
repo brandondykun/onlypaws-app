@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 
+import { getExplorePostsForQuery } from "@/api/post";
 import Button from "@/components/Button/Button";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
@@ -14,6 +16,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import { getNextPageParam } from "@/utils/utils";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -24,17 +27,24 @@ const ExploreScreen = () => {
   const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const {
-    explorePosts,
-    setSimilarPosts,
-    refresh,
-    refreshing,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextLoading,
-    hasFetchNextError,
-  } = useExplorePostsContext();
+  const { setSelectedExplorePost } = useExplorePostsContext();
+
+  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getExplorePostsForQuery(pageParam);
+    return res.data;
+  };
+
+  const explorePosts = useInfiniteQuery({
+    queryKey: ["posts", "explore"],
+    queryFn: fetchPosts,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+  });
+
+  // Memoize the flattened posts data
+  const dataToRender = useMemo(() => {
+    return explorePosts.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [explorePosts.data]);
 
   // add search button to header
   useLayoutEffect(() => {
@@ -57,26 +67,30 @@ const ExploreScreen = () => {
         </View>
       ),
     });
-  });
+  }, [navigation, router, setLightOrDark]);
 
   // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
+  const footerComponent = explorePosts.isFetchingNextPage ? (
     <LoadingFooter />
-  ) : hasFetchNextError ? (
-    <RetryFetchFooter fetchFn={fetchNext} message="Oh no! There was an error fetching more posts!" buttonText="Retry" />
+  ) : explorePosts.isFetchNextPageError ? (
+    <RetryFetchFooter
+      fetchFn={explorePosts.fetchNextPage}
+      message="Oh no! There was an error fetching more posts!"
+      buttonText="Retry"
+    />
   ) : null;
 
   const emptyComponent =
-    !initialFetchComplete || (hasInitialFetchError && refreshing) ? (
+    explorePosts.isLoading || (explorePosts.isError && explorePosts.isRefetching) ? (
       <PostTileSkeleton />
-    ) : hasInitialFetchError ? (
+    ) : explorePosts.isError ? (
       <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
         <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
           There was an error fetching your explore posts. Swipe down to try again.
         </Text>
       </View>
-    ) : !refreshing ? (
-      <View style={{ flex: 1, justifyContent: "center", paddingTop: "50%" }}>
+    ) : !explorePosts.isRefetching ? (
+      <View style={{ flex: 1, justifyContent: "center" }}>
         <Text
           style={{
             fontSize: 20,
@@ -87,7 +101,7 @@ const ExploreScreen = () => {
           darkColor={COLORS.zinc[400]}
           lightColor={COLORS.zinc[600]}
         >
-          There are no posts to display.
+          There are no posts to display
         </Text>
       </View>
     ) : null;
@@ -96,18 +110,25 @@ const ExploreScreen = () => {
     <View style={{ flex: 1, paddingTop: 8 }}>
       <FlashList
         showsVerticalScrollIndicator={false}
-        data={explorePosts}
+        data={dataToRender}
         numColumns={3}
-        contentContainerStyle={{ paddingBottom: tabBarHeight }}
+        contentContainerStyle={{ paddingBottom: tabBarHeight, flexGrow: 1 }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
+        onEndReached={
+          explorePosts.hasNextPage &&
+          !explorePosts.isFetchingNextPage &&
+          !explorePosts.isLoading &&
+          !explorePosts.isFetchNextPageError
+            ? () => explorePosts.fetchNextPage()
+            : null
+        }
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
-        refreshing={refreshing}
+        refreshing={explorePosts.isRefetching}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refresh}
+            refreshing={explorePosts.isRefetching}
+            onRefresh={explorePosts.refetch}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
           />
@@ -118,7 +139,7 @@ const ExploreScreen = () => {
             post={post}
             index={index}
             onPress={() => {
-              setSimilarPosts([post]);
+              setSelectedExplorePost(post);
               router.push({ pathname: "/(app)/explore/list", params: { postId: post.id.toString() } });
             }}
           />

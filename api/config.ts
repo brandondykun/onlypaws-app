@@ -27,10 +27,10 @@ export const axiosPost = async <T>(url: string, data: any, config?: AxiosRequest
 export const axiosDelete = async (url: string) => {
   try {
     const res = await axiosInstance.delete(url);
-    return { data: res.data, error: null };
+    return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
-    return { data: null, error: error.message };
+    return { data: null, error: error.message, status: error?.status };
   }
 };
 

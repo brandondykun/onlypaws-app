@@ -1,41 +1,27 @@
-import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import LottieView from "lottie-react-native";
-import React, { useLayoutEffect, useRef } from "react";
-import { ScrollView, View, Switch, StyleSheet, TextInput as RNTextInput, Platform } from "react-native";
+import React from "react";
+import { useWindowDimensions } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { createPost } from "@/api/post";
-import AiModal from "@/components/AiModal/AiModal";
-import Button from "@/components/Button/Button";
-import DiscardPostModal from "@/components/DiscardPostModal/DiscardPostModal";
-import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
-import Modal from "@/components/Modal/Modal";
-import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
-import { COLORS } from "@/constants/Colors";
+import CreateEditPostScreen from "@/components/CreateEditPostScreen/CreateEditPostScreen";
 import { useAddPostContext } from "@/context/AddPostContext";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useColorMode } from "@/context/ColorModeContext";
 import { usePostsContext } from "@/context/PostsContext";
+import { SearchedProfile } from "@/types";
 import { getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
   const router = useRouter();
-  const navigation = useNavigation();
-  const tabBarHeight = useBottomTabBarHeight();
-  const aiModalRef = useRef<RNBottomSheetModal>(null);
-  const discardPostModalRef = useRef<RNBottomSheetModal>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
-  const textInputRef = useRef<RNTextInput>(null);
+  const screenWidth = useWindowDimensions().width;
 
   const { addPost } = usePostsContext();
   const { authProfile, updatePostsCount } = useAuthProfileContext();
-  const { isDarkMode, setLightOrDark } = useColorMode();
   const {
     setImages,
+    addTag: addTagToState,
+    removeTag: removeTagFromState,
     setCaption,
     setCaptionError,
     setAiGenerated,
@@ -48,21 +34,7 @@ const AddPostScreen = () => {
     resetState,
   } = useAddPostContext();
 
-  // add search button to header
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPressOut={() => discardPostModalRef.current?.present()}
-          variant="text"
-          text="Discard"
-          disabled={submitLoading}
-        />
-      ),
-    });
-  });
-
-  // handle discard post from discard post modal
+  // Handle discard post
   const handleDiscardPost = () => {
     resetState();
     if (router.canGoBack()) {
@@ -72,7 +44,18 @@ const AddPostScreen = () => {
     }
   };
 
-  const handleAddPost = async () => {
+  // Handle adding tag (non-async for create mode)
+  const handleAddTag = (imageId: string, profile: SearchedProfile, xPosition: number, yPosition: number) => {
+    addTagToState(imageId, profile, xPosition, yPosition);
+  };
+
+  // Handle removing tag (non-async for create mode)
+  const handleRemoveTag = (tagId: string) => {
+    removeTagFromState(tagId);
+  };
+
+  // Handle creating post
+  const handleCreatePost = async () => {
     setCaptionError("");
 
     let hasErrors = false;
@@ -102,6 +85,27 @@ const AddPostScreen = () => {
     formData.append("profileId", authProfile.id.toString());
     formData.append("aiGenerated", aiGenerated.toString());
 
+    // Format tags as an object with image indices as keys
+    const tagsFormatted: { [key: string]: any[] } = {};
+    images.forEach((image, index) => {
+      if (image.tags && image.tags.length > 0) {
+        tagsFormatted[index.toString()] = image.tags.map((tag) => {
+          return {
+            taggedProfileId: tag.tagged_profile.id,
+            xPosition: Number(((tag.x_position / screenWidth) * 100).toFixed(2)),
+            yPosition: Number(((tag.y_position / screenWidth) * 100).toFixed(2)),
+            originalHeight: screenWidth,
+            originalWidth: screenWidth,
+          };
+        });
+      }
+    });
+
+    // Only append tags if there are any
+    if (Object.keys(tagsFormatted).length > 0) {
+      formData.append("tags", JSON.stringify(tagsFormatted));
+    }
+
     images.forEach((image, i) => {
       formData.append("images", {
         uri: getImageUri(image),
@@ -110,7 +114,6 @@ const AddPostScreen = () => {
         mimeType: "multipart/form-data",
       } as any);
 
-      // Add corresponding order value
       formData.append("order", i.toString());
     });
 
@@ -124,18 +127,19 @@ const AddPostScreen = () => {
         setCaption("");
         setImages([]);
         setAiGenerated(false);
+        // Dismiss all existing modals/stacks
         router.dismissAll();
-        router.back(); // Navigate back to add tab index (camera screen)
-        // Use setTimeout to ensure navigation to posts tab happens after returning to add index
+        // Replace the current history with the root route
+        router.replace("/");
+        // Navigate to the posts screen
         setTimeout(() => {
           router.navigate("/(app)/posts");
-        }, 100);
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Post successfully created!",
-        });
-        scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Post successfully created!",
+          });
+        }, 50);
       } else {
         Toast.show({
           type: "error",
@@ -147,129 +151,24 @@ const AddPostScreen = () => {
     setSubmitLoading(false);
   };
 
-  // handle caption text input focus
-  const handleFocus = () => {
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd();
-    }, 10);
-  };
-
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: tabBarHeight + 48 }}
-      automaticallyAdjustKeyboardInsets={true}
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={!submitLoading}
-      ref={scrollViewRef}
-    >
-      <ImageSwiper images={images} />
-      <View style={{ paddingVertical: 16, paddingTop: 0, flex: 1 }}>
-        <View style={{ marginBottom: 36 }}>
-          <TextInput
-            ref={textInputRef}
-            value={caption}
-            onChangeText={setCaption}
-            multiline={true}
-            placeholder="Paw-some caption goes here..."
-            numberOfLines={Platform.OS === "ios" ? 100 : 10}
-            error={captionError}
-            showCharCount
-            maxLength={1000}
-            textAlignVertical="top"
-            onFocus={handleFocus}
-            inputStyle={{
-              minHeight: 140,
-              maxHeight: 800,
-              backgroundColor: "transparent",
-              borderColor: "transparent",
-              borderRadius: 4,
-              fontSize: 16,
-              marginBottom: 6,
-              paddingHorizontal: 16,
-            }}
-            focusedBorderColor={"transparent"}
-            charCountPaddingRight={8}
-            scrollEnabled={false}
-          />
-        </View>
-        <View style={{ paddingHorizontal: 16 }}>
-          <View style={s.aiGeneratedContainer}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "400" }}>Contains AI Generated Content</Text>
-              <Text
-                darkColor={COLORS.zinc[400]}
-                lightColor={COLORS.zinc[600]}
-                style={{ fontSize: 14, fontWeight: "400" }}
-              >
-                Please identify if this post contains AI generated content.{" "}
-                <Button
-                  buttonStyle={s.learnMoreButton}
-                  textStyle={[s.learnMoreButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[400]) }]}
-                  variant="text"
-                  text="Learn More"
-                  onPress={() => aiModalRef.current?.present()}
-                  hitSlop={10}
-                />
-              </Text>
-            </View>
-            <Switch value={aiGenerated} onValueChange={() => setAiGenerated((prev) => !prev)} />
-          </View>
-          <View style={{ flex: 1, justifyContent: "flex-end" }}>
-            <Button text="Add Post" onPress={handleAddPost} loading={submitLoading} />
-          </View>
-        </View>
-      </View>
-      <AiModal ref={aiModalRef} />
-      <Modal visible={submitLoading} animationType="fade" withScroll={false} transparent={true} raw={true}>
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.9)",
-          }}
-        />
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <View>
-            <LottieView
-              style={{ height: 150, width: 150 }}
-              source={require("../../../assets/animations/upload.json")}
-              autoPlay
-              loop
-            />
-          </View>
-          <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={{ fontSize: 26, fontWeight: "300" }}>
-            Uploading Post
-          </Text>
-        </View>
-      </Modal>
-      <DiscardPostModal ref={discardPostModalRef} onDiscard={handleDiscardPost} />
-    </ScrollView>
+    <CreateEditPostScreen
+      isEdit={false}
+      images={images}
+      caption={caption}
+      setCaption={setCaption}
+      captionError={captionError}
+      setCaptionError={setCaptionError}
+      aiGenerated={aiGenerated}
+      setAiGenerated={setAiGenerated}
+      submitLoading={submitLoading}
+      setSubmitLoading={setSubmitLoading}
+      addTag={handleAddTag}
+      removeTag={handleRemoveTag}
+      handleSubmit={handleCreatePost}
+      handleDiscard={handleDiscardPost}
+    />
   );
 };
 
 export default AddPostScreen;
-
-const s = StyleSheet.create({
-  aiGeneratedContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 64,
-  },
-  learnMoreButton: {
-    padding: 0,
-    margin: 0,
-    paddingTop: 0,
-    height: "auto",
-    marginBottom: -3,
-  },
-  learnMoreButtonText: {
-    fontSize: 14,
-    fontWeight: "400",
-    textDecorationLine: "none",
-  },
-});

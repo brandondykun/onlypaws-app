@@ -10,10 +10,11 @@ type Props = {
   uri: string;
   width?: number;
   height?: number;
+  setShowTagPopovers?: React.Dispatch<React.SetStateAction<boolean>>;
   style?: StyleProp<ImageStyle>;
 };
 
-const ImageLoader = ({ uri, width, height, style }: Props) => {
+const ImageLoader = ({ uri, width, height, setShowTagPopovers, style }: Props) => {
   const { isDarkMode } = useColorMode();
   const [loading, setLoading] = useState(true);
   const screenWidth = Dimensions.get("window").width;
@@ -35,13 +36,14 @@ const ImageLoader = ({ uri, width, height, style }: Props) => {
         </View>
       ) : null}
 
-      <Zoomable>
+      <Zoomable onInteractionStart={() => setShowTagPopovers && setShowTagPopovers(false)}>
         <Image
           source={{ uri: uri }}
           style={[{ width: width ? width : screenWidth, height: height ? height : screenWidth }, style]}
           onLoadEnd={() => {
             setLoading(false);
           }}
+          cachePolicy="none"
         />
       </Zoomable>
     </View>

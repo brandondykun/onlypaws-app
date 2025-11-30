@@ -1,29 +1,14 @@
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
-import { PostDetailed } from "@/types";
-import {
-  likePostInState,
-  unlikePostInState,
-  savePostInState,
-  unSavePostInState,
-  addCommentInState,
-  togglePostHiddenInState,
-  addPostReportedInState,
-  removePostInState,
-} from "@/utils/utils";
+import { PostDetailed, PostsDetailedPage } from "@/types";
 
 import { useExplorePostsContext } from "./ExplorePostsContext";
-import { useExploreProfileDetailsContext } from "./ExploreProfileDetailsContext";
-import { useFeedPostsContext } from "./FeedPostsContext";
-import { useFeedProfileDetailsContext } from "./FeedProfileDetailsContext";
-import { usePostsContext } from "./PostsContext";
-import { usePostsProfileDetailsContext } from "./PostsProfileDetailsContext";
-import { useSavedPostsContext } from "./SavedPostsContext";
 
 // Post manager for all posts in the app
 // Any time a post is modified, it should be modified through this manager
 // This will ensure that the change is propagated throughout the app so if the
-// post appears is another screen, the change will be reflected appropriately
+// post appears in another screen, the change will be reflected appropriately
 
 type PostManagerContextType = {
   onLike: (postId: number) => void;
@@ -51,100 +36,332 @@ type Props = {
 
 const PostManagerContextProvider = ({ children }: Props) => {
   const explorePosts = useExplorePostsContext();
-  const feedPosts = useFeedPostsContext();
-  const savedPosts = useSavedPostsContext();
-  const exploreProfile = useExploreProfileDetailsContext();
-  const feedProfile = useFeedProfileDetailsContext();
-  const postsProfile = usePostsProfileDetailsContext(); // the profile being viewed's posts
-  const authProfilePosts = usePostsContext(); // the logged in user's posts
 
+  const queryClient = useQueryClient();
+
+  // save a post wherever it appears in the app
   const savePost = (postData: PostDetailed) => {
-    // save post wherever it appears in the app
-    savedPosts.savePost(postData); // special behavior for saving a post
-    savePostInState(feedPosts.setData, postData.id);
-    savePostInState(explorePosts.setExplorePosts, postData.id);
-    savePostInState(explorePosts.setSimilarPosts, postData.id);
-    savePostInState(exploreProfile.posts.setData, postData.id);
-    savePostInState(feedProfile.posts.setData, postData.id);
-    savePostInState(postsProfile.posts.setData, postData.id);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postData.id) {
+        return { ...prev, is_saved: true };
+      }
+      return prev;
+    });
+
+    // Update all post queries EXCEPT saved posts (we'll handle that separately)
+    const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
+      queryKey: ["posts"],
+    });
+
+    allPostQueries.forEach(([queryKey, oldData]) => {
+      // Skip the saved posts query - we'll handle it separately
+      if (queryKey.includes("saved")) {
+        return;
+      }
+
+      if (!oldData?.pages) return;
+
+      queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKey, {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          results:
+            page.results?.map((post) => (post.id === postData.id ? { ...post, is_saved: true } : post)) ?? page.results,
+        })),
+      });
+    });
+
+    // Special case to add a saved post to the saved posts cache.
+    // This ensure that the saved posts are updated locally without having to refetch the posts.
+    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(["posts", "saved"], (oldData) => {
+      if (!oldData) return oldData;
+
+      // Check if post already exists in saved posts
+      const currentIds: number[] = [];
+      if (oldData.pages) {
+        for (const page of oldData.pages) {
+          if (page.results) {
+            currentIds.push(...page.results.map((post) => post.id));
+          }
+        }
+      }
+
+      if (currentIds.includes(postData.id)) {
+        // Post already exists, just update it
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            results:
+              page.results?.map((post) => (post.id === postData.id ? { ...post, is_saved: true } : post)) ??
+              page.results,
+          })),
+        };
+      }
+
+      // Add the new post to the beginning of the first page
+      const firstPage = oldData.pages[0];
+      const updatedFirstPage = {
+        ...firstPage,
+        results: [{ ...postData, is_saved: true }, ...(firstPage?.results || [])],
+      };
+
+      return {
+        ...oldData,
+        pages: [updatedFirstPage, ...oldData.pages.slice(1)],
+      };
+    });
   };
 
+  // unsave a post wherever it appears in the app
   const unSavePost = (postId: number) => {
-    // un-save post wherever it appears in the app
-    savedPosts.unSavePost(postId); // special behavior for un-saving a post
-    unSavePostInState(feedPosts.setData, postId);
-    unSavePostInState(explorePosts.setExplorePosts, postId);
-    unSavePostInState(explorePosts.setSimilarPosts, postId);
-    unSavePostInState(exploreProfile.posts.setData, postId);
-    unSavePostInState(feedProfile.posts.setData, postId);
-    unSavePostInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, is_saved: false };
+      }
+      return prev;
+    });
+
+    // Update all post queries including saved posts
+    // For saved posts, we update is_saved to false but don't remove the post
+    // It will be removed on the next refetch to avoid abrupt UI changes
+    const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
+      queryKey: ["posts"],
+    });
+
+    allPostQueries.forEach(([queryKey, oldData]) => {
+      if (!oldData?.pages) return;
+
+      queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKey, {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          results:
+            page.results?.map((post) => (post.id === postId ? { ...post, is_saved: false } : post)) ?? page.results,
+        })),
+      });
+    });
   };
 
+  // like a post wherever it appears in the app
   const onLike = (postId: number) => {
-    // like post wherever it appears in the app
-    likePostInState(explorePosts.setExplorePosts, postId);
-    likePostInState(explorePosts.setSimilarPosts, postId);
-    likePostInState(feedPosts.setData, postId);
-    likePostInState(savedPosts.setData, postId);
-    likePostInState(exploreProfile.posts.setData, postId);
-    likePostInState(feedProfile.posts.setData, postId);
-    likePostInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, liked: true, likes_count: prev.likes_count + 1 };
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          const updatePost = (post: PostDetailed) => {
+            if (post.id === postId) {
+              return { ...post, liked: true, likes_count: post.likes_count + 1 };
+            }
+            return post;
+          };
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.map(updatePost) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
   };
 
+  // unlike a post wherever it appears in the app
   const onUnlike = (postId: number) => {
-    // un-like post wherever it appears in the app
-    unlikePostInState(explorePosts.setExplorePosts, postId);
-    unlikePostInState(explorePosts.setSimilarPosts, postId);
-    unlikePostInState(feedPosts.setData, postId);
-    unlikePostInState(savedPosts.setData, postId);
-    unlikePostInState(exploreProfile.posts.setData, postId);
-    unlikePostInState(feedProfile.posts.setData, postId);
-    unlikePostInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, liked: false, likes_count: prev.likes_count - 1 };
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          const updatePost = (post: PostDetailed) => {
+            if (post.id === postId) {
+              return { ...post, liked: false, likes_count: post.likes_count - 1 };
+            }
+            return post;
+          };
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.map(updatePost) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
   };
 
+  // add a comment to post wherever it appears in the app
   const onComment = (postId: number) => {
-    // add comment count to post wherever it appears in the app
-    addCommentInState(explorePosts.setExplorePosts, postId);
-    addCommentInState(explorePosts.setSimilarPosts, postId);
-    addCommentInState(feedPosts.setData, postId);
-    addCommentInState(savedPosts.setData, postId);
-    addCommentInState(exploreProfile.posts.setData, postId);
-    addCommentInState(feedProfile.posts.setData, postId);
-    addCommentInState(postsProfile.posts.setData, postId);
-    addCommentInState(authProfilePosts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, comments_count: prev.comments_count + 1 };
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          const updatePost = (post: PostDetailed) => {
+            if (post.id === postId) {
+              return { ...post, comments_count: post.comments_count + 1 };
+            }
+            return post;
+          };
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.map(updatePost) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
   };
 
+  // toggle is_hidden true or false for post wherever it appears in the app
   const onToggleHidden = (postId: number) => {
-    // toggle is_hidden true or false for post wherever it appears in the app
-    togglePostHiddenInState(explorePosts.setExplorePosts, postId);
-    togglePostHiddenInState(explorePosts.setSimilarPosts, postId);
-    togglePostHiddenInState(feedPosts.setData, postId);
-    togglePostHiddenInState(savedPosts.setData, postId);
-    togglePostHiddenInState(exploreProfile.posts.setData, postId);
-    togglePostHiddenInState(feedProfile.posts.setData, postId);
-    togglePostHiddenInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, is_hidden: !prev.is_hidden };
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          const updatePost = (post: PostDetailed) => {
+            if (post.id === postId) {
+              return { ...post, is_hidden: !post.is_hidden };
+            }
+            return post;
+          };
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.map(updatePost) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
   };
 
+  // remove post wherever it appears in the app
   const removePostFromData = (postId: number) => {
-    // remove post wherever it appears in the app
-    removePostInState(explorePosts.setExplorePosts, postId);
-    removePostInState(explorePosts.setSimilarPosts, postId);
-    removePostInState(feedPosts.setData, postId);
-    removePostInState(savedPosts.setData, postId);
-    removePostInState(exploreProfile.posts.setData, postId);
-    removePostInState(feedProfile.posts.setData, postId);
-    removePostInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return null;
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.filter((post) => post.id !== postId) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
   };
 
+  // toggle is_reported true for post wherever it appears in the app
   const onReportPost = (postId: number, is_inappropriate_content: boolean) => {
-    // toggle is_reported true for post wherever it appears in the app
-    addPostReportedInState(explorePosts.setExplorePosts, postId);
-    addPostReportedInState(explorePosts.setSimilarPosts, postId);
-    addPostReportedInState(feedPosts.setData, postId);
-    addPostReportedInState(savedPosts.setData, postId);
-    addPostReportedInState(exploreProfile.posts.setData, postId);
-    addPostReportedInState(feedProfile.posts.setData, postId);
-    addPostReportedInState(postsProfile.posts.setData, postId);
+    explorePosts.setSelectedExplorePost((prev) => {
+      if (prev && prev.id === postId) {
+        return { ...prev, is_hidden: true, is_reported: true };
+      }
+      return prev;
+    });
+
+    // Update all queries that might contain posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      (oldData) => {
+        if (!oldData) return oldData;
+
+        // Handle infinite query structure
+        if (oldData.pages) {
+          const updatePost = (post: PostDetailed) => {
+            if (post.id === postId) {
+              return { ...post, is_hidden: true, is_reported: true };
+            }
+            return post;
+          };
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results: page.results?.map(updatePost) ?? page.results,
+            })),
+          };
+        }
+
+        return oldData;
+      },
+    );
 
     // if post was reported as inappropriate, remove it from wherever it appears in the app
     if (is_inappropriate_content) {

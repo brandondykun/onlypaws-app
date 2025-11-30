@@ -7,7 +7,7 @@ import LoadingFooter from "../LoadingFooter/LoadingFooter";
 import Text from "../Text/Text";
 
 type Props = {
-  nextUrl: string | null;
+  nextUrl: string | null | boolean;
   fetchNextLoading: boolean;
   initialFetchLoading?: boolean;
 };

@@ -1,20 +1,18 @@
 import { BlurView } from "expo-blur";
-import { ImagePickerAsset } from "expo-image-picker";
 import { useState, useRef, useEffect } from "react";
 import { View, Dimensions, Pressable, StyleSheet, Animated } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Image as CropperImage } from "react-native-image-crop-picker";
-import { PhotoFile } from "react-native-vision-camera";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileImage as TProfileImage } from "@/types";
+import { ImageAsset } from "@/types/post/post";
 
 import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {
-  image: TProfileImage | PhotoFile | ImagePickerAsset | CropperImage | null;
+  image: TProfileImage | ImageAsset | null;
   size?: number;
 };
 const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
@@ -85,7 +83,18 @@ const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
     } else {
       opacity.setValue(0);
     }
-  }, [visible, viewPosition, screenWidth, screenHeight, imageSize, smallImageSize]);
+  }, [
+    visible,
+    viewPosition,
+    screenWidth,
+    screenHeight,
+    imageSize,
+    smallImageSize,
+    opacity,
+    scale,
+    translateX,
+    translateY,
+  ]);
 
   return (
     <View ref={viewRef}>

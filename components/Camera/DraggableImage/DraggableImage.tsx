@@ -1,22 +1,20 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
-import { ImagePickerAsset } from "expo-image-picker";
 import React, { useRef, useEffect, useCallback } from "react";
 import { Dimensions, View, Pressable, StyleSheet, Animated } from "react-native";
-import { Image as CropperImage } from "react-native-image-crop-picker";
 import { useIsActive, useReorderableDrag } from "react-native-reorderable-list";
-import { PhotoFile } from "react-native-vision-camera";
 
 import ImageLoader from "@/components/ImageLoader/ImageLoader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { ImageAssetWithTags } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
 type Props = {
-  item: PhotoFile | ImagePickerAsset | CropperImage;
+  item: ImageAssetWithTags;
   index: number;
-  setImages: React.Dispatch<React.SetStateAction<(PhotoFile | ImagePickerAsset | CropperImage)[]>>;
+  setImages: React.Dispatch<React.SetStateAction<ImageAssetWithTags[]>>;
 };
 
 const DraggableImage = ({ item, index, setImages }: Props) => {

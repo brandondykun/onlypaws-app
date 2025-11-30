@@ -15,16 +15,16 @@ const PostDetailsScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const tabBarHeight = useBottomTabBarHeight();
   const { setLightOrDark } = useColorMode();
-  const { post, error, loading, refetch } = usePost(postId);
+  const { data: post, isError, isLoading, refetch } = usePost(postId);
 
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, paddingBottom: tabBarHeight + 24 }}
       showsVerticalScrollIndicator={false}
     >
-      {loading ? (
+      {isLoading ? (
         <PostSkeleton />
-      ) : !error && post ? (
+      ) : !isError && post ? (
         <Post post={post} captionDefaultExpanded={true} captionExpandable={false} headerVisible={false} />
       ) : (
         <View style={{ paddingVertical: 64, alignItems: "center", paddingHorizontal: 24 }}>
