@@ -121,3 +121,8 @@ export const isCreatePostImageTag = (tag: CreatePostImageTag | PostImageTag): ta
 export const getNextPageParam = (lastPage: PaginatedPostsResponse) => {
   return lastPage?.next?.split("page=")[1] ?? null;
 };
+
+// convert minutes to milliseconds
+export const minutesToMilliseconds = (minutes: number) => {
+  return minutes * 1000 * 60;
+};

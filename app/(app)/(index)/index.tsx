@@ -12,6 +12,7 @@ import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import { getNextPageParam } from "@/utils/utils";
@@ -23,6 +24,7 @@ const FeedScreen = () => {
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
   const insets = useSafeAreaInsets();
+  const { selectedProfileId } = useAuthUserContext();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
     const res = await getFeedForQuery(pageParam);
@@ -30,10 +32,11 @@ const FeedScreen = () => {
   };
 
   const feedPosts = useInfiniteQuery({
-    queryKey: ["posts", "feed"],
+    queryKey: [selectedProfileId, "posts", "feed"],
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
   });
 
   const scrollY = useRef(new Animated.Value(0)).current;

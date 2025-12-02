@@ -8,6 +8,7 @@ import { getSimilarPostsForQuery } from "@/api/post";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import Post from "@/components/Post/Post";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useAdsInList } from "@/hooks/useAdsInList";
 import { PostDetailed } from "@/types";
@@ -16,6 +17,7 @@ import { getNextPageParam } from "@/utils/utils";
 const ExplorePostsListScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { selectedExplorePost } = useExplorePostsContext();
+  const { selectedProfileId } = useAuthUserContext();
 
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
@@ -26,10 +28,11 @@ const ExplorePostsListScreen = () => {
   };
 
   const similarPosts = useInfiniteQuery({
-    queryKey: ["posts", "explore", "similar", postId.toString()],
+    queryKey: [selectedProfileId, "posts", "explore", "similar", postId.toString()],
     queryFn: fetchSimilarPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

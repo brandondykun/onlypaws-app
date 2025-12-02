@@ -13,7 +13,6 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { AdsConfigProvider } from "@/context/AdsConfigContext";
-import AuthProfileContextProvider from "@/context/AuthProfileContext";
 import AuthUserContextProvider from "@/context/AuthUserContext";
 import ColorModeContextProvider from "@/context/ColorModeContext";
 import AuthInterceptor from "@/interceptors/AuthInterceptor";
@@ -64,32 +63,30 @@ const RootLayout = () => {
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
         <AuthUserContextProvider>
-          <AuthProfileContextProvider>
-            <ColorModeContextProvider>
-              <AdsConfigProvider>
-                <AuthInterceptor>
-                  <BottomSheetModalProvider>
-                    <Stack
-                      screenOptions={{
-                        headerStyle: {
-                          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                        },
-                        headerShadowVisible: false, // applied here
-                        contentStyle: {
-                          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                        },
-                      }}
-                    >
-                      <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
-                      <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
-                      <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
-                    </Stack>
-                    <Toast config={toastConfig} />
-                  </BottomSheetModalProvider>
-                </AuthInterceptor>
-              </AdsConfigProvider>
-            </ColorModeContextProvider>
-          </AuthProfileContextProvider>
+          <ColorModeContextProvider>
+            <AdsConfigProvider>
+              <AuthInterceptor>
+                <BottomSheetModalProvider>
+                  <Stack
+                    screenOptions={{
+                      headerStyle: {
+                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                      },
+                      headerShadowVisible: false, // applied here
+                      contentStyle: {
+                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                      },
+                    }}
+                  >
+                    <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
+                    <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
+                    <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
+                  </Stack>
+                  <Toast config={toastConfig} />
+                </BottomSheetModalProvider>
+              </AuthInterceptor>
+            </AdsConfigProvider>
+          </ColorModeContextProvider>
         </AuthUserContextProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>

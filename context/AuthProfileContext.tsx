@@ -1,8 +1,9 @@
+import { InfiniteData, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-import { getProfileDetails } from "@/api/profile";
-import { PetType, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { getProfileDetailsForQuery } from "@/api/profile";
+import { PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
 
 import { useAuthUserContext } from "./AuthUserContext";
 
@@ -27,21 +28,23 @@ type AuthProfileContextType = {
   backgroundRefreshing: boolean;
 };
 
+const defaultProfile: ProfileDetailsType = {
+  id: null!,
+  username: "",
+  name: "",
+  about: "",
+  image: null,
+  is_following: false,
+  posts_count: 0,
+  followers_count: 0,
+  following_count: 0,
+  breed: "",
+  pet_type: null,
+  profile_type: "regular",
+};
+
 const AuthProfileContext = createContext<AuthProfileContextType>({
-  authProfile: {
-    id: null!,
-    username: null!,
-    name: "",
-    about: null,
-    image: null,
-    is_following: false,
-    posts_count: 0,
-    followers_count: 0,
-    following_count: 0,
-    breed: "",
-    pet_type: null,
-    profile_type: "regular",
-  },
+  authProfile: defaultProfile,
   loading: false,
   updateProfileImage: (image: ProfileImage) => {},
   updateAboutText: (aboutText: string) => {},
@@ -60,152 +63,135 @@ type Props = {
   children: React.ReactNode;
 };
 
-const defaultProfile: ProfileDetailsType = {
-  id: null!,
-  username: "",
-  name: "",
-  about: "",
-  image: null,
-  is_following: false,
-  posts_count: 0,
-  followers_count: 0,
-  following_count: 0,
-  breed: "",
-  pet_type: null,
-  profile_type: "regular",
-};
-
 const AuthProfileContextProvider = ({ children }: Props) => {
-  const [authProfile, setAuthProfile] = useState<ProfileDetailsType>(defaultProfile);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [backgroundRefreshing, setBackgroundRefreshing] = useState(false);
-  const hasInitiallyFetchedRef = useRef(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
+  const queryClient = useQueryClient();
 
-  // refresh the profile details without setting the loading state.
-  // setting the loading state to true will trigger the auth interceptor to
-  // return null and redirect the app the the index route (feed screen).
-  // since the profile has been authenticated already, there's no need to set loading to true.
-  const backgroundRefreshProfileDetails = useCallback(async () => {
-    if (selectedProfileId && !authLoading) {
-      setBackgroundRefreshing(true);
-      const { error, data } = await getProfileDetails(selectedProfileId);
-      if (!error && data) {
-        setAuthProfile(data);
-      }
-      setBackgroundRefreshing(false);
-    }
-  }, [authLoading, selectedProfileId]);
+  const fetchProfile = async (id: number) => {
+    const res = await getProfileDetailsForQuery(id);
+    return res.data;
+  };
 
-  const fetchProfileDetails = useCallback(async () => {
-    // if fetching a profile for the first time on app load
-    if (selectedProfileId && !authLoading && !hasInitiallyFetchedRef.current) {
-      setLoading(true);
-      const { error, data } = await getProfileDetails(selectedProfileId);
-      if (!error && data) {
-        setAuthProfile(data);
-        hasInitiallyFetchedRef.current = true;
-      }
-      setLoading(false);
-    } else if (selectedProfileId && !authLoading && hasInitiallyFetchedRef.current) {
-      // if the user is already authenticated but the user changes profiles, refresh in the background
-      // without this check, any time a profile is changed, the app would redirect to the index route (feed screen)
-      backgroundRefreshProfileDetails();
-    }
-  }, [authLoading, selectedProfileId, backgroundRefreshProfileDetails]);
+  // Use useQuery with enabled flag to handle null selectedProfileId
+  const {
+    data: profileData,
+    isLoading,
+    isFetching,
+    refetch: queryRefetch,
+  } = useQuery({
+    queryKey: [selectedProfileId, "profile"],
+    queryFn: () => fetchProfile(selectedProfileId!),
+    enabled: !!selectedProfileId && !authLoading,
+    staleTime: 0, // Always refetch to get latest data
+    placeholderData: (previousData) => previousData, // Keep previous profile data while fetching new one
+  });
 
-  useEffect(() => {
-    fetchProfileDetails();
-  }, [fetchProfileDetails]);
+  const authProfile = profileData || defaultProfile;
 
-  useEffect(() => {
-    if (!selectedProfileId) {
-      setAuthProfile(defaultProfile);
-      hasInitiallyFetchedRef.current = false;
-    }
-    // NOTE: We don't reset hasInitiallyFetchedRef when switching profiles
-    // If we did, setLoading(true) would be called, causing AuthInterceptor
-    // to return null and unmount the app, resetting navigation to feed screen.
-    // Profile changes should use backgroundRefreshProfileDetails instead.
-  }, [selectedProfileId]);
+  // Helper function to update the cache
+  const updateCache = (updater: (prev: ProfileDetailsType) => ProfileDetailsType) => {
+    if (!selectedProfileId) return;
+
+    // Use the exact same format as the useQuery key
+    const queryKey = [selectedProfileId, "profile"];
+
+    // Use setQueryData with exact key match
+    queryClient.setQueryData<ProfileDetailsType>(queryKey, (oldData) => {
+      if (!oldData) return oldData;
+      return updater(oldData);
+    });
+  };
 
   // refresh profile if user swipes down
   const refreshProfile = async () => {
     setRefreshing(true);
     Haptics.impactAsync();
-    await backgroundRefreshProfileDetails();
+    await queryRefetch();
     setRefreshing(false);
   };
 
   const updateProfileImage = (image: ProfileImage) => {
-    setAuthProfile((prev) => {
-      return { ...prev, image: image };
-    });
+    updateCache((prev) => ({ ...prev, image }));
   };
 
   const updateAboutText = (aboutText: string) => {
-    setAuthProfile((prev) => {
-      return { ...prev, about: aboutText };
-    });
+    updateCache((prev) => ({ ...prev, about: aboutText }));
   };
 
   const updateName = (name: string) => {
-    setAuthProfile((prev) => {
-      return { ...prev, name: name };
-    });
+    updateCache((prev) => ({ ...prev, name }));
   };
 
   const updateAuthProfile = (name: string, about: string | null, breed: string | null, petType: PetType | null) => {
-    setAuthProfile((prev) => {
-      return { ...prev, name: name, about: about, breed: breed, pet_type: petType };
-    });
+    updateCache((prev) => ({
+      ...prev,
+      name,
+      about,
+      breed,
+      pet_type: petType,
+    }));
   };
 
   const updateUsername = (username: string) => {
-    setAuthProfile((prev) => {
-      return { ...prev, username };
-    });
+    if (!selectedProfileId) return;
+
+    // Update the profile cache
+    updateCache((prev) => ({ ...prev, username }));
+
+    // Helper to update posts data
+    const updatePostsUsername = (oldData: InfiniteData<PostsDetailedPage> | undefined) => {
+      if (!oldData || !oldData.pages) return oldData;
+
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          results: page.results
+            ? page.results.map((post) => ({
+                ...post,
+                profile: {
+                  ...post.profile,
+                  username,
+                },
+              }))
+            : null,
+        })),
+      };
+    };
+
+    // Update username in all posts for this profile (authProfile posts)
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
+      updatePostsUsername,
+    );
   };
 
   const removeFollowing = () => {
-    setAuthProfile((prev) => {
-      return {
-        ...prev,
-        following_count: prev.following_count - 1,
-      };
-    });
+    updateCache((prev) => ({
+      ...prev,
+      following_count: prev.following_count - 1,
+    }));
   };
 
   const addFollowing = () => {
-    setAuthProfile((prev) => {
-      return {
-        ...prev,
-        following_count: prev.following_count + 1,
-      };
-    });
+    updateCache((prev) => ({
+      ...prev,
+      following_count: prev.following_count + 1,
+    }));
   };
 
   const updatePostsCount = (action: "add" | "subtract", amount: number) => {
-    setAuthProfile((prev) => {
-      if (action === "add") {
-        return {
-          ...prev,
-          posts_count: prev.posts_count + amount,
-        };
-      } else {
-        return {
-          ...prev,
-          posts_count: prev.posts_count - amount,
-        };
-      }
-    });
+    updateCache((prev) => ({
+      ...prev,
+      posts_count: action === "add" ? prev.posts_count + amount : prev.posts_count - amount,
+    }));
   };
 
   const value = {
     authProfile,
-    loading,
+    loading: isLoading,
     updateProfileImage,
     updateAboutText,
     removeFollowing,
@@ -216,7 +202,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updateUsername,
     refetch: refreshProfile,
     refreshing,
-    backgroundRefreshing,
+    backgroundRefreshing: isFetching && !isLoading && !refreshing,
   };
 
   return <AuthProfileContext.Provider value={value}>{children}</AuthProfileContext.Provider>;
@@ -225,34 +211,6 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 export default AuthProfileContextProvider;
 
 export const useAuthProfileContext = () => {
-  const {
-    authProfile,
-    loading,
-    updateProfileImage,
-    updateAboutText,
-    removeFollowing,
-    addFollowing,
-    updatePostsCount,
-    updateName,
-    updateAuthProfile,
-    updateUsername,
-    refetch,
-    refreshing,
-    backgroundRefreshing,
-  } = useContext(AuthProfileContext);
-  return {
-    authProfile,
-    loading,
-    updateProfileImage,
-    updateAboutText,
-    removeFollowing,
-    addFollowing,
-    updatePostsCount,
-    updateName,
-    updateAuthProfile,
-    updateUsername,
-    refetch,
-    refreshing,
-    backgroundRefreshing,
-  };
+  const context = useContext(AuthProfileContext);
+  return context;
 };

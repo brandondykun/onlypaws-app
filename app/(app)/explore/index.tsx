@@ -14,6 +14,7 @@ import PostTile from "@/components/PostTile/PostTile";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { getNextPageParam } from "@/utils/utils";
@@ -26,6 +27,7 @@ const ExploreScreen = () => {
 
   const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
+  const { selectedProfileId } = useAuthUserContext();
 
   const { setSelectedExplorePost } = useExplorePostsContext();
 
@@ -35,10 +37,11 @@ const ExploreScreen = () => {
   };
 
   const explorePosts = useInfiniteQuery({
-    queryKey: ["posts", "explore"],
+    queryKey: [selectedProfileId, "posts", "explore"],
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

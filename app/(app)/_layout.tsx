@@ -11,6 +11,7 @@ import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import AuthProfileContextProvider from "@/context/AuthProfileContext";
 import AuthProfileFollowersContextProvider from "@/context/AuthProfileFollowersContext";
 import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -129,9 +130,9 @@ const TabsComponent = () => {
 const TabLayout = () => {
   const { isDarkMode } = useColorMode();
 
-  const { authLoading, isAuthenticated, user } = useAuthUserContext();
+  const { authLoading, isAuthenticated, user, selectedProfileId } = useAuthUserContext();
 
-  if (authLoading) {
+  if (authLoading || !selectedProfileId) {
     return (
       <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[100] }]}>
         <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={s.loadingViewText}>
@@ -156,25 +157,27 @@ const TabLayout = () => {
   }
 
   return (
-    <PostsContextProvider>
-      <ExplorePostsContextProvider>
-        <ProfileSearchContextProvider>
-          <AuthProfileFollowingContextProvider>
-            <AuthProfileFollowersContextProvider>
-              <PostManagerContextProvider>
-                <ProfileDetailsManagerContextProvider>
-                  <NotificationsContextProvider>
-                    <ReportReasonsContextProvider>
-                      <TabsComponent />
-                    </ReportReasonsContextProvider>
-                  </NotificationsContextProvider>
-                </ProfileDetailsManagerContextProvider>
-              </PostManagerContextProvider>
-            </AuthProfileFollowersContextProvider>
-          </AuthProfileFollowingContextProvider>
-        </ProfileSearchContextProvider>
-      </ExplorePostsContextProvider>
-    </PostsContextProvider>
+    <AuthProfileContextProvider>
+      <PostsContextProvider>
+        <ExplorePostsContextProvider>
+          <ProfileSearchContextProvider>
+            <AuthProfileFollowingContextProvider>
+              <AuthProfileFollowersContextProvider>
+                <PostManagerContextProvider>
+                  <ProfileDetailsManagerContextProvider>
+                    <NotificationsContextProvider>
+                      <ReportReasonsContextProvider>
+                        <TabsComponent />
+                      </ReportReasonsContextProvider>
+                    </NotificationsContextProvider>
+                  </ProfileDetailsManagerContextProvider>
+                </PostManagerContextProvider>
+              </AuthProfileFollowersContextProvider>
+            </AuthProfileFollowingContextProvider>
+          </ProfileSearchContextProvider>
+        </ExplorePostsContextProvider>
+      </PostsContextProvider>
+    </AuthProfileContextProvider>
   );
 };
 

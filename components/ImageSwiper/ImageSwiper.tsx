@@ -51,8 +51,6 @@ const ImageSwiper = ({
   const { setLightOrDark } = useColorMode();
   const width = useWindowDimensions().width;
 
-  console.log("RERENDERED IMAGE SWIPER");
-
   return (
     <View style={{ width: width }}>
       <Carousel<PostImage | ImageAssetWithTags>

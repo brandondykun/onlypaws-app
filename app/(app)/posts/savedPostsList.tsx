@@ -4,10 +4,12 @@ import { useEffect, useMemo } from "react";
 
 import { getSavedPostsForQuery } from "@/api/post";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const SavedPostsListScreen = () => {
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
+  const { selectedProfileId } = useAuthUserContext();
 
   const router = useRouter();
 
@@ -17,10 +19,11 @@ const SavedPostsListScreen = () => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: ["posts", "saved"],
+    queryKey: [selectedProfileId, "posts", "saved"],
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

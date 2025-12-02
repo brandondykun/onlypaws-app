@@ -66,10 +66,13 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!authLoading) {
-      SplashScreen.hideAsync();
+    if (!authLoading && selectedProfileId) {
+      // set quick timeout to prevent flash of loading screen in app/_layout.tsx
+      setTimeout(() => {
+        SplashScreen.hideAsync();
+      }, 10);
     }
-  }, [authLoading]);
+  }, [authLoading, selectedProfileId]);
 
   const authenticate = useCallback(async (user: MyInfo) => {
     setUser(user);
@@ -100,6 +103,8 @@ const AuthUserContextProvider = ({ children }: Props) => {
   }, [router, queryClient]);
 
   const changeSelectedProfileId = async (profileId: number) => {
+    // No need to clear cache - query keys include selectedProfileId
+    // so React Query will automatically treat this as a new query
     // save new selected profile id to persist profile selection between sessions
     await SecureStore.setItemAsync("SELECTED_PROFILE_ID", profileId.toString());
     setSelectedProfileId(profileId);

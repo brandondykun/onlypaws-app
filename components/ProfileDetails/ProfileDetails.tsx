@@ -5,19 +5,23 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import React from "react";
 import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { unfollowProfile, followProfile } from "@/api/interactions";
+import { getProfileDetailsForQuery, getProfilePostsForQuery } from "@/api/profile";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
-import { ProfileDetails as ProfileDetailsType, PostDetailed } from "@/types";
+import { ProfileDetails as ProfileDetailsType } from "@/types";
+import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
 import LoadingFooter from "../LoadingFooter/LoadingFooter";
@@ -29,54 +33,65 @@ import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 type Props = {
   profileId: number | string;
   onPostPreviewPress: (index: number) => void;
-  profileData: ProfileDetailsType | null;
-  profileLoading: boolean;
-  profileRefresh: () => void;
-  profileRefreshing: boolean;
-  profileError: boolean;
-  postsLoading: boolean;
-  postsError: boolean;
-  postsData: PostDetailed[] | null;
-  postsRefresh: () => void;
-  postsRefreshing: boolean;
-  fetchNext: () => void;
-  fetchNextLoading: boolean;
-  hasFetchNextError: boolean;
 };
 
-const ProfileDetails = ({
-  profileId,
-  onPostPreviewPress,
-  profileData,
-  profileLoading,
-  profileRefresh,
-  profileRefreshing,
-  profileError,
-  postsLoading,
-  postsError,
-  postsData,
-  postsRefresh,
-  postsRefreshing,
-  fetchNext,
-  fetchNextLoading,
-  hasFetchNextError,
-}: Props) => {
+const ProfileDetails = ({ profileId, onPostPreviewPress }: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
-  const { isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
 
+  const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
   const profileDetailsManager = useProfileDetailsManagerContext();
 
   const [followLoading, setFollowLoading] = useState(false);
 
+  const fetchProfile = async (id: number | string) => {
+    const res = await getProfileDetailsForQuery(id);
+    return res.data;
+  };
+
+  const profile = useQuery({
+    queryKey: [selectedProfileId, "profile", profileId.toString()],
+    queryFn: () => fetchProfile(profileId),
+    staleTime: profileId === authProfile.id ? 0 : minutesToMilliseconds(5),
+    enabled: !!selectedProfileId,
+  });
+
+  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getProfilePostsForQuery(profileId, pageParam);
+    return res.data;
+  };
+
+  // determine the query key based on the profile ID
+  // if the logged in user is looking at their own profile, use the authProfile query key
+  // if the logged in user is looking at another profile, use the profile query key
+  const queryKey =
+    profileId === authProfile.id
+      ? [selectedProfileId, "posts", "authProfile"]
+      : [selectedProfileId, "posts", "profile", profileId.toString()];
+
+  const posts = useInfiniteQuery({
+    queryKey: queryKey,
+    queryFn: fetchPosts,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    staleTime: profileId === authProfile.id ? 0 : minutesToMilliseconds(5),
+    enabled: !!selectedProfileId,
+  });
+
+  // Memoize the flattened posts data
+  const dataToRender = useMemo(() => {
+    return posts.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [posts.data]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: profileData ? `@${profileData.username}` : "",
+      title: profile.data ? `@${profile.data.username}` : "",
       headerRight: () => {
-        if (profileData?.id === authProfile.id) {
+        if (profile.data?.id === authProfile.id) {
           // only show if user is looking at own profile
           return (
             <Pressable
@@ -93,7 +108,7 @@ const ProfileDetails = ({
         }
       },
     });
-  }, [profileData, navigation, isDarkMode, authProfile.id]);
+  }, [profile.data, navigation, isDarkMode, authProfile.id]);
 
   const handlePostPreviewPress = (index: number) => {
     onPostPreviewPress(index);
@@ -148,14 +163,14 @@ const ProfileDetails = ({
   };
 
   const handleRefresh = () => {
-    profileRefresh();
-    postsRefresh();
+    profile.refetch();
+    posts.refetch();
   };
 
   const emptyComponent =
-    postsLoading || postsRefreshing ? (
+    posts.isLoading || posts.isRefetching ? (
       <PostTileSkeleton />
-    ) : !postsError ? (
+    ) : !posts.isError ? (
       <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
         <Text
           style={{
@@ -193,23 +208,29 @@ const ProfileDetails = ({
     );
 
   // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
+  const footerComponent = posts.isFetchingNextPage ? (
     <LoadingFooter />
-  ) : hasFetchNextError ? (
-    <RetryFetchFooter fetchFn={fetchNext} message="Oh no! There was an error fetching more posts!" buttonText="Retry" />
+  ) : posts.isFetchNextPageError ? (
+    <RetryFetchFooter
+      fetchFn={posts.fetchNextPage}
+      message="Oh no! There was an error fetching more posts!"
+      buttonText="Retry"
+    />
   ) : null;
 
   return (
     <>
       <FlashList
         showsVerticalScrollIndicator={false}
-        data={postsLoading || postsRefreshing ? [] : postsData}
+        data={posts.isLoading || posts.isRefetching ? [] : dataToRender}
         numColumns={3}
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={
-          !fetchNextLoading && !postsLoading && !postsError && !hasFetchNextError ? () => fetchNext() : null
+          !posts.isFetchingNextPage && !posts.isLoading && !posts.isError && !posts.isFetchNextPageError
+            ? () => posts.fetchNextPage()
+            : null
         }
         ListEmptyComponent={emptyComponent}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
@@ -221,15 +242,15 @@ const ProfileDetails = ({
         ListFooterComponent={footerComponent}
         ListHeaderComponent={
           <ProfileDetailsHeader
-            profileData={profileData!}
-            postsCount={profileData?.posts_count!}
+            profileData={profile.data!}
+            postsCount={profile.data?.posts_count!}
             handleFollowersPress={handleFollowersPress}
             handleFollowingPress={handleFollowingPress}
             handleUnfollowPress={handleUnfollowPress}
             handleFollowPress={handleFollowPress}
-            profileLoading={profileLoading}
+            profileLoading={profile.isLoading}
             followLoading={followLoading}
-            profileError={!!profileError}
+            profileError={profile.isLoadingError}
           />
         }
         renderItem={({ item, index }) => {
@@ -237,7 +258,7 @@ const ProfileDetails = ({
         }}
         refreshControl={
           <RefreshControl
-            refreshing={profileRefreshing || postsRefreshing}
+            refreshing={profile.isRefetching || posts.isRefetching}
             onRefresh={handleRefresh}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}

@@ -5,22 +5,25 @@ import { useMemo } from "react";
 import { getProfilePostsForQuery } from "@/api/profile";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const PostsListScreen = () => {
   const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
   const { initialIndex } = useLocalSearchParams<{ initialIndex: string }>();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getProfilePostsForQuery(authProfile.id, pageParam);
+    const res = await getProfilePostsForQuery(selectedProfileId!, pageParam);
     return res.data;
   };
 
   const posts = useInfiniteQuery({
-    queryKey: ["posts", "authProfile", authProfile.id],
+    queryKey: [selectedProfileId, "posts", "authProfile"],
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

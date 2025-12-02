@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 import { PostDetailed, PostsDetailedPage } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
+import { useAuthUserContext } from "./AuthUserContext";
 
 type PostContextType = {
   addPost: (data: PostDetailed) => void;
@@ -26,12 +27,13 @@ type Props = {
 };
 
 const PostsContextProvider = ({ children }: Props) => {
-  const { authProfile, updatePostsCount } = useAuthProfileContext();
+  const { updatePostsCount } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
   const queryClient = useQueryClient();
 
   const addPost = (data: PostDetailed) => {
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts", "authProfile", authProfile.id] },
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -57,7 +59,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const deletePost = (id: number) => {
     // Update all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts", "authProfile", authProfile.id] },
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -82,7 +84,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const addToCommentCount = (postId: number) => {
     // Update the comment count for the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts", "authProfile", authProfile.id] },
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -112,7 +114,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const removeImageFromPost = (postId: number, imageId: number) => {
     // Remove an image from the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts", "authProfile", authProfile.id] },
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -142,7 +144,7 @@ const PostsContextProvider = ({ children }: Props) => {
   const updatePost = (postId: number, data: PostDetailed) => {
     // Update the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts", "authProfile", authProfile.id] },
+      { queryKey: [selectedProfileId, "posts", "authProfile"] },
       (oldData) => {
         if (!oldData) return oldData;
 

@@ -118,8 +118,11 @@ const ChangeProfileModal = forwardRef(
                         </Text>
                       </View>
                     </View>
-                    {isSelected ? <Ionicons name="checkmark-circle-sharp" size={28} color={COLORS.lime[500]} /> : null}
-                    {isSelectedButLoading ? <ActivityIndicator size="small" color={COLORS.lime[500]} /> : null}
+                    {isSelectedButLoading ? (
+                      <ActivityIndicator size="small" color={COLORS.lime[500]} />
+                    ) : isSelected ? (
+                      <Ionicons name="checkmark-circle-sharp" size={28} color={COLORS.lime[500]} />
+                    ) : null}
                   </View>
                 </Pressable>
               );

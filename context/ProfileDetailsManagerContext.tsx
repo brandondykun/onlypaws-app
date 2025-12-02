@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 import { ProfileDetails } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
+import { useAuthUserContext } from "./AuthUserContext";
 import { useProfileSearchContext } from "./ProfileSearchContext";
 
 // Profile details manager for profiles throughout the app.
@@ -27,6 +28,7 @@ type Props = { children: React.ReactNode };
 
 const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
   const { addFollowing, removeFollowing } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
 
   const queryClient = useQueryClient();
 
@@ -35,7 +37,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
   const onFollow = (profileId: number) => {
     addFollowing();
     // follow profile wherever it appears in the app
-    queryClient.setQueryData(["profile", profileId.toString()], (oldData: ProfileDetails) => {
+    queryClient.setQueryData([selectedProfileId, "profile", profileId.toString()], (oldData: ProfileDetails) => {
       if (!oldData) return oldData;
       return {
         ...oldData,
@@ -52,13 +54,13 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       }),
     );
     // refresh the feed posts query to add the followed profile to the feed
-    queryClient.refetchQueries({ queryKey: ["posts", "feed"] });
+    queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "feed"] });
   };
 
   const onUnfollow = (profileId: number) => {
     removeFollowing();
     // unfollow profile wherever it appears in the app
-    queryClient.setQueryData(["profile", profileId.toString()], (oldData: ProfileDetails) => {
+    queryClient.setQueryData([selectedProfileId, "profile", profileId.toString()], (oldData: ProfileDetails) => {
       if (!oldData) return oldData;
       return {
         ...oldData,
@@ -75,7 +77,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       }),
     );
     // refresh the feed posts query to remove the unfollowed profile from the feed
-    queryClient.refetchQueries({ queryKey: ["posts", "feed"] });
+    queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "feed"] });
   };
 
   const value = { onFollow, onUnfollow };

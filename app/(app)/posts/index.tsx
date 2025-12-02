@@ -1,41 +1,21 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 
-import { getProfilePostsForQuery } from "@/api/profile";
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
-import { getNextPageParam } from "@/utils/utils";
 
 const PostsScreen = () => {
-  const { authProfile, refetch, refreshing, loading } = useAuthProfileContext();
+  const { authProfile } = useAuthProfileContext();
   const router = useRouter();
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
-
-  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getProfilePostsForQuery(authProfile.id, pageParam);
-    return res.data;
-  };
-
-  const posts = useInfiniteQuery({
-    queryKey: ["posts", "authProfile", authProfile.id],
-    queryFn: fetchPosts,
-    initialPageParam: "1",
-    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-  });
-
-  // Memoize the flattened posts data
-  const dataToRender = useMemo(() => {
-    return posts.data?.pages.flatMap((page) => page.results) ?? [];
-  }, [posts.data]);
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });
@@ -72,25 +52,7 @@ const PostsScreen = () => {
     });
   }, [navigation, authProfile.id, unreadCount, router, setLightOrDark]);
 
-  return (
-    <ProfileDetails
-      profileId={authProfile.id}
-      onPostPreviewPress={handlePostPreviewPress}
-      profileData={authProfile}
-      profileLoading={refreshing || loading}
-      profileRefresh={() => refetch()}
-      profileRefreshing={refreshing}
-      profileError={false} // this will be false for the users own profile, the data is already fetched in the AuthProfileContext
-      postsLoading={posts.isLoading}
-      postsError={posts.isError}
-      postsData={dataToRender}
-      postsRefresh={() => posts.refetch()}
-      postsRefreshing={posts.isRefetching}
-      fetchNext={() => posts.fetchNextPage()}
-      fetchNextLoading={posts.isFetchingNextPage}
-      hasFetchNextError={posts.isFetchNextPageError}
-    />
-  );
+  return <ProfileDetails profileId={authProfile.id} onPostPreviewPress={handlePostPreviewPress} />;
 };
 
 export default PostsScreen;

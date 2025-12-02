@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 
 import { PostDetailed, PostsDetailedPage } from "@/types";
 
+import { useAuthUserContext } from "./AuthUserContext";
 import { useExplorePostsContext } from "./ExplorePostsContext";
 
 // Post manager for all posts in the app
@@ -36,6 +37,7 @@ type Props = {
 
 const PostManagerContextProvider = ({ children }: Props) => {
   const explorePosts = useExplorePostsContext();
+  const { selectedProfileId } = useAuthUserContext();
 
   const queryClient = useQueryClient();
 
@@ -48,17 +50,17 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all post queries EXCEPT saved posts (we'll handle that separately)
+    // Update all post queries for current profile EXCEPT saved posts (we'll handle that separately)
+    // Note: We can't use partial queryKey matching here because we need to exclude "saved" posts
     const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
-      queryKey: ["posts"],
+      predicate: (query) => {
+        const key = query.queryKey;
+        // Only match queries for current profile, excluding saved posts
+        return key[0] === selectedProfileId && key[1] === "posts" && !key.includes("saved");
+      },
     });
 
     allPostQueries.forEach(([queryKey, oldData]) => {
-      // Skip the saved posts query - we'll handle it separately
-      if (queryKey.includes("saved")) {
-        return;
-      }
-
       if (!oldData?.pages) return;
 
       queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKey, {
@@ -73,7 +75,7 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Special case to add a saved post to the saved posts cache.
     // This ensure that the saved posts are updated locally without having to refetch the posts.
-    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(["posts", "saved"], (oldData) => {
+    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>([selectedProfileId, "posts", "saved"], (oldData) => {
       if (!oldData) return oldData;
 
       // Check if post already exists in saved posts
@@ -122,11 +124,11 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all post queries including saved posts
+    // Update all post queries for current profile including saved posts
     // For saved posts, we update is_saved to false but don't remove the post
     // It will be removed on the next refetch to avoid abrupt UI changes
     const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
-      queryKey: ["posts"],
+      queryKey: [selectedProfileId, "posts"],
     });
 
     allPostQueries.forEach(([queryKey, oldData]) => {
@@ -152,9 +154,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -190,9 +192,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -228,9 +230,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -266,9 +268,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -304,9 +306,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -335,9 +337,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all queries that might contain posts
+    // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: ["posts"] }, // Matches any query starting with 'posts'
+      { queryKey: [selectedProfileId, "posts"] },
       (oldData) => {
         if (!oldData) return oldData;
 
@@ -385,7 +387,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
 export default PostManagerContextProvider;
 
 export const usePostManagerContext = () => {
-  const { onLike, onUnlike, onComment, unSavePost, savePost, onToggleHidden, onReportPost } =
-    useContext(PostManagerContext);
-  return { onLike, onUnlike, onComment, unSavePost, savePost, onToggleHidden, onReportPost };
+  const context = useContext(PostManagerContext);
+  if (!context) {
+    throw new Error("usePostManagerContext must be used within PostManagerContextProvider");
+  }
+  return context;
 };
