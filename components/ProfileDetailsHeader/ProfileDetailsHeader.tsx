@@ -110,7 +110,7 @@ const ProfileDetailsHeader = ({
     <View>
       <View style={s.profileInfoContainer}>
         <View style={s.profileImageContainer}>
-          <ProfileDetailsHeaderImage size={120} image={profileData?.image || null} />
+          <ProfileDetailsHeaderImage size={125} image={profileData?.image || null} />
         </View>
         {profileData?.name && <Text style={s.nameText}>{profileData?.name}</Text>}
         {profileData?.about && (
