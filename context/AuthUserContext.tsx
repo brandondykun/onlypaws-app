@@ -66,13 +66,13 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!authLoading && selectedProfileId) {
+    if (!authLoading) {
       // set quick timeout to prevent flash of loading screen in app/_layout.tsx
       setTimeout(() => {
         SplashScreen.hideAsync();
       }, 10);
     }
-  }, [authLoading, selectedProfileId]);
+  }, [authLoading]);
 
   const authenticate = useCallback(async (user: MyInfo) => {
     setUser(user);
