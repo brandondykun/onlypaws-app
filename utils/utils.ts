@@ -64,7 +64,13 @@ export const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage | Pr
   // Return an image uri from a PhotoFile or ImagePickerAsset or PostImage
   if (isCropperImage(image)) return image.path;
   // PhotoFile does not have a uri, it has a path that does not start with file://
-  if (isPhotoFile(image)) return `file://${image.path}`;
+  if (isPhotoFile(image)) {
+    if (image.path.startsWith("file://")) {
+      return image.path;
+    } else {
+      return `file://${image.path}`;
+    }
+  }
   if (isPostImage(image)) return image.image;
   if (isProfileImage(image)) return image.image;
   return image.uri;
