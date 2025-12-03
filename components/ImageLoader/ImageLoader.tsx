@@ -1,10 +1,9 @@
 import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { ActivityIndicator, Dimensions, ImageStyle, StyleProp, StyleSheet, View } from "react-native";
+import { Dimensions, ImageStyle, StyleProp, View } from "react-native";
 
-import { COLORS } from "@/constants/Colors";
-import { useColorMode } from "@/context/ColorModeContext";
+import PostImageSkeleton from "../LoadingSkeletons/PostImageSkeleton";
 
 type Props = {
   uri: string;
@@ -15,26 +14,12 @@ type Props = {
 };
 
 const ImageLoader = ({ uri, width, height, setShowTagPopovers, style }: Props) => {
-  const { isDarkMode } = useColorMode();
   const [loading, setLoading] = useState(true);
   const screenWidth = Dimensions.get("window").width;
 
   return (
     <View style={{ width: width ? width : screenWidth, height: height ? height : screenWidth, position: "relative" }}>
-      {loading ? (
-        <View
-          style={[
-            s.loadingView,
-            {
-              height: height ? height : screenWidth,
-              width: width ? width : screenWidth,
-              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-            },
-          ]}
-        >
-          <ActivityIndicator size="large" color={isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600]} />
-        </View>
-      ) : null}
+      {loading ? <PostImageSkeleton /> : null}
 
       <Zoomable onInteractionStart={() => setShowTagPopovers && setShowTagPopovers(false)}>
         <Image
@@ -43,7 +28,6 @@ const ImageLoader = ({ uri, width, height, setShowTagPopovers, style }: Props) =
           onLoadEnd={() => {
             setLoading(false);
           }}
-          cachePolicy="none"
         />
       </Zoomable>
     </View>
@@ -51,15 +35,3 @@ const ImageLoader = ({ uri, width, height, setShowTagPopovers, style }: Props) =
 };
 
 export default ImageLoader;
-
-const s = StyleSheet.create({
-  loadingView: {
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-});
