@@ -1,4 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -22,6 +23,7 @@ type Props = {
   handleFollowingPress: () => void;
   handleFollowPress: (profile: ProfileDetails) => void;
   handleUnfollowPress: (profileId: number) => void;
+  handleTaggedPostsPress: () => void;
   profileLoading: boolean;
   followLoading?: boolean;
   profileError: boolean;
@@ -34,6 +36,7 @@ const ProfileDetailsHeader = ({
   handleFollowingPress,
   handleUnfollowPress,
   handleFollowPress,
+  handleTaggedPostsPress,
   profileLoading,
   followLoading,
   profileError,
@@ -47,36 +50,47 @@ const ProfileDetailsHeader = ({
   if (profileLoading) return <ProfileDetailsHeaderSkeleton showTwoButtons={authProfile.id === profileData?.id} />;
 
   const followButtons = (
-    <View style={{ flex: 1 }}>
-      {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
+    <>
+      <View style={{ flex: 1 }}>
+        {profileData && profileData?.is_following && profileData?.id !== authProfile.id ? (
+          <Button
+            text="Unfollow"
+            textStyle={[s.followButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }]}
+            buttonStyle={[
+              s.headerButton,
+              {
+                borderColor: setLightOrDark(COLORS.sky[600], COLORS.sky[700]),
+                backgroundColor: `${COLORS.sky[500]}1A`,
+              },
+            ]}
+            variant="outline"
+            onPress={() => handleUnfollowPress(profileData.id)}
+            loading={followLoading}
+            loadingIconSize={12}
+            loadingIconScale={0.7}
+          />
+        ) : profileData && profileData?.id !== authProfile.id ? (
+          <Button
+            text="Follow"
+            textStyle={s.followButtonText}
+            buttonStyle={[s.headerButton, { backgroundColor: COLORS.sky[500] }]}
+            onPress={() => handleFollowPress(profileData)}
+            loading={followLoading}
+            loadingIconSize={12}
+            loadingIconScale={0.7}
+          />
+        ) : null}
+      </View>
+      <View style={{ flex: 1 }}>
         <Button
-          text="Unfollow"
-          textStyle={[s.followButtonText, { color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }]}
-          buttonStyle={[
-            s.headerButton,
-            {
-              borderColor: setLightOrDark(COLORS.sky[600], COLORS.sky[700]),
-              backgroundColor: `${COLORS.sky[500]}1A`,
-            },
-          ]}
-          variant="outline"
-          onPress={() => handleUnfollowPress(profileData.id)}
-          loading={followLoading}
-          loadingIconSize={12}
-          loadingIconScale={0.7}
+          text="Tagged Posts"
+          textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
+          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+          onPress={handleTaggedPostsPress}
+          icon={<FontAwesome name="tag" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
         />
-      ) : profileData && profileData?.id !== authProfile.id ? (
-        <Button
-          text="Follow"
-          textStyle={s.followButtonText}
-          buttonStyle={[s.headerButton, { backgroundColor: COLORS.sky[500] }]}
-          onPress={() => handleFollowPress(profileData)}
-          loading={followLoading}
-          loadingIconSize={12}
-          loadingIconScale={0.7}
-        />
-      ) : null}
-    </View>
+      </View>
+    </>
   );
 
   const selfProfileButtons = (
@@ -87,14 +101,16 @@ const ProfileDetailsHeader = ({
           textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
           buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
           onPress={() => router.push("/(app)/posts/savedPosts")}
+          icon={<FontAwesome name="bookmark" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
         />
       </View>
       <View style={{ flex: 1 }}>
         <Button
-          text="Edit Profile"
+          text="Tagged Posts"
           textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
           buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
-          onPress={() => router.push("/(app)/profile/editProfile")}
+          onPress={handleTaggedPostsPress}
+          icon={<FontAwesome name="tag" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
         />
       </View>
     </>

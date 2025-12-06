@@ -46,7 +46,7 @@ const ProfileSearchScreen = () => {
   };
 
   const handleProfilePress = (profileId: number) => {
-    router.push({ pathname: "/(app)/explore/profile", params: { profileId: profileId } });
+    router.push({ pathname: "/(app)/explore/profileDetails", params: { profileId: profileId.toString() } });
   };
 
   let content = (

@@ -33,9 +33,10 @@ import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 type Props = {
   profileId: number | string;
   onPostPreviewPress: (index: number) => void;
+  onTaggedPostsPress: () => void;
 };
 
-const ProfileDetails = ({ profileId, onPostPreviewPress }: Props) => {
+const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
@@ -251,6 +252,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress }: Props) => {
             profileLoading={profile.isLoading}
             followLoading={followLoading}
             profileError={profile.isLoadingError}
+            handleTaggedPostsPress={onTaggedPostsPress}
           />
         }
         renderItem={({ item, index }) => {

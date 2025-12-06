@@ -114,3 +114,8 @@ export const deletePostImageTag = async (id: number | string) => {
   const url = `/v1/post/image/tag/${id}/`;
   return await axiosDelete(url);
 };
+
+export const getTaggedPostsForQuery = async (profileId: number | string, pageParam: number | string) => {
+  const url = `/v1/profile/${profileId}/tagged/?page=${pageParam}`;
+  return await axiosInstance.get<PaginatedPostsResponse>(url);
+};

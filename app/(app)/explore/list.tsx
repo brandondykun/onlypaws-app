@@ -42,7 +42,7 @@ const ExplorePostsListScreen = () => {
 
   const onProfilePress = useMemo(
     () => (profileId: number) => {
-      router.push({ pathname: "/(app)/explore/profile", params: { profileId: profileId } });
+      router.push({ pathname: "/(app)/explore/profileDetails", params: { profileId: profileId } });
     },
     [router],
   );

@@ -20,7 +20,7 @@ const ExploreProfilePostsListScreen = () => {
       router.back();
       return;
     }
-    router.push({ pathname: "/(app)/explore/profile", params: { profileId: profileId.toString() } });
+    router.push({ pathname: "/(app)/explore/profileDetails", params: { profileId: profileId.toString() } });
   };
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {

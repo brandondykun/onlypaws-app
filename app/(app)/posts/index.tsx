@@ -7,6 +7,7 @@ import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 
@@ -16,6 +17,7 @@ const PostsScreen = () => {
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
+  const { selectedProfileId } = useAuthUserContext();
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });
@@ -52,7 +54,17 @@ const PostsScreen = () => {
     });
   }, [navigation, authProfile.id, unreadCount, router, setLightOrDark]);
 
-  return <ProfileDetails profileId={authProfile.id} onPostPreviewPress={handlePostPreviewPress} />;
+  const handleTaggedPostsPress = () => {
+    router.push({ pathname: "/(app)/posts/taggedPosts", params: { profileId: selectedProfileId } });
+  };
+
+  return (
+    <ProfileDetails
+      profileId={authProfile.id}
+      onPostPreviewPress={handlePostPreviewPress}
+      onTaggedPostsPress={handleTaggedPostsPress}
+    />
+  );
 };
 
 export default PostsScreen;

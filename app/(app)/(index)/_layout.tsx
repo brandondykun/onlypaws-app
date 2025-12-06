@@ -21,7 +21,12 @@ const FeedStack = () => {
     >
       <Stack.Screen name="index" options={{ title: "Feed" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
-      <Stack.Screen name="profileList" options={{ title: "Posts" }} />
+      <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
+      <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen
+        name="taggedPostsList"
+        options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }}
+      />
     </Stack>
   );
 };

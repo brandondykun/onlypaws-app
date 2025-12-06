@@ -130,9 +130,9 @@ const TabsComponent = () => {
 const TabLayout = () => {
   const { isDarkMode } = useColorMode();
 
-  const { authLoading, isAuthenticated, user, selectedProfileId } = useAuthUserContext();
+  const { authLoading, isAuthenticated, user } = useAuthUserContext();
 
-  if (authLoading || !selectedProfileId) {
+  if (authLoading) {
     return (
       <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[100] }]}>
         <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={s.loadingViewText}>

@@ -1,19 +1,18 @@
-import { useLocalSearchParams } from "expo-router";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 
-const ProfileDetailsScreen = () => {
+const ExploreProfileScreen = () => {
   const { profileId } = useLocalSearchParams<{ profileId: string }>();
 
   const router = useRouter();
 
   const handlePostPreviewPress = (index: number) => {
-    router.push({ pathname: "/(app)/(index)/profilePostsList", params: { initialIndex: index, profileId } });
+    router.push({ pathname: "/(app)/explore/profilePostsList", params: { initialIndex: index, profileId } });
   };
 
   const handleTaggedPostsPress = () => {
-    router.push({ pathname: "/(app)/(index)/taggedPosts", params: { profileId: profileId } });
+    router.push({ pathname: "/(app)/explore/taggedPosts", params: { profileId: profileId } });
   };
 
   return (
@@ -25,4 +24,4 @@ const ProfileDetailsScreen = () => {
   );
 };
 
-export default ProfileDetailsScreen;
+export default ExploreProfileScreen;

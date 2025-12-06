@@ -11,7 +11,17 @@ const PostsProfileDetailsScreen = () => {
     router.push({ pathname: "/(app)/posts/profilePostsList", params: { initialIndex: index, profileId } });
   };
 
-  return <ProfileDetails profileId={profileId} onPostPreviewPress={handlePostPreviewPress} />;
+  const handleTaggedPostsPress = () => {
+    router.push({ pathname: "/(app)/posts/taggedPosts", params: { profileId: profileId } });
+  };
+
+  return (
+    <ProfileDetails
+      profileId={profileId}
+      onPostPreviewPress={handlePostPreviewPress}
+      onTaggedPostsPress={handleTaggedPostsPress}
+    />
+  );
 };
 
 export default PostsProfileDetailsScreen;
