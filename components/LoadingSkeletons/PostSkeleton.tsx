@@ -6,8 +6,6 @@ import { Dimensions } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 
-import { POST_HEIGHT } from "../Post/Post";
-
 type Props = {
   props?: IContentLoaderProps;
 };
@@ -25,8 +23,8 @@ const PostSkeleton = ({ ...props }: Props) => {
     <ContentLoader
       speed={1}
       width={screenWidth}
-      height={POST_HEIGHT}
-      viewBox={`0 0 ${screenWidth} ${POST_HEIGHT}`}
+      height={screenWidth + 200}
+      viewBox={`0 0 ${screenWidth} ${screenWidth + 200}`}
       backgroundColor={bgColor}
       foregroundColor={highlightColor}
       {...props}

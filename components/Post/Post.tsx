@@ -19,17 +19,15 @@ import { PostDetailed } from "@/types";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
 import Button from "../Button/Button";
+import CollapsibleText from "../CollapsibleText/CollapsibleText";
 import CommentsModal from "../CommentsModal/CommentsModal";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
 import PostAiModal from "../PostAiModal/PostAiModal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";
 
-import PostCaption from "./PostCaption";
 import PostMenu from "./PostMenu";
 import PostTagsModal from "./PostTagsModal";
-
-export const POST_HEIGHT = Dimensions.get("window").width + 200;
 
 type Props = {
   post: PostDetailed;
@@ -266,7 +264,7 @@ const Post = ({
   );
 
   return (
-    <View style={{ minHeight: POST_HEIGHT }}>
+    <View style={{ paddingBottom: 36 }}>
       {headerVisible ? (
         <View style={{ padding: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -344,8 +342,7 @@ const Post = ({
           </GestureDetector>
         </GestureHandlerRootView>
       </View>
-
-      <View style={{ paddingBottom: captionIsExpanded ? 24 : 0 }}>
+      <View>
         <View style={{ flexDirection: "row", gap: 16, paddingHorizontal: 8, justifyContent: "center" }}>
           <View style={{ minWidth: 38, justifyContent: "center" }}>
             <Pressable
@@ -439,12 +436,14 @@ const Post = ({
             ) : null}
           </View>
         </View>
-        <PostCaption
-          isExpanded={captionIsExpanded}
-          setIsExpanded={setCaptionIsExpanded}
-          caption={post.caption}
-          expandable={captionExpandable}
-        />
+        <View style={{ paddingHorizontal: 8 }}>
+          <CollapsibleText
+            isExpanded={captionIsExpanded}
+            setIsExpanded={setCaptionIsExpanded}
+            caption={post.caption}
+            expandable={captionExpandable}
+          />
+        </View>
         <View style={{ paddingLeft: 8, paddingTop: 6 }}>
           <Text darkColor={COLORS.zinc[500]} style={{ fontSize: 13 }}>
             {getTimeSince(post.created_at)}

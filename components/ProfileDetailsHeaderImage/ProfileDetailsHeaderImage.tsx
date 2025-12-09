@@ -102,11 +102,19 @@ const ProfileDetailsHeaderImage = ({ image, size }: Props) => {
         <View
           style={{
             borderColor: setLightOrDark(COLORS.sky[500], COLORS.sky[500]),
-            borderWidth: 4,
+            borderWidth: 3,
             borderRadius: 100,
           }}
         >
-          <ProfileImage image={image} size={size ? size : 100} />
+          <View
+            style={{
+              borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+              borderWidth: 1,
+              borderRadius: 100,
+            }}
+          >
+            <ProfileImage image={image} size={size ? size : 100} />
+          </View>
         </View>
       </Pressable>
       <Modal

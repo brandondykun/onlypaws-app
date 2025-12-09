@@ -15,8 +15,6 @@ import { adManager } from "@/services/ads/AdManager";
 
 import Text from "../Text/Text";
 
-export const AD_POST_HEIGHT = Dimensions.get("window").width + 200;
-
 type Props = {
   adId: string; // Unique ID for this ad position
   onAdLoaded?: () => void;
@@ -87,7 +85,7 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
   // Show loading placeholder to reserve space and prevent layout shift
   if (isLoading || !nativeAd) {
     return (
-      <Animated.View style={[s.container, { minHeight: AD_POST_HEIGHT, opacity: pulseAnim }]}>
+      <Animated.View style={[s.container, { paddingBottom: 36, opacity: pulseAnim }]}>
         {/* Header Skeleton */}
         <View style={s.header}>
           <View style={s.headerContent}>
@@ -165,7 +163,7 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
   }
 
   return (
-    <View style={[s.container, { minHeight: AD_POST_HEIGHT }]}>
+    <View style={[s.container, { paddingBottom: 36 }]}>
       <NativeAdView nativeAd={nativeAd} style={[s.nativeAdView, { width: screenWidth }]}>
         {/* Header with Ad Badge */}
         <View style={s.header}>

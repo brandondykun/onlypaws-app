@@ -15,12 +15,12 @@ const FeedProfilePostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number) => {
-    if (profileId === authProfile.id) {
+  const onProfilePress = (id: number) => {
+    if (id === authProfile.id || id === Number(profileId)) {
       router.back();
       return;
     }
-    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId: profileId.toString() } });
+    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId: id.toString() } });
   };
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {

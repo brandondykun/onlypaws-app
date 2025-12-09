@@ -57,7 +57,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
   const profile = useQuery({
     queryKey: [selectedProfileId, "profile", profileId.toString()],
     queryFn: () => fetchProfile(profileId),
-    staleTime: profileId === authProfile.id ? 0 : minutesToMilliseconds(5),
+    staleTime: profileId.toString() === selectedProfileId?.toString() ? 0 : minutesToMilliseconds(5),
     enabled: !!selectedProfileId,
   });
 
@@ -69,8 +69,10 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
   // determine the query key based on the profile ID
   // if the logged in user is looking at their own profile, use the authProfile query key
   // if the logged in user is looking at another profile, use the profile query key
+  // NOTE: We compare with selectedProfileId directly (not authProfile.id) because authProfile
+  // uses placeholderData which can return stale data during profile switches
   const queryKey =
-    profileId === authProfile.id
+    profileId.toString() === selectedProfileId?.toString()
       ? [selectedProfileId, "posts", "authProfile"]
       : [selectedProfileId, "posts", "profile", profileId.toString()];
 
@@ -79,7 +81,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    staleTime: profileId === authProfile.id ? 0 : minutesToMilliseconds(5),
+    staleTime: profileId.toString() === selectedProfileId?.toString() ? 0 : minutesToMilliseconds(5),
     enabled: !!selectedProfileId,
   });
 
