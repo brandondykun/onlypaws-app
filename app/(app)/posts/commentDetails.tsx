@@ -3,6 +3,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, ScrollView, ActivityIndicator } from "react-native";
+import Toast from "react-native-toast-message";
 
 import { getCommentChain } from "@/api/interactions";
 import Button from "@/components/Button/Button";
@@ -13,7 +14,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { CommentChainResponse } from "@/types/post/post";
-import Toast from "react-native-toast-message";
+import { ImageAspectRatio } from "@/types/post/post";
 
 const CommentDetailsScreen = () => {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
@@ -24,6 +25,7 @@ const CommentDetailsScreen = () => {
   const [commentChain, setCommentChain] = useState<CommentChainResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTagPopovers, setShowTagPopovers] = useState(false);
 
   const fetchCommentChain = useCallback(async () => {
     setLoading(true);
@@ -71,7 +73,14 @@ const CommentDetailsScreen = () => {
       contentContainerStyle={{ flexGrow: 1, paddingBottom: tabBarHeight + 24 }}
       showsVerticalScrollIndicator={false}
     >
-      <ImageSwiper images={commentChain.post?.images || []} />
+      <ImageSwiper
+        images={commentChain.post?.images || []}
+        aspectRatio={commentChain.post?.aspect_ratio || ("1:1" as ImageAspectRatio)}
+        showTagPopovers={showTagPopovers}
+        setShowTagPopovers={setShowTagPopovers}
+        onTagsButtonPress={() => setShowTagPopovers((prev) => !prev)}
+        handleCoordinatesPress={() => setShowTagPopovers((prev) => !prev)}
+      />
       <View>
         {isTopLevelComment ? (
           <View style={{ marginTop: 12 }}>

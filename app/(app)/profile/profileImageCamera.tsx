@@ -6,7 +6,7 @@ import { useRef, useState, useCallback } from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
-import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
+import { Camera, useCameraDevice, useCameraPermission, Point, useCameraFormat } from "react-native-vision-camera";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { addProfileImage, editProfileImage } from "@/api/profile";
@@ -41,6 +41,12 @@ const ProfileImageCamera = () => {
   const isFocused = useIsFocused();
   const cameraRef = useRef<Camera>(null!);
   const device = useCameraDevice(facing);
+
+  // Select the desired format
+  const format = useCameraFormat(device, [
+    // Swap width and height because cameras are in landscape orientation
+    { videoAspectRatio: screenHeight / screenWidth }, // Target the screen's aspect ratio
+  ]);
 
   const takePicture = async () => {
     if (cameraRef?.current) {
@@ -164,6 +170,14 @@ const ProfileImageCamera = () => {
     }
   };
 
+  // get the aspect ratio of the camera preview container
+  const previewAspectRatio = format?.photoWidth ? format.photoWidth / format.photoHeight : 1;
+  // get the total vertical space not taken by the camera preview container
+  const totalVerticalPadding = screenHeight - screenWidth * previewAspectRatio;
+  // divide the total vertical padding by 2 to get the top and bottom padding
+  const paddingGap = totalVerticalPadding / 2;
+  // the padding gap is the same for the top and bottom because the preview image container is centered vertically
+
   let content = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator color={COLORS.zinc[500]} />
@@ -199,7 +213,7 @@ const ProfileImageCamera = () => {
     content = (
       <GestureHandlerRootView>
         <View style={{ flex: 1, position: "relative" }}>
-          <CameraBackground />
+          <CameraBackground aspectRatio="1:1" />
 
           {/* Top */}
           <CameraHeader
@@ -207,6 +221,8 @@ const ProfileImageCamera = () => {
             toggleFlash={toggleFlash}
             flash={flash}
             toggleCameraFacing={toggleCameraFacing}
+            aspectRatio="1:1"
+            showAspectRatioToggle={false}
           />
 
           {/* Camera Square */}
@@ -224,7 +240,7 @@ const ProfileImageCamera = () => {
             imageChangeLoading={imageChangeLoading}
           />
           {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
-          <View style={[s.cameraContainer, { width: screenWidth, height: screenWidth }]}>
+          <View style={[s.cameraLayout, { top: paddingGap, bottom: paddingGap }]}>
             <GestureDetector gesture={gesture}>
               <Camera
                 style={s.camera}
@@ -233,7 +249,7 @@ const ProfileImageCamera = () => {
                 isActive={isFocused}
                 photo={true}
                 enableZoomGesture={true}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             </GestureDetector>
           </View>
@@ -272,5 +288,12 @@ const s = StyleSheet.create({
   camera: {
     position: "relative",
     flex: 1,
+  },
+  cameraLayout: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    borderRadius: 20,
+    overflow: "hidden",
   },
 });

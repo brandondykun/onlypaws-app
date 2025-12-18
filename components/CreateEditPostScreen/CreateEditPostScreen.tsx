@@ -31,8 +31,8 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostImage, SearchedProfile } from "@/types";
-import { ImageAssetWithTags } from "@/types/post/post";
-import { getImageUri } from "@/utils/utils";
+import { ImageAspectRatio, ImageAssetWithTags } from "@/types/post/post";
+import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
 
 type Props = {
   isEdit: boolean;
@@ -56,6 +56,7 @@ type Props = {
   addTagLoading?: boolean; // For edit mode tag operations
   removeTagLoading?: boolean; // For edit mode tag operations
   removeImageLoading?: boolean; // For edit mode image deletion
+  aspectRatio: ImageAspectRatio;
 };
 
 const CreateEditPostScreen = ({
@@ -80,6 +81,7 @@ const CreateEditPostScreen = ({
   addTagLoading = false,
   removeTagLoading = false,
   removeImageLoading = false,
+  aspectRatio,
 }: Props) => {
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
@@ -189,10 +191,17 @@ const CreateEditPostScreen = ({
         <View style={{ flex: 1, paddingBottom: 24 }}>
           <ImageSwiper
             images={images}
+            aspectRatio={aspectRatio}
             renderItem={({ item }) => {
               const image = item as PostImage | ImageAssetWithTags;
               return (
-                <View style={{ width: screenWidth, height: screenWidth, position: "relative" }}>
+                <View
+                  style={{
+                    width: screenWidth,
+                    height: getImageHeightAspectAware(screenWidth, aspectRatio),
+                    position: "relative",
+                  }}
+                >
                   {images.length > 1 && onRemoveImage ? (
                     <Pressable
                       style={({ pressed }) => [s.removeButton, { opacity: pressed ? 0.7 : 1 }]}
@@ -206,11 +215,18 @@ const CreateEditPostScreen = ({
                   {isPostImage(image) ? (
                     <PostImageWithTags
                       item={image}
+                      aspectRatio={aspectRatio}
                       showTagPopovers={showTagPopovers}
                       setShowTagPopovers={setShowTagPopovers}
+                      handleCoordinatesPress={() => setShowTagPopovers((prev) => !prev)}
                     />
                   ) : (
-                    <ImageLoader uri={getImageUri(image)} height={screenWidth} width={screenWidth} style={s.image} />
+                    <ImageLoader
+                      uri={getImageUri(image)}
+                      width={screenWidth}
+                      height={getImageHeightAspectAware(screenWidth, aspectRatio)}
+                      style={s.image}
+                    />
                   )}
                 </View>
               );
@@ -251,7 +267,13 @@ const CreateEditPostScreen = ({
       ) : (
         // Create mode - show images with tags section and AI section
         <>
-          <ImageSwiper images={images} showTagPopovers={showTagPopovers} setShowTagPopovers={setShowTagPopovers} />
+          <ImageSwiper
+            images={images}
+            showTagPopovers={showTagPopovers}
+            setShowTagPopovers={setShowTagPopovers}
+            aspectRatio={aspectRatio}
+            handleCoordinatesPress={() => setShowTagPopovers((prev) => !prev)}
+          />
           <View style={{ paddingVertical: 16, paddingTop: 0, flex: 1 }}>
             <View style={{ marginBottom: 16 }}>
               <TextInput
@@ -331,6 +353,7 @@ const CreateEditPostScreen = ({
       {/* Tag Images Modal */}
       <TagImagesModal
         images={images}
+        aspectRatio={aspectRatio}
         addTag={addTag}
         removeTag={removeTag}
         visible={tagImagesModalVisible}
@@ -404,7 +427,7 @@ const s = StyleSheet.create({
     right: 12,
     backgroundColor: COLORS.zinc[800],
     borderRadius: 8,
-    zIndex: 10,
+    zIndex: 60,
     justifyContent: "center",
     alignItems: "center",
     padding: 6,

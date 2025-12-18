@@ -6,12 +6,13 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { COLORS } from "@/constants/Colors";
 
 type Props = {
+  postId: number | string;
   showTagPopovers: boolean;
   setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
   onPress?: () => void;
 };
 
-const ShowTagsButton = ({ showTagPopovers, setShowTagPopovers, onPress }: Props) => {
+const ShowTagsButton = ({ postId, showTagPopovers, setShowTagPopovers, onPress }: Props) => {
   const animatedValue = useRef(new Animated.Value(showTagPopovers ? 1 : 0)).current;
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const ShowTagsButton = ({ showTagPopovers, setShowTagPopovers, onPress }: Props)
   return (
     <View style={s.root}>
       <GestureDetector gesture={blockingTapGesture}>
-        <Pressable hitSlop={10}>
+        <Pressable hitSlop={10} testID={`show-tags-button-${postId}`}>
           {({ pressed }) => (
             <Animated.View style={[s.pressable, { backgroundColor }]}>
               <AntDesign name="tag" size={15} color={showTagPopovers ? COLORS.zinc[100] : COLORS.zinc[300]} />

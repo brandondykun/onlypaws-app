@@ -1,24 +1,46 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Dimensions, View, StyleSheet, Pressable, Platform } from "react-native";
+import { View, StyleSheet, Pressable, Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { ImageAspectRatio } from "@/types/post/post";
+
+import AspectRatioToggle from "./AspectRatioToggle";
 
 type Props = {
   handleBackButtonPress: () => void;
   toggleFlash: () => void;
   flash: string;
   toggleCameraFacing: () => void;
+  setAspectRatio?: (aspectRatio: ImageAspectRatio) => void;
+  aspectRatio?: ImageAspectRatio;
+  showAspectRatioToggle?: boolean;
 };
 
-const CameraHeader = ({ handleBackButtonPress, toggleFlash, flash, toggleCameraFacing }: Props) => {
+const CameraHeader = ({
+  handleBackButtonPress,
+  toggleFlash,
+  flash,
+  toggleCameraFacing,
+  setAspectRatio,
+  aspectRatio = "1:1",
+  showAspectRatioToggle = true,
+}: Props) => {
   const { setLightOrDark } = useColorMode();
   const insets = useSafeAreaInsets();
-  const screenHeight = Dimensions.get("window").height;
-  const screenWidth = Dimensions.get("window").width;
+
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
+  let marginTop = Platform.OS === "ios" ? insets.top + 24 : 12 + 24;
+
+  if (!showAspectRatioToggle) {
+    // if the aspect ratio toggle is not shown, we need to add 12px to the margin top
+    // to account for the missing height from the toggle button.
+    marginTop += 12;
+  }
 
   return (
     <View
@@ -29,20 +51,21 @@ const CameraHeader = ({ handleBackButtonPress, toggleFlash, flash, toggleCameraF
         },
       ]}
     >
-      <View style={[s.topIconContainer, { marginTop: Platform.OS === "ios" ? insets.top + 24 : 12 + 24 }]}>
+      <View style={[s.topIconContainer, { marginTop: marginTop }]}>
         <Pressable onPress={handleBackButtonPress} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
-          <AntDesign name="close" size={28} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])} />
+          <AntDesign name="close" size={24} color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[100])} />
         </Pressable>
         <Pressable onPress={toggleFlash} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
           <Ionicons
             name={flash === "on" ? "flash" : "flash-off"}
-            size={24}
-            color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+            size={20}
+            color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[100])}
           />
         </Pressable>
+        {showAspectRatioToggle ? <AspectRatioToggle aspectRatio={aspectRatio} setAspectRatio={setAspectRatio} /> : null}
 
         <Pressable onPress={toggleCameraFacing} hitSlop={10} style={({ pressed }) => [pressed && { opacity: 0.6 }]}>
-          <MaterialIcons name="flip-camera-ios" size={30} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])} />
+          <MaterialIcons name="flip-camera-ios" size={24} color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[100])} />
         </Pressable>
       </View>
     </View>

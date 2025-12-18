@@ -337,6 +337,7 @@ const Post = ({
                 showTagPopovers={showTagPopovers}
                 setShowTagPopovers={setShowTagPopovers}
                 onTagsButtonPress={handleTagsButtonPress}
+                aspectRatio={post.aspect_ratio}
               />
             </View>
           </GestureDetector>

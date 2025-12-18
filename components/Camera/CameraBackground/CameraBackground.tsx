@@ -1,28 +1,59 @@
+import { useEffect } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { getImageHeightAspectAware } from "@/utils/utils";
 
-const CameraBackground = () => {
-  const { setLightOrDark } = useColorMode();
+type Props = {
+  aspectRatio: "1:1" | "4:5";
+};
+
+const CameraBackground = ({ aspectRatio }: Props) => {
+  const { setLightOrDark, isDarkMode } = useColorMode();
   const screenWidth = Dimensions.get("window").width;
+
+  const targetHeight = getImageHeightAspectAware(screenWidth, aspectRatio);
+
+  const animatedHeight = useSharedValue(targetHeight);
+
+  useEffect(() => {
+    animatedHeight.value = withTiming(targetHeight, {
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [targetHeight, animatedHeight]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+  }));
+
+  const overlayBg = {
+    backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+    opacity: isDarkMode ? 0.6 : 0.5,
+  };
 
   return (
     <View style={s.root} pointerEvents="none">
       {/* Top */}
-      <View style={[s.top, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]), opacity: 0.8 }]} />
+      <View style={[s.top, overlayBg]} />
 
       {/* Camera Square */}
-      <View
+      <Animated.View
         style={[
           s.middle,
-          { height: screenWidth, width: screenWidth, borderColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[800]) },
+          animatedStyle,
+          {
+            width: screenWidth,
+            borderColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[800]),
+          },
         ]}
         pointerEvents="none"
-      />
+      ></Animated.View>
 
       {/* Bottom */}
-      <View style={[s.bottom, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]), opacity: 0.8 }]} />
+      <View style={[s.bottom, overlayBg]} />
     </View>
   );
 };

@@ -1,3 +1,5 @@
+import { ImageAspectRatio } from "./types/post/post";
+
 export type Tokens = {
   access: string;
   refresh: string;
@@ -146,6 +148,7 @@ export type Post = {
   likes: PostLike[];
   comments: PostComment[];
   contains_ai: boolean;
+  aspect_ratio: ImageAspectRatio;
 };
 
 export type PostDetailed = {
@@ -164,6 +167,7 @@ export type PostDetailed = {
   is_reported: boolean; // has current profile already reported the post
   contains_ai: boolean;
   tagged_profiles: SearchedProfile[];
+  aspect_ratio: ImageAspectRatio;
 };
 
 // Define the shape of a page in your infinite query

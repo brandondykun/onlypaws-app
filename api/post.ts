@@ -105,9 +105,7 @@ export const createPostImageTag = async (tag: {
   original_height: number;
 }) => {
   const url = `/v1/post/image/tag/`;
-  const data = { ...tag, x_position: tag.x_position.toFixed(2), y_position: tag.y_position.toFixed(2) };
-  console.log("DATA: ", data);
-  return await axiosPost<PostImageTag>(url, data);
+  return await axiosPost<PostImageTag>(url, tag);
 };
 
 export const deletePostImageTag = async (id: number | string) => {

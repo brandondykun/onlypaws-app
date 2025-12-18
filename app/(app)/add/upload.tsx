@@ -10,7 +10,7 @@ import { useAddPostContext } from "@/context/AddPostContext";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { SearchedProfile } from "@/types";
-import { getImageUri } from "@/utils/utils";
+import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
   const router = useRouter();
@@ -32,6 +32,7 @@ const AddPostScreen = () => {
     submitLoading,
     captionError,
     resetState,
+    aspectRatio,
   } = useAddPostContext();
 
   // Handle discard post
@@ -84,17 +85,23 @@ const AddPostScreen = () => {
     formData.append("caption", caption.trim());
     formData.append("profileId", authProfile.id.toString());
     formData.append("aiGenerated", aiGenerated.toString());
+    formData.append("aspectRatio", aspectRatio);
 
     // Format tags as an object with image indices as keys
     const tagsFormatted: { [key: string]: any[] } = {};
+    const imageHeight = Math.round(getImageHeightAspectAware(screenWidth, aspectRatio));
+
     images.forEach((image, index) => {
       if (image.tags && image.tags.length > 0) {
         tagsFormatted[index.toString()] = image.tags.map((tag) => {
+          console.log("TAG: ", tag);
+          console.log("TAG X POSITION: ", tag.x_position);
+          console.log("TAG Y POSITION: ", tag.y_position);
           return {
             taggedProfileId: tag.tagged_profile.id,
-            xPosition: Number(((tag.x_position / screenWidth) * 100).toFixed(2)),
-            yPosition: Number(((tag.y_position / screenWidth) * 100).toFixed(2)),
-            originalHeight: screenWidth,
+            xPosition: parseFloat(tag.x_position.toFixed(2)),
+            yPosition: parseFloat(tag.y_position.toFixed(2)),
+            originalHeight: imageHeight,
             originalWidth: screenWidth,
           };
         });
@@ -167,6 +174,7 @@ const AddPostScreen = () => {
       removeTag={handleRemoveTag}
       handleSubmit={handleCreatePost}
       handleDiscard={handleDiscardPost}
+      aspectRatio={aspectRatio}
     />
   );
 };

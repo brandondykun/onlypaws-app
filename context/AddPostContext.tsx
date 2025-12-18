@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
 
 import { SearchedProfile } from "@/types";
-import { ImageAssetWithTags } from "@/types/post/post";
+import { ImageAssetWithTags, ImageAspectRatio } from "@/types/post/post";
 
 type PostContextType = {
   images: ImageAssetWithTags[];
@@ -17,6 +17,8 @@ type PostContextType = {
   resetState: () => void;
   addTag: (imageId: string, profile: SearchedProfile, xPosition: number, yPosition: number) => void;
   removeTag: (tagId: string) => void;
+  aspectRatio: ImageAspectRatio;
+  setAspectRatio: React.Dispatch<React.SetStateAction<ImageAspectRatio>>;
 };
 
 const AddPostContext = createContext<PostContextType>({
@@ -33,6 +35,8 @@ const AddPostContext = createContext<PostContextType>({
   resetState: () => {},
   addTag: () => {},
   removeTag: () => {},
+  aspectRatio: "1:1",
+  setAspectRatio: () => {},
 });
 
 type Props = {
@@ -46,6 +50,7 @@ type Props = {
 
 const AddPostContextProvider = ({ children }: Props) => {
   const [images, setImages] = useState<ImageAssetWithTags[]>([]);
+  const [aspectRatio, setAspectRatio] = useState<ImageAspectRatio>("1:1");
   const [caption, setCaption] = useState("");
   const [captionError, setCaptionError] = useState("");
   const [aiGenerated, setAiGenerated] = useState(false);
@@ -65,7 +70,6 @@ const AddPostContextProvider = ({ children }: Props) => {
                   tagged_profile: profile,
                   x_position: xPosition,
                   y_position: yPosition,
-                  positioningMode: "pixel",
                   id: `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
                 },
               ],
@@ -105,6 +109,8 @@ const AddPostContextProvider = ({ children }: Props) => {
     resetState,
     addTag,
     removeTag,
+    aspectRatio,
+    setAspectRatio,
   };
 
   return <AddPostContext.Provider value={value}>{children}</AddPostContext.Provider>;

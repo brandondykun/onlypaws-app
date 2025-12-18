@@ -16,7 +16,8 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { SearchedProfile } from "@/types";
 import { PostImage } from "@/types";
-import { ImageAssetWithTags } from "@/types/post/post";
+import { ImageAspectRatio, ImageAssetWithTags } from "@/types/post/post";
+import { getImageHeightAspectAware } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
@@ -32,6 +33,7 @@ type Props = {
   removeTag: (tagId: string) => void;
   visible: boolean;
   setVisible: (visible: boolean) => void;
+  aspectRatio: ImageAspectRatio;
   addTagLoading?: boolean;
   removeTagLoading?: boolean;
 };
@@ -42,12 +44,13 @@ const TagImagesModal = ({
   removeTag,
   visible,
   setVisible,
+  aspectRatio,
   addTagLoading = false,
   removeTagLoading = false,
 }: Props) => {
   const { setLightOrDark } = useColorMode();
 
-  const width = useWindowDimensions().width;
+  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,7 +64,12 @@ const TagImagesModal = ({
 
   const handleProfileSelection = (profile: SearchedProfile) => {
     const currentImage = images[currentIndex];
-    addTag(currentImage.id.toString(), profile, tappedCoordinates?.x || 0, tappedCoordinates?.y || 0);
+    addTag(
+      currentImage.id.toString(),
+      profile,
+      parseFloat(tappedCoordinates?.x.toFixed(2) || "0"),
+      parseFloat(tappedCoordinates?.y.toFixed(2) || "0"),
+    );
     setSearchModalVisible(false);
     setTappedCoordinates(null);
   };
@@ -83,17 +91,27 @@ const TagImagesModal = ({
   const handleCoordinatesPress = (e: GestureResponderEvent) => {
     if (isLoading) return;
 
-    const EDGE_BUFFER = 20;
+    const EDGE_BUFFER = 5;
     const x = e.nativeEvent.locationX;
     const y = e.nativeEvent.locationY;
 
-    // Check if coordinates are too close to any edge
-    if (x < EDGE_BUFFER || x > width - EDGE_BUFFER || y < EDGE_BUFFER || y > width - EDGE_BUFFER) {
+    const imageHeight = Math.round(getImageHeightAspectAware(width, aspectRatio));
+
+    // Check if coordinates are too close to any edge - if so, ignore the tap.
+    // This is to prevent the user from adding a tag too close to the edge of the image
+    // so it isn't cropped out when the image is processed and cropped on the backend.
+    // The buffer gives space so if the crop is not exactly the same as the visible display of the image,
+    // it won't be cropped out.
+    if (x < EDGE_BUFFER || x > width - EDGE_BUFFER || y < EDGE_BUFFER || y > imageHeight - EDGE_BUFFER) {
       console.log("Tag too close to edge, ignoring");
       return;
     }
 
-    setTappedCoordinates({ x, y });
+    // convert the x and y positions to 0-100 percentage with max 2 decimal places
+    const xPosition = Number(((x / width) * 100).toFixed(2));
+    const yPosition = Number(((y / imageHeight) * 100).toFixed(2));
+
+    setTappedCoordinates({ x: xPosition, y: yPosition });
     setSearchModalVisible(true);
   };
 
@@ -126,6 +144,7 @@ const TagImagesModal = ({
           </View>
         </View>
         <ImageSwiper
+          aspectRatio={aspectRatio}
           images={images}
           onIndexChange={setCurrentIndex}
           renderItem={({ item }) => (
@@ -134,6 +153,7 @@ const TagImagesModal = ({
               handleCoordinatesPress={handleCoordinatesPress}
               showTagPopovers={showTagPopovers}
               setShowTagPopovers={setShowTagPopovers}
+              aspectRatio={aspectRatio}
             />
           )}
         />

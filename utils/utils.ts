@@ -4,9 +4,9 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Image } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostImage, ProfileImage, PostImageTag, PaginatedPostsResponse } from "@/types";
+import { PostImage, ProfileImage, PaginatedPostsResponse } from "@/types";
 import { FeedbackTicketType } from "@/types/feedback/feedback";
-import { CreatePostImageTag } from "@/types/post/post";
+import { ImageAspectRatio } from "@/types/post/post";
 
 dayjs.extend(relativeTime);
 
@@ -119,10 +119,6 @@ export const verifyUsername = (username: string) => {
   return null;
 };
 
-export const isCreatePostImageTag = (tag: CreatePostImageTag | PostImageTag): tag is CreatePostImageTag => {
-  return tag.hasOwnProperty("positioningMode");
-};
-
 // get the next page parameter from a paginated response
 export const getNextPageParam = (lastPage: PaginatedPostsResponse) => {
   return lastPage?.next?.split("page=")[1] ?? null;
@@ -131,4 +127,18 @@ export const getNextPageParam = (lastPage: PaginatedPostsResponse) => {
 // convert minutes to milliseconds
 export const minutesToMilliseconds = (minutes: number) => {
   return minutes * 1000 * 60;
+};
+
+export const getImageHeightAspectAware = (screenWidth: number, aspectRatio: ImageAspectRatio) => {
+  if (aspectRatio === "4:5") {
+    return screenWidth + screenWidth / 5;
+  }
+  return screenWidth;
+};
+
+export const getAspectRatioFloat = (aspectRatio: ImageAspectRatio) => {
+  if (aspectRatio === "4:5") {
+    return 0.8;
+  }
+  return 1;
 };

@@ -30,7 +30,6 @@ export type CreatePostImageTag = {
   tagged_profile: SearchedProfile;
   x_position: number;
   y_position: number;
-  positioningMode: "pixel" | "percentage";
   id: string;
 };
 
@@ -55,3 +54,5 @@ export type CropperImageWithTags = CropperImage & {
 export type ImageAssetWithTags = PhotoFileWithTags | ImagePickerAssetWithTags | CropperImageWithTags;
 
 export type ImageAsset = PhotoFile | ImagePickerAsset | CropperImage;
+
+export type ImageAspectRatio = "1:1" | "4:5";

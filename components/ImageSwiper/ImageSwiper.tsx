@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet, useWindowDimensions, GestureResponderEvent } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
@@ -7,7 +7,8 @@ import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostImage } from "@/types";
-import { ImageAsset, ImageAssetWithTags } from "@/types/post/post";
+import { ImageAspectRatio, ImageAsset, ImageAssetWithTags } from "@/types/post/post";
+import { getImageHeightAspectAware } from "@/utils/utils";
 
 import PostImageWithTags from "../PostImageWithTags/PostImageWithTags";
 
@@ -19,6 +20,8 @@ type Props =
       showTagPopovers?: undefined;
       setShowTagPopovers?: undefined;
       onTagsButtonPress?: undefined;
+      aspectRatio?: ImageAspectRatio;
+      handleCoordinatesPress?: (e: GestureResponderEvent) => void;
     }
   | {
       images: PostImage[] | ImageAssetWithTags[];
@@ -27,6 +30,8 @@ type Props =
       showTagPopovers: boolean;
       setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
       onTagsButtonPress?: () => void;
+      aspectRatio?: ImageAspectRatio;
+      handleCoordinatesPress?: (e: GestureResponderEvent) => void;
     };
 
 // Basic pagination example if custom pagination causes issues
@@ -45,11 +50,15 @@ const ImageSwiper = ({
   showTagPopovers,
   setShowTagPopovers,
   onTagsButtonPress,
+  handleCoordinatesPress,
+  aspectRatio = "1:1",
 }: Props) => {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const { setLightOrDark } = useColorMode();
   const width = useWindowDimensions().width;
+
+  const imageHeight = getImageHeightAspectAware(width, aspectRatio);
 
   return (
     <View style={{ width: width }}>
@@ -57,7 +66,7 @@ const ImageSwiper = ({
         key={images[0]?.id}
         ref={ref}
         width={width}
-        height={width}
+        height={imageHeight}
         data={images}
         onProgressChange={progress}
         renderItem={({ item, index }) => {
@@ -68,8 +77,10 @@ const ImageSwiper = ({
             <PostImageWithTags
               item={item}
               showTagPopovers={showTagPopovers}
-              setShowTagPopovers={setShowTagPopovers!}
+              setShowTagPopovers={setShowTagPopovers}
               onTagsButtonPress={onTagsButtonPress}
+              aspectRatio={aspectRatio}
+              handleCoordinatesPress={handleCoordinatesPress ? handleCoordinatesPress : undefined}
             />
           );
         }}

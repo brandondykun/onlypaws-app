@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, View, ActivityIndicator, useWindowDimensions } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Camera, useCameraDevice, useCameraPermission, Point } from "react-native-vision-camera";
+import { Camera, useCameraDevice, useCameraPermission, Point, useCameraFormat } from "react-native-vision-camera";
 import { scheduleOnRN } from "react-native-worklets";
 
 import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
@@ -15,14 +15,16 @@ import NoCameraDevice from "@/components/Camera/NoCameraDevice/NoCameraDevice";
 import RequestCameraPermission from "@/components/Camera/RequestCameraPermission/RequestCameraPermission";
 import { COLORS } from "@/constants/Colors";
 import { useAddPostContext } from "@/context/AddPostContext";
+import { useColorMode } from "@/context/ColorModeContext";
 
 // Max images for a post
 const MAX_IMAGES = 5;
 
 const CameraScreen = () => {
-  const { images, setImages, resetState } = useAddPostContext();
+  const { images, setImages, resetState, setAspectRatio, aspectRatio } = useAddPostContext();
   const { hasPermission, requestPermission } = useCameraPermission();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { setLightOrDark } = useColorMode();
 
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [focusPoint, setFocusPoint] = useState<Point | null>(null);
@@ -32,6 +34,12 @@ const CameraScreen = () => {
   const isFocused = useIsFocused();
   const cameraRef = useRef<Camera>(null!);
   const device = useCameraDevice(facing);
+
+  // Select the desired format
+  const format = useCameraFormat(device, [
+    // Swap width and height because cameras are in landscape orientation
+    { videoAspectRatio: screenHeight / screenWidth }, // Target the screen's aspect ratio
+  ]);
 
   const onNextButtonPress = () => {
     router.push("/(app)/add/editImages");
@@ -136,13 +144,21 @@ const CameraScreen = () => {
     router.back();
   };
 
+  // get the aspect ratio of the camera preview container
+  const previewAspectRatio = format?.photoWidth ? format.photoWidth / format.photoHeight : 1;
+  // get the total vertical space not taken by the camera preview container
+  const totalVerticalPadding = screenHeight - screenWidth * previewAspectRatio;
+  // divide the total vertical padding by 2 to get the top and bottom padding
+  const paddingGap = totalVerticalPadding / 2;
+  // the padding gap is the same for the top and bottom because the preview image container is centered vertically
+
   if (device && hasPermission && isFocused) {
     const maxImagesReached = images.length === MAX_IMAGES;
 
     content = (
       <GestureHandlerRootView>
         <View style={{ flex: 1, position: "relative" }}>
-          <CameraBackground />
+          <CameraBackground aspectRatio={aspectRatio} />
 
           {/* Top */}
           <CameraHeader
@@ -150,6 +166,8 @@ const CameraScreen = () => {
             toggleFlash={toggleFlash}
             flash={flash}
             toggleCameraFacing={toggleCameraFacing}
+            setAspectRatio={setAspectRatio}
+            aspectRatio={aspectRatio}
           />
 
           {/* Camera Square */}
@@ -167,16 +185,17 @@ const CameraScreen = () => {
             imageChangeLoading={imageChangeLoading}
           />
           {focusPoint ? <FocusIcon focusPoint={focusPoint} /> : null}
-          <View style={[s.cameraContainer, { width: screenWidth, height: screenWidth }]}>
+          <View style={[s.cameraLayout, { top: paddingGap, bottom: paddingGap }]}>
             <GestureDetector gesture={gesture}>
               <Camera
                 style={s.camera}
                 ref={cameraRef}
+                format={format}
                 device={device}
                 isActive={isFocused}
                 photo={true}
                 enableZoomGesture={true}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             </GestureDetector>
           </View>
@@ -187,7 +206,9 @@ const CameraScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={s.contentContainer}>{content}</View>
+      <View style={[s.contentContainer, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[950]) }]}>
+        {content}
+      </View>
     </View>
   );
 };
@@ -198,14 +219,20 @@ const s = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: COLORS.zinc[900],
   },
   cameraContainer: {
     flex: 1,
-    borderRadius: 12,
-    overflow: "hidden",
+    position: "relative",
   },
   camera: {
-    position: "relative",
     flex: 1,
+  },
+  cameraLayout: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    borderRadius: 20,
+    overflow: "hidden",
   },
 });

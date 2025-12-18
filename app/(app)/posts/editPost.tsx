@@ -12,7 +12,7 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { PostImage, SearchedProfile } from "@/types";
 import { ImageAssetWithTags } from "@/types/post/post";
-import { getNextPageParam } from "@/utils/utils";
+import { getImageHeightAspectAware, getNextPageParam } from "@/utils/utils";
 
 const EditPost = () => {
   const postId = useLocalSearchParams<{ postId: string }>().postId;
@@ -56,7 +56,7 @@ const EditPost = () => {
     if (!postToEdit) return;
 
     // if no Post changes were made, go back
-    if (caption.trim() === postToEdit.caption) {
+    if (caption.trim() === postToEdit.caption && aiGenerated === postToEdit.contains_ai) {
       router.back();
       return;
     }
@@ -150,14 +150,15 @@ const EditPost = () => {
     if (!postToEdit?.images) return;
 
     setAddTagLoading(true);
+    const imageHeight = Math.round(getImageHeightAspectAware(screenWidth, postToEdit.aspect_ratio));
+
     const { data, error } = await createPostImageTag({
       post_image_id: Number(imageId),
       tagged_profile_id: profile.id,
-      // normalize the x and y positions to 0-100 percentage with max 2 decimal places
-      x_position: Number(((xPosition / screenWidth) * 100).toFixed(2)),
-      y_position: Number(((yPosition / screenWidth) * 100).toFixed(2)),
+      x_position: xPosition,
+      y_position: yPosition,
       original_width: screenWidth,
-      original_height: screenWidth,
+      original_height: imageHeight,
     });
 
     if (data && !error) {
@@ -208,6 +209,7 @@ const EditPost = () => {
       addTagLoading={addTagLoading}
       removeTagLoading={removeTagLoading}
       removeImageLoading={removeImageLoading}
+      aspectRatio={postToEdit.aspect_ratio}
     />
   );
 };

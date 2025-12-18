@@ -6,12 +6,13 @@ import { View, Dimensions, StyleSheet, ScrollView, Pressable, Animated } from "r
 import ImagePicker from "react-native-image-crop-picker";
 
 import Button from "@/components/Button/Button";
+import AspectRatioToggle from "@/components/Camera/CameraHeader/AspectRatioToggle";
 import ReorderImageModal from "@/components/Camera/ReorderImageModal/ReorderImageModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAddPostContext } from "@/context/AddPostContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { getImageUri } from "@/utils/utils";
+import { getImageUri, getImageHeightAspectAware } from "@/utils/utils";
 
 // Animated Image Component with smooth scaling
 const AnimatedImageWithScale = ({ source, style, pressed }: { source: any; style: any; pressed: boolean }) => {
@@ -34,7 +35,7 @@ const AnimatedImageWithScale = ({ source, style, pressed }: { source: any; style
 
 const EditImages = () => {
   const { setLightOrDark } = useColorMode();
-  const { images, setImages } = useAddPostContext();
+  const { images, setImages, aspectRatio, setAspectRatio } = useAddPostContext();
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -61,7 +62,7 @@ const EditImages = () => {
     ImagePicker.openCropper({
       path: currentUri,
       width: 1080,
-      height: 1080,
+      height: aspectRatio === "4:5" ? 1340 : 1080,
       mediaType: "photo",
       compressImageQuality: 1,
     })
@@ -81,6 +82,8 @@ const EditImages = () => {
       });
   };
 
+  const imageHeight = getImageHeightAspectAware(screenWidth, aspectRatio);
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, paddingTop: 16, paddingBottom: 24 }}
@@ -96,7 +99,7 @@ const EditImages = () => {
             contentContainerStyle={{
               paddingHorizontal: 16,
               gap: 12,
-              height: screenWidth * 0.8,
+              height: imageHeight * 0.8,
             }}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -109,7 +112,7 @@ const EditImages = () => {
                     s.imageContainer,
                     {
                       width: screenWidth * 0.8,
-                      height: screenWidth * 0.8,
+                      height: imageHeight * 0.8,
                     },
                   ]}
                   key={image.id}
@@ -125,7 +128,7 @@ const EditImages = () => {
                         style={{
                           borderRadius: 6,
                           width: screenWidth * 0.8,
-                          height: screenWidth * 0.8,
+                          height: imageHeight * 0.8,
                         }}
                         pressed={pressed}
                       />
@@ -142,7 +145,7 @@ const EditImages = () => {
                 s.imageContainer,
                 {
                   width: screenWidth * 0.8,
-                  height: screenWidth * 0.8,
+                  height: imageHeight * 0.8,
                 },
               ]}
               key={images[0].id}
@@ -158,7 +161,7 @@ const EditImages = () => {
                     style={{
                       borderRadius: 6,
                       width: screenWidth * 0.8,
-                      height: screenWidth * 0.8,
+                      height: imageHeight * 0.8,
                     }}
                     pressed={pressed}
                   />
@@ -167,7 +170,18 @@ const EditImages = () => {
             </Pressable>
           </View>
         ) : null}
-        <View style={{ padding: 16, justifyContent: "center", alignItems: "center", paddingTop: 48 }}>
+        <View
+          style={{
+            padding: 16,
+            justifyContent: "center",
+            alignItems: "flex-end",
+            paddingTop: 48,
+            flexDirection: "row",
+            gap: 6,
+            flex: 1,
+            paddingBottom: 48,
+          }}
+        >
           {images.length > 1 ? (
             <Pressable
               onPress={() => setImagePreviewModalVisible(true)}
@@ -188,6 +202,7 @@ const EditImages = () => {
           ) : null}
         </View>
         <View style={s.nextButtonContainer}>
+          <AspectRatioToggle aspectRatio={aspectRatio} setAspectRatio={setAspectRatio} />
           <Button
             text="Next"
             onPress={() => router.push("/(app)/add/upload")}
@@ -239,11 +254,10 @@ const s = StyleSheet.create({
   },
   nextButtonContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "flex-end",
     paddingHorizontal: 24,
     paddingBottom: 24,
-    flex: 1,
   },
   reorderButton: {
     alignItems: "center",

@@ -1,7 +1,7 @@
 import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { Dimensions, ImageStyle, StyleProp, View } from "react-native";
+import { ImageStyle, StyleProp, useWindowDimensions, View } from "react-native";
 
 import PostImageSkeleton from "../LoadingSkeletons/PostImageSkeleton";
 
@@ -15,7 +15,7 @@ type Props = {
 
 const ImageLoader = ({ uri, width, height, setShowTagPopovers, style }: Props) => {
   const [loading, setLoading] = useState(true);
-  const screenWidth = Dimensions.get("window").width;
+  const { width: screenWidth } = useWindowDimensions();
 
   return (
     <View style={{ width: width ? width : screenWidth, height: height ? height : screenWidth, position: "relative" }}>

@@ -1,8 +1,8 @@
-import { Dimensions, GestureResponderEvent, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { GestureResponderEvent, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { PostImage } from "@/types";
-import { ImageAssetWithTags } from "@/types/post/post";
-import { getImageUri } from "@/utils/utils";
+import { ImageAspectRatio, ImageAssetWithTags } from "@/types/post/post";
+import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
 
 import ImageLoader from "../ImageLoader/ImageLoader";
 
@@ -16,6 +16,7 @@ type Props =
       showTagPopovers: boolean;
       setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
       onTagsButtonPress?: () => void;
+      aspectRatio?: ImageAspectRatio;
     }
   | {
       item: PostImage | ImageAssetWithTags;
@@ -23,6 +24,7 @@ type Props =
       showTagPopovers: boolean;
       setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
       onTagsButtonPress?: () => void;
+      aspectRatio?: ImageAspectRatio;
     };
 
 const PostImageWithTags = ({
@@ -31,24 +33,26 @@ const PostImageWithTags = ({
   showTagPopovers,
   setShowTagPopovers,
   onTagsButtonPress,
+  aspectRatio = "1:1",
 }: Props) => {
-  const width = useWindowDimensions().width;
+  const { width } = useWindowDimensions();
   const tagsToDisplay = item.tags;
   const hasTags = tagsToDisplay.length > 0;
 
   if (!handleCoordinatesPress) {
     return (
-      <View style={{ position: "relative" }}>
+      <View style={{ position: "relative", zIndex: 50 }}>
         <ImageLoader
           uri={getImageUri(item)}
-          height={width}
           width={width}
+          height={getImageHeightAspectAware(width, aspectRatio)}
           style={s.image}
           setShowTagPopovers={setShowTagPopovers}
         />
         {hasTags && (
           <>
             <ShowTagsButton
+              postId={item.id}
               showTagPopovers={showTagPopovers}
               setShowTagPopovers={setShowTagPopovers}
               onPress={onTagsButtonPress}
@@ -56,10 +60,10 @@ const PostImageWithTags = ({
             {tagsToDisplay.map((tag) => (
               <PopoverTag
                 key={`${getImageUri(item)}-${tag.tagged_profile.id}`}
-                item={item}
                 tag={tag}
                 visible={showTagPopovers}
                 setVisible={setShowTagPopovers}
+                aspectRatio={aspectRatio}
               />
             ))}
           </>
@@ -72,13 +76,14 @@ const PostImageWithTags = ({
     <Pressable onPress={handleCoordinatesPress} style={{ position: "relative" }}>
       <ImageLoader
         uri={getImageUri(item)}
-        height={width}
         width={width}
+        height={getImageHeightAspectAware(width, aspectRatio)}
         style={s.image}
         setShowTagPopovers={setShowTagPopovers}
       />
       {tagsToDisplay.length > 0 && (
         <ShowTagsButton
+          postId={item.id}
           showTagPopovers={showTagPopovers}
           setShowTagPopovers={setShowTagPopovers}
           onPress={onTagsButtonPress}
@@ -87,10 +92,10 @@ const PostImageWithTags = ({
       {tagsToDisplay.map((tag) => (
         <PopoverTag
           key={`${getImageUri(item)}-${tag.tagged_profile.id}`}
-          item={item}
           tag={tag}
           visible={showTagPopovers}
           setVisible={setShowTagPopovers}
+          aspectRatio={aspectRatio}
         />
       ))}
     </Pressable>
@@ -99,12 +104,8 @@ const PostImageWithTags = ({
 
 export default PostImageWithTags;
 
-const windowWidth = Dimensions.get("window").width;
-
 const s = StyleSheet.create({
   image: {
-    width: windowWidth,
-    height: windowWidth,
     resizeMode: "cover",
   },
 });
