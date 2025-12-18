@@ -42,6 +42,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       return {
         ...oldData,
         is_following: true,
+        followers_count: oldData.followers_count + 1,
       };
     });
     // handle updating the follow/un-follow button in the profile search screen in Explore tab
@@ -65,6 +66,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       return {
         ...oldData,
         is_following: false,
+        followers_count: oldData.followers_count - 1,
       };
     });
     // handle updating the follow/un-follow button in the profile search screen in Explore tab

@@ -129,9 +129,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
         text2: "There was an error unfollowing that account.",
       });
     }
-    setTimeout(() => {
-      setFollowLoading(false);
-    }, 100);
+    setFollowLoading(false);
   };
 
   const handleFollowPress = async (profile: ProfileDetailsType) => {
@@ -146,9 +144,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
         text2: "There was an error following that account.",
       });
     }
-    setTimeout(() => {
-      setFollowLoading(false);
-    }, 100);
+    setFollowLoading(false);
   };
 
   const handleFollowersPress = () => {
