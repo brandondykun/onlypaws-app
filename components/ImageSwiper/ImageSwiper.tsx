@@ -61,7 +61,7 @@ const ImageSwiper = ({
   const imageHeight = getImageHeightAspectAware(width, aspectRatio);
 
   return (
-    <View style={{ width: width }}>
+    <View style={{ width: width }} collapsable={false}>
       <Carousel<PostImage | ImageAssetWithTags>
         key={images[0]?.id}
         ref={ref}

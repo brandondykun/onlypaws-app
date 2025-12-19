@@ -12,13 +12,13 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PaginatedPostCommentsResponse, PostCommentDetailed } from "@/types";
 
-import ReplyComment from "./ReplyComment";
+import FetchRepliesRetry from "./FetchRepliesRetry";
+import HideRepliesButton from "./HideRepliesButton";
 import MainComment from "./MainComment";
 import MainCommentReplyButton from "./MainCommentReplyButton";
+import ReplyComment from "./ReplyComment";
 import ReplyCommentReplyButton from "./ReplyCommentReplyButton";
-import HideRepliesButton from "./HideRepliesButton";
 import ShowRepliesButton from "./ShowRepliesButton";
-import FetchRepliesRetry from "./FetchRepliesRetry";
 
 type Props = {
   comment: PostCommentDetailed;

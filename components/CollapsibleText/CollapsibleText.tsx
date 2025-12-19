@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View, StyleSheet, StyleProp, TextStyle, ViewStyle, Pressable, Animated } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, StyleProp, TextStyle, ViewStyle, Pressable } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 import { COLORS } from "@/constants/Colors";
 
@@ -17,9 +18,9 @@ type Props = {
   expandable?: boolean;
 };
 
-const ANIMATION_DURATION_FAST = 200;
-const ANIMATION_DURATION_MEDIUM = 300;
-const ANIMATION_DURATION_SLOW = 500;
+const ANIMATION_DURATION_FAST = 100;
+const ANIMATION_DURATION_MEDIUM = 200;
+const ANIMATION_DURATION_SLOW = 300;
 
 // Minimum height difference (in pixels) to consider text as truncatable
 const TRUNCATION_THRESHOLD = 2;
@@ -39,10 +40,9 @@ const PostCaption = ({
   const [fullTextHeight, setFullTextHeight] = useState(0);
   const [truncatedTextHeight, setTruncatedTextHeight] = useState(0);
   const [hasInitializedHeight, setHasInitializedHeight] = useState(false);
-  // Controls which text version is visible - swapped at START of animation to prevent text reflow
   const [showFullText, setShowFullText] = useState(false);
 
-  const animatedHeight = useRef(new Animated.Value(0)).current;
+  const animatedHeight = useSharedValue(0);
 
   const onFullTextLayout = (event: any) => {
     const { height } = event.nativeEvent.layout;
@@ -67,7 +67,7 @@ const PostCaption = ({
     if (fullTextHeight > 0 && truncatedTextHeight > 0 && !hasInitializedHeight) {
       const initialHeight = isExpanded ? fullTextHeight : truncatedTextHeight;
 
-      animatedHeight.setValue(initialHeight);
+      animatedHeight.value = initialHeight;
       setHasInitializedHeight(true);
       setShowFullText(isExpanded);
     }
@@ -78,24 +78,27 @@ const PostCaption = ({
     if (!hasInitializedHeight || fullTextHeight === 0 || truncatedTextHeight === 0) return;
 
     const targetHeight = isExpanded ? fullTextHeight : truncatedTextHeight;
+    const duration =
+      fullTextHeight > 300
+        ? ANIMATION_DURATION_SLOW
+        : fullTextHeight > 150
+          ? ANIMATION_DURATION_MEDIUM
+          : ANIMATION_DURATION_FAST;
 
     // Immediately swap the visible text at the START of the animation
-    // This prevents text reflow/jumping during the animation because:
-    // - On expand: full text is shown immediately (clipped by container), then container animates open
-    // - On collapse: truncated text is shown immediately (fits in current height), then container animates closed
     setShowFullText(isExpanded);
 
-    Animated.timing(animatedHeight, {
-      toValue: targetHeight,
-      duration:
-        fullTextHeight > 300
-          ? ANIMATION_DURATION_SLOW
-          : fullTextHeight > 150
-            ? ANIMATION_DURATION_MEDIUM
-            : ANIMATION_DURATION_FAST,
-      useNativeDriver: false,
-    }).start();
+    animatedHeight.value = withTiming(targetHeight, {
+      duration,
+    });
   }, [isExpanded, hasInitializedHeight, fullTextHeight, truncatedTextHeight, animatedHeight]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      height: animatedHeight.value,
+      overflow: "hidden",
+    };
+  });
 
   const toggleExpansion = () => {
     if (expandable && fullTextHeight > truncatedTextHeight + TRUNCATION_THRESHOLD) {
@@ -135,7 +138,7 @@ const PostCaption = ({
 
       {/* Animated container that clips content - height controlled by animation */}
       <Pressable onPress={toggleExpansion} style={s.textTouchable} hitSlop={10}>
-        <Animated.View style={[s.animatedContainer, hasInitializedHeight && { height: animatedHeight }]}>
+        <Animated.View style={[hasInitializedHeight && animatedStyle]}>
           {/* Truncated text - in document flow, visible when collapsed */}
           <Text style={[s.text, textStyle, showFullText && s.hiddenInPlace]} numberOfLines={numberOfLines}>
             {caption}
@@ -145,12 +148,7 @@ const PostCaption = ({
           {showFullText && <Text style={[s.text, s.absoluteText, textStyle]}>{caption}</Text>}
         </Animated.View>
         {showMoreButton && (
-          <Pressable
-            onPress={toggleExpansion}
-            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }, s.moreButton]}
-            hitSlop={10}
-            testID="post-caption-more-button"
-          >
+          <Pressable onPress={toggleExpansion} style={s.moreButton} hitSlop={10} testID="post-caption-more-button">
             <Text style={[s.moreText, isExpanded ? lessTextStyle : moreTextStyle]}>
               {isExpanded ? "show less" : "view more"}
             </Text>
@@ -181,9 +179,6 @@ const s = StyleSheet.create({
   },
   textTouchable: {
     alignSelf: "flex-start",
-  },
-  animatedContainer: {
-    overflow: "hidden",
   },
   text: {
     fontSize: 14,
