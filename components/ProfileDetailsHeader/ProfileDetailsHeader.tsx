@@ -40,7 +40,7 @@ const ProfileDetailsHeader = ({
   const { authProfile } = useAuthProfileContext();
 
   if (profileError) return <ProfileErrorMessage />;
-  if (profileLoading) return <ProfileDetailsHeaderSkeleton showTwoButtons={authProfile.id === profileData?.id} />;
+  if (profileLoading) return <ProfileDetailsHeaderSkeleton />;
 
   return (
     <View style={s.root}>
