@@ -3,12 +3,12 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 
-import ProfileImage from "@/components/ProfileImage/ProfileImage";
-import Text from "@/components/Text/Text";
-import { COLORS } from "@/constants/Colors";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import { DBNotification, WSNotification } from "@/types/notifications/base";
-import { getTimeSince } from "@/utils/utils";
+
+import Description from "./components/Description";
+import ProfileImageAndUsername from "./components/ProfileImageAndUsername";
+import UnreadIndicator from "./components/UnreadIndicator";
 
 type Props = {
   item: DBNotification | WSNotification;
@@ -60,39 +60,22 @@ const NotificationListItem = ({ item, index }: Props) => {
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the comment details
       router.push({ pathname: "/(app)/posts/commentDetails", params: { commentId: item.extra_data.comment_id } });
+    } else if (item.notification_type === "tagged_post") {
+      // Mark the notification as read
+      if (!item.is_read) markAsRead(item.id.toString());
+      // Navigate to the post details
+      router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_id } });
     }
   };
 
   return (
-    <Pressable onPress={handlePress} style={({ pressed }) => [pressed && { opacity: 0.7 }]}>
-      <View style={s.root}>
-        {item.is_read ? null : <View style={s.notificationIndicator} testID={`notification-indicator-${item.id}`} />}
-        <View style={{ flex: 1, overflow: "hidden" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <ProfileImage image={senderImage || null} size={28} />
-            <Text style={{ fontSize: 22, fontWeight: "400" }} numberOfLines={1}>
-              {senderUsername}
-            </Text>
-          </View>
-          <View style={{ gap: 6, flexDirection: "row", alignItems: "flex-end" }}>
-            <View>
-              <Text style={s.title} numberOfLines={1} darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[950]}>
-                {item.title}
-              </Text>
-            </View>
-            <View>
-              <Text darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
-                {getTimeSince(item.created_at)}
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View>
-          {postImagePreview ? (
-            <Image source={{ uri: postImagePreview }} style={{ width: 50, height: 50, borderRadius: 6 }} />
-          ) : null}
-        </View>
+    <Pressable onPress={handlePress} style={({ pressed }) => [pressed && { opacity: 0.7 }, s.root]}>
+      <UnreadIndicator isRead={item.is_read} id={item.id} />
+      <View style={s.imageAndDescriptionContainer}>
+        <ProfileImageAndUsername profileImage={senderImage} username={senderUsername} />
+        <Description title={item.title} createdAt={item.created_at} />
       </View>
+      {postImagePreview && <Image source={{ uri: postImagePreview }} style={s.previewImage} />}
     </Pressable>
   );
 };
@@ -107,19 +90,13 @@ const s = StyleSheet.create({
     gap: 12,
     position: "relative",
   },
-  notificationIndicator: {
-    position: "absolute",
-    top: 13,
-    left: -2,
-    width: 10,
-    height: 10,
-    backgroundColor: COLORS.red[500],
-    borderRadius: 100,
-    zIndex: 10,
+  imageAndDescriptionContainer: {
+    flex: 1,
+    overflow: "hidden",
   },
-  title: {
-    fontSize: 15,
-    fontWeight: "400",
-    wordWrap: "nowrap",
+  previewImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
   },
 });

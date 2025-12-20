@@ -5,10 +5,12 @@ import { DBCommentLikeNotification, WSCommentLikeNotification } from "./comment-
 import { DBCommentReplyNotification, WSCommentReplyNotification } from "./comment-reply";
 import { DBFollowNotification, WSFollowNotification } from "./follow";
 import { DBPostLikeNotification, WSPostLikeNotification } from "./post-like";
+import { DBPostTagNotification, WSPostTagNotification } from "./post-tag";
 
 // Types - matching Django model
 export type NotificationType =
   | "like_post"
+  | "tagged_post"
   | "like_comment"
   | "comment"
   | "comment_reply"
@@ -52,6 +54,7 @@ export interface PaginatedDBNotificationsResponse {
 // the notifications can be of different types, but they will all have the same base fields
 export type DBNotification =
   | DBPostLikeNotification
+  | DBPostTagNotification
   | DBCommentLikeNotification
   | DBFollowNotification
   | DBCommentReplyNotification
@@ -60,6 +63,7 @@ export type DBNotification =
 // Notification from websocket
 export type WSNotification =
   | WSPostLikeNotification
+  | WSPostTagNotification
   | WSCommentLikeNotification
   | WSFollowNotification
   | WSCommentReplyNotification
