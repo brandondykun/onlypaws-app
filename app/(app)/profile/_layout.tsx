@@ -34,6 +34,14 @@ const ProfileStack = () => {
       <Stack.Screen name="feedback/createFeedback" options={{ title: "New Feedback" }} />
       <Stack.Screen name="feedback/index" options={{ title: "Feedback" }} />
       <Stack.Screen name="feedback/[id]" options={{ title: "Details" }} />
+      <Stack.Screen name="qrCode" options={{ title: "Share Code" }} />
+      <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />
+      <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
+      <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen
+        name="taggedPostsList"
+        options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }}
+      />
     </Stack>
   );
 };

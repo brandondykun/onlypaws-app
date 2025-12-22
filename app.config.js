@@ -1,4 +1,5 @@
 const APP_VARIANT = process.env.APP_VARIANT ? process.env.APP_VARIANT : "development";
+const SCHEME = process.env.SCHEME ? process.env.SCHEME : "onlypawsappdev";
 
 // Different app name, bundle identifier (ios) and package (android) are used
 // so different variants of the app can be on the same device simultaneously
@@ -28,7 +29,7 @@ export default {
       resizeMode: "contain",
       backgroundColor: "#f4f4f5",
     },
-    scheme: "myapp",
+    scheme: SCHEME,
     userInterfaceStyle: "automatic",
     ios: {
       supportsTablet: true,
@@ -76,6 +77,7 @@ export default {
           cameraPermissionText: "OnlyPaws needs access to your Camera.",
           enableMicrophonePermission: true,
           microphonePermissionText: "OnlyPaws needs access to your Microphone.",
+          enableCodeScanner: true,
         },
       ],
       [

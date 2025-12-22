@@ -34,6 +34,20 @@ const ProfileScreen = () => {
   // add search button to header
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={() => router.push("/(app)/profile/qrCode")}
+          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingVertical: 8 }]}
+          hitSlop={20}
+          testID="view-qr-code-button"
+        >
+          <MaterialCommunityIcons
+            name="qrcode-scan"
+            size={22}
+            color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[200])}
+          />
+        </Pressable>
+      ),
       headerRight: () => (
         <Pressable
           onPressOut={() => profileOptionsModalRef.current?.present()}
@@ -140,6 +154,7 @@ const ProfileScreen = () => {
         changeProfileModalRef={changeProfileModalRef}
       />
       <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
+      {/* <QrCodeModal visible={qrCodeModalVisible} onClose={handleQrCodeModalClose} /> */}
     </>
   );
 };
