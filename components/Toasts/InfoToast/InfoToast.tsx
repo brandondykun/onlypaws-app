@@ -12,10 +12,11 @@ type Props = {
 
 const DARK_BG_COLOR = COLORS.sky[950];
 const DARK_BORDER_COLOR = COLORS.sky[600];
-const LIGHT_BG_COLOR = COLORS.sky[700];
+const DARK_TEXT_COLOR = COLORS.zinc[100];
+
+const LIGHT_BG_COLOR = COLORS.sky[100];
 const LIGHT_BORDER_COLOR = COLORS.sky[400];
-const ICON_COLOR = COLORS.zinc[100];
-const LIGHT_TEXT_COLOR = COLORS.zinc[100];
+const LIGHT_TEXT_COLOR = COLORS.sky[950];
 
 const InfoToast = ({ text1, text2 }: Props) => {
   const { isDarkMode } = useColorMode();
@@ -26,7 +27,7 @@ const InfoToast = ({ text1, text2 }: Props) => {
         width: "90%",
         backgroundColor: isDarkMode ? DARK_BG_COLOR : LIGHT_BG_COLOR,
         padding: 12,
-        borderRadius: 6,
+        borderRadius: 12,
         borderColor: isDarkMode ? DARK_BORDER_COLOR : LIGHT_BORDER_COLOR,
         borderWidth: 1,
         marginTop: 24,
@@ -35,13 +36,19 @@ const InfoToast = ({ text1, text2 }: Props) => {
       }}
     >
       <View>
-        <Ionicons name="information-circle-outline" size={24} color={ICON_COLOR} />
+        <Ionicons name="information-circle-outline" size={24} color={isDarkMode ? DARK_TEXT_COLOR : LIGHT_TEXT_COLOR} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text lightColor={LIGHT_TEXT_COLOR} style={{ fontSize: 20, marginBottom: 8, fontWeight: "bold" }}>
+        <Text
+          lightColor={LIGHT_TEXT_COLOR}
+          darkColor={DARK_TEXT_COLOR}
+          style={{ fontSize: 20, marginBottom: 8, fontWeight: "bold" }}
+        >
           {text1}
         </Text>
-        <Text lightColor={LIGHT_TEXT_COLOR}>{text2}</Text>
+        <Text lightColor={LIGHT_TEXT_COLOR} darkColor={DARK_TEXT_COLOR}>
+          {text2}
+        </Text>
       </View>
     </View>
   );

@@ -12,10 +12,11 @@ type Props = {
 
 const DARK_BG_COLOR = COLORS.red[950];
 const DARK_BORDER_COLOR = COLORS.red[600];
-const LIGHT_BG_COLOR = COLORS.red[700];
-const LIGHT_BORDER_COLOR = COLORS.red[400];
-const LIGHT_TEXT_COLOR = COLORS.zinc[50];
-const ICON_COLOR = COLORS.zinc[100];
+const DARK_TEXT_COLOR = COLORS.zinc[100];
+
+const LIGHT_BG_COLOR = COLORS.red[100];
+const LIGHT_BORDER_COLOR = COLORS.red[300];
+const LIGHT_TEXT_COLOR = COLORS.red[950];
 
 const ErrorToast = ({ text1, text2 }: Props) => {
   const { isDarkMode } = useColorMode();
@@ -26,7 +27,7 @@ const ErrorToast = ({ text1, text2 }: Props) => {
         width: "90%",
         backgroundColor: isDarkMode ? DARK_BG_COLOR : LIGHT_BG_COLOR,
         padding: 12,
-        borderRadius: 6,
+        borderRadius: 12,
         borderColor: isDarkMode ? DARK_BORDER_COLOR : LIGHT_BORDER_COLOR,
         borderWidth: 1,
         marginTop: 24,
@@ -36,7 +37,7 @@ const ErrorToast = ({ text1, text2 }: Props) => {
       }}
     >
       <View>
-        <MaterialIcons name="error-outline" size={26} color={ICON_COLOR} />
+        <MaterialIcons name="error-outline" size={26} color={isDarkMode ? DARK_TEXT_COLOR : LIGHT_TEXT_COLOR} />
       </View>
       <View style={{ flex: 1 }}>
         <Text lightColor={LIGHT_TEXT_COLOR} style={{ fontSize: 20, marginBottom: 8, fontWeight: "bold" }}>

@@ -12,10 +12,11 @@ type Props = {
 
 const DARK_BG_COLOR = COLORS.lime[950];
 const DARK_BORDER_COLOR = COLORS.lime[600];
-const LIGHT_BG_COLOR = COLORS.lime[700];
+const DARK_ICON_COLOR = COLORS.zinc[100];
+
+const LIGHT_BG_COLOR = COLORS.lime[100];
 const LIGHT_BORDER_COLOR = COLORS.lime[400];
-const ICON_COLOR = COLORS.zinc[100];
-const LIGHT_TEXT_COLOR = COLORS.zinc[100];
+const LIGHT_TEXT_COLOR = COLORS.lime[900];
 
 const SuccessToast = ({ text1, text2 }: Props) => {
   const { isDarkMode } = useColorMode();
@@ -26,7 +27,7 @@ const SuccessToast = ({ text1, text2 }: Props) => {
         width: "90%",
         backgroundColor: isDarkMode ? DARK_BG_COLOR : LIGHT_BG_COLOR,
         padding: 12,
-        borderRadius: 6,
+        borderRadius: 12,
         borderColor: isDarkMode ? DARK_BORDER_COLOR : LIGHT_BORDER_COLOR,
         borderWidth: 1,
         marginTop: 24,
@@ -35,7 +36,7 @@ const SuccessToast = ({ text1, text2 }: Props) => {
       }}
     >
       <View>
-        <Ionicons name="checkmark-circle-outline" size={24} color={ICON_COLOR} />
+        <Ionicons name="checkmark-circle-outline" size={24} color={isDarkMode ? DARK_ICON_COLOR : LIGHT_TEXT_COLOR} />
       </View>
       <View style={{ flex: 1 }}>
         <Text lightColor={LIGHT_TEXT_COLOR} style={{ fontSize: 20, marginBottom: 8, fontWeight: "bold" }}>
