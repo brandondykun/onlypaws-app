@@ -94,6 +94,15 @@ export default {
         },
       ],
       "expo-font",
+      [
+        "expo-media-library",
+        {
+          photosPermission: "Allow OnlyPaws to access your photos.",
+          savePhotosPermission: "Allow OnlyPaws to save photos.",
+          isAccessMediaLocationEnabled: true,
+          granularPermissions: ["audio", "photo"],
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,

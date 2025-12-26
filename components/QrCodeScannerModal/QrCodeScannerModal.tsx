@@ -1,5 +1,5 @@
 import * as Linking from "expo-linking";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useRef, useState, useEffect } from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator, AppState } from "react-native";
 import {
@@ -38,6 +38,7 @@ const QrCodeScannerModal = ({ visible, onClose }: Props) => {
 
   const qrLock = useRef(false);
   const appState = useRef(AppState.currentState);
+  const router = useRouter();
 
   // Get the app's scheme dynamically
   const appScheme = Linking.parse(Linking.createURL("")).scheme;
@@ -62,7 +63,7 @@ const QrCodeScannerModal = ({ visible, onClose }: Props) => {
   }, []);
 
   const codeScanner = useCodeScanner({
-    codeTypes: ["qr", "ean-13"],
+    codeTypes: ["qr"],
     onCodeScanned: (codes) => {
       if (codes.length > 0 && !qrLock.current) {
         setLoading(true);
