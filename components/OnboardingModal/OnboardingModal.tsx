@@ -16,8 +16,7 @@ import Text from "../Text/Text";
 
 /**
  * OnboardingModal - Interactive tour component that guides new users through app features.
- * Uses a dual-wrapper approach for smooth height animations (invisible wrapper measures,
- * visible wrapper displays with animated height).
+ * Displays a modal at the bottom of the screen that guides users through the main app tabs.
  */
 type OnboardingStep = "welcome" | "feed" | "explore" | "addPost" | "posts" | "profile";
 
@@ -34,7 +33,6 @@ const ANIMATION_DURATIONS = {
   fadeOut: 200,
   fadeIn: 300,
   fadeInDelay: 100,
-  height: 600,
   backgroundFade: 500,
   navigationDelay: 200,
   welcomeTransitionDelay: 50,
@@ -50,10 +48,8 @@ type ModalContentProps = {
     closingMessage?: string;
   };
   currentStep: OnboardingStep;
-  isInvisible?: boolean;
-  onClosePress?: () => void;
-  onNextPress?: () => void;
-  buttonDisabled?: boolean;
+  onClosePress: () => void;
+  onNextPress: () => void;
   isTransitioning?: boolean;
   fadeAnim: Animated.Value;
   closeIconColor: string;
@@ -62,25 +58,23 @@ type ModalContentProps = {
 const ModalContent = ({
   content,
   currentStep,
-  isInvisible,
   onClosePress,
   onNextPress,
-  buttonDisabled,
   isTransitioning,
   fadeAnim,
   closeIconColor,
 }: ModalContentProps) => (
-  <BlurView intensity={10} style={s.blurView} testID={!isInvisible ? "onboarding-modal-blur-view" : undefined}>
+  <BlurView intensity={10} style={s.blurView} testID="onboarding-modal-blur-view">
     <Pressable
-      onPress={onClosePress || (() => {})}
-      style={({ pressed }) => [s.closeButton, pressed && !isInvisible && s.closeButtonPressed]}
-      testID={!isInvisible ? "onboarding-modal-close-button" : undefined}
+      onPress={onClosePress}
+      style={({ pressed }) => [s.closeButton, pressed && s.closeButtonPressed]}
+      testID="onboarding-modal-close-button"
     >
       <AntDesign name="close" size={20} color={closeIconColor} />
     </Pressable>
     <View style={s.contentContainer}>
       <View style={s.textContainer}>
-        <Animated.View style={[s.textWrapper, !isInvisible && { opacity: fadeAnim }]}>
+        <Animated.View style={[s.textWrapper, { opacity: fadeAnim }]}>
           <Text style={s.titleText} darkColor={COLORS.sky[500]} lightColor={COLORS.sky[600]}>
             {content.title}
           </Text>
@@ -95,11 +89,11 @@ const ModalContent = ({
         </Animated.View>
       </View>
     </View>
-    <View style={[s.buttonContainer, isInvisible && s.buttonContainerInvisible]}>
+    <View style={s.buttonContainer}>
       <Button
         text={currentStep === "profile" ? "Get Started" : "Next"}
-        onPress={isInvisible ? () => {} : onNextPress}
-        disabled={buttonDisabled || isTransitioning}
+        onPress={onNextPress}
+        disabled={isTransitioning}
       />
     </View>
   </BlurView>
@@ -118,21 +112,6 @@ const OnboardingModal = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const modalFadeAnim = useRef(new Animated.Value(0)).current;
   const backgroundFadeAnim = useRef(new Animated.Value(0)).current;
-  const heightAnim = useRef(new Animated.Value(0)).current; // Starts at 0, set immediately when content is measured
-  const contentHeightRef = useRef<number | null>(null);
-
-  // Animates the modal height to a target value (uses non-native driver)
-  const animateHeight = (toHeight: number) => {
-    return new Promise<void>((resolve) => {
-      Animated.timing(heightAnim, {
-        toValue: toHeight,
-        duration: ANIMATION_DURATIONS.height,
-        useNativeDriver: false, // Height animations don't support native driver
-      }).start(() => {
-        resolve();
-      });
-    });
-  };
 
   // Generic fade animation helper using native driver (for opacity animations)
   const animateFade = (animValue: Animated.Value, toValue: number, duration: number, delay: number = 0) => {
@@ -162,28 +141,6 @@ const OnboardingModal = () => {
     });
   };
 
-  /**
-   * Measures content height from invisible wrapper and animates visible modal to match.
-   * First measurement sets height immediately, subsequent changes animate smoothly.
-   * Uses 1px threshold to prevent unnecessary animations from tiny measurement differences.
-   */
-  const handleContentLayout = (event: any) => {
-    const { height } = event.nativeEvent.layout;
-    if (height <= 0) return;
-
-    if (contentHeightRef.current === null) {
-      // Initial measurement - set immediately without animation
-      contentHeightRef.current = height;
-      heightAnim.setValue(height);
-    } else if (Math.abs(contentHeightRef.current - height) > 1) {
-      // Height changed - animate to new height
-      const previousHeight = contentHeightRef.current;
-      contentHeightRef.current = height;
-      heightAnim.setValue(previousHeight); // Start from previous height
-      animateHeight(height);
-    }
-  };
-
   // Resets modal to initial state and triggers staggered fade-in animations
   const resetModalState = useCallback(() => {
     setVisible(true);
@@ -192,9 +149,6 @@ const OnboardingModal = () => {
     modalFadeAnim.setValue(0);
     backgroundFadeAnim.setValue(0);
     fadeAnim.setValue(1); // Set to 1 immediately - no fade needed since outer modal fades in
-    contentHeightRef.current = null;
-    // Set initial height to 0 to prevent sliding animation - will be set immediately when measured
-    heightAnim.setValue(0);
 
     // Animate background overlay first, then modal content after delay
     animateFade(backgroundFadeAnim, 1, ANIMATION_DURATIONS.initialBackgroundFadeIn);
@@ -204,8 +158,7 @@ const OnboardingModal = () => {
       ANIMATION_DURATIONS.initialModalFadeIn,
       ANIMATION_DURATIONS.initialModalDelay,
     );
-    // Inner content already visible (fadeAnim = 1), no need to animate it on first step
-  }, [backgroundFadeAnim, fadeAnim, heightAnim, modalFadeAnim]);
+  }, [backgroundFadeAnim, fadeAnim, modalFadeAnim]);
 
   // Show modal if user hasn't completed onboarding for their profile type
   useEffect(() => {
@@ -365,13 +318,6 @@ const OnboardingModal = () => {
   const borderColor = setLightOrDark(COLORS.sky[400], COLORS.sky[500]);
   const backgroundOverlayColor = setLightOrDark(`${COLORS.zinc[100]}CC`, `${COLORS.zinc[950]}CC`);
 
-  /**
-   * Dual-wrapper rendering strategy:
-   * - Invisible wrapper: measures content height without constraints (opacity 0, zIndex -1)
-   * - Visible wrapper: displays modal with animated height from measurements
-   *
-   * This approach is needed because React Native can't animate to "auto" height.
-   */
   return (
     <Modal
       visible={visible}
@@ -386,43 +332,26 @@ const OnboardingModal = () => {
           style={[s.backgroundOverlay, { backgroundColor: backgroundOverlayColor, opacity: backgroundFadeAnim }]}
         />
         <View style={s.modalContentWrapper}>
-          {/* Invisible wrapper for height measurement */}
-          <View style={s.invisibleWrapper} onLayout={handleContentLayout}>
+          <Animated.View
+            style={[
+              s.animatedModal,
+              {
+                backgroundColor,
+                borderColor,
+                opacity: modalFadeAnim,
+              },
+            ]}
+          >
             <ModalContent
               content={content}
               currentStep={currentStep}
-              isInvisible={true}
-              buttonDisabled={true}
+              onClosePress={handleClose}
+              onNextPress={handleNext}
               isTransitioning={isTransitioning}
               fadeAnim={fadeAnim}
               closeIconColor={closeIconColor}
             />
-          </View>
-          {/* Visible modal with animated height */}
-          <View style={s.visibleContainer}>
-            {/* Outer Animated.View for height and opacity (non-native driver for height) */}
-            <Animated.View
-              style={[
-                s.animatedModal,
-                {
-                  backgroundColor,
-                  borderColor,
-                  height: heightAnim,
-                  opacity: modalFadeAnim,
-                },
-              ]}
-            >
-              <ModalContent
-                content={content}
-                currentStep={currentStep}
-                onClosePress={handleClose}
-                onNextPress={handleNext}
-                isTransitioning={isTransitioning}
-                fadeAnim={fadeAnim}
-                closeIconColor={closeIconColor}
-              />
-            </Animated.View>
-          </View>
+          </Animated.View>
         </View>
       </View>
     </Modal>
@@ -446,29 +375,11 @@ const s = StyleSheet.create({
   modalContentWrapper: {
     position: "absolute",
     bottom: 100, // Offset for tab bar
-    left: 0,
-    right: 0,
-  },
-  invisibleWrapper: {
-    position: "absolute",
-    opacity: 0, // Hidden but still rendered for measurement
-    zIndex: -1,
-    bottom: 0,
     left: 8,
     right: 8,
-  },
-  visibleContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 8,
-    right: 8,
-    overflow: "hidden",
-    borderRadius: 12,
   },
   animatedModal: {
     borderWidth: 1,
-    gap: 12,
-    position: "relative",
     borderRadius: 12,
     overflow: "hidden",
   },
@@ -476,7 +387,6 @@ const s = StyleSheet.create({
     padding: 24,
     paddingTop: 32, // Extra space for close button
     paddingBottom: 24,
-    flex: 1,
   },
   closeButton: {
     alignSelf: "flex-end",
@@ -489,11 +399,10 @@ const s = StyleSheet.create({
     opacity: 0.6,
   },
   contentContainer: {
-    flex: 1,
+    paddingBottom: 60, // Space for absolutely positioned button
   },
   textContainer: {
     marginBottom: 24,
-    paddingBottom: 60, // Space for button
   },
   textWrapper: {
     gap: 12,
@@ -520,9 +429,5 @@ const s = StyleSheet.create({
     bottom: 24,
     left: 16,
     right: 16,
-  },
-  buttonContainerInvisible: {
-    left: 0,
-    right: 0,
   },
 });
