@@ -11,6 +11,7 @@ import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import AnnouncementsContextProvider from "@/context/AnnouncementsContext";
 import AuthProfileContextProvider from "@/context/AuthProfileContext";
 import AuthProfileFollowersContextProvider from "@/context/AuthProfileFollowersContext";
 import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingContext";
@@ -159,23 +160,25 @@ const TabLayout = () => {
   return (
     <AuthProfileContextProvider>
       <PostsContextProvider>
-        <ExplorePostsContextProvider>
-          <ProfileSearchContextProvider>
-            <AuthProfileFollowingContextProvider>
-              <AuthProfileFollowersContextProvider>
-                <PostManagerContextProvider>
-                  <ProfileDetailsManagerContextProvider>
-                    <NotificationsContextProvider>
-                      <ReportReasonsContextProvider>
-                        <TabsComponent />
-                      </ReportReasonsContextProvider>
-                    </NotificationsContextProvider>
-                  </ProfileDetailsManagerContextProvider>
-                </PostManagerContextProvider>
-              </AuthProfileFollowersContextProvider>
-            </AuthProfileFollowingContextProvider>
-          </ProfileSearchContextProvider>
-        </ExplorePostsContextProvider>
+        <AnnouncementsContextProvider>
+          <ExplorePostsContextProvider>
+            <ProfileSearchContextProvider>
+              <AuthProfileFollowingContextProvider>
+                <AuthProfileFollowersContextProvider>
+                  <PostManagerContextProvider>
+                    <ProfileDetailsManagerContextProvider>
+                      <NotificationsContextProvider>
+                        <ReportReasonsContextProvider>
+                          <TabsComponent />
+                        </ReportReasonsContextProvider>
+                      </NotificationsContextProvider>
+                    </ProfileDetailsManagerContextProvider>
+                  </PostManagerContextProvider>
+                </AuthProfileFollowersContextProvider>
+              </AuthProfileFollowingContextProvider>
+            </ProfileSearchContextProvider>
+          </ExplorePostsContextProvider>
+        </AnnouncementsContextProvider>
       </PostsContextProvider>
     </AuthProfileContextProvider>
   );

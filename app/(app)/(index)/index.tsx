@@ -7,6 +7,7 @@ import { View, RefreshControl, Animated, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getFeedForQuery } from "@/api/post";
+import AnnouncementsHeader from "@/components/AnnouncementsHeader.tsx/AnnouncementsHeader";
 import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
@@ -119,6 +120,7 @@ const FeedScreen = () => {
     <View style={{ flex: 1 }}>
       <FlashList
         data={dataToRender}
+        ListHeaderComponent={<AnnouncementsHeader />}
         showsVerticalScrollIndicator={false}
         refreshing={feedPosts.isRefetching}
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: insets.top + HEADER_HEIGHT - 20 }}

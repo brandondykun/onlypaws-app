@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { ProgressSteps, ProgressStep } from "react-native-progress-steps";
@@ -8,6 +9,7 @@ import Toast from "react-native-toast-message";
 import { createProfile, updateUsername, updateProfile } from "@/api/profile";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import { COLORS } from "@/constants/Colors";
+import { SHOW_WELCOME_ANNOUNCEMENT_KEY } from "@/context/AnnouncementsContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 
@@ -185,6 +187,9 @@ const OnboardingMainScreen = () => {
         name: name,
         profile_type: "regular",
       });
+
+      // Set flag to show welcome announcement on first app entry for new users
+      await SecureStore.setItemAsync(SHOW_WELCOME_ANNOUNCEMENT_KEY, "true");
 
       // Show welcome message first
       setShowWelcome(true);
