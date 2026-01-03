@@ -71,6 +71,11 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
     profileOptionsModalRef.current?.dismiss();
   };
 
+  const handleAppDetailsPress = () => {
+    router.push("/(app)/profile/appDetails");
+    profileOptionsModalRef.current?.dismiss();
+  };
+
   return (
     <BottomSheetModal ref={profileOptionsModalRef} handleTitle="Profile Options" enableDynamicSizing snapPoints={[]}>
       <BottomSheetView style={s.root}>
@@ -119,6 +124,7 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
           </Pressable>
         </View>
         <View style={{ backgroundColor: BUTTON_BG, borderRadius: BORDER_RADIUS }}>
+          {/* Edit Username Button */}
           <Pressable
             style={({ pressed }) => [
               pressed && s.pressed,
@@ -130,6 +136,8 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
             <Text style={s.buttonText}>Edit Username</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
+
+          {/* Edit Profile Button */}
           <Pressable
             style={({ pressed }) => [
               pressed && s.pressed,
@@ -142,6 +150,8 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
             <Text style={s.buttonText}>Edit Profile</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
+
+          {/* Account Options Button */}
           <Pressable
             style={({ pressed }) => [
               pressed && s.pressed,
@@ -153,6 +163,21 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
             <Text style={s.buttonText}>Account Options</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
+
+          {/* App Details Button */}
+          <Pressable
+            style={({ pressed }) => [
+              pressed && s.pressed,
+              s.linkButton,
+              { borderBottomWidth: 1, borderBottomColor: BORDER_COLOR },
+            ]}
+            onPress={handleAppDetailsPress}
+          >
+            <Text style={s.buttonText}>App Details</Text>
+            <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
+          </Pressable>
+
+          {/* App Feedback Button */}
           <Pressable style={({ pressed }) => [pressed && s.pressed, s.linkButton]} onPress={handleAppFeedbackPress}>
             <Text style={s.buttonText}>App Feedback</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />

@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
 import { useCallback, useLayoutEffect, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
-import { ScrollView } from "react-native";
 
 import { getFeedbackTickets } from "@/api/feedback";
 import Button from "@/components/Button/Button";
@@ -100,35 +99,30 @@ const FeedbackScreen = () => {
   // initial fetch complete and data state
   if (initialFetchComplete && !hasInitialFetchError) {
     content = (
-      <View>
-        <FlashList
-          data={data}
-          keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={emptyComponent}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-          onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
-          refreshing={refreshing}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refresh}
-              tintColor={COLORS.zinc[400]}
-              colors={[COLORS.zinc[400]]}
-            />
-          }
-          renderItem={({ item }) => <FeedbackListItem item={item} />}
-          ListFooterComponent={footerComponent}
-        />
-      </View>
+      <FlashList
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={emptyComponent}
+        showsVerticalScrollIndicator={false}
+        onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+        onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
+        refreshing={refreshing}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tintColor={COLORS.zinc[400]}
+            colors={[COLORS.zinc[400]]}
+          />
+        }
+        renderItem={({ item }) => <FeedbackListItem item={item} />}
+        ListFooterComponent={footerComponent}
+        contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
+      />
     );
   }
 
-  return (
-    <ScrollView contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}>
-      <View style={{ flexGrow: 1 }}>{content}</View>
-    </ScrollView>
-  );
+  return <View style={{ flexGrow: 1 }}>{content}</View>;
 };
 
 export default FeedbackScreen;

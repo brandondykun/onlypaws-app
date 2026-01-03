@@ -1,4 +1,6 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import * as Application from "expo-application";
+import * as Device from "expo-device";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
@@ -61,6 +63,13 @@ const CreateFeedbackScreen = () => {
       title,
       description,
       ticket_type: getFeedbackType(feedbackType ? feedbackType?.title : ""),
+      app_version: Application.nativeApplicationVersion ?? undefined,
+      device_info: {
+        device_model: Device.modelName ?? undefined,
+        manufacturer: Device.manufacturer ?? undefined,
+        os_name: Device.osName ?? undefined,
+        os_version: Device.osVersion ?? undefined,
+      },
     });
 
     if (data && !error) {

@@ -43,6 +43,7 @@ const ProfileStack = () => {
         name="taggedPostsList"
         options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }}
       />
+      <Stack.Screen name="appDetails" options={{ title: "App Details" }} />
     </Stack>
   );
 };

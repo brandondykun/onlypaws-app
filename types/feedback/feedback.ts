@@ -4,10 +4,19 @@ export type FeedbackTicketType = "general" | "bug" | "feature";
 export type FeedbackPriorityType = "low" | "medium" | "high" | "critical";
 export type FeedbackStatusType = "open" | "in_progress" | "resolved" | "closed" | "duplicate";
 
+export type DeviceInfo = {
+  device_model?: string;
+  manufacturer?: string;
+  os_name?: string;
+  os_version?: string;
+};
+
 export type CreateFeedbackTicket = {
   title: string;
   description: string;
   ticket_type: FeedbackTicketType;
+  app_version?: string;
+  device_info?: DeviceInfo;
 };
 
 export type FeedbackTicket = {
@@ -36,7 +45,7 @@ export type FeedbackTicketDetailed = {
   created_at: string;
   updated_at: string;
   app_version: string;
-  device_info: string;
+  device_info: DeviceInfo;
   comments: FeedbackTicketComment[];
   comments_count: string;
 };
