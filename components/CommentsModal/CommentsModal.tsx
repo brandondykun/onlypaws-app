@@ -16,7 +16,8 @@ import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { PaginatedPostCommentsResponse, PostCommentDetailed } from "@/types";
+import { PostCommentDetailed } from "@/types";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 import BottomSheetModal, { BottomSheetTextInput } from "../BottomSheet/BottomSheet";
 import { DARK_BORDER_COLOR } from "../BottomSheet/BottomSheet";
@@ -133,7 +134,7 @@ const CommentsModal = forwardRef(
       if (fetchNextUrl) {
         setFetchNextLoading(true);
         setHasFetchNextError(false);
-        const { error, data } = await axiosFetch<PaginatedPostCommentsResponse>(fetchNextUrl);
+        const { error, data } = await axiosFetch<PaginatedResponse<PostCommentDetailed>>(fetchNextUrl);
         if (!error && data) {
           setComments((prev) => [...prev, ...data.results]);
           setFetchNextUrl(data.next);

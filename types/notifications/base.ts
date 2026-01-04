@@ -1,5 +1,7 @@
 import { Profile } from "@/types";
 
+import { PaginatedResponse } from "../shared/pagination";
+
 import { DBCommentNotification, WSCommentNotification } from "./comment";
 import { DBCommentLikeNotification, WSCommentLikeNotification } from "./comment-like";
 import { DBCommentReplyNotification, WSCommentReplyNotification } from "./comment-reply";
@@ -43,12 +45,7 @@ export interface WSBaseNotification {
 }
 
 // Paginated notifications response
-export interface PaginatedDBNotificationsResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: DBNotification[];
-}
+export type PaginatedDBNotificationsResponse = PaginatedResponse<DBNotification>;
 
 // Notification from relational database
 // the notifications can be of different types, but they will all have the same base fields

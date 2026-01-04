@@ -1,13 +1,7 @@
 import { CommentChainResponse } from "@/types/post/post";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
-import {
-  PaginatedPostCommentsResponse,
-  PostCommentDetailed,
-  PostLike,
-  CommentLike,
-  Follow,
-  PaginatedProfileResponse,
-} from "../types";
+import { PostCommentDetailed, PostLike, CommentLike, Follow, FollowProfile } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete } from "./config";
 
@@ -34,12 +28,12 @@ export const addComment = async (
 
 export const getPostComments = async (postId: number) => {
   const url = `/v1/interactions/comment/post/${postId}/list/`;
-  return await axiosFetch<PaginatedPostCommentsResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostCommentDetailed>>(url);
 };
 
 export const getCommentReplies = async (commentId: number) => {
   const url = `/v1/interactions/comment/${commentId}/replies/`;
-  return await axiosFetch<PaginatedPostCommentsResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostCommentDetailed>>(url);
 };
 
 export const getCommentChain = async (commentId: string | number) => {
@@ -69,10 +63,10 @@ export const unfollowProfile = async (profileId: number) => {
 
 export const getFollowers = async (profileId: number) => {
   const url = `/v1/interactions/followers/${profileId}/`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
+  return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
 export const getFollowing = async (profileId: number) => {
   const url = `/v1/interactions/following/${profileId}/`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
+  return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };

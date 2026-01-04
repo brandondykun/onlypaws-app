@@ -50,13 +50,6 @@ export type FeedbackTicketDetailed = {
   comments_count: string;
 };
 
-export type PaginatedFeedbackTicketsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: FeedbackTicket[];
-};
-
 export type FeedbackTicketComment = {
   id: number;
   ticket: number;

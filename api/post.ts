@@ -1,23 +1,17 @@
-import {
-  PaginatedExploreResponse,
-  PaginatedSavedPostsResponse,
-  PostDetailed,
-  SavedPost,
-  PaginatedFeedResponse,
-  PostImageTag,
-  PaginatedPostsResponse,
-} from "../types";
+import { PaginatedResponse } from "@/types/shared/pagination";
+
+import { PostDetailed, SavedPost, PostImageTag } from "../types";
 
 import { axiosFetch, axiosPost, axiosDelete, axiosPatch, axiosInstance } from "./config";
 
 export const getFeed = async () => {
   const url = `/v1/post/feed/`;
-  return await axiosFetch<PaginatedFeedResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getFeedForQuery = async (pageParam: number | string) => {
   const url = `/v1/post/feed/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedPostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const createPost = async (postData: FormData, accessToken: string) => {
@@ -43,12 +37,12 @@ export const deletePost = async (postId: number) => {
 
 export const getSavedPosts = async () => {
   const url = "/v1/post/saved/";
-  return await axiosFetch<PaginatedSavedPostsResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getSavedPostsForQuery = async (pageParam: number | string) => {
   const url = `/v1/post/saved/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedPostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const savePost = async (postId: number, profileId: number) => {
@@ -73,22 +67,22 @@ export const getPostForQuery = async (postId: number | string) => {
 
 export const getExplorePosts = async () => {
   const url = `/v1/post/explore/`;
-  return await axiosFetch<PaginatedExploreResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getExplorePostsForQuery = async (pageParam: number | string) => {
   const url = `/v1/post/explore/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedPostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getSimilarPosts = async (postId: number) => {
   const url = `/v1/post/${postId}/similar/`;
-  return await axiosFetch<PaginatedExploreResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getSimilarPostsForQuery = async (postId: number | string, pageParam: number | string) => {
   const url = `/v1/post/${postId}/similar/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedPostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const deletePostImage = async (id: number | string) => {
@@ -115,5 +109,5 @@ export const deletePostImageTag = async (id: number | string) => {
 
 export const getTaggedPostsForQuery = async (profileId: number | string, pageParam: number | string) => {
   const url = `/v1/profile/${profileId}/tagged/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedPostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };

@@ -1,13 +1,15 @@
 import { AxiosError } from "axios";
 
+import { PaginatedResponse } from "@/types/shared/pagination";
+
 import {
   ProfileDetails,
   ProfileImage,
   Profile,
-  PaginatedSearchedProfileResponse,
   CreateProfileResponse,
-  PaginatedProfileResponse,
-  PaginatedProfilePostsResponse,
+  PostDetailed,
+  SearchedProfile,
+  FollowProfile,
 } from "../types";
 
 import { axiosFetch, axiosPost, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
@@ -24,22 +26,22 @@ export const getProfileDetailsForQuery = async (profileId: number | string) => {
 
 export const getProfilePosts = async (profileId: string | number) => {
   const url = `/v1/profile/${profileId}/posts/`;
-  return await axiosFetch<PaginatedProfilePostsResponse>(url);
+  return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const getProfilePostsForQuery = async (profileId: string | number, pageParam: number | string) => {
   const url = `/v1/profile/${profileId}/posts/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedProfilePostsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
 export const searchProfiles = async (username: string) => {
   const url = `/v1/profile/search/?username=${encodeURIComponent(username)}`;
-  return await axiosFetch<PaginatedSearchedProfileResponse>(url);
+  return await axiosFetch<PaginatedResponse<SearchedProfile>>(url);
 };
 
 export const searchProfilesForQuery = async (username: string, pageParam: number | string) => {
   const url = `/v1/profile/search/?username=${encodeURIComponent(username)}&page=${pageParam}`;
-  return await axiosInstance.get<PaginatedSearchedProfileResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<SearchedProfile>>(url);
 };
 
 export const addProfileImage = async (postData: FormData, accessToken: string) => {
@@ -95,12 +97,12 @@ export const createProfile = async (
 
 export const searchFollowers = async (profileId: number, username: string) => {
   const url = `/v1/profile/${profileId}/followers/?username=${username}`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
+  return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
 export const searchFollowing = async (profileId: number, username: string) => {
   const url = `/v1/profile/${profileId}/following/?username=${username}`;
-  return await axiosFetch<PaginatedProfileResponse>(url);
+  return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
 export const getPetTypeOptions = async () => {

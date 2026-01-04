@@ -1,20 +1,16 @@
-import {
-  FeedbackTicket,
-  CreateFeedbackTicket,
-  FeedbackTicketDetailed,
-  PaginatedFeedbackTicketsResponse,
-} from "@/types/feedback/feedback";
+import { FeedbackTicket, CreateFeedbackTicket, FeedbackTicketDetailed } from "@/types/feedback/feedback";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 import { axiosFetch, axiosPost, axiosInstance } from "./config";
 
 export const getFeedbackTickets = async () => {
   const url = `/v1/feedback/`;
-  return await axiosFetch<PaginatedFeedbackTicketsResponse>(url);
+  return await axiosFetch<PaginatedResponse<FeedbackTicket>>(url);
 };
 
 export const getFeedbackTicketsForQuery = async (pageParam: number | string) => {
   const url = `/v1/feedback/?page=${pageParam}`;
-  return await axiosInstance.get<PaginatedFeedbackTicketsResponse>(url);
+  return await axiosInstance.get<PaginatedResponse<FeedbackTicket>>(url);
 };
 
 export const createFeedbackTicket = async (feedbackTicket: CreateFeedbackTicket) => {

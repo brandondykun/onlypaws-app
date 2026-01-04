@@ -192,69 +192,12 @@ export type ProfileDetails = {
   profile_type: ProfileType;
 };
 
-// Paginated response for posts - can work for any request fetching posts
-export type PaginatedPostsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostDetailed[];
-};
-
-export type PaginatedExploreResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostDetailed[];
-};
-
-export type PaginatedPostCommentsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostCommentDetailed[];
-};
-
-export type PaginatedProfilePostsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostDetailed[];
-};
-
-export type PaginatedSearchedProfileResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: SearchedProfile[];
-};
-
-export type PaginatedFeedResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostDetailed[];
-};
-
-export type PaginatedSavedPostsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PostDetailed[];
-};
-
 export type FollowProfile = {
   id: number;
   username: string;
   about: string;
   image: null | ProfileImage;
   name: string;
-};
-
-export type PaginatedProfileResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: FollowProfile[];
 };
 
 export type Follow = {
@@ -284,13 +227,6 @@ export type ReportReason = {
   id: number;
   name: string;
   description: string;
-};
-
-export type PaginatedReportReasonsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: ReportReason[];
 };
 
 export type CreatePostReportResponse = {

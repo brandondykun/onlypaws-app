@@ -3,10 +3,11 @@ import { debounce, DebouncedFunc } from "lodash";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
-import { searchFollowers } from "@/api/profile";
 import { getFollowers } from "@/api/interactions";
+import { searchFollowers } from "@/api/profile";
 import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
-import { FollowProfile, PaginatedProfileResponse } from "@/types";
+import { FollowProfile } from "@/types";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
@@ -109,7 +110,7 @@ const AuthProfileFollowersContextProvider = ({ children }: Props) => {
     if (searchFetchNextUrl) {
       setSearchFetchNextLoading(true);
       setHasSearchFetchNextError(false);
-      const { error, data: fetchNextData } = await axiosFetch<PaginatedProfileResponse>(searchFetchNextUrl);
+      const { error, data: fetchNextData } = await axiosFetch<PaginatedResponse<FollowProfile>>(searchFetchNextUrl);
       if (!error && fetchNextData) {
         setSearchResults((prev) => [...prev!, ...fetchNextData.results]);
         setSearchFetchNextUrl(fetchNextData.next);

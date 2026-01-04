@@ -10,7 +10,8 @@ import { deleteCommentLike, getCommentReplies, likeComment } from "@/api/interac
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { PaginatedPostCommentsResponse, PostCommentDetailed } from "@/types";
+import { PostCommentDetailed } from "@/types";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 import FetchRepliesRetry from "./FetchRepliesRetry";
 import HideRepliesButton from "./HideRepliesButton";
@@ -116,7 +117,7 @@ const Comment = ({
     if (fetchNextUrl) {
       setFetchNextLoading(true);
       setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedPostCommentsResponse>(fetchNextUrl);
+      const { error, data } = await axiosFetch<PaginatedResponse<PostCommentDetailed>>(fetchNextUrl);
       if (!error && data) {
         handleAddReplies(comment.id, data.results);
         setFetchNextUrl(data.next);

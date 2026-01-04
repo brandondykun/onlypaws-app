@@ -3,7 +3,8 @@ import { createContext, useCallback, useContext, useState } from "react";
 
 import { axiosFetch } from "@/api/config";
 import { searchProfiles } from "@/api/profile";
-import { SearchedProfile, PaginatedSearchedProfileResponse } from "@/types";
+import { SearchedProfile } from "@/types";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 type ProfileSearchContextType = {
   searchText: string;
@@ -86,7 +87,7 @@ const ProfileSearchContextProvider = ({ children }: Props) => {
     if (fetchNextUrl) {
       setFetchNextLoading(true);
       setHasFetchNextError(false);
-      const { error, data: fetchNextData } = await axiosFetch<PaginatedSearchedProfileResponse>(fetchNextUrl);
+      const { error, data: fetchNextData } = await axiosFetch<PaginatedResponse<SearchedProfile>>(fetchNextUrl);
       if (!error && fetchNextData) {
         setData((prev) => [...prev, ...fetchNextData.results]);
         setFetchNextUrl(fetchNextData.next);

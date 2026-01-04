@@ -13,7 +13,8 @@ import Button from "@/components/Button/Button";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import TextInput from "@/components/TextInput/TextInput";
 import { useAuthUserContext } from "@/context/AuthUserContext";
-import { PaginatedFeedbackTicketsResponse } from "@/types/feedback/feedback";
+import { FeedbackTicket } from "@/types/feedback/feedback";
+import { PaginatedResponse } from "@/types/shared/pagination";
 import { getFeedbackType } from "@/utils/utils";
 
 const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
@@ -80,7 +81,7 @@ const CreateFeedbackScreen = () => {
 
     if (data && !error) {
       // Update the feedback tickets query data to include the new feedback ticket
-      queryClient.setQueryData<InfiniteData<PaginatedFeedbackTicketsResponse>>(
+      queryClient.setQueryData<InfiniteData<PaginatedResponse<FeedbackTicket>>>(
         [selectedProfileId, "feedback-tickets"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
