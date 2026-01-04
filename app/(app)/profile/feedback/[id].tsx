@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native";
 
@@ -11,87 +11,80 @@ import FeedbackComment from "@/components/Feedback/FeedbackComment/FeedbackComme
 import FeedbackTypeBubble from "@/components/Feedback/FeedbackTypeBubble/FeedbackTypeBubble";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { FeedbackTicketDetailed } from "@/types/feedback/feedback";
+import { useAuthUserContext } from "@/context/AuthUserContext";
+import { minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { selectedProfileId } = useAuthUserContext();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const [data, setData] = useState<FeedbackTicketDetailed | null>(null);
-  const [hasInitialFetchError, setHasInitialFetchError] = useState(false);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
+  const fetchFeedbackTicket = async () => {
+    const res = await getFeedbackTicket(id);
+    return res.data;
+  };
 
-  const fetchData = useCallback(async () => {
-    try {
-      const { data, error } = await getFeedbackTicket(id);
-      if (data && !error) {
-        setData(data);
-      } else {
-        setHasInitialFetchError(true);
-      }
-    } catch {
-      setHasInitialFetchError(true);
-    } finally {
-      setInitialFetchComplete(true);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const data = useQuery({
+    queryKey: [selectedProfileId, "feedback-ticket", id],
+    queryFn: () => fetchFeedbackTicket(),
+    enabled: !!selectedProfileId,
+    staleTime: minutesToMilliseconds(5),
+  });
 
   // default to loading state
   let content = (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator color={COLORS.zinc[500]} size="small" />
     </View>
   );
 
   // initial fetch error state
-  if (initialFetchComplete && hasInitialFetchError) {
+  if (data.isError) {
     content = (
-      <ErrorMessageWithRefresh refresh={fetchData} errorText="There was an error fetching your feedback details" />
+      <ErrorMessageWithRefresh refresh={data.refetch} errorText="There was an error fetching your feedback details" />
     );
   }
 
   // initial fetch complete and data state
-  if (initialFetchComplete && !hasInitialFetchError && data) {
-    const createdAt = data?.created_at ? new Date(data?.created_at) : null;
-    const commentsCount = parseInt(data?.comments_count);
+  if (!data.isPending && !data.isError && data.data) {
+    const feedbackTicket = data?.data;
+    const commentsCount = parseInt(feedbackTicket?.comments_count);
+    const createdAt = feedbackTicket?.created_at ? new Date(feedbackTicket?.created_at) : null;
+    const createdAtFormatted = createdAt
+      ? createdAt.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "N/A";
+
     content = (
       <View>
         <FeedbackCard style={{ marginBottom: 28 }}>
           <Text numberOfLines={1} style={s.titleText}>
-            {data.title}
+            {feedbackTicket.title}
           </Text>
           <View style={s.feedbackTypeContainer}>
-            <FeedbackTypeBubble ticketType={data.ticket_type} />
+            <FeedbackTypeBubble ticketType={feedbackTicket.ticket_type} />
           </View>
           <Text style={s.description} darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]}>
-            {data.description}
+            {feedbackTicket.description}
           </Text>
           <Text style={s.dateText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-            Submitted on{" "}
-            {createdAt
-              ? createdAt.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              : "N/A"}
+            {`Submitted on ${createdAtFormatted}`}
           </Text>
         </FeedbackCard>
         <View style={s.commentsHeader}>
           <Text style={s.commentsHeaderText}>Developer Comments</Text>
           {commentsCount ? (
             <Text style={s.commentsCount} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-              {data?.comments_count} {parseInt(data?.comments_count) === 1 ? "comment" : "comments"}
+              {commentsCount} {commentsCount === 1 ? "comment" : "comments"}
             </Text>
           ) : null}
         </View>
         <View>
-          {data?.comments && data?.comments.length > 0 ? (
-            data?.comments.map((comment) => {
+          {feedbackTicket?.comments && feedbackTicket?.comments.length > 0 ? (
+            feedbackTicket?.comments.map((comment) => {
               return <FeedbackComment key={comment.id} comment={comment} />;
             })
           ) : (

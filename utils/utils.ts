@@ -4,9 +4,10 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Image } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostImage, ProfileImage, PaginatedPostsResponse } from "@/types";
+import { PostImage, ProfileImage } from "@/types";
 import { FeedbackTicketType } from "@/types/feedback/feedback";
 import { ImageAspectRatio } from "@/types/post/post";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 dayjs.extend(relativeTime);
 
@@ -120,7 +121,7 @@ export const verifyUsername = (username: string) => {
 };
 
 // get the next page parameter from a paginated response
-export const getNextPageParam = (lastPage: PaginatedPostsResponse) => {
+export const getNextPageParam = (lastPage: PaginatedResponse<any>) => {
   return lastPage?.next?.split("page=")[1] ?? null;
 };
 

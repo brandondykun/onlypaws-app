@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { QueryObserverResult } from "@tanstack/react-query";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
@@ -8,7 +9,7 @@ import Button from "../Button/Button";
 import Text from "../Text/Text";
 
 type Props = {
-  refresh: () => Promise<void>;
+  refresh: () => Promise<void> | Promise<QueryObserverResult<any, Error>>;
   errorText: string;
   style?: StyleProp<ViewStyle>;
 };

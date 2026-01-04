@@ -1,11 +1,11 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { FlashList } from "@shopify/flash-list";
-import * as Haptics from "expo-haptics";
-import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
-import { useCallback, useLayoutEffect, useEffect } from "react";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useNavigation, useRouter } from "expo-router";
+import { useLayoutEffect, useMemo, useRef, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
 
-import { getFeedbackTickets } from "@/api/feedback";
+import { getFeedbackTicketsForQuery } from "@/api/feedback";
 import Button from "@/components/Button/Button";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
 import FeedbackListItem from "@/components/Feedback/FeedbackListItem/FeedbackListItem";
@@ -13,45 +13,47 @@ import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { FeedbackTicket } from "@/types/feedback/feedback";
+import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackScreen = () => {
-  const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
+  const { setLightOrDark } = useColorMode();
+
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
-  const { setLightOrDark } = useColorMode();
+  const listRef = useRef<FlashListRef<FeedbackTicket>>(null);
+  const prevItemCount = useRef<number | undefined>(undefined);
 
-  // will be true when the user navigates back to this screen after creating a feedback ticket
-  const { shouldRefresh } = useLocalSearchParams<{ shouldRefresh?: "true" | "false" }>();
+  const fetchFeedbackTickets = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getFeedbackTicketsForQuery(pageParam);
+    return res.data;
+  };
 
-  const initialFetch = useCallback(async () => {
-    const { data, error } = await getFeedbackTickets();
-    return { data, error };
-  }, []);
-
-  const {
-    data,
-    refresh,
-    refreshing,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextLoading,
-    hasFetchNextError,
-  } = usePaginatedFetch<FeedbackTicket>(initialFetch, {
-    onRefresh: () => Haptics.impactAsync(),
-    enabled: !!authProfile?.id,
+  const feedbackTickets = useInfiniteQuery({
+    queryKey: [selectedProfileId, "feedback-tickets"],
+    queryFn: fetchFeedbackTickets,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
+    staleTime: minutesToMilliseconds(5),
   });
 
+  // Get total count from first page (API returns total count)
+  const totalCount = feedbackTickets.data?.pages[0]?.count;
+
+  // Scroll to top only when a new item is added (count increases)
   useEffect(() => {
-    if (shouldRefresh === "true") {
-      refresh();
+    if (prevItemCount.current !== undefined && totalCount !== undefined && totalCount > prevItemCount.current) {
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
     }
-  }, [shouldRefresh, refresh]);
+    if (totalCount !== undefined) {
+      prevItemCount.current = totalCount;
+    }
+  }, [totalCount]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -70,12 +72,16 @@ const FeedbackScreen = () => {
   let content = <ActivityIndicator />;
 
   // initial fetch error state
-  if (initialFetchComplete && hasInitialFetchError) {
+  if (!feedbackTickets.isLoading && feedbackTickets.isError) {
     content = (
-      <ErrorMessageWithRefresh refresh={refresh} errorText="There was an error fetching your feedback tickets" />
+      <ErrorMessageWithRefresh
+        refresh={feedbackTickets.refetch}
+        errorText="There was an error fetching your feedback tickets"
+      />
     );
   }
 
+  // content to be displayed when there are no feedback tickets
   const emptyComponent = (
     <View style={s.emptyComponentContainer}>
       <Text style={s.emptyComponentTitle}>No feedback tickets found</Text>
@@ -86,31 +92,42 @@ const FeedbackScreen = () => {
   );
 
   // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
+  const footerComponent = feedbackTickets.isFetchingNextPage ? (
     <LoadingFooter />
-  ) : hasFetchNextError ? (
+  ) : feedbackTickets.isFetchNextPageError ? (
     <RetryFetchFooter
-      fetchFn={fetchNext}
+      fetchFn={feedbackTickets.fetchNextPage}
       message="Oh no! There was an error fetching more feedback tickets!"
       buttonText="Retry"
     />
   ) : null;
 
+  // Memoize the flattened feedback tickets data
+  const dataToRender = useMemo(() => {
+    return feedbackTickets.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [feedbackTickets.data]);
+
   // initial fetch complete and data state
-  if (initialFetchComplete && !hasInitialFetchError) {
+  if (!feedbackTickets.isLoading && !feedbackTickets.isError) {
     content = (
       <FlashList
-        data={data}
+        ref={listRef}
+        data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
+        extraData={feedbackTickets.dataUpdatedAt}
         ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? () => fetchNext() : null}
-        refreshing={refreshing}
+        onEndReached={
+          !feedbackTickets.isFetchingNextPage && !feedbackTickets.isFetchNextPageError && !feedbackTickets.isError
+            ? () => feedbackTickets.fetchNextPage()
+            : null
+        }
+        refreshing={feedbackTickets.isRefetching}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refresh}
+            refreshing={feedbackTickets.isRefetching}
+            onRefresh={() => feedbackTickets.refetch()}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
           />

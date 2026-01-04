@@ -1,4 +1,5 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import * as Device from "expo-device";
 import { useRouter } from "expo-router";
@@ -11,6 +12,8 @@ import { createFeedbackTicket } from "@/api/feedback";
 import Button from "@/components/Button/Button";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import TextInput from "@/components/TextInput/TextInput";
+import { useAuthUserContext } from "@/context/AuthUserContext";
+import { PaginatedFeedbackTicketsResponse } from "@/types/feedback/feedback";
 import { getFeedbackType } from "@/utils/utils";
 
 const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
@@ -20,8 +23,11 @@ const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
 ];
 
 const CreateFeedbackScreen = () => {
+  const { selectedProfileId } = useAuthUserContext();
+
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
@@ -73,12 +79,29 @@ const CreateFeedbackScreen = () => {
     });
 
     if (data && !error) {
-      router.replace({
-        pathname: "/profile/feedback",
-        params: {
-          refresh: "true",
+      // Update the feedback tickets query data to include the new feedback ticket
+      queryClient.setQueryData<InfiniteData<PaginatedFeedbackTicketsResponse>>(
+        [selectedProfileId, "feedback-tickets"],
+        (oldData) => {
+          if (!oldData?.pages) return oldData;
+
+          const firstPage = oldData.pages[0];
+          const updatedFirstPage = {
+            ...firstPage,
+            count: firstPage?.count + 1,
+            results: [data, ...(firstPage?.results || [])],
+          };
+
+          // Handle infinite query structure
+          return {
+            ...oldData,
+            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
+          };
         },
-      });
+      );
+
+      // Navigate back to the feedback screen
+      router.back();
 
       Toast.show({
         type: "success",
