@@ -36,7 +36,7 @@ const FeedScreen = () => {
     queryKey: [selectedProfileId, "posts", "feed"],
     queryFn: fetchPosts,
     initialPageParam: "1",
-    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
     enabled: !!selectedProfileId,
   });
 
@@ -58,8 +58,8 @@ const FeedScreen = () => {
 
   // interpolated value for scaling the header logo
   const headerLogoScale = scrollY.interpolate({
-    inputRange: [0, insets.top + HEADER_HEIGHT],
-    outputRange: [1, 0.8],
+    inputRange: [-(insets.top + HEADER_HEIGHT + 100), insets.top + HEADER_HEIGHT],
+    outputRange: [2, 0.7],
     extrapolate: "clamp",
   });
 
@@ -117,43 +117,44 @@ const FeedScreen = () => {
   }, [feedPosts.data]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlashList
-        data={dataToRender}
-        ListHeaderComponent={<AnnouncementsHeader />}
-        showsVerticalScrollIndicator={false}
-        refreshing={feedPosts.isRefetching}
-        contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: insets.top + HEADER_HEIGHT - 20 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={feedPosts.isRefetching}
-            onRefresh={feedPosts.refetch}
-            tintColor={COLORS.zinc[400]}
-            colors={[COLORS.zinc[400]]}
-            progressViewOffset={insets.top + HEADER_HEIGHT}
-          />
-        }
-        renderItem={({ item }) => <Post post={item} onProfilePress={handleProfilePress} />}
-        keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
-        onEndReached={
-          !feedPosts.isFetchingNextPage && !feedPosts.isFetching && feedPosts.hasNextPage
-            ? feedPosts.fetchNextPage
-            : null
-        }
-        ListFooterComponent={
-          dataToRender.length > 0 ? (
-            <FlatListLoadingFooter nextUrl={feedPosts.hasNextPage} fetchNextLoading={feedPosts.isFetchingNextPage} />
-          ) : null
-        }
-        ListEmptyComponent={emptyComponent}
-        onScroll={(event) => {
-          const offsetY = event.nativeEvent.contentOffset.y;
-          scrollY.setValue(offsetY);
-        }}
-        scrollEventThrottle={16}
-      />
-    </View>
+    <FlashList
+      data={dataToRender}
+      ListHeaderComponent={<AnnouncementsHeader />}
+      showsVerticalScrollIndicator={false}
+      refreshing={feedPosts.isRefetching}
+      style={{ flex: 1 }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingBottom: tabBarHeight,
+        paddingTop: HEADER_HEIGHT + 20,
+      }}
+      refreshControl={
+        <RefreshControl
+          refreshing={feedPosts.isRefetching}
+          onRefresh={feedPosts.refetch}
+          tintColor={COLORS.zinc[400]}
+          colors={[COLORS.zinc[400]]}
+          progressViewOffset={insets.top + HEADER_HEIGHT + 10}
+        />
+      }
+      renderItem={({ item }) => <Post post={item} onProfilePress={handleProfilePress} />}
+      keyExtractor={(item) => item.id.toString()}
+      onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
+      onEndReached={
+        !feedPosts.isFetchingNextPage && !feedPosts.isFetching && feedPosts.hasNextPage ? feedPosts.fetchNextPage : null
+      }
+      ListFooterComponent={
+        dataToRender.length > 0 ? (
+          <FlatListLoadingFooter nextUrl={feedPosts.hasNextPage} fetchNextLoading={feedPosts.isFetchingNextPage} />
+        ) : null
+      }
+      ListEmptyComponent={emptyComponent}
+      onScroll={(event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        scrollY.setValue(offsetY);
+      }}
+      scrollEventThrottle={16}
+    />
   );
 };
 
@@ -172,9 +173,9 @@ const s = StyleSheet.create({
   emptyComponentContainer: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: "50%",
   },
   emptyComponentText: {
+    marginTop: -100,
     fontSize: 20,
     textAlign: "center",
     paddingHorizontal: 36,
