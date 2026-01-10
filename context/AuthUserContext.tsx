@@ -139,7 +139,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
         if (success && accessToken) {
           const { data: myInfoData, error: myInfoError } = await getMyInfo();
           if (myInfoData && !myInfoError) {
-            authenticate(myInfoData);
+            await authenticate(myInfoData);
             //redirect to app
           }
         } else {

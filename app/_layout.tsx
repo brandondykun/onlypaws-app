@@ -1,5 +1,4 @@
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -66,24 +65,22 @@ const RootLayout = () => {
           <ColorModeContextProvider>
             <AdsConfigProvider>
               <AuthInterceptor>
-                <BottomSheetModalProvider>
-                  <Stack
-                    screenOptions={{
-                      headerStyle: {
-                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                      },
-                      headerShadowVisible: false, // applied here
-                      contentStyle: {
-                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                      },
-                    }}
-                  >
-                    <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
-                    <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
-                    <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
-                  </Stack>
-                  <Toast config={toastConfig} />
-                </BottomSheetModalProvider>
+                <Stack
+                  screenOptions={{
+                    headerStyle: {
+                      backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                    },
+                    headerShadowVisible: false, // applied here
+                    contentStyle: {
+                      backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                    },
+                  }}
+                >
+                  <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
+                  <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
+                  <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
+                </Stack>
+                <Toast config={toastConfig} />
               </AuthInterceptor>
             </AdsConfigProvider>
           </ColorModeContextProvider>

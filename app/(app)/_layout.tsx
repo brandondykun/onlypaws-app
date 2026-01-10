@@ -2,6 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { BlurView } from "expo-blur";
 import { Tabs, Redirect, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -185,27 +186,29 @@ const TabLayout = () => {
 
   return (
     <AuthProfileContextProvider>
-      <PostsContextProvider>
-        <AnnouncementsContextProvider>
-          <ExplorePostsContextProvider>
-            <ProfileSearchContextProvider>
-              <AuthProfileFollowingContextProvider>
-                <AuthProfileFollowersContextProvider>
-                  <PostManagerContextProvider>
-                    <ProfileDetailsManagerContextProvider>
-                      <NotificationsContextProvider>
-                        <ReportReasonsContextProvider>
-                          <TabsComponent />
-                        </ReportReasonsContextProvider>
-                      </NotificationsContextProvider>
-                    </ProfileDetailsManagerContextProvider>
-                  </PostManagerContextProvider>
-                </AuthProfileFollowersContextProvider>
-              </AuthProfileFollowingContextProvider>
-            </ProfileSearchContextProvider>
-          </ExplorePostsContextProvider>
-        </AnnouncementsContextProvider>
-      </PostsContextProvider>
+      <BottomSheetModalProvider>
+        <PostsContextProvider>
+          <AnnouncementsContextProvider>
+            <ExplorePostsContextProvider>
+              <ProfileSearchContextProvider>
+                <AuthProfileFollowingContextProvider>
+                  <AuthProfileFollowersContextProvider>
+                    <PostManagerContextProvider>
+                      <ProfileDetailsManagerContextProvider>
+                        <NotificationsContextProvider>
+                          <ReportReasonsContextProvider>
+                            <TabsComponent />
+                          </ReportReasonsContextProvider>
+                        </NotificationsContextProvider>
+                      </ProfileDetailsManagerContextProvider>
+                    </PostManagerContextProvider>
+                  </AuthProfileFollowersContextProvider>
+                </AuthProfileFollowingContextProvider>
+              </ProfileSearchContextProvider>
+            </ExplorePostsContextProvider>
+          </AnnouncementsContextProvider>
+        </PostsContextProvider>
+      </BottomSheetModalProvider>
     </AuthProfileContextProvider>
   );
 };
