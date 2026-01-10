@@ -23,7 +23,7 @@ type Props = {
   onDismiss?: () => void;
 } & BottomSheetModalProps;
 
-export const DARK_BORDER_COLOR = "#313135";
+export const DARK_BORDER_COLOR = COLORS.zinc[800];
 
 const BottomSheetModal = forwardRef(
   (
@@ -44,7 +44,7 @@ const BottomSheetModal = forwardRef(
         onChange={onChange}
         snapPoints={snapPoints}
         index={0}
-        backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100] }}
+        backgroundStyle={{ backgroundColor: isDarkMode ? COLORS.zinc[925] : COLORS.zinc[300] }}
         enablePanDownToClose={true}
         onDismiss={onDismiss}
         enableHandlePanningGesture={true}
@@ -56,15 +56,7 @@ const BottomSheetModal = forwardRef(
         keyboardBlurBehavior="restore"
         handleComponent={() => {
           return (
-            <View
-              style={{
-                alignItems: "center",
-                borderBottomColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
-                borderBottomWidth: 1,
-                paddingBottom: 8,
-              }}
-              testID="bottom-sheet-handle"
-            >
+            <View style={{ alignItems: "center", paddingBottom: 4 }} testID="bottom-sheet-handle">
               <Octicons name="horizontal-rule" size={30} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[900]} />
               <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "bold", marginTop: -5 }}>
                 {handleTitle}

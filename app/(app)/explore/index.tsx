@@ -58,8 +58,8 @@ const ExploreScreen = () => {
             buttonStyle={[
               s.headerSearchButton,
               {
-                backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]),
-                borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+                backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
+                borderColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
               },
             ]}
             textStyle={s.headerSearchButtonFont}
@@ -160,10 +160,9 @@ const s = StyleSheet.create({
     borderRadius: 100,
     width: "100%",
     borderWidth: 1,
-    flex: 1,
     justifyContent: "flex-start",
     paddingLeft: 16,
-    height: 40,
+    height: 44,
   },
   headerSearchButtonFont: {
     fontSize: 18,

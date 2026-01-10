@@ -1,6 +1,6 @@
-import Feather from "@expo/vector-icons/Feather";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { BlurView } from "expo-blur";
 import { Tabs, Redirect, useSegments } from "expo-router";
@@ -45,8 +45,36 @@ const TabsComponent = () => {
       <Tabs
         backBehavior="history"
         screenOptions={{
-          tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.sky[500]),
-          tabBarInactiveTintColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]),
+          tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
+          tabBarInactiveTintColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[600]),
+          tabBarLabel: ({ focused, children }) => {
+            return (
+              <View style={{ alignItems: "center", gap: 4 }}>
+                <Text
+                  style={{
+                    fontSize: 9,
+                    textTransform: "uppercase",
+                    fontWeight: focused ? "700" : "500",
+                    color: focused
+                      ? setLightOrDark(COLORS.zinc[950], COLORS.zinc[50])
+                      : setLightOrDark(COLORS.zinc[600], COLORS.zinc[500]),
+                  }}
+                >
+                  {children}
+                </Text>
+                {focused ? (
+                  <View
+                    style={{
+                      width: 6,
+                      height: 3,
+                      borderRadius: 5,
+                      backgroundColor: setLightOrDark(COLORS.sky[600], COLORS.sky[500]),
+                    }}
+                  />
+                ) : null}
+              </View>
+            );
+          },
           tabBarStyle: s.tabBarStyle,
           headerShadowVisible: false, // applied here
           tabBarBackground: () => {
@@ -56,7 +84,7 @@ const TabsComponent = () => {
                 <BlurView
                   style={{
                     flex: 1,
-                    backgroundColor: setLightOrDark("#fafafaCC", "#000000CC"),
+                    backgroundColor: setLightOrDark("#e4e4e7CC", `#050506CC`),
                   }}
                   intensity={isDarkMode ? 20 : 10}
                   tint={isDarkMode ? "dark" : "light"}
@@ -79,7 +107,7 @@ const TabsComponent = () => {
           name="(index)"
           options={{
             title: "Feed",
-            tabBarIcon: ({ color, focused }) => <FontAwesome5 name="square-full" size={20} color={color} />,
+            tabBarIcon: ({ color }) => <Octicons name="home-fill" size={20} color={color} />,
             headerShown: false,
           }}
         />
@@ -87,7 +115,7 @@ const TabsComponent = () => {
           name="explore"
           options={{
             title: "Explore",
-            tabBarIcon: ({ color, focused }) => <Feather name="search" size={24} color={color} />,
+            tabBarIcon: ({ color }) => <FontAwesome name="search" size={20} color={color} style={{ marginTop: -2 }} />,
             headerShown: false,
           }}
         />
@@ -95,18 +123,16 @@ const TabsComponent = () => {
           name="add"
           options={{
             title: "Add Post",
-            tabBarIcon: ({ color, focused }) => <Octicons name="diff-added" size={24} color={color} />,
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="camera-enhance" size={24} color={color} />,
             headerShown: false,
-            tabBarStyle: {
-              display: "none",
-            },
+            tabBarStyle: { display: "none" },
           }}
         />
         <Tabs.Screen
           name="posts"
           options={{
             title: "Posts",
-            tabBarIcon: ({ color, focused }) => <MaterialIcons name="grid-on" size={24} color={color} />,
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="camera-burst" size={24} color={color} />,
             headerShown: false,
             tabBarBadge: notificationsCountFormatted,
             tabBarBadgeStyle: { fontSize: 12 },
@@ -117,7 +143,7 @@ const TabsComponent = () => {
           name="profile"
           options={{
             title: "Profile",
-            tabBarIcon: ({ color, focused }) => <MaterialIcons name="person" size={24} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="paw" size={20} color={color} />,
             headerShown: false,
             tabBarStyle: segment[2] === "profileImageCamera" ? { display: "none" } : s.tabBarStyle,
           }}

@@ -82,7 +82,7 @@ const AddProfileScreen = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: tabBarHeight + 36 }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: tabBarHeight + 36 }}
       automaticallyAdjustKeyboardInsets
       showsVerticalScrollIndicator={false}
     >

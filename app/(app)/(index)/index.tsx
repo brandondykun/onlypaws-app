@@ -66,7 +66,7 @@ const FeedScreen = () => {
   // interpolated value for the header border bottom color
   const borderColor = scrollY.interpolate({
     inputRange: [0, insets.top + HEADER_HEIGHT],
-    outputRange: isDarkMode ? [COLORS.zinc[950], COLORS.zinc[900]] : [COLORS.zinc[50], COLORS.zinc[100]],
+    outputRange: isDarkMode ? [COLORS.zinc[950], COLORS.zinc[900]] : [COLORS.zinc[200], COLORS.zinc[300]],
     extrapolate: "clamp",
   });
 
@@ -79,7 +79,7 @@ const FeedScreen = () => {
             {
               height: insets.top + HEADER_HEIGHT,
               transform: [{ translateY: headerTranslateY }],
-              backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+              backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[200],
               borderBottomColor: borderColor,
             },
           ]}

@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { verifyEmail, resendVerifyEmail } from "@/api/auth";
+import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
@@ -76,6 +77,7 @@ const VerifyEmailScreen = () => {
 
   return (
     <SafeAreaView style={s.safeArea}>
+      <SubtleMeshBackground />
       <ScrollView
         contentContainerStyle={s.scrollRoot}
         automaticallyAdjustKeyboardInsets
@@ -139,6 +141,7 @@ export default VerifyEmailScreen;
 const s = StyleSheet.create({
   safeArea: {
     flex: 1,
+    position: "relative",
   },
   scrollRoot: {
     paddingHorizontal: 16,

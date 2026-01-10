@@ -26,10 +26,10 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
   const router = useRouter();
 
   // shared styling values
-  const BUTTON_BG = setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]);
-  const BORDER_COLOR = setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]);
-  const ICON_COLOR = setLightOrDark(COLORS.zinc[900], COLORS.zinc[300]);
-  const BORDER_RADIUS = 12;
+  const BUTTON_BG = setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]);
+  const BORDER_COLOR = setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]);
+  const ICON_COLOR = setLightOrDark(COLORS.zinc[950], COLORS.zinc[300]);
+  const BORDER_RADIUS = 16;
 
   const handleGuidelinesPress = () => {
     router.push("/(app)/profile/guidelines");

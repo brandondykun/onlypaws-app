@@ -55,9 +55,7 @@ const ChangeProfileModal = forwardRef(
           <View
             style={{
               backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
-              borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-              borderRadius: 18,
-              borderWidth: 1,
+              borderRadius: 16,
             }}
           >
             {profileOptions?.map((profile, index) => {

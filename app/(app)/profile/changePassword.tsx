@@ -112,7 +112,7 @@ const ChangePasswordScreen = () => {
           style={{
             gap: 4,
             padding: 16,
-            backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[900]),
+            backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
             borderRadius: 12,
             marginTop: 8,
           }}

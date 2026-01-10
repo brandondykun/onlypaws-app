@@ -99,7 +99,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
           return (
             <Pressable
               onPressOut={() => optionsModalRef.current?.present()}
-              style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
+              style={({ pressed }) => [pressed && { opacity: 0.7 }, { padding: 8 }]}
               hitSlop={20}
               testID="profile-details-menu-button"
             >
@@ -149,14 +149,14 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
 
   const handleFollowersPress = () => {
     // only enabled for logged in user on profile screen
-    if (profileId === authProfile.id) {
+    if (Number(profileId) === authProfile.id) {
       router.push("/(app)/posts/followers");
     }
   };
 
   const handleFollowingPress = () => {
     // only enabled for logged in user on profile screen
-    if (profileId === authProfile.id) {
+    if (Number(profileId) === authProfile.id) {
       router.push("/(app)/posts/following");
     }
   };
@@ -235,7 +235,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         ListHeaderComponentStyle={{
           borderBottomWidth: 1,
-          borderBottomColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200],
+          borderBottomColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
           borderStyle: "solid",
         }}
         ListFooterComponent={footerComponent}
@@ -271,7 +271,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
             style={{
               borderRadius: 8,
               overflow: "hidden",
-              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[50],
             }}
           >
             <Pressable

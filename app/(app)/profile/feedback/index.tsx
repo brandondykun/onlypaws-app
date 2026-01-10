@@ -63,6 +63,7 @@ const FeedbackScreen = () => {
           variant="text"
           onPress={() => router.push("/(app)/profile/feedback/createFeedback")}
           textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }}
+          buttonStyle={{ paddingHorizontal: 8, paddingBottom: 4 }}
         />
       ),
     });

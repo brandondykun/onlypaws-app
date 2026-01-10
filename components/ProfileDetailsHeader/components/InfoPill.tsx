@@ -16,7 +16,7 @@ const InfoPill = ({ text }: Props) => {
       style={[
         s.root,
         {
-          backgroundColor: setLightOrDark(COLORS.sky[100], `${COLORS.sky[950]}b3`),
+          backgroundColor: setLightOrDark(COLORS.sky[200], `${COLORS.sky[950]}b3`),
         },
       ]}
     >

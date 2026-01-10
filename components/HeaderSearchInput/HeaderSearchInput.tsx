@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -21,11 +21,10 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder }
       inputStyle={[
         s.modalSearchInput,
         {
-          backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]),
-          borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
         },
       ]}
-      rootStyle={{ width: Platform.OS === "ios" ? "100%" : "70%", marginTop: Platform.OS === "ios" ? -4 : 4 }}
+      rootStyle={{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 16 }}
       placeholderTextColor={COLORS.zinc[500]}
       value={value}
       onChangeText={onChangeText}
@@ -36,6 +35,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder }
       autoFocus={true}
       autoCorrect={false}
       withClearButton={true}
+      hideErrorAndTextCount={true}
     />
   );
 };
@@ -46,9 +46,10 @@ const s = StyleSheet.create({
   modalSearchInput: {
     borderRadius: 100,
     paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingVertical: 0,
+    paddingTop: 0,
     fontSize: 18,
-    height: 40,
+    height: 44,
     width: "100%",
   },
 });

@@ -7,6 +7,7 @@ import Toast from "react-native-toast-message";
 
 import { login, registerUser } from "@/api/auth";
 import { getMyInfo } from "@/api/auth";
+import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
@@ -115,67 +116,76 @@ const RegisterScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets showsVerticalScrollIndicator={false}>
-      <View style={{ alignItems: "center" }}>
-        <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
-      </View>
-      <View style={s.inputsContainer}>
-        <View style={{ marginBottom: 24 }}>
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            error={emailError}
-            placeholder="youremail@email.com"
-            icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-          />
-          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
-            * Choose an email you can access to verify your account.
-          </Text>
-          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
-            * Your email will not be visible to other users.
-          </Text>
+    <View style={s.root}>
+      <SubtleMeshBackground />
+      <ScrollView
+        contentContainerStyle={s.scrollView}
+        automaticallyAdjustKeyboardInsets
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ alignItems: "center" }}>
+          <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
         </View>
+        <View style={s.inputsContainer}>
+          <View style={{ marginBottom: 24 }}>
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              error={emailError}
+              placeholder="youremail@email.com"
+              icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+            <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+              * Choose an email you can access to verify your account.
+            </Text>
+            <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+              * Your email will not be visible to other users.
+            </Text>
+          </View>
 
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          error={passwordError}
-          placeholder="*********"
-          icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-          autoCapitalize="none"
-          secureTextEntry
-        />
-        <View style={{ marginBottom: 24 }}>
           <TextInput
-            label="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            error={confirmPasswordError}
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            error={passwordError}
             placeholder="*********"
             icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
             secureTextEntry
           />
-          <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
-            * Password must be at least 9 characters.
-          </Text>
+          <View style={{ marginBottom: 24 }}>
+            <TextInput
+              label="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              error={confirmPasswordError}
+              placeholder="*********"
+              icon={
+                <Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />
+              }
+              autoCapitalize="none"
+              secureTextEntry
+            />
+            <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
+              * Password must be at least 9 characters.
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <Button text="Create Account" onPress={handleCreateAccount} loading={submitLoading} />
+        <Button text="Create Account" onPress={handleCreateAccount} loading={submitLoading} />
 
-      <View style={s.helperTextContainer}>
-        <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
-          Already have an account?
-        </Text>
-        <Button text="Log in" variant="text" onPress={() => router.replace("/auth/login")} />
-      </View>
-    </ScrollView>
+        <View style={s.helperTextContainer}>
+          <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
+            Already have an account?
+          </Text>
+          <Button text="Log in" variant="text" onPress={() => router.replace("/auth/login")} />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -183,6 +193,10 @@ export default RegisterScreen;
 
 const s = StyleSheet.create({
   root: {
+    flex: 1,
+    position: "relative",
+  },
+  scrollView: {
     flexGrow: 1,
     padding: 16,
     paddingTop: 72,

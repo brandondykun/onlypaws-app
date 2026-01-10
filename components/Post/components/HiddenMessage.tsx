@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import Button from "@/components/Button/Button";
+import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -31,7 +32,7 @@ const HiddenMessage = ({ isHidden, profileId, postId, isReported, onToggleHidden
         testID={`post-${postId}-hidden-view`}
       >
         <Ionicons name="eye-off" size={42} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[700]} />
-        <Text style={s.reportedText}>
+        <Text style={s.reportedText} lightColor={COLORS.zinc[700]} darkColor={COLORS.zinc[500]}>
           {(isReported ? "You reported this post, " : "This post has been reported, ") + "so we hid it for you."}
         </Text>
         <Button
@@ -51,7 +52,7 @@ const HiddenMessage = ({ isHidden, profileId, postId, isReported, onToggleHidden
       <View style={[s.reportedMessage, { backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[50] }]}>
         <Ionicons name="alert-circle-outline" size={14} color={isDarkMode ? COLORS.red[600] : COLORS.red[500]} />
         <Text style={{ color: isDarkMode ? COLORS.red[600] : COLORS.red[500], fontSize: 15 }}>
-          This post has been reported.
+          This post has been reported
         </Text>
         <Ionicons name="alert-circle-outline" size={14} color={isDarkMode ? COLORS.red[600] : COLORS.red[500]} />
       </View>

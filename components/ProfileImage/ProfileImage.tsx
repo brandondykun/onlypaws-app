@@ -44,7 +44,7 @@ const ProfileImage = ({ image, iconSize, size }: Props) => {
       ) : (
         <View
           style={{
-            backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300],
+            backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[50],
             height: imageSize,
             width: imageSize,
             borderRadius: imageSize,

@@ -17,13 +17,13 @@ const ReplyButton = ({ onReplyPress }: Props) => {
         s.replyButton,
         pressed && { opacity: 0.6 },
         {
-          backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
+          backgroundColor: isDarkMode ? COLORS.zinc[800] : `${COLORS.zinc[100]}80`,
         },
       ]}
       onPress={onReplyPress}
       hitSlop={8}
     >
-      <Text lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[400]} style={s.replyButtonText}>
+      <Text lightColor={COLORS.zinc[700]} darkColor={COLORS.zinc[400]} style={s.replyButtonText}>
         Reply
       </Text>
     </Pressable>

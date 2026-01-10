@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { login, getMyInfo } from "@/api/auth";
+import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
@@ -92,53 +93,58 @@ const LoginScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root}>
-      <View style={{ flex: 1 }}>
-        <View style={{ alignItems: "center", marginBottom: 24 }}>
-          <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
-        </View>
-        <View style={s.icon}>
-          <PawLogo mode={isDarkMode ? "dark" : "light"} height={100} width={100} />
-        </View>
+    <View style={s.root}>
+      <SubtleMeshBackground />
+      <ScrollView contentContainerStyle={s.scrollView}>
+        <View style={{ flex: 1 }}>
+          <View style={{ alignItems: "center", marginBottom: 24 }}>
+            <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
+          </View>
+          <View style={s.icon}>
+            <PawLogo mode={isDarkMode ? "dark" : "light"} height={100} width={100} />
+          </View>
 
-        <View style={s.inputsContainer}>
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            error={emailError}
-            placeholder="youremail@email.com"
-            icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-          />
-          <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            error={passwordError}
-            placeholder="*********"
-            icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            secureTextEntry
-            testID="login-password"
-          />
-        </View>
+          <View style={s.inputsContainer}>
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              error={emailError}
+              placeholder="youremail@email.com"
+              icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              error={passwordError}
+              placeholder="*********"
+              icon={
+                <Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />
+              }
+              autoCapitalize="none"
+              secureTextEntry
+              testID="login-password"
+            />
+          </View>
 
-        <Button text="Log In" onPress={handleLogin} loading={loginLoading} testID="login-button" />
+          <Button text="Log In" onPress={handleLogin} loading={loginLoading} testID="login-button" />
 
-        <View style={s.helperTextContainer}>
-          <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
-            Don't have an account?
-          </Text>
-          <Button text="Register" variant="text" onPress={() => router.replace("/auth/register")} />
+          <View style={s.helperTextContainer}>
+            <Text darkColor={COLORS.zinc[400]} style={{ fontSize: 18 }}>
+              Don't have an account?
+            </Text>
+            <Button text="Register" variant="text" onPress={() => router.replace("/auth/register")} />
+          </View>
+          <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
+            <Button text="Reset Password" variant="text" onPress={() => router.push("/auth/forgotPassword")} />
+          </View>
         </View>
-        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
-          <Button text="Reset Password" variant="text" onPress={() => router.push("/auth/forgotPassword")} />
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -146,6 +152,10 @@ export default LoginScreen;
 
 const s = StyleSheet.create({
   root: {
+    flex: 1,
+    position: "relative",
+  },
+  scrollView: {
     flexGrow: 1,
     padding: 16,
     paddingTop: 96,

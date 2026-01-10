@@ -14,7 +14,7 @@ const FeedbackCard = ({ children, style, ...rest }: Props) => {
   return (
     <View
       style={{
-        backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]),
+        backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
         borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
         padding: 16,
         borderRadius: 12,

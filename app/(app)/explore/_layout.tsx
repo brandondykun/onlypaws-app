@@ -13,14 +13,11 @@ const ExploreStack = () => {
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
-        },
-        headerTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
-        contentStyle: {
-          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
-        },
+        headerStyle: { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[950]) },
+        headerTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[200]),
+        contentStyle: { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[950]) },
         headerShadowVisible: false,
+        headerBackButtonDisplayMode: "minimal",
       }}
     >
       <Stack.Screen name="index" options={{ title: "Explore" }} />
@@ -30,7 +27,7 @@ const ExploreStack = () => {
           title: "Search",
           headerTitle: () => {
             return (
-              <View style={{ width: "100%" }}>
+              <View style={{ width: "100%", alignItems: "center" }}>
                 <HeaderSearchInput
                   value={search.searchText}
                   onChangeText={search.setSearchText}
@@ -45,11 +42,8 @@ const ExploreStack = () => {
       <Stack.Screen name="list" options={{ title: "Posts" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile" }} />
       <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
-      <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }} />
-      <Stack.Screen
-        name="taggedPostsList"
-        options={{ title: "Tagged Posts", headerBackButtonDisplayMode: "minimal" }}
-      />
+      <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts" }} />
+      <Stack.Screen name="taggedPostsList" options={{ title: "Tagged Posts" }} />
     </Stack>
   );
 };

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { resetPassword } from "@/api/auth";
+import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
@@ -107,65 +108,76 @@ const ResetPasswordScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root} automaticallyAdjustKeyboardInsets showsVerticalScrollIndicator={false}>
-      <View style={{ flex: 1 }}>
-        <View style={{ alignItems: "center", marginBottom: 8 }}>
-          <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
-        </View>
-        <Text
-          darkColor={COLORS.zinc[300]}
-          lightColor={COLORS.zinc[700]}
-          style={{ fontSize: 20, textAlign: "center", fontWeight: "300", marginBottom: 24 }}
-        >
-          We sent a confirmation code to {email}
-        </Text>
-        <Text
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[700]}
-          style={{ fontSize: 16, textAlign: "center", fontWeight: "300" }}
-        >
-          Please enter the confirmation code.
-        </Text>
-        <View style={s.inputsContainer}>
-          <View style={{ marginBottom: 24 }}>
-            <OtpInput
-              ref={otpInputRef}
-              setOtpCode={(val) => {
-                setConfirmationCodeError("");
-                setConfirmationCode(val);
-              }}
-              error={confirmationCodeError}
+    <View style={s.root}>
+      <SubtleMeshBackground />
+      <ScrollView
+        contentContainerStyle={s.scrollView}
+        automaticallyAdjustKeyboardInsets
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ flex: 1 }}>
+          <View style={{ alignItems: "center", marginBottom: 8 }}>
+            <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
+          </View>
+          <Text
+            darkColor={COLORS.zinc[300]}
+            lightColor={COLORS.zinc[700]}
+            style={{ fontSize: 20, textAlign: "center", fontWeight: "300", marginBottom: 24 }}
+          >
+            We sent a confirmation code to {email}
+          </Text>
+          <Text
+            darkColor={COLORS.zinc[400]}
+            lightColor={COLORS.zinc[700]}
+            style={{ fontSize: 16, textAlign: "center", fontWeight: "300" }}
+          >
+            Please enter the confirmation code.
+          </Text>
+          <View style={s.inputsContainer}>
+            <View style={{ marginBottom: 24 }}>
+              <OtpInput
+                ref={otpInputRef}
+                setOtpCode={(val) => {
+                  setConfirmationCodeError("");
+                  setConfirmationCode(val);
+                }}
+                error={confirmationCodeError}
+              />
+            </View>
+            <TextInput
+              label="New Password"
+              value={newPassword}
+              onChangeText={setNewPassword}
+              error={newPasswordError}
+              placeholder="newPassword123!"
+              icon={
+                <Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />
+              }
+              autoCapitalize="none"
+              secureTextEntry
+            />
+            <TextInput
+              label="Confirm New Password"
+              value={confirmNewPassword}
+              onChangeText={setConfirmNewPassword}
+              error={confirmNewPasswordError}
+              placeholder="newPassword123!"
+              icon={
+                <Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />
+              }
+              autoCapitalize="none"
+              secureTextEntry
             />
           </View>
-          <TextInput
-            label="New Password"
-            value={newPassword}
-            onChangeText={setNewPassword}
-            error={newPasswordError}
-            placeholder="newPassword123!"
-            icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            secureTextEntry
-          />
-          <TextInput
-            label="Confirm New Password"
-            value={confirmNewPassword}
-            onChangeText={setConfirmNewPassword}
-            error={confirmNewPasswordError}
-            placeholder="newPassword123!"
-            icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            secureTextEntry
-          />
-        </View>
 
-        <Button text="Submit" onPress={handleSubmit} loading={loading} testID="reset-password-button" />
+          <Button text="Submit" onPress={handleSubmit} loading={loading} testID="reset-password-button" />
 
-        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
-          <Button text="Back" variant="text" onPress={() => router.back()} />
+          <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
+            <Button text="Back" variant="text" onPress={() => router.back()} />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -173,6 +185,10 @@ export default ResetPasswordScreen;
 
 const s = StyleSheet.create({
   root: {
+    flex: 1,
+    position: "relative",
+  },
+  scrollView: {
     flexGrow: 1,
     padding: 16,
     paddingTop: 96,

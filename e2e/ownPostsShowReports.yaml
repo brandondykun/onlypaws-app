@@ -17,7 +17,7 @@ appId: com.bdykun.onlypawsapp.dev
     id: "post-tile-pressable-55"
 
 # post should show message that it has been reported
-- assertVisible: "This post has been reported."
+- assertVisible: "This post has been reported"
 - tapOn:
     id: "post-menu-button-55"
 

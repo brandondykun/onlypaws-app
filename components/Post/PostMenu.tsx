@@ -210,9 +210,9 @@ const PostMenu = forwardRef(
             ) : null}
             <View
               style={{
-                borderRadius: 8,
+                borderRadius: 16,
                 overflow: "hidden",
-                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300],
+                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[100],
               }}
             >
               {postProfileId === authProfile.id ? (
@@ -229,7 +229,7 @@ const PostMenu = forwardRef(
                     <View
                       style={[
                         s.profileOption,
-                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300] },
                       ]}
                     >
                       <Text style={{ textAlign: "center", fontSize: 18 }}>Edit Post</Text>
@@ -261,7 +261,7 @@ const PostMenu = forwardRef(
                     <View
                       style={[
                         s.profileOption,
-                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300] },
                       ]}
                     >
                       <Text style={{ textAlign: "center", fontSize: 18 }}>View Profile</Text>
@@ -281,7 +281,7 @@ const PostMenu = forwardRef(
                     <View
                       style={[
                         s.profileOption,
-                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                        { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300] },
                       ]}
                     >
                       <Text
@@ -305,7 +305,7 @@ const PostMenu = forwardRef(
                       <View
                         style={[
                           s.profileOption,
-                          { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400] },
+                          { borderBottomWidth: 1, borderBottomColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[300] },
                         ]}
                       >
                         <Text style={{ textAlign: "center", fontSize: 18 }}>

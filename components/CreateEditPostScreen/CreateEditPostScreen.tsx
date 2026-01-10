@@ -109,9 +109,17 @@ const CreateEditPostScreen = ({
             onPress={handleSubmit}
             loading={submitLoading || removeImageLoading || addTagLoading || removeTagLoading}
             textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]), fontWeight: "500" }}
+            buttonStyle={{ paddingHorizontal: 8, paddingBottom: 4 }}
           />
         ),
-        headerLeft: () => <Button text={discardButtonText} variant="text" onPress={handleDiscard} />,
+        headerLeft: () => (
+          <Button
+            text={discardButtonText}
+            variant="text"
+            onPress={handleDiscard}
+            buttonStyle={{ paddingHorizontal: 8, paddingBottom: 4 }}
+          />
+        ),
         animation: "fade",
       });
     } else {
@@ -122,6 +130,7 @@ const CreateEditPostScreen = ({
             variant="text"
             text={discardButtonText}
             disabled={submitLoading}
+            buttonStyle={{ paddingHorizontal: 8, paddingBottom: 4 }}
           />
         ),
       });

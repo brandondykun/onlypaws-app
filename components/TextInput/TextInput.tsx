@@ -31,6 +31,7 @@ type Props = {
   rootStyle?: StyleProp<ViewStyle>;
   focusedBorderColor?: string;
   charCountPaddingRight?: number;
+  hideErrorAndTextCount?: boolean;
 } & TextInputProps;
 
 const TextInput = forwardRef(
@@ -49,6 +50,7 @@ const TextInput = forwardRef(
       focusedBorderColor,
       charCountPaddingRight = 0,
       withClearButton = false,
+      hideErrorAndTextCount = false,
       ...rest
     }: Props,
     ref: ForwardedRef<RNTextInput>,
@@ -172,7 +174,7 @@ const TextInput = forwardRef(
               s.input,
               {
                 color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
-                backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+                backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
                 borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
               },
               error ? { borderColor: COLORS.red[600] } : null,
@@ -207,7 +209,7 @@ const TextInput = forwardRef(
           ) : null}
         </View>
 
-        <View style={s.errorAndTextCountContainer}>
+        <View style={{ ...s.errorAndTextCountContainer, height: hideErrorAndTextCount ? 0 : 18 }}>
           <Text style={s.errorText}>{error}</Text>
           {showCharCount ? (
             <Text
@@ -263,7 +265,6 @@ const s = StyleSheet.create({
     borderColor: COLORS.red[600],
   },
   errorAndTextCountContainer: {
-    height: 18,
     flexDirection: "row",
     justifyContent: "space-between",
   },

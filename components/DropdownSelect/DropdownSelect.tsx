@@ -30,7 +30,7 @@ const DropdownSelect = forwardRef(
             style={[
               s.label,
               {
-                backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]),
+                backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[950]),
                 color: setLightOrDark(COLORS.zinc[500], COLORS.zinc[400]),
               },
             ]}
@@ -47,7 +47,7 @@ const DropdownSelect = forwardRef(
                 style={[
                   s.dropdownButtonStyle,
                   {
-                    backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+                    backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
                     borderColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
                   },
                 ]}

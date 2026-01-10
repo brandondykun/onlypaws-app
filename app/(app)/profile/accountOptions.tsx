@@ -19,21 +19,15 @@ const AccountOptions = () => {
 
   return (
     <ScrollView contentContainerStyle={[s.root, { paddingBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          marginBottom: 12,
-          color: COLORS.zinc[500],
-        }}
-      >
+      <Text style={s.sectionTitle} lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]}>
         ACCOUNT INFORMATION
       </Text>
       <View
         style={{
-          backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[900]),
+          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[925]),
           borderRadius: 12,
-          marginBottom: 24,
+          marginBottom: 12,
+          padding: 16,
         }}
       >
         <LabelAndText label="EMAIL" text={user?.email} />
@@ -41,123 +35,141 @@ const AccountOptions = () => {
       <View
         style={{
           marginBottom: 48,
-          borderTopWidth: 1,
-          borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-          borderBottomWidth: 1,
+          backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[925]),
+          borderRadius: 12,
+          paddingHorizontal: 12,
         }}
       >
         <Pressable
           onPress={() => router.push("/profile/changeEmail")}
-          style={{
-            paddingVertical: 12,
-            paddingHorizontal: 12,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-            borderBottomWidth: 1,
-          }}
+          style={({ pressed }) => [
+            {
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]),
+              borderBottomWidth: 1,
+            },
+            pressed && { opacity: 0.6 },
+          ]}
         >
           <Text style={{ fontSize: 18 }}>Change Email</Text>
           <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
         </Pressable>
         <Pressable
           onPress={() => router.push("/profile/changePassword")}
-          style={{
-            paddingVertical: 12,
-            paddingHorizontal: 12,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+          style={({ pressed }) => [
+            {
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+            pressed && { opacity: 0.6 },
+          ]}
         >
           <Text style={{ fontSize: 18 }}>Change Password</Text>
           <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
         </Pressable>
       </View>
       <View>
-        <Text
+        <Text style={s.sectionTitle} lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]}>
+          PROFILE INFORMATION
+        </Text>
+        <View
           style={{
-            fontSize: 14,
-            fontWeight: "600",
             marginBottom: 12,
-            color: COLORS.zinc[500],
+            backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[925]),
+            borderRadius: 12,
+            padding: 16,
           }}
         >
-          PROFILE(S) INFORMATION
-        </Text>
-        <View style={{ flexDirection: "row" }}>
-          <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[700]} style={{ fontSize: 16, marginBottom: 24 }}>
-            Profiles ({profileOptions?.length})
+          <Text
+            style={{ paddingBottom: 4, fontWeight: "400", fontSize: 16 }}
+            darkColor={COLORS.zinc[400]}
+            lightColor={COLORS.zinc[600]}
+          >
+            Your account has {profileOptions?.length} {profileOptions?.length === 1 ? "profile" : "profiles"}
           </Text>
-        </View>
-        <View style={{ marginBottom: 32, gap: 16 }}>
-          {profileOptions?.map((profile) => (
-            <View key={profile.id} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-              {profile.image ? (
-                <Image
-                  source={{ uri: profile.image.image }}
-                  style={{ borderRadius: ICON_SIZE, height: ICON_SIZE, width: ICON_SIZE }}
-                />
-              ) : (
-                <View
-                  style={{
-                    height: ICON_SIZE,
-                    width: ICON_SIZE,
-                    borderRadius: ICON_SIZE,
-                    backgroundColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[800]),
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Ionicons
-                    name="paw"
-                    size={ICON_SIZE - 20}
-                    color={setLightOrDark(COLORS.zinc[300], COLORS.zinc[600])}
+          <View style={{ gap: 16, marginTop: 12 }}>
+            {profileOptions?.map((profile) => (
+              <View key={profile.id} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                {profile.image ? (
+                  <Image
+                    source={{ uri: profile.image.image }}
+                    style={{ borderRadius: ICON_SIZE, height: ICON_SIZE, width: ICON_SIZE }}
                   />
+                ) : (
+                  <View
+                    style={{
+                      height: ICON_SIZE,
+                      width: ICON_SIZE,
+                      borderRadius: ICON_SIZE,
+                      backgroundColor: setLightOrDark(COLORS.zinc[400], COLORS.zinc[800]),
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons
+                      name="paw"
+                      size={ICON_SIZE - 20}
+                      color={setLightOrDark(COLORS.zinc[300], COLORS.zinc[600])}
+                    />
+                  </View>
+                )}
+                <View>
+                  <Text style={{ fontSize: 20 }}>{profile.username}</Text>
+                  <Text
+                    style={{ fontSize: 16, color: COLORS.zinc[500], fontStyle: profile.name ? "normal" : "italic" }}
+                  >
+                    {profile?.name || "No name"}
+                  </Text>
                 </View>
-              )}
-              <View>
-                <Text style={{ fontSize: 20 }}>{profile.username}</Text>
-                <Text style={{ fontSize: 16, color: COLORS.zinc[500], fontStyle: profile.name ? "normal" : "italic" }}>
-                  {profile?.name || "No name"}
-                </Text>
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
         <View
           style={{
             marginBottom: 48,
-            borderTopWidth: 1,
-            borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-            borderBottomWidth: 1,
+            backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[925]),
+            borderRadius: 12,
+            paddingHorizontal: 12,
           }}
         >
           <Pressable
             onPress={() => router.push("/(app)/profile/add")}
-            style={{
-              paddingVertical: 12,
-              paddingHorizontal: 12,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-              borderBottomWidth: 1,
-            }}
+            style={({ pressed }) => [
+              {
+                paddingVertical: 12,
+                paddingHorizontal: 12,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]),
+                borderBottomWidth: 1,
+              },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <Text style={{ fontSize: 18 }}>Add Profile</Text>
             <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
           </Pressable>
           <Pressable
             onPress={() => router.push("/profile/deleteProfile")}
-            style={{
-              paddingVertical: 12,
-              paddingHorizontal: 12,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+            style={({ pressed }) => [
+              {
+                paddingVertical: 12,
+                paddingHorizontal: 12,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <Text style={{ fontSize: 18 }}>Delete Profile</Text>
             <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
@@ -180,7 +192,7 @@ export const LabelAndText = ({ label, text, placeholder = "" }: LabelAndTextProp
   const { setLightOrDark } = useColorMode();
 
   return (
-    <View style={{ padding: 12 }}>
+    <View>
       <Text style={s.label}>{label}</Text>
       <Text
         style={{
@@ -212,5 +224,10 @@ const s = StyleSheet.create({
     color: COLORS.zinc[500],
     letterSpacing: 0.5,
     paddingBottom: 4,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
   },
 });

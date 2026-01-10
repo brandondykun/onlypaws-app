@@ -13,7 +13,7 @@ const AppDetailsScreen = () => {
 
   const infoTextColor = setLightOrDark(COLORS.zinc[900], COLORS.zinc[400]);
   const borderBottomColor = setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]);
-  const backgroundColor = setLightOrDark(COLORS.zinc[125], COLORS.zinc[900]);
+  const backgroundColor = setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]);
 
   return (
     <ScrollView

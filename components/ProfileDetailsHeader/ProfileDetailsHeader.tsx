@@ -1,7 +1,10 @@
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
+import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useColorMode } from "@/context/ColorModeContext";
 import { ProfileDetails } from "@/types";
 
 import ProfileDetailsHeaderSkeleton from "../LoadingSkeletons/ProfileDetailsHeaderSkeleton";
@@ -38,12 +41,19 @@ const ProfileDetailsHeader = ({
   profileError,
 }: Props) => {
   const { authProfile } = useAuthProfileContext();
+  const { isDarkMode } = useColorMode();
 
   if (profileError) return <ProfileErrorMessage />;
   if (profileLoading) return <ProfileDetailsHeaderSkeleton />;
 
   return (
     <View style={s.root}>
+      {isDarkMode && (
+        <LinearGradient
+          colors={[`${COLORS.sky[950]}0D`, `${COLORS.sky[900]}33`]}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
       <ProfileImageAndStats
         profileData={profileData}
         postsCount={postsCount}
@@ -71,5 +81,6 @@ const s = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 4,
+    position: "relative",
   },
 });

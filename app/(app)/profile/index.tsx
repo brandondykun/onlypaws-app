@@ -4,6 +4,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useRef } from "react";
 import React from "react";
@@ -23,7 +24,7 @@ const ProfileScreen = () => {
   const { user } = useAuthUserContext();
   const { authProfile } = useAuthProfileContext();
 
-  const { setLightOrDark } = useColorMode();
+  const { setLightOrDark, isDarkMode } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const changeProfileModalRef = useRef<RNBottomSheetModal>(null);
@@ -37,7 +38,7 @@ const ProfileScreen = () => {
       headerLeft: () => (
         <Pressable
           onPress={() => router.push("/(app)/profile/qrCode")}
-          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingVertical: 8 }]}
+          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingHorizontal: 16, paddingVertical: 8 }]}
           hitSlop={20}
           testID="view-qr-code-button"
         >
@@ -51,7 +52,7 @@ const ProfileScreen = () => {
       headerRight: () => (
         <Pressable
           onPressOut={() => profileOptionsModalRef.current?.present()}
-          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingLeft: 24, paddingVertical: 8 }]}
+          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingHorizontal: 8, paddingVertical: 8 }]}
           hitSlop={20}
           testID="view-profile-options-button"
         >
@@ -76,7 +77,13 @@ const ProfileScreen = () => {
     !authProfile.name || !petDetailsText || !authProfile.about || !authProfile.pet_type || !authProfile.breed;
 
   return (
-    <>
+    <View style={s.root}>
+      {isDarkMode && (
+        <LinearGradient
+          colors={[`${COLORS.sky[950]}00`, `${COLORS.sky[900]}33`]}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
       <ScrollView
         contentContainerStyle={[s.scrollViewContent, { paddingBottom: tabBarHeight }]}
         showsVerticalScrollIndicator={false}
@@ -107,13 +114,22 @@ const ProfileScreen = () => {
           )}
         </View>
         {missingProfileInfo && <MissingProfileInfoMessage />}
-        <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) }]}>
+        <View
+          style={[
+            s.card,
+            {
+              backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
+              borderWidth: 1,
+              borderColor: setLightOrDark(COLORS.zinc[200], `${COLORS.sky[950]}99`),
+            },
+          ]}
+        >
           <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
             Account
           </Text>
           <View style={s.accountItems}>
             <View style={s.accountItemContainer}>
-              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]) }]}>
+              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[800]) }]}>
                 <Feather name="mail" size={20} color={setLightOrDark(COLORS.sky[500], COLORS.sky[500])} />
               </View>
               <View>
@@ -126,7 +142,7 @@ const ProfileScreen = () => {
               </View>
             </View>
             <View style={s.accountItemContainer}>
-              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[800]) }]}>
+              <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.zinc[125], COLORS.zinc[800]) }]}>
                 <Ionicons name="at" size={24} color={setLightOrDark(COLORS.sky[500], COLORS.sky[500])} />
               </View>
               <View>
@@ -140,7 +156,16 @@ const ProfileScreen = () => {
             </View>
           </View>
         </View>
-        <View style={[s.card, { backgroundColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]) }]}>
+        <View
+          style={[
+            s.card,
+            {
+              backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
+              borderWidth: 1,
+              borderColor: setLightOrDark(COLORS.zinc[200], `${COLORS.sky[950]}99`),
+            },
+          ]}
+        >
           <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
             About
           </Text>
@@ -154,14 +179,17 @@ const ProfileScreen = () => {
         changeProfileModalRef={changeProfileModalRef}
       />
       <ChangeProfileModal ref={changeProfileModalRef} onAddProfilePress={handleAddProfilePress} />
-      {/* <QrCodeModal visible={qrCodeModalVisible} onClose={handleQrCodeModalClose} /> */}
-    </>
+    </View>
   );
 };
 
 export default ProfileScreen;
 
 const s = StyleSheet.create({
+  root: {
+    flex: 1,
+    position: "relative",
+  },
   scrollViewContent: {
     flexGrow: 1,
     padding: 16,

@@ -42,7 +42,7 @@ const ActionButtons = ({
           <Button
             text="Saved Posts"
             textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[800], COLORS.zinc[50]) }]}
-            buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+            buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[700]) }]}
             onPress={() => router.push("/(app)/posts/savedPosts")}
             icon={<FontAwesome name="bookmark" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
           />
@@ -52,7 +52,7 @@ const ActionButtons = ({
         <Button
           text="Tagged Posts"
           textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]) }]}
-          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[700]) }]}
           onPress={handleTaggedPostsPress}
           icon={<FontAwesome name="tag" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
         />

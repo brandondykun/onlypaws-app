@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import { requestResetPasswordToken } from "@/api/auth";
+import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
@@ -57,47 +58,50 @@ const ForgotPasswordScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={s.root}>
-      <View style={{ flex: 1 }}>
-        <View style={{ alignItems: "center", marginBottom: 24 }}>
-          <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
-        </View>
-        <Text
-          darkColor={COLORS.zinc[200]}
-          lightColor={COLORS.zinc[900]}
-          style={{ fontSize: 28, textAlign: "center", fontWeight: "300", marginBottom: 36 }}
-        >
-          Password Reset
-        </Text>
-        <Text
-          darkColor={COLORS.zinc[300]}
-          lightColor={COLORS.zinc[700]}
-          style={{ fontSize: 18, textAlign: "center", fontWeight: "300" }}
-        >
-          Please enter your account email. We will send you a code to reset your password.
-        </Text>
+    <View style={s.root}>
+      <SubtleMeshBackground />
+      <ScrollView contentContainerStyle={s.scrollView}>
+        <View style={{ flex: 1 }}>
+          <View style={{ alignItems: "center", marginBottom: 24 }}>
+            <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} height={70} width={200} />
+          </View>
+          <Text
+            darkColor={COLORS.zinc[200]}
+            lightColor={COLORS.zinc[900]}
+            style={{ fontSize: 28, textAlign: "center", fontWeight: "300", marginBottom: 36 }}
+          >
+            Password Reset
+          </Text>
+          <Text
+            darkColor={COLORS.zinc[300]}
+            lightColor={COLORS.zinc[700]}
+            style={{ fontSize: 18, textAlign: "center", fontWeight: "300" }}
+          >
+            Please enter your account email. We will send you a code to reset your password.
+          </Text>
 
-        <View style={s.inputsContainer}>
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            error={emailError}
-            placeholder="youremail@email.com"
-            icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-          />
-        </View>
+          <View style={s.inputsContainer}>
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              error={emailError}
+              placeholder="youremail@email.com"
+              icon={<Ionicons name="at-sharp" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+          </View>
 
-        <Button text="Submit" onPress={handleSubmit} loading={loading} testID="submit-button" />
+          <Button text="Submit" onPress={handleSubmit} loading={loading} testID="submit-button" />
 
-        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
-          <Button text="Back" variant="text" onPress={() => router.back()} />
+          <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "center", paddingBottom: insets.bottom }}>
+            <Button text="Back" variant="text" onPress={() => router.back()} />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -105,6 +109,10 @@ export default ForgotPasswordScreen;
 
 const s = StyleSheet.create({
   root: {
+    flex: 1,
+    position: "relative",
+  },
+  scrollView: {
     flexGrow: 1,
     padding: 16,
     paddingTop: 96,

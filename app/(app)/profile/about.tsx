@@ -15,10 +15,9 @@ const AboutScreen = () => {
       contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 18 }]}
     >
       <View style={s.headerContainer}>
-        <Text style={s.header}>About</Text>
         <Text style={s.headerText}>Here is some information on how OnlyPaws works!</Text>
       </View>
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -38,7 +37,7 @@ const AboutScreen = () => {
         </Text>
       </View>
 
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -83,7 +82,7 @@ const AboutScreen = () => {
         </View>
       </View>
 
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -120,7 +119,7 @@ const AboutScreen = () => {
         </View>
       </View>
 
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -150,12 +149,6 @@ const s = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 42,
-  },
-  header: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 24,
   },
   headerText: {
     fontSize: 16,

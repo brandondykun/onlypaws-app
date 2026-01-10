@@ -17,13 +17,12 @@ const GuidelinesScreen = () => {
       contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 18 }]}
     >
       <View style={s.headerContainer}>
-        <Text style={s.header}>Community Guidelines</Text>
         <Text style={s.headerText}>
           Thank you for being a member of OnlyPaws! To ensure you enjoy your time here, we've put together some helpful
           information about the app, and how we're working to facilitate a safe, pet friendly environment.
         </Text>
       </View>
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -47,7 +46,7 @@ const GuidelinesScreen = () => {
         </Text>
       </View>
 
-      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }]}>
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
         <View
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
@@ -120,12 +119,6 @@ const s = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 42,
-  },
-  header: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 24,
   },
   headerText: {
     fontSize: 16,

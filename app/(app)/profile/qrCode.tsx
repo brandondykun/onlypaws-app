@@ -40,7 +40,10 @@ const QrCodeScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Pressable onPress={showSaveQrCodeBottomSheet} style={({ pressed }) => [pressed && { opacity: 0.7 }]}>
+        <Pressable
+          onPress={showSaveQrCodeBottomSheet}
+          style={({ pressed }) => [pressed && { opacity: 0.7 }, { paddingHorizontal: 16, paddingVertical: 8 }]}
+        >
           <Feather name="download" size={22} color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[300])} />
         </Pressable>
       ),
@@ -106,7 +109,7 @@ const QrCodeScreen = () => {
     >
       <View style={{ ...s.mainView }}>
         <ViewShot ref={viewShotRef}>
-          <View style={{ ...s.contentContainer, backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[950]) }}>
+          <View style={{ ...s.contentContainer, backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[950]) }}>
             <View style={s.logoContainer}>
               <OnlyPawsLogo mode={isDarkMode ? "dark" : "light"} width={180} height={45} />
             </View>

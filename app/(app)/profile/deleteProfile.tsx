@@ -150,7 +150,7 @@ const DeleteProfileScreen = () => {
           <Button
             text="Delete Profile"
             onPress={() => bottomSheetRef.current?.present()}
-            buttonStyle={{ backgroundColor: COLORS.red[600] }}
+            buttonStyle={{ backgroundColor: setLightOrDark(COLORS.red[700], COLORS.red[600]) }}
             disabled={selectedProfileId === null}
           />
         ) : null}

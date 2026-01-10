@@ -30,10 +30,7 @@ const PostsScreen = () => {
         return (
           <Pressable
             onPress={() => router.push("/(app)/posts/notifications")}
-            style={({ pressed }) => [
-              pressed && { opacity: 0.7 },
-              { paddingLeft: 0, paddingVertical: 8, flexDirection: "row", gap: 2 },
-            ]}
+            style={({ pressed }) => [pressed && { opacity: 0.7 }, { padding: 8, flexDirection: "row", gap: 2 }]}
             hitSlop={20}
             testID="notifications-menu-button"
           >

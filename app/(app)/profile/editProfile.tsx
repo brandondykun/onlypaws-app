@@ -40,6 +40,7 @@ const EditProfileScreen = () => {
               router.replace("/(app)/profile");
             }
           }}
+          buttonStyle={{ paddingHorizontal: 8, paddingBottom: 4 }}
         />
       ),
     });

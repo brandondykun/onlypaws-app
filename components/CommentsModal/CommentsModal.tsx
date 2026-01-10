@@ -363,7 +363,7 @@ const CommentsModal = forwardRef(
         <View
           style={{
             paddingBottom: Platform.OS === "ios" ? 24 : 18,
-            borderTopColor: isDarkMode ? DARK_BORDER_COLOR : COLORS.zinc[300],
+            borderTopColor: isDarkMode ? DARK_BORDER_COLOR : `${COLORS.zinc[400]}80`,
             borderTopWidth: 1,
           }}
         >
@@ -424,13 +424,11 @@ const CommentsModal = forwardRef(
                   disabled={addCommentLoading || !inputHasText}
                   testID="clear-comment-input-button"
                 >
-                  <View
-                    style={[s.clearButton, { backgroundColor: setLightOrDark(COLORS.zinc[600], COLORS.zinc[300]) }]}
-                  >
+                  <View style={[s.clearButton, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[300]) }]}>
                     <Ionicons
                       name="backspace-outline"
                       size={16}
-                      color={setLightOrDark(COLORS.zinc[100], COLORS.zinc[800])}
+                      color={setLightOrDark(COLORS.zinc[950], COLORS.zinc[800])}
                     />
                   </View>
                 </Pressable>

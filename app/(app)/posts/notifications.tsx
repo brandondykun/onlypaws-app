@@ -113,7 +113,7 @@ const NotificationsScreen = () => {
         onEndReachedThreshold={0.5} // Trigger when 50% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? fetchNext : null}
         ItemSeparatorComponent={() => (
-          <View style={{ height: 1, backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]) }} />
+          <View style={{ height: 1, backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[900]) }} />
         )}
         refreshing={refreshing}
         refreshControl={
