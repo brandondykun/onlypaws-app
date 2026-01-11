@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-import { Tokens, AccessToken, UserProfile, MyInfo } from "../types";
+import { Tokens, UserProfile, MyInfo } from "../types";
 
 import { axiosPost, axiosFetch, axiosPostCustomError, axiosInstance } from "./config";
 import { BASE_URL } from "./config";
@@ -13,7 +13,7 @@ export const login = async (email: string, password: string) => {
 export const refreshToken = async (refresh: string) => {
   try {
     // don't use wrapper function. This needs to use axios and not axiosInstance
-    const res = await axios.post<AccessToken>(`${BASE_URL}/v1/auth/refresh/`, {
+    const res = await axios.post<Tokens>(`${BASE_URL}/v1/auth/refresh/`, {
       refresh,
     });
     return { data: res.data, error: null };
@@ -131,6 +131,17 @@ export const completeOnboarding = async (profileType: "regular" | "business") =>
     const res = await axiosInstance.post<MyInfo>(url, {
       profile_type: profileType,
     });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message, status: error.status };
+  }
+};
+
+export const logOut = async (refreshToken: string) => {
+  const url = "/v1/auth/logout/";
+  try {
+    const res = await axiosInstance.post(url, { refresh: refreshToken });
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;

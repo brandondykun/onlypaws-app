@@ -2,7 +2,13 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 export const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const axiosInstance = axios.create({ baseURL: BASE_URL });
+export const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    "X-Client-Type": "mobile",
+  },
+});
 
 export const axiosFetch = async <T>(url: string) => {
   try {

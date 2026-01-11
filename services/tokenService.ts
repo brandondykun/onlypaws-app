@@ -127,6 +127,11 @@ export const refreshAccessToken = async (
       const newAccessToken = data.access;
       await setAccessToken(newAccessToken);
 
+      // Save the new refresh token (JWT token rotation)
+      if (data.refresh) {
+        await setRefreshToken(data.refresh);
+      }
+
       // Process all queued requests with the new token
       failedRequestsQueue.forEach((callback) => callback(newAccessToken));
       failedRequestsQueue.length = 0;
