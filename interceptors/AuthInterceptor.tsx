@@ -3,7 +3,9 @@ import { useEffect } from "react";
 
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useMaintenance } from "@/context/MaintenanceContext";
 import * as tokenService from "@/services/tokenService";
+import { SystemStatusResponse } from "@/types/status/status";
 
 import { axiosInstance } from "../api/config";
 
@@ -14,6 +16,7 @@ type Props = {
 const AuthInterceptor = ({ children }: Props) => {
   const { logOut, selectedProfileId } = useAuthUserContext();
   const { loading } = useAuthProfileContext();
+  const { triggerMaintenance, isInMaintenance } = useMaintenance();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,7 +33,16 @@ const AuthInterceptor = ({ children }: Props) => {
         const config = error?.config;
         // Any status codes that falls outside the range of 2xx cause this function to trigger
         // Do something with response error
-        if (error.response.status === 401 && !config._retry) {
+
+        // Handle 503 Service Unavailable (maintenance mode)
+        if (error.response?.status === 503) {
+          // Extract maintenance info from response if available
+          const maintenanceData = error.response?.data as SystemStatusResponse | undefined;
+          triggerMaintenance(maintenanceData);
+          return Promise.reject(error);
+        }
+
+        if (error.response?.status === 401 && !config._retry) {
           config._retry = true;
 
           try {
@@ -44,8 +56,11 @@ const AuthInterceptor = ({ children }: Props) => {
                 config.headers.Authorization = `Bearer ${accessToken}`;
                 return axiosInstance(config);
               } else {
-                console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR");
-                logOut();
+                // Don't logout if the app is in maintenance mode - the failure is due to 503, not auth
+                if (!isInMaintenance) {
+                  console.log("CALLING LOGOUT FROM AUTH INTERCEPTOR");
+                  logOut();
+                }
                 return Promise.reject(error);
               }
             } else {
@@ -65,7 +80,7 @@ const AuthInterceptor = ({ children }: Props) => {
     return () => {
       axiosInstance.interceptors.response.eject(responseInterceptor);
     };
-  }, [logOut, router]);
+  }, [logOut, router, triggerMaintenance, isInMaintenance]);
 
   useEffect(() => {
     const requestInterceptor = axiosInstance.interceptors.request.use(

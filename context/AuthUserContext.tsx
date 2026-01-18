@@ -8,6 +8,8 @@ import { getMyInfo } from "@/api/auth";
 import * as tokenService from "@/services/tokenService";
 import { MyInfo, ProfileOption, User } from "@/types";
 
+import { useMaintenance } from "./MaintenanceContext";
+
 const DEFAULT_USER: User = {
   id: null,
   email: null,
@@ -64,6 +66,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
 
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isInMaintenance } = useMaintenance();
 
   useEffect(() => {
     if (!authLoading) {
@@ -143,14 +146,17 @@ const AuthUserContextProvider = ({ children }: Props) => {
             //redirect to app
           }
         } else {
-          console.log("CALLING LOGOUT FROM AUTH USER CONTEXT PROVIDER");
-          logOut();
+          // Don't logout if the app is in maintenance mode - the failure is due to 503, not auth
+          if (!isInMaintenance) {
+            console.log("CALLING LOGOUT FROM AUTH USER CONTEXT PROVIDER");
+            logOut();
+          }
         }
       }
       setAuthLoading(false);
     };
     persistLogin();
-  }, [authenticate, logOut]);
+  }, [authenticate, logOut, isInMaintenance]);
 
   const setActiveProfileId = (id: number) => {
     setSelectedProfileId(id);
