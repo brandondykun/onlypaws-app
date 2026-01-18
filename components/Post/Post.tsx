@@ -20,9 +20,9 @@ import CommentButton from "./components/CommentButton";
 import HiddenMessage from "./components/HiddenMessage";
 import LikeButton from "./components/LikeButton";
 import PostHeader from "./components/PostHeader";
+import PostMenu from "./components/PostMenu/PostMenu";
 import SaveButton from "./components/SaveButton";
 import TimeAgo from "./components/TimeAgo";
-import PostMenu from "./PostMenu";
 import PostTagsModal from "./PostTagsModal";
 
 type Props = {
