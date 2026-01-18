@@ -5,15 +5,17 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 
+import { logOut as logOutApi } from "@/api/auth";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import * as tokenService from "@/services/tokenService";
 
 type Props = {
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal | null>;
@@ -24,6 +26,18 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
   const { logOut } = useAuthUserContext();
   const { setLightOrDark } = useColorMode();
   const router = useRouter();
+  const [logOutLoading, setLogOutLoading] = useState(false);
+
+  const handleLogOut = async () => {
+    setLogOutLoading(true);
+    // Get refresh token and call backend logout API to clear server-side tokens
+    const refreshToken = await tokenService.getRefreshToken();
+    if (refreshToken) {
+      await logOutApi(refreshToken);
+    }
+    // Clear local state and tokens
+    await logOut();
+  };
 
   // shared styling values
   const BUTTON_BG = setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]);
@@ -184,7 +198,7 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
           </Pressable>
         </View>
         <View style={s.logoutButtonContainer}>
-          <Button text="Log Out" onPress={logOut} />
+          <Button text="Log Out" onPress={handleLogOut} loading={logOutLoading} />
         </View>
       </BottomSheetView>
     </BottomSheetModal>
