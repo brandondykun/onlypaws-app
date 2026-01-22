@@ -182,9 +182,11 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // WebSocket notifications are real-time but ephemeral (stored in memory)
   // DB notifications are persistent but fetched with pagination
   // We merge both to provide a seamless UX
+  // Note: follow_request notifications are excluded - they are handled by FollowRequestsContext
   const allNotifications = useMemo(() => {
     // Only show recent WebSocket notifications (last 50) to avoid performance issues
-    const recentWsNotifications = wsNotifications.slice(0, 50);
+    // Filter out follow_request notifications - they are displayed separately in the follow requests UI
+    const recentWsNotifications = wsNotifications.filter((n) => n.notification_type !== "follow_request").slice(0, 50);
 
     // Use Map for efficient deduplication by notification ID
     const notificationMap = new Map<number, DBNotification | WSNotification>();
@@ -195,8 +197,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
     });
 
     // Add DB notifications (won't override existing WS notifications due to Map behavior)
+    // Filter out follow_request notifications from DB as well
     dbNotifications.forEach((dbNotif) => {
-      if (!notificationMap.has(dbNotif.id)) {
+      if (!notificationMap.has(dbNotif.id) && dbNotif.notification_type !== "follow_request") {
         notificationMap.set(dbNotif.id, dbNotif);
       }
     });
@@ -303,8 +306,22 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const handleIncomingNotification = useCallback(
     (notificationData: WSNotification) => {
       setWsNotifications((prev) => {
-        // Prevent duplicates
-        const exists = prev.some((existingNotif) => existingNotif.id === notificationData.id);
+        // Prevent duplicates - use a combination of fields since id can be null for WS notifications
+        const getNotificationKey = (n: WSNotification) => {
+          // If id is available, use it
+          if (n.id != null) return `id_${n.id}`;
+          // Otherwise, create a key from notification type and relevant data
+          const baseKey = `${n.notification_type}_${n.created_at}`;
+          // Add type-specific data to make the key unique
+          if (n.extra_data) {
+            const extraDataStr = JSON.stringify(n.extra_data);
+            return `${baseKey}_${extraDataStr}`;
+          }
+          return baseKey;
+        };
+
+        const newKey = getNotificationKey(notificationData);
+        const exists = prev.some((existingNotif) => getNotificationKey(existingNotif) === newKey);
         if (exists) return prev;
 
         const newNotifications = [{ ...notificationData, is_read: false }, ...prev];

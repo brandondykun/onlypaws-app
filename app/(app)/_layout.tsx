@@ -19,6 +19,7 @@ import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingC
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
+import FollowRequestsContextProvider from "@/context/FollowRequestsContext";
 import NotificationsContextProvider from "@/context/NotificationsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import PostManagerContextProvider from "@/context/PostManagerContext";
@@ -196,9 +197,11 @@ const TabLayout = () => {
                     <PostManagerContextProvider>
                       <ProfileDetailsManagerContextProvider>
                         <NotificationsContextProvider>
-                          <ReportReasonsContextProvider>
-                            <TabsComponent />
-                          </ReportReasonsContextProvider>
+                          <FollowRequestsContextProvider>
+                            <ReportReasonsContextProvider>
+                              <TabsComponent />
+                            </ReportReasonsContextProvider>
+                          </FollowRequestsContextProvider>
                         </NotificationsContextProvider>
                       </ProfileDetailsManagerContextProvider>
                     </PostManagerContextProvider>

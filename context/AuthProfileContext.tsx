@@ -21,11 +21,19 @@ type AuthProfileContextType = {
   addFollowing: () => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
-  updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => void;
+  updateAuthProfile: (
+    name: string,
+    about: string | null,
+    breed: string | null,
+    petType: PetType | null,
+    isPrivate: boolean,
+  ) => void;
   updateUsername: (username: string) => void;
   refetch: () => Promise<void>;
   refreshing: boolean;
   backgroundRefreshing: boolean;
+  addFollower: () => void;
+  removeFollower: () => void;
 };
 
 const defaultProfile: ProfileDetailsType = {
@@ -41,6 +49,9 @@ const defaultProfile: ProfileDetailsType = {
   breed: "",
   pet_type: null,
   profile_type: "regular",
+  is_private: false,
+  can_view_posts: true,
+  has_requested_follow: false,
 };
 
 const AuthProfileContext = createContext<AuthProfileContextType>({
@@ -52,11 +63,19 @@ const AuthProfileContext = createContext<AuthProfileContextType>({
   addFollowing: () => {},
   updatePostsCount: (action: "add" | "subtract", amount: number) => {},
   updateName: (name: string) => {},
-  updateAuthProfile: (name: string, about: string | null, breed: string | null, petType: PetType | null) => {},
+  updateAuthProfile: (
+    name: string,
+    about: string | null,
+    breed: string | null,
+    petType: PetType | null,
+    isPrivate: boolean,
+  ) => {},
   updateUsername: (username: string) => {},
   refetch: () => Promise.resolve(),
   refreshing: false,
   backgroundRefreshing: false,
+  addFollower: () => {},
+  removeFollower: () => {},
 });
 
 type Props = {
@@ -81,7 +100,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     isFetching,
     refetch: queryRefetch,
   } = useQuery({
-    queryKey: [selectedProfileId, "profile"],
+    queryKey: [selectedProfileId, "profile", selectedProfileId!.toString()],
     queryFn: () => fetchProfile(selectedProfileId!),
     enabled: !!selectedProfileId && !authLoading,
     staleTime: 0, // Always refetch to get latest data
@@ -95,7 +114,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     if (!selectedProfileId) return;
 
     // Use the exact same format as the useQuery key
-    const queryKey = [selectedProfileId, "profile"];
+    const queryKey = [selectedProfileId, "profile", selectedProfileId.toString()];
 
     // Use setQueryData with exact key match
     queryClient.setQueryData<ProfileDetailsType>(queryKey, (oldData) => {
@@ -124,13 +143,20 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updateCache((prev) => ({ ...prev, name }));
   };
 
-  const updateAuthProfile = (name: string, about: string | null, breed: string | null, petType: PetType | null) => {
+  const updateAuthProfile = (
+    name: string,
+    about: string | null,
+    breed: string | null,
+    petType: PetType | null,
+    isPrivate: boolean,
+  ) => {
     updateCache((prev) => ({
       ...prev,
       name,
       about,
       breed,
       pet_type: petType,
+      is_private: isPrivate,
     }));
   };
 
@@ -163,7 +189,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 
     // Update username in all posts for this profile (authProfile posts)
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
+      { queryKey: [selectedProfileId, "posts", "profile", selectedProfileId.toString()] },
       updatePostsUsername,
     );
   };
@@ -179,6 +205,20 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updateCache((prev) => ({
       ...prev,
       following_count: prev.following_count + 1,
+    }));
+  };
+
+  const addFollower = () => {
+    updateCache((prev) => ({
+      ...prev,
+      followers_count: prev.followers_count + 1,
+    }));
+  };
+
+  const removeFollower = () => {
+    updateCache((prev) => ({
+      ...prev,
+      followers_count: prev.followers_count - 1,
     }));
   };
 
@@ -203,6 +243,8 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     refetch: refreshProfile,
     refreshing,
     backgroundRefreshing: isFetching && !isLoading && !refreshing,
+    addFollower,
+    removeFollower,
   };
 
   return <AuthProfileContext.Provider value={value}>{children}</AuthProfileContext.Provider>;
