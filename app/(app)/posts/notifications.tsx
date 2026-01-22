@@ -1,24 +1,29 @@
+import Entypo from "@expo/vector-icons/Entypo";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
-import { ActivityIndicator, RefreshControl, View } from "react-native";
+import { ActivityIndicator, RefreshControl, View, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
+import Pressable from "@/components/Pressable/Pressable";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 
 const NotificationsScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
+  const router = useRouter();
   const { setLightOrDark } = useColorMode();
+  const { hasReceivedRequests, hasSentRequests } = useFollowRequestsContext();
 
   // Get all notification data and controls from the centralized context
   const {
@@ -104,6 +109,33 @@ const NotificationsScreen = () => {
         unreadCount={unreadCount}
         markAllAsReadLoading={markAllAsReadLoading}
       />
+      {hasReceivedRequests || hasSentRequests ? (
+        <Pressable
+          onPress={() => router.push("/posts/followRequests")}
+          style={{
+            ...s.followRequestsButton,
+            borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[900]),
+            backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[925]),
+          }}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "400" }} darkColor={COLORS.zinc[200]} lightColor={COLORS.zinc[800]}>
+            View Follow Requests
+          </Text>
+          <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
+            {hasReceivedRequests || hasSentRequests ? (
+              <View
+                style={{
+                  height: 10,
+                  width: 10,
+                  borderRadius: 25,
+                  backgroundColor: setLightOrDark(COLORS.lime[500], COLORS.red[500]),
+                }}
+              />
+            ) : null}
+            <Entypo name="chevron-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
+          </View>
+        </Pressable>
+      ) : null}
       <FlashList
         showsVerticalScrollIndicator={false}
         data={allNotifications}
@@ -133,3 +165,15 @@ const NotificationsScreen = () => {
 };
 
 export default NotificationsScreen;
+
+const s = StyleSheet.create({
+  followRequestsButton: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    marginHorizontal: -16,
+    paddingHorizontal: 32,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+});

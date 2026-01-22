@@ -9,6 +9,7 @@ import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
@@ -18,6 +19,7 @@ const ProfileSearchScreen = () => {
   const profileDetailsManager = useProfileDetailsManagerContext();
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
+  const { cancelRequest } = useFollowRequestsContext();
 
   const handleUnfollowPress = async (profileId: number) => {
     const { error } = await unfollowProfile(profileId);
@@ -43,6 +45,11 @@ const ProfileSearchScreen = () => {
         text2: "There was an error following that account.",
       });
     }
+  };
+
+  const handleCancelFollowRequest = async (profileId: number) => {
+    await cancelRequest(profileId);
+    profileDetailsManager.onCancelFollowRequest(profileId);
   };
 
   const handleProfilePress = (profileId: number) => {
@@ -99,6 +106,7 @@ const ProfileSearchScreen = () => {
             handleUnfollowPress={handleUnfollowPress}
             key={profile.id}
             onPress={handleProfilePress}
+            handleCancelFollowRequest={handleCancelFollowRequest}
           />
         )}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom

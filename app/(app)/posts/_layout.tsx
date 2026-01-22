@@ -70,6 +70,7 @@ const PostsStack = () => {
       <Stack.Screen name="commentDetails" options={{ title: "Comment Details" }} />
       <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts" }} />
       <Stack.Screen name="taggedPostsList" options={{ title: "Tagged Posts" }} />
+      <Stack.Screen name="followRequests" options={{ title: "Follow Requests" }} />
     </Stack>
   );
 };
