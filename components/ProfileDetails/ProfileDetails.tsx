@@ -1,7 +1,5 @@
 import { SimpleLineIcons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
@@ -24,11 +22,11 @@ import { ProfileDetails as ProfileDetailsType } from "@/types";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
-import LoadingFooter from "../LoadingFooter/LoadingFooter";
-import PostTileSkeleton from "../LoadingSkeletons/PostTileSkeleton";
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
-import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
+
+import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
+import FooterComponent from "./components/FooterComponent/FooterComponent";
 
 type Props = {
   profileId: number | string;
@@ -54,10 +52,15 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
     return res.data;
   };
 
+  const isOwnProfile = profileId.toString() === selectedProfileId?.toString();
+  // Use the same query key as AuthProfileContext when viewing own profile
+  // This ensures cache updates from the context are reflected here
+  const profileQueryKey = [selectedProfileId, "profile", profileId.toString()];
+
   const profile = useQuery({
-    queryKey: [selectedProfileId, "profile", profileId.toString()],
+    queryKey: profileQueryKey,
     queryFn: () => fetchProfile(profileId),
-    staleTime: profileId.toString() === selectedProfileId?.toString() ? 0 : minutesToMilliseconds(5),
+    staleTime: isOwnProfile ? 0 : minutesToMilliseconds(5),
     enabled: !!selectedProfileId,
   });
 
@@ -66,22 +69,16 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
     return res.data;
   };
 
-  // determine the query key based on the profile ID
-  // if the logged in user is looking at their own profile, use the authProfile query key
-  // if the logged in user is looking at another profile, use the profile query key
   // NOTE: We compare with selectedProfileId directly (not authProfile.id) because authProfile
   // uses placeholderData which can return stale data during profile switches
-  const queryKey =
-    profileId.toString() === selectedProfileId?.toString()
-      ? [selectedProfileId, "posts", "authProfile"]
-      : [selectedProfileId, "posts", "profile", profileId.toString()];
+  const postsQueryKey = [selectedProfileId, "posts", "profile", profileId.toString()];
 
   const posts = useInfiniteQuery({
-    queryKey: queryKey,
+    queryKey: postsQueryKey,
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    staleTime: profileId.toString() === selectedProfileId?.toString() ? 0 : minutesToMilliseconds(5),
+    staleTime: isOwnProfile ? 0 : minutesToMilliseconds(5),
     enabled: !!selectedProfileId,
   });
 
@@ -166,79 +163,48 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
     posts.refetch();
   };
 
-  const emptyComponent =
-    posts.isLoading || posts.isRefetching ? (
-      <PostTileSkeleton />
-    ) : !posts.isError ? (
-      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
-        <Text
-          style={{
-            fontSize: 18,
-            textAlign: "center",
-            paddingHorizontal: 36,
-            fontWeight: "300",
-            paddingTop: 96,
-          }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          {authProfile.id === profileId
-            ? "You don't have any posts yet! Add a post to see it here."
-            : "No posts to see yet."}
-        </Text>
-      </View>
-    ) : (
-      <View
-        style={{
-          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-          height: 280,
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        <Ionicons name="alert-circle-outline" size={36} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[700]} />
-        <Text style={{ fontSize: 19, fontWeight: "400" }}>Error loading posts</Text>
-        <Text darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]} style={{ fontSize: 16, fontWeight: "300" }}>
-          Swipe down to refresh
-        </Text>
-        <Entypo name="chevron-thin-down" size={20} color={isDarkMode ? COLORS.zinc[500] : COLORS.zinc[500]} />
-      </View>
-    );
+  const handleEndReached = () => {
+    const hasErrors = posts.isError || posts.isFetchNextPageError;
+    const isLoading = posts.isLoading || posts.isFetchingNextPage;
 
-  // content to be displayed in the footer
-  const footerComponent = posts.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : posts.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={posts.fetchNextPage}
-      message="Oh no! There was an error fetching more posts!"
-      buttonText="Retry"
-    />
-  ) : null;
+    if (posts.hasNextPage && !hasErrors && !isLoading) {
+      posts.fetchNextPage();
+    }
+  };
 
   return (
     <>
       <FlashList
         showsVerticalScrollIndicator={false}
-        data={posts.isLoading || posts.isRefetching ? [] : dataToRender}
+        data={dataToRender}
         numColumns={3}
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={
-          !posts.isFetchingNextPage && !posts.isLoading && !posts.isError && !posts.isFetchNextPageError
-            ? () => posts.fetchNextPage()
-            : null
-        }
-        ListEmptyComponent={emptyComponent}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
+        onEndReached={handleEndReached}
         ListHeaderComponentStyle={{
           borderBottomWidth: 1,
           borderBottomColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300],
           borderStyle: "solid",
         }}
-        ListFooterComponent={footerComponent}
+        ListEmptyComponent={
+          <EmptyComponent
+            canViewPosts={profile.data?.can_view_posts}
+            profileId={profileId}
+            postsIsError={posts.isError}
+            postsIsLoading={posts.isLoading}
+            postsIsRefetching={posts.isRefetching}
+            error={posts.error}
+          />
+        }
+        ListFooterComponent={
+          <FooterComponent
+            isFetchingNextPage={posts.isFetchingNextPage}
+            isFetchNextPageError={posts.isFetchNextPageError}
+            fetchNextPage={posts.fetchNextPage}
+          />
+        }
         ListHeaderComponent={
           <ProfileDetailsHeader
             profileData={profile.data!}

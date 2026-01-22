@@ -6,6 +6,8 @@ import { View, Pressable } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
+import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { SearchedProfile } from "@/types";
 
 import Button from "../Button/Button";
@@ -18,6 +20,7 @@ type Props =
       handleUnfollowPress: (profileId: number) => Promise<void>;
       onPress?: ((profileId: number) => void) | undefined;
       showFollowButtons?: true;
+      handleCancelFollowRequest: (profileId: number) => Promise<void>;
     }
   | {
       profile: SearchedProfile;
@@ -25,6 +28,7 @@ type Props =
       handleUnfollowPress?: undefined;
       onPress?: ((profileId: number) => void) | undefined;
       showFollowButtons?: false;
+      handleCancelFollowRequest?: undefined;
     };
 
 const ICON_SIZE = 42;
@@ -34,11 +38,14 @@ const SearchedProfilePreview = ({
   handleFollowPress,
   handleUnfollowPress,
   onPress,
+  handleCancelFollowRequest,
   showFollowButtons = true,
 }: Props) => {
   const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
+
   const [followLoading, setFollowLoading] = useState(false);
+  const [cancelRequestLoading, setCancelRequestLoading] = useState(false);
 
   const handleFollow = async (searchedProfile: SearchedProfile) => {
     setFollowLoading(true);
@@ -60,6 +67,14 @@ const SearchedProfilePreview = ({
     if (onPress && !isOwnProfile) {
       onPress(profile.id);
     }
+  };
+
+  const handleCancelRequest = async () => {
+    setCancelRequestLoading(true);
+    if (handleCancelFollowRequest) {
+      await handleCancelFollowRequest(profile.id);
+    }
+    setCancelRequestLoading(false);
   };
 
   const isOwnProfile = authProfile.id === profile.id;
@@ -102,7 +117,9 @@ const SearchedProfilePreview = ({
             )}
           </View>
           <View style={{ flex: 1, justifyContent: "center" }}>
-            <Text style={{ fontWeight: "700", fontSize: 14 }}>{isOwnProfile ? "You" : profile.username}</Text>
+            <Text style={{ fontWeight: "700", fontSize: 14, marginBottom: 2 }} numberOfLines={1}>
+              {isOwnProfile ? "You" : profile.username}
+            </Text>
             <Text
               style={{
                 color: COLORS.zinc[500],
@@ -116,7 +133,20 @@ const SearchedProfilePreview = ({
           </View>
         </View>
       </Pressable>
-      {showFollowButtons && !isOwnProfile && (
+      {showFollowButtons && profile.has_requested_follow && (
+        <Button
+          text="cancel"
+          textStyle={{ fontSize: 12 }}
+          buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+          variant="outline"
+          onPress={handleCancelRequest}
+          testID={`${profile.username}-cancel-request`}
+          loading={cancelRequestLoading}
+          loadingIconSize={12}
+          loadingIconScale={0.7}
+        />
+      )}
+      {!profile.has_requested_follow && showFollowButtons && !isOwnProfile && (
         <View>
           {profile.is_following ? (
             <Button

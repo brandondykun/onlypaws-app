@@ -52,9 +52,16 @@ const ActionButtons = ({
         <Button
           text="Tagged Posts"
           textStyle={[s.profileButtonText, { color: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]) }]}
-          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[700]) }]}
+          buttonStyle={[
+            s.headerButton,
+            {
+              backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[700]),
+              opacity: !profileData.can_view_posts ? 0.6 : 1,
+            },
+          ]}
           onPress={handleTaggedPostsPress}
           icon={<FontAwesome name="tag" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
+          disabled={!profileData.can_view_posts}
         />
       </View>
     </View>

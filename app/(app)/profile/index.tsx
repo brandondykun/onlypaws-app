@@ -173,6 +173,48 @@ const ProfileScreen = () => {
             {authProfile.about ? authProfile.about : "No about text"}
           </Text>
         </View>
+        <View
+          style={[
+            s.card,
+            {
+              backgroundColor: authProfile.is_private
+                ? setLightOrDark(COLORS.zinc[50], `${COLORS.red[950]}4D`)
+                : setLightOrDark(COLORS.zinc[50], `${COLORS.lime[950]}4D`),
+              borderWidth: isDarkMode ? 2 : 2,
+              borderColor: authProfile.is_private
+                ? setLightOrDark(COLORS.red[300], COLORS.red[950])
+                : setLightOrDark(COLORS.lime[300], COLORS.lime[950]),
+            },
+          ]}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ ...s.cardTitle, marginBottom: 8 }} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
+              Privacy
+            </Text>
+            <Ionicons
+              name={authProfile.is_private ? "lock-closed-outline" : "lock-open-outline"}
+              size={20}
+              color={
+                authProfile.is_private
+                  ? setLightOrDark(COLORS.red[500], COLORS.red[600])
+                  : setLightOrDark(COLORS.lime[500], COLORS.lime[500])
+              }
+              style={{ marginTop: -6 }}
+            />
+          </View>
+          <Text style={s.aboutText} darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[800]}>
+            {authProfile.is_private
+              ? "Your profile is private. Only your followers can see your posts."
+              : "Your profile is public. Anyone can see your posts."}
+          </Text>
+        </View>
       </ScrollView>
       <ProfileOptionsModal
         profileOptionsModalRef={profileOptionsModalRef}
@@ -224,7 +266,7 @@ const s = StyleSheet.create({
     paddingLeft: 2,
   },
   headerTextContainer: {
-    marginBottom: 28,
+    marginBottom: 16,
   },
   headerName: {
     fontSize: 30,
@@ -260,7 +302,6 @@ const s = StyleSheet.create({
   },
   aboutText: {
     fontSize: 18,
-    fontWeight: "300",
     lineHeight: 24,
   },
   accountItems: {

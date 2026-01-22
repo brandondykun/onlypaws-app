@@ -22,7 +22,12 @@ const PostTagsModal = forwardRef(({ taggedProfiles, onProfilePress }: Props, ref
       <BottomSheetView>
         <ScrollView contentContainerStyle={{ paddingTop: 8, paddingBottom: insets.bottom }}>
           {taggedProfiles.map((profile) => (
-            <SearchedProfilePreview key={profile.id} profile={profile} onPress={onProfilePress} />
+            <SearchedProfilePreview
+              key={profile.id}
+              profile={profile}
+              onPress={onProfilePress}
+              showFollowButtons={false}
+            />
           ))}
         </ScrollView>
       </BottomSheetView>

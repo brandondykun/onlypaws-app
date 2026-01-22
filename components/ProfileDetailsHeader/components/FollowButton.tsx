@@ -16,6 +16,24 @@ type Props = {
 
 const FollowButton = ({ profileData, followLoading, handleUnfollowPress, handleFollowPress }: Props) => {
   const { setLightOrDark } = useColorMode();
+
+  const isFollowPending = profileData.has_requested_follow && !profileData.is_following;
+
+  if (isFollowPending && !profileData.is_following) {
+    return (
+      <Button
+        text="Follow Requested"
+        textStyle={s.followButtonText}
+        variant="outline"
+        buttonStyle={{
+          ...s.headerButton,
+          borderColor: setLightOrDark(COLORS.sky[600], COLORS.sky[900]),
+          backgroundColor: `${COLORS.sky[500]}1A`,
+        }}
+        disabled
+      />
+    );
+  }
   return (
     <>
       {profileData?.is_following ? (
