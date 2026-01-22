@@ -6,6 +6,8 @@ import { DBCommentNotification, WSCommentNotification } from "./comment";
 import { DBCommentLikeNotification, WSCommentLikeNotification } from "./comment-like";
 import { DBCommentReplyNotification, WSCommentReplyNotification } from "./comment-reply";
 import { DBFollowNotification, WSFollowNotification } from "./follow";
+import { DBFollowRequestNotification, WSFollowRequestNotification } from "./follow-request";
+import { DBFollowRequestAcceptedNotification, WSFollowRequestAcceptedNotification } from "./follow-request-accepted";
 import { DBPostLikeNotification, WSPostLikeNotification } from "./post-like";
 import { DBPostTagNotification, WSPostTagNotification } from "./post-tag";
 
@@ -18,7 +20,9 @@ export type NotificationType =
   | "comment_reply"
   | "follow"
   | "mention"
-  | "system";
+  | "system"
+  | "follow_request"
+  | "follow_request_accepted";
 
 // base type for notifications fetched from relational database
 export interface DBBaseNotification {
@@ -55,7 +59,9 @@ export type DBNotification =
   | DBCommentLikeNotification
   | DBFollowNotification
   | DBCommentReplyNotification
-  | DBCommentNotification;
+  | DBCommentNotification
+  | DBFollowRequestNotification
+  | DBFollowRequestAcceptedNotification;
 
 // Notification from websocket
 export type WSNotification =
@@ -64,7 +70,9 @@ export type WSNotification =
   | WSCommentLikeNotification
   | WSFollowNotification
   | WSCommentReplyNotification
-  | WSCommentNotification;
+  | WSCommentNotification
+  | WSFollowRequestNotification
+  | WSFollowRequestAcceptedNotification;
 
 // full websocket message type
 export interface WSNotificationMessage {

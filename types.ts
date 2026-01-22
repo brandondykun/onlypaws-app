@@ -58,6 +58,8 @@ export type Profile = {
   name: string;
   pet_type: PetType | null;
   breed: string | null;
+  is_private: boolean;
+  profile_type: ProfileType;
 };
 
 export type SearchedProfile = {
@@ -68,6 +70,8 @@ export type SearchedProfile = {
   image: ProfileImage | null;
   name: string;
   profile_type: ProfileType;
+  has_requested_follow: boolean;
+  is_private: boolean;
 };
 
 export type MyInfo = {
@@ -190,6 +194,9 @@ export type ProfileDetails = {
   pet_type: PetType | null;
   breed: string | null;
   profile_type: ProfileType;
+  is_private: boolean;
+  can_view_posts: boolean;
+  has_requested_follow: boolean;
 };
 
 export type FollowProfile = {
