@@ -65,9 +65,6 @@ export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
     try {
       const { data, status } = await getSystemStatus();
 
-      console.log("SYSTEM STATUS DATA: ", data);
-      console.log("SYSTEM STATUS STATUS: ", status);
-
       if (data) {
         // Check if status is maintenance OR if we got a 503
         const isMaintenanceActive = data.status === "maintenance" || status === 503;
