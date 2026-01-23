@@ -5,12 +5,10 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import React from "react";
 import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
 
-import { unfollowProfile, followProfile } from "@/api/interactions";
 import { getProfileDetailsForQuery, getProfilePostsForQuery } from "@/api/profile";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -43,9 +41,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const { selectedProfileId } = useAuthUserContext();
-  const profileDetailsManager = useProfileDetailsManagerContext();
-
-  const [followLoading, setFollowLoading] = useState(false);
+  const { followProfile, unfollowProfile } = useProfileDetailsManagerContext();
 
   const fetchProfile = async (id: number | string) => {
     const res = await getProfileDetailsForQuery(id);
@@ -114,34 +110,12 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
     onPostPreviewPress(index);
   };
 
-  const handleUnfollowPress = async (profileId: number) => {
-    setFollowLoading(true);
-    const { error } = await unfollowProfile(profileId);
-    if (!error) {
-      profileDetailsManager.onUnfollow(profileId);
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error unfollowing that account.",
-      });
-    }
-    setFollowLoading(false);
+  const handleUnfollowPress = (profileId: number) => {
+    unfollowProfile(profileId);
   };
 
-  const handleFollowPress = async (profile: ProfileDetailsType) => {
-    setFollowLoading(true);
-    const { error, data } = await followProfile(profile.id);
-    if (!error && data) {
-      profileDetailsManager.onFollow(profile.id);
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error following that account.",
-      });
-    }
-    setFollowLoading(false);
+  const handleFollowPress = (targetProfile: ProfileDetailsType) => {
+    followProfile(targetProfile.id, { isPrivate: targetProfile.is_private });
   };
 
   const handleFollowersPress = () => {
@@ -214,7 +188,6 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
             handleUnfollowPress={handleUnfollowPress}
             handleFollowPress={handleFollowPress}
             profileLoading={profile.isLoading}
-            followLoading={followLoading}
             profileError={profile.isLoadingError}
             handleTaggedPostsPress={onTaggedPostsPress}
           />

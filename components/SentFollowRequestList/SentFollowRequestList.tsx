@@ -16,7 +16,7 @@ import ListFooterComponent from "./components/ListFooterComponent";
 const SentFollowRequestList = () => {
   const { sentRequests, cancelRequest, sentRequestsQuery: query } = useFollowRequestsContext();
   const tabBarHeight = useBottomTabBarHeight();
-  const profileDetailsManager = useProfileDetailsManagerContext();
+  const { cancelFollowRequest } = useProfileDetailsManagerContext();
   const flashListRef = useRef<FlashListRef<TSentFollowRequestWithStatus>>(null);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const SentFollowRequestList = () => {
 
   const handleCancelRequest = async (profileId: number) => {
     await cancelRequest(profileId);
-    profileDetailsManager.onCancelFollowRequest(profileId);
+    cancelFollowRequest(profileId);
   };
 
   return (

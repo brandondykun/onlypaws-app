@@ -1,13 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { useState } from "react";
 import { View, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
-import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { SearchedProfile } from "@/types";
 
 import Button from "../Button/Button";
@@ -16,11 +13,11 @@ import Text from "../Text/Text";
 type Props =
   | {
       profile: SearchedProfile;
-      handleFollowPress: (searchedProfile: SearchedProfile) => Promise<void>;
-      handleUnfollowPress: (profileId: number) => Promise<void>;
+      handleFollowPress: (searchedProfile: SearchedProfile) => void;
+      handleUnfollowPress: (profileId: number) => void;
       onPress?: ((profileId: number) => void) | undefined;
       showFollowButtons?: true;
-      handleCancelFollowRequest: (profileId: number) => Promise<void>;
+      handleCancelFollowRequest: (profileId: number) => void;
     }
   | {
       profile: SearchedProfile;
@@ -44,37 +41,10 @@ const SearchedProfilePreview = ({
   const { authProfile } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
 
-  const [followLoading, setFollowLoading] = useState(false);
-  const [cancelRequestLoading, setCancelRequestLoading] = useState(false);
-
-  const handleFollow = async (searchedProfile: SearchedProfile) => {
-    setFollowLoading(true);
-    if (handleFollowPress) {
-      await handleFollowPress(searchedProfile);
-    }
-    setFollowLoading(false);
-  };
-
-  const handleUnfollow = async (profileId: number) => {
-    setFollowLoading(true);
-    if (handleUnfollowPress) {
-      await handleUnfollowPress(profileId);
-    }
-    setFollowLoading(false);
-  };
-
   const handlePress = () => {
     if (onPress && !isOwnProfile) {
       onPress(profile.id);
     }
-  };
-
-  const handleCancelRequest = async () => {
-    setCancelRequestLoading(true);
-    if (handleCancelFollowRequest) {
-      await handleCancelFollowRequest(profile.id);
-    }
-    setCancelRequestLoading(false);
   };
 
   const isOwnProfile = authProfile.id === profile.id;
@@ -139,11 +109,8 @@ const SearchedProfilePreview = ({
           textStyle={{ fontSize: 12 }}
           buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
           variant="outline"
-          onPress={handleCancelRequest}
+          onPress={() => handleCancelFollowRequest?.(profile.id)}
           testID={`${profile.username}-cancel-request`}
-          loading={cancelRequestLoading}
-          loadingIconSize={12}
-          loadingIconScale={0.7}
         />
       )}
       {!profile.has_requested_follow && showFollowButtons && !isOwnProfile && (
@@ -154,22 +121,16 @@ const SearchedProfilePreview = ({
               textStyle={{ fontSize: 12 }}
               buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
               variant="outline"
-              onPress={() => handleUnfollow(profile.id)}
+              onPress={() => handleUnfollowPress?.(profile.id)}
               testID={`${profile.username}-unfollow`}
-              loading={followLoading}
-              loadingIconSize={12}
-              loadingIconScale={0.7}
             />
           ) : (
             <Button
               text="follow"
               textStyle={{ fontSize: 12 }}
               buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
-              onPress={() => handleFollow(profile)}
+              onPress={() => handleFollowPress?.(profile)}
               testID={`${profile.username}-follow`}
-              loading={followLoading}
-              loadingIconSize={12}
-              loadingIconScale={0.7}
             />
           )}
         </View>

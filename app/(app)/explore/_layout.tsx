@@ -31,7 +31,7 @@ const ExploreStack = () => {
                 <HeaderSearchInput
                   value={search.searchText}
                   onChangeText={search.setSearchText}
-                  onSubmitEditing={search.search}
+                  onSubmitEditing={search.submitSearch}
                   placeholder="Search profiles..."
                 />
               </View>
