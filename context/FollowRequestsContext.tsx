@@ -70,7 +70,7 @@ type Props = {
 const FollowRequestsContextProvider = ({ children }: Props) => {
   const { selectedProfileId } = useAuthUserContext();
   const { wsNotifications } = useNotificationsContext();
-  const { addFollower, addFollowing } = useAuthProfileContext();
+  const { addFollower, addFollowing, authProfile } = useAuthProfileContext();
   const queryClient = useQueryClient();
   const profileDetailsManager = useProfileDetailsManagerContext();
 
@@ -116,7 +116,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
     queryFn: fetchReceivedRequests,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
+    enabled: !!selectedProfileId && !!authProfile.id,
   });
 
   const sentRequestsQuery = useInfiniteQuery({
@@ -124,7 +124,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
     queryFn: fetchSentRequests,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
+    enabled: !!selectedProfileId && !!authProfile.id,
   });
 
   // ============================================================================
