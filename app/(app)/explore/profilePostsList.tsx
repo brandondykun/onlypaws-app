@@ -15,12 +15,15 @@ const ExploreProfilePostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (id: number) => {
+  const onProfilePress = (id: number, username?: string) => {
     if (id === authProfile.id || id === Number(profileId)) {
       router.back();
       return;
     }
-    router.push({ pathname: "/(app)/explore/profileDetails", params: { profileId: id.toString() } });
+    router.push({
+      pathname: "/(app)/explore/profileDetails",
+      params: { profileId: id.toString(), username: username },
+    });
   };
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {

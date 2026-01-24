@@ -62,8 +62,11 @@ const ProfileSearchScreen = () => {
     }
   };
 
-  const handleProfilePress = (profileId: number) => {
-    router.push({ pathname: "/(app)/explore/profileDetails", params: { profileId: profileId.toString() } });
+  const handleProfilePress = (profileId: number, username?: string) => {
+    router.push({
+      pathname: "/(app)/explore/profileDetails",
+      params: { profileId: profileId.toString(), username: username },
+    });
   };
 
   // Footer component for loading and error states

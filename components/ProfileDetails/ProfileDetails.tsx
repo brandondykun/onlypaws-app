@@ -30,9 +30,10 @@ type Props = {
   profileId: number | string;
   onPostPreviewPress: (index: number) => void;
   onTaggedPostsPress: () => void;
+  username?: string;
 };
 
-const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: Props) => {
+const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, username }: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
@@ -85,7 +86,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: profile.data ? `@${profile.data.username}` : "",
+      title: profile.data ? `@${profile.data.username}` : username ? `@${username}` : "",
       headerRight: () => {
         if (profile.data?.id === authProfile.id) {
           // only show if user is looking at own profile
@@ -104,7 +105,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress }: P
         }
       },
     });
-  }, [profile.data, navigation, isDarkMode, authProfile.id]);
+  }, [profile.data, navigation, isDarkMode, authProfile.id, username]);
 
   const handlePostPreviewPress = (index: number) => {
     onPostPreviewPress(index);

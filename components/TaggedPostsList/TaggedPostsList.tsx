@@ -11,7 +11,7 @@ import { minutesToMilliseconds } from "@/utils/utils";
 type Props = {
   profileId: string;
   initialIndex: string;
-  onProfilePress: (profileId: number) => void;
+  onProfilePress: (profileId: number, username?: string) => void;
 };
 
 const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Props) => {

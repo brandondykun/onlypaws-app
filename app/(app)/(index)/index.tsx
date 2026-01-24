@@ -96,8 +96,8 @@ const FeedScreen = () => {
     });
   }, [navigation, isDarkMode, headerTranslateY, headerLogoOpacity, insets.top, borderColor, headerLogoScale]);
 
-  const handleProfilePress = (profileId: number | string) => {
-    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId } });
+  const handleProfilePress = (profileId: number | string, username?: string) => {
+    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId, username: username } });
   };
 
   const emptyComponent = feedPosts.isFetching ? (

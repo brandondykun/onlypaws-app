@@ -40,7 +40,10 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
       <Pressable
         style={{ flex: 1, flexDirection: "row", gap: 8 }}
         onPress={() =>
-          router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: item.requester.id } })
+          router.push({
+            pathname: "/(app)/posts/profileDetails",
+            params: { profileId: item.requester.id, username: item.requester.username },
+          })
         }
       >
         <View style={{ justifyContent: "center" }}>

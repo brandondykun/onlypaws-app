@@ -150,7 +150,10 @@ const FollowersScreen = () => {
         renderItem={({ item: profile }) => (
           <Pressable
             onPress={() => {
-              router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: profile.id } });
+              router.push({
+                pathname: "/(app)/posts/profileDetails",
+                params: { profileId: profile.id, username: profile.username },
+              });
             }}
           >
             <FollowListProfile profile={profile} />

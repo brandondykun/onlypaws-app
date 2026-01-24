@@ -9,7 +9,7 @@ import Post from "../Post/Post";
 type Props = {
   posts: PostDetailed[];
   initialIndex?: number;
-  onProfilePress: (profileId: number) => void;
+  onProfilePress: (profileId: number, username?: string) => void;
 };
 
 const PostScrollList = ({ posts, initialIndex, onProfilePress }: Props) => {

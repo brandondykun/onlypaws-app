@@ -15,7 +15,7 @@ type Props =
       profile: SearchedProfile;
       handleFollowPress: (searchedProfile: SearchedProfile) => void;
       handleUnfollowPress: (profileId: number) => void;
-      onPress?: ((profileId: number) => void) | undefined;
+      onPress?: ((profileId: number, username?: string) => void) | undefined;
       showFollowButtons?: true;
       handleCancelFollowRequest: (profileId: number) => void;
     }
@@ -23,7 +23,7 @@ type Props =
       profile: SearchedProfile;
       handleFollowPress?: undefined;
       handleUnfollowPress?: undefined;
-      onPress?: ((profileId: number) => void) | undefined;
+      onPress?: ((profileId: number, username?: string) => void) | undefined;
       showFollowButtons?: false;
       handleCancelFollowRequest?: undefined;
     };
@@ -43,7 +43,7 @@ const SearchedProfilePreview = ({
 
   const handlePress = () => {
     if (onPress && !isOwnProfile) {
-      onPress(profile.id);
+      onPress(profile.id, profile.username);
     }
   };
 

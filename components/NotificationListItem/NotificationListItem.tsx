@@ -29,7 +29,7 @@ const NotificationListItem = ({ item, index }: Props) => {
   // if it is a follow notification, there is no post preview image
   const postImagePreview = isFollowNotification
     ? null
-    : item.extra_data.post_preview_image
+    : "post_preview_image" in item.extra_data
       ? item.extra_data.post_preview_image
       : null;
 

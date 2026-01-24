@@ -33,7 +33,12 @@ const SentFollowRequest = ({ item, cancelRequest }: Props) => {
     <View style={s.root}>
       <Pressable
         style={{ flex: 1, flexDirection: "row", gap: 8 }}
-        onPress={() => router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: item.target.id } })}
+        onPress={() =>
+          router.push({
+            pathname: "/(app)/posts/profileDetails",
+            params: { profileId: item.target.id, username: item.target.username },
+          })
+        }
       >
         <View style={{ justifyContent: "center" }}>
           <ProfileImage image={item?.target?.image?.image ?? null} size={40} iconSize={24} />

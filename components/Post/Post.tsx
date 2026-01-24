@@ -27,7 +27,7 @@ import PostTagsModal from "./PostTagsModal";
 
 type Props = {
   post: PostDetailed;
-  onProfilePress?: (profileId: number) => void;
+  onProfilePress?: (profileId: number, username?: string) => void;
   captionDefaultExpanded?: boolean;
   captionExpandable?: boolean;
   headerVisible?: boolean;
@@ -142,7 +142,7 @@ const Post = ({
 
   // function for post menu
   const handleProfilePress = () => {
-    onProfilePress && onProfilePress(post.profile.id!);
+    onProfilePress && onProfilePress(post.profile.id!, post.profile.username ?? undefined);
   };
 
   // function for post menu

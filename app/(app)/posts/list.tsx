@@ -33,12 +33,15 @@ const PostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number) => {
+  const onProfilePress = (profileId: number, username?: string) => {
     if (profileId === authProfile.id) {
       router.back();
       return;
     }
-    router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: profileId.toString() } });
+    router.push({
+      pathname: "/(app)/posts/profileDetails",
+      params: { profileId: profileId.toString(), username: username },
+    });
   };
 
   return <PostScrollList posts={dataToRender} onProfilePress={onProfilePress} initialIndex={Number(initialIndex)} />;

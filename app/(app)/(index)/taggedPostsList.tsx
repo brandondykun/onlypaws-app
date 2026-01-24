@@ -7,8 +7,11 @@ const TaggedPostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number) => {
-    router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId: profileId.toString() } });
+  const onProfilePress = (profileId: number, username?: string) => {
+    router.push({
+      pathname: "/(app)/(index)/profileDetails",
+      params: { profileId: profileId.toString(), username: username },
+    });
   };
 
   return <TaggedPostsList profileId={profileId} initialIndex={initialIndex} onProfilePress={onProfilePress} />;

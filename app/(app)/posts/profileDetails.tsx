@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 
 const PostsProfileDetailsScreen = () => {
-  const { profileId } = useLocalSearchParams<{ profileId: string }>();
+  const { profileId, username } = useLocalSearchParams<{ profileId: string; username?: string }>();
 
   const router = useRouter();
 
@@ -20,6 +20,7 @@ const PostsProfileDetailsScreen = () => {
       profileId={profileId}
       onPostPreviewPress={handlePostPreviewPress}
       onTaggedPostsPress={handleTaggedPostsPress}
+      username={username}
     />
   );
 };
