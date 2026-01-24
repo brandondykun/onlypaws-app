@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { View, ActivityIndicator, RefreshControl, StyleSheet, Pressable } from "react-native";
 
 import { getFollowersForQuery } from "@/api/interactions";
+import FollowListHeader from "@/components/FollowListHeader/FollowListHeader";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
@@ -134,15 +135,7 @@ const FollowersScreen = () => {
         onEndReached={handleEndReached}
         refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
         ListHeaderComponent={
-          <View style={{ marginVertical: 16 }}>
-            <Text
-              style={{ fontSize: 16, fontWeight: "600", paddingLeft: 16, paddingTop: 16 }}
-              darkColor={COLORS.zinc[300]}
-              lightColor={COLORS.zinc[600]}
-            >
-              All Followers
-            </Text>
-          </View>
+          <FollowListHeader title={isSearchActive ? `Search results for "${submittedSearchText}"` : "All followers"} />
         }
         refreshControl={
           isSearchActive ? undefined : (
