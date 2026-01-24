@@ -2,15 +2,7 @@ import { AxiosError } from "axios";
 
 import { PaginatedResponse } from "@/types/shared/pagination";
 
-import {
-  ProfileDetails,
-  ProfileImage,
-  Profile,
-  CreateProfileResponse,
-  PostDetailed,
-  SearchedProfile,
-  FollowProfile,
-} from "../types";
+import { ProfileDetails, ProfileImage, Profile, CreateProfileResponse, PostDetailed, SearchedProfile } from "../types";
 
 import { axiosFetch, axiosPost, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
@@ -93,11 +85,6 @@ export const createProfile = async (
     const data = error.response?.data as { username?: string[] };
     return { data: null, error: data, status: error.status };
   }
-};
-
-export const searchFollowing = async (profileId: number, username: string) => {
-  const url = `/v1/profile/${profileId}/following/?username=${username}`;
-  return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
 export const getPetTypeOptions = async () => {

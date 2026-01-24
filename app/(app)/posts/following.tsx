@@ -1,35 +1,97 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
-import { View, ActivityIndicator, RefreshControl, StyleSheet, Platform, Pressable } from "react-native";
+import { useMemo } from "react";
+import { View, ActivityIndicator, RefreshControl, StyleSheet, Pressable } from "react-native";
 
+import { getFollowingForQuery } from "@/api/interactions";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
 import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
+import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
+import { getNextPageParam } from "@/utils/utils";
 
 const FollowingScreen = () => {
-  const followingCtx = useAuthProfileFollowingContext();
+  const { submittedSearchText } = useAuthProfileFollowingContext();
+  const { selectedProfileId } = useAuthUserContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
 
-  // Lazy load following when screen is visited
-  useEffect(() => {
-    if (!followingCtx.initialFetchComplete && !followingCtx.refreshing) {
-      followingCtx.fetch();
-    }
-  }, [followingCtx]);
+  // Fetch functions
+  const fetchFollowing = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getFollowingForQuery(selectedProfileId!, pageParam);
+    return res.data;
+  };
 
-  let content = (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 12 }}>
-      <ActivityIndicator color={COLORS.zinc[500]} size="large" />
-    </View>
-  );
+  const fetchSearchResults = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getFollowingForQuery(selectedProfileId!, pageParam, submittedSearchText);
+    return res.data;
+  };
 
+  // Main following query
+  const followingQuery = useInfiniteQuery({
+    queryKey: [selectedProfileId, "following", selectedProfileId],
+    queryFn: fetchFollowing,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId,
+  });
+
+  // Search query
+  const searchQuery = useInfiniteQuery({
+    queryKey: [selectedProfileId, "following", "search", submittedSearchText],
+    queryFn: fetchSearchResults,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
+    enabled: !!selectedProfileId && !!submittedSearchText,
+  });
+
+  // Flattened data
+  const following = useMemo(() => {
+    return followingQuery.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [followingQuery.data]);
+
+  const searchResults = useMemo(() => {
+    return searchQuery.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [searchQuery.data]);
+
+  const isSearchActive = !!submittedSearchText;
+
+  // Determine which query and data to use based on search state
+  const activeQuery = isSearchActive ? searchQuery : followingQuery;
+  const dataToRender = useMemo(() => {
+    return isSearchActive ? searchResults : following;
+  }, [isSearchActive, searchResults, following]);
+
+  // Footer component for loading and error states
+  const footerComponent = activeQuery.isFetchingNextPage ? (
+    <LoadingFooter />
+  ) : activeQuery.isFetchNextPageError ? (
+    <RetryFetchFooter
+      fetchFn={activeQuery.fetchNextPage}
+      message="There was an error loading more profiles."
+      buttonText="Retry"
+    />
+  ) : null;
+
+  // Empty component handling different states
   const emptyComponent =
-    followingCtx.searchResults?.length === 0 ? (
+    activeQuery.isLoading || (activeQuery.isError && activeQuery.isRefetching) ? (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
+        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
+      </View>
+    ) : activeQuery.isError ? (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
+        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
+          There was an error loading following. Swipe down to try again.
+        </Text>
+      </View>
+    ) : isSearchActive ? (
+      // No search results found
       <View style={{ marginTop: 48 }}>
         <Text
           style={{ textAlign: "center", fontSize: 20, fontWeight: "300" }}
@@ -40,6 +102,7 @@ const FollowingScreen = () => {
         </Text>
       </View>
     ) : (
+      // No following yet
       <View style={s.emptyComponent}>
         <Text style={s.emptyComponentMainText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
           You are not following any profiles.
@@ -50,32 +113,42 @@ const FollowingScreen = () => {
       </View>
     );
 
-  if (followingCtx.initialFetchComplete && !followingCtx.searchLoading) {
-    const dataToRender = followingCtx.searchResults ? followingCtx.searchResults : followingCtx.data;
-    const onEndReached =
-      !followingCtx.fetchNextLoading && !followingCtx.hasFetchNextError && !followingCtx.hasInitialFetchError
-        ? () => followingCtx.fetchNext()
-        : null;
-    const searchOnEndReached =
-      !followingCtx.searchFetchNextLoading && !followingCtx.hasSearchFetchNextError
-        ? () => followingCtx.fetchSearchNext()
-        : null;
+  const handleEndReached = () => {
+    const hasErrors = activeQuery.isError || activeQuery.isFetchNextPageError;
+    const isLoading = activeQuery.isLoading || activeQuery.isFetchingNextPage;
 
-    content = (
+    if (activeQuery.hasNextPage && !hasErrors && !isLoading) {
+      activeQuery.fetchNextPage();
+    }
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
       <FlashList
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
-        refreshing={followingCtx.refreshing}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
-        onEndReachedThreshold={0.3} // Trigger when 30%
-        onEndReached={followingCtx.searchResults ? searchOnEndReached : onEndReached}
+        onEndReachedThreshold={0.3}
+        onEndReached={handleEndReached}
+        refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
+        ListHeaderComponent={
+          <View style={{ marginVertical: 16 }}>
+            <Text
+              style={{ fontSize: 16, fontWeight: "600", paddingLeft: 16, paddingTop: 16 }}
+              darkColor={COLORS.zinc[300]}
+              lightColor={COLORS.zinc[600]}
+            >
+              All Following
+            </Text>
+          </View>
+        }
         refreshControl={
-          followingCtx.searchResults ? undefined : (
+          isSearchActive ? undefined : (
             <RefreshControl
-              refreshing={followingCtx.refreshing}
-              onRefresh={followingCtx.refetch}
+              refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
+              onRefresh={activeQuery.refetch}
               tintColor={COLORS.zinc[400]}
               colors={[COLORS.zinc[400]]}
             />
@@ -90,27 +163,15 @@ const FollowingScreen = () => {
             <FollowListProfile profile={profile} />
           </Pressable>
         )}
-        ListFooterComponent={
-          followingCtx.fetchNextLoading || followingCtx.searchFetchNextLoading ? <LoadingFooter /> : null
-        }
+        ListFooterComponent={footerComponent}
       />
-    );
-  }
-
-  return <View style={{ flex: 1 }}>{content}</View>;
+    </View>
+  );
 };
 
 export default FollowingScreen;
 
 const s = StyleSheet.create({
-  modalSearchInput: {
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    fontSize: 16,
-    height: 35,
-    marginTop: Platform.OS === "android" ? 4 : -3,
-  },
   emptyComponent: {
     flex: 1,
     justifyContent: "center",
