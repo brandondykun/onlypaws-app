@@ -17,8 +17,8 @@ const PostImageSkeleton = ({ ...props }: Props) => {
   const screenWidth = Dimensions.get("window").width;
   const { isDarkMode } = useColorMode();
 
-  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200]; // tile color
-  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[400]; // swiping tile highlight color
+  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300]; // tile color
+  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200]; // swiping tile highlight color
 
   return (
     <ContentLoader

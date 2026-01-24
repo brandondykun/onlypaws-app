@@ -17,7 +17,7 @@ const CommentSkeleton = ({ rows = 10, ...props }: Props) => {
   const screenWidth = Dimensions.get("window").width;
   const { isDarkMode } = useColorMode();
 
-  const bgColor = isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200]; // tile color
+  const bgColor = isDarkMode ? COLORS.zinc[700] : COLORS.zinc[400]; // tile color
   const highlightColor = isDarkMode ? COLORS.zinc[600] : COLORS.zinc[300]; // swiping tile highlight color
 
   // create correctly positioned row for each row in rows prop

@@ -27,8 +27,8 @@ const PostTileSkeleton = ({ rows = 6, ...props }: Props) => {
   // svg area height
   const viewHeight = size * rows + 1 * rows;
 
-  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200]; // tile color
-  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300]; // swiping tile highlight color
+  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300]; // tile color
+  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200]; // swiping tile highlight color
 
   // create correctly positioned row for each row in rows prop
   const tiles = [...Array(rows)].map((_, i) => {

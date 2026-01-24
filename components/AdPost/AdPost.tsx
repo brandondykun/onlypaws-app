@@ -5,14 +5,15 @@
 
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState, useRef } from "react";
-import { View, Dimensions, StyleSheet, Image, Animated } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Dimensions, StyleSheet, Image } from "react-native";
 import { NativeAd, NativeAdView, NativeAsset, NativeAssetType, NativeMediaView } from "react-native-google-mobile-ads";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { adManager } from "@/services/ads/AdManager";
 
+import PostSkeleton from "../LoadingSkeletons/PostSkeleton";
 import Text from "../Text/Text";
 
 type Props = {
@@ -26,26 +27,8 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
   const screenWidth = Dimensions.get("window").width;
   const [nativeAd, setNativeAd] = useState<NativeAd | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const pulseAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    // Start pulsing animation for skeleton
-    const pulseAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 0.5,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    pulseAnimation.start();
-
     const loadAd = async () => {
       try {
         // Try to get preloaded ad from cache first
@@ -54,12 +37,10 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
         if (ad) {
           setNativeAd(ad);
           setIsLoading(false);
-          pulseAnimation.stop();
           console.log(`Ad loaded for ${adId}`);
           onAdLoaded?.();
         } else {
           setIsLoading(false);
-          pulseAnimation.stop();
           onAdFailedToLoad?.({
             name: "AdLoadError",
             message: "Failed to load ad",
@@ -68,98 +49,16 @@ const AdPost = ({ adId, onAdLoaded, onAdFailedToLoad }: Props) => {
       } catch (error) {
         console.log("Native ad failed to load:", error);
         setIsLoading(false);
-        pulseAnimation.stop();
         onAdFailedToLoad?.(error as Error);
       }
     };
 
     loadAd();
-
-    // Cleanup function - only stop animation
-    // Don't destroy the ad - let the AdManager handle cleanup when list unmounts
-    return () => {
-      pulseAnimation.stop();
-    };
-  }, [adId, onAdLoaded, onAdFailedToLoad, pulseAnim]);
+  }, [adId, onAdLoaded, onAdFailedToLoad]);
 
   // Show loading placeholder to reserve space and prevent layout shift
   if (isLoading || !nativeAd) {
-    return (
-      <Animated.View style={[s.container, { paddingBottom: 36, opacity: pulseAnim }]}>
-        {/* Header Skeleton */}
-        <View style={s.header}>
-          <View style={s.headerContent}>
-            <View style={s.profileSection}>
-              <View
-                style={[
-                  s.adIcon,
-                  {
-                    backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-                  },
-                ]}
-              />
-              <View style={{ gap: 4 }}>
-                <View
-                  style={[
-                    s.skeletonText,
-                    { width: 100, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] },
-                  ]}
-                />
-                <View
-                  style={[
-                    s.skeletonText,
-                    { width: 30, height: 16, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] },
-                  ]}
-                />
-              </View>
-            </View>
-            <View
-              style={[
-                s.adIndicator,
-                {
-                  backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-                },
-              ]}
-            />
-          </View>
-        </View>
-
-        {/* Image Skeleton */}
-        <View
-          style={{
-            width: screenWidth,
-            height: screenWidth,
-            backgroundColor: isDarkMode ? COLORS.zinc[900] : COLORS.zinc[100],
-          }}
-        />
-
-        {/* Footer Skeleton */}
-        <View style={s.footer}>
-          <View style={s.content}>
-            <View
-              style={[
-                s.skeletonText,
-                { width: "80%", height: 20, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] },
-              ]}
-            />
-            <View
-              style={[
-                s.skeletonText,
-                { width: "60%", backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200] },
-              ]}
-            />
-          </View>
-          <View
-            style={[
-              s.skeletonButton,
-              {
-                backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200],
-              },
-            ]}
-          />
-        </View>
-      </Animated.View>
-    );
+    return <PostSkeleton />;
   }
 
   return (
@@ -378,15 +277,5 @@ const s = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     textDecorationLine: "underline",
-  },
-  skeletonText: {
-    height: 18,
-    borderRadius: 4,
-  },
-  skeletonButton: {
-    height: 48,
-    borderRadius: 8,
-    alignSelf: "center",
-    minWidth: 140,
   },
 });

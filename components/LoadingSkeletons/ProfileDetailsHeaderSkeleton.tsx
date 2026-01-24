@@ -15,8 +15,8 @@ type Props = {
 const ProfileDetailsHeaderSkeleton = ({ ...props }: Props) => {
   const { isDarkMode } = useColorMode();
 
-  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[200]; // tile base color
-  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[400]; // animated moving highlight color
+  const bgColor = isDarkMode ? COLORS.zinc[900] : COLORS.zinc[300]; // tile base color
+  const highlightColor = isDarkMode ? COLORS.zinc[800] : COLORS.zinc[200]; // animated moving highlight color
 
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
