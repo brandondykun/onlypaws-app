@@ -3,10 +3,11 @@ import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { View, Platform, RefreshControl, ActivityIndicator } from "react-native";
+import { View, Platform, RefreshControl } from "react-native";
 
 import { searchProfilesForQuery } from "@/api/profile";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -38,7 +39,7 @@ const ProfileSearchScreen = () => {
 
   // Memoize the flattened profiles data
   const dataToRender = useMemo(() => {
-    return profileSearch.data?.pages.flatMap((page) => page.results) ?? [];
+    return profileSearch.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [profileSearch.data]);
 
   const handleUnfollowPress = (profileId: number) => {
@@ -68,35 +69,6 @@ const ProfileSearchScreen = () => {
     });
   };
 
-  // Empty component when no results are found
-  const emptyComponent =
-    profileSearch.isLoading || (profileSearch.isError && profileSearch.isRefetching) ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
-        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
-      </View>
-    ) : profileSearch.isError ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
-          There was an error with that search. Swipe down to try again.
-        </Text>
-      </View>
-    ) : !profileSearch.isRefetching ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
-        <Text
-          style={{
-            fontSize: 20,
-            textAlign: "center",
-            paddingHorizontal: 36,
-            fontWeight: "300",
-          }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          No profiles found with that username.
-        </Text>
-      </View>
-    ) : null;
-
   // Initial state - no search submitted yet
   if (!submittedSearchText) {
     return (
@@ -123,7 +95,16 @@ const ProfileSearchScreen = () => {
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: Platform.OS === "android" ? 0 : 24 }}
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={emptyComponent}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            isLoading={profileSearch.isLoading}
+            isError={profileSearch.isError}
+            isRefetching={profileSearch.isRefetching}
+            errorMessage="There was an error with that search."
+            errorSubMessage="Swipe down to try again."
+            emptyMessage="No profiles found with that username."
+          />
+        }
         showsVerticalScrollIndicator={false}
         renderItem={({ item: profile }) => (
           <SearchedProfilePreview

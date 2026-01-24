@@ -3,12 +3,13 @@ import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { View, ActivityIndicator, RefreshControl, StyleSheet, Pressable } from "react-native";
+import { View, RefreshControl, Pressable } from "react-native";
 
 import { getFollowingForQuery } from "@/api/interactions";
 import FollowListHeader from "@/components/FollowListHeader/FollowListHeader";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
@@ -67,40 +68,14 @@ const FollowingScreen = () => {
     return isSearchActive ? searchResults : following;
   }, [isSearchActive, searchResults, following]);
 
-  // Empty component handling different states
-  const emptyComponent =
-    activeQuery.isLoading || (activeQuery.isError && activeQuery.isRefetching) ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
-        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
-      </View>
-    ) : activeQuery.isError ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 72 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
-          There was an error loading following. Swipe down to try again.
-        </Text>
-      </View>
-    ) : isSearchActive ? (
-      // No search results found
-      <View style={{ marginTop: 48 }}>
-        <Text
-          style={{ textAlign: "center", fontSize: 20, fontWeight: "300" }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          No results found
-        </Text>
-      </View>
-    ) : (
-      // No following yet
-      <View style={s.emptyComponent}>
-        <Text style={s.emptyComponentMainText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-          You are not following any profiles.
-        </Text>
-        <Text style={s.emptyComponentSubText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[500]}>
-          Get out there and find some profiles to follow!
-        </Text>
-      </View>
-    );
+  // Search empty component for when search has no results
+  const searchEmptyComponent = isSearchActive ? (
+    <View style={{ marginTop: 48 }}>
+      <Text style={{ textAlign: "center", fontSize: 20 }} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+        No results found
+      </Text>
+    </View>
+  ) : undefined;
 
   const handleEndReached = () => {
     const hasErrors = activeQuery.isError || activeQuery.isFetchNextPageError;
@@ -116,12 +91,21 @@ const FollowingScreen = () => {
       <FlashList
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: tabBarHeight }}
         onEndReachedThreshold={0.3}
         onEndReached={handleEndReached}
         refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            isLoading={activeQuery.isLoading}
+            isError={activeQuery.isError}
+            isRefetching={activeQuery.isRefetching}
+            errorMessage="There was an error loading following."
+            emptyMessage="You are not following any profiles. Get out there and find some profiles to follow!"
+            customEmptyComponent={searchEmptyComponent}
+          />
+        }
         ListHeaderComponent={
           <FollowListHeader title={isSearchActive ? `Search results for "${submittedSearchText}"` : "All following"} />
         }
@@ -161,25 +145,3 @@ const FollowingScreen = () => {
 };
 
 export default FollowingScreen;
-
-const s = StyleSheet.create({
-  emptyComponent: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 24,
-    marginTop: 48,
-  },
-  emptyComponentMainText: {
-    fontSize: 20,
-    textAlign: "center",
-    paddingHorizontal: 36,
-    fontWeight: "300",
-  },
-  emptyComponentSubText: {
-    fontSize: 18,
-    textAlign: "center",
-    paddingHorizontal: 36,
-    fontWeight: "300",
-  },
-});

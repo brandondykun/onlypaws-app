@@ -1,15 +1,15 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import React, { useEffect, useRef } from "react";
-import { StyleSheet } from "react-native";
+import { RefreshControl, StyleSheet } from "react-native";
 
+import { COLORS } from "@/constants/Colors";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { FollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
 import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import ReceivedFollowRequest from "../ReceivedFollowRequest/ReceivedFollowRequest";
-
-import ListEmptyComponent from "./components/ListEmptyComponent";
 
 const ReceivedFollowRequestList = () => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -46,8 +46,21 @@ const ReceivedFollowRequestList = () => {
       renderItem={({ item }) => (
         <ReceivedFollowRequest item={item} acceptRequest={acceptRequest} declineRequest={declineRequest} />
       )}
+      refreshControl={
+        <RefreshControl
+          refreshing={query.isRefetching && !query.isFetchingNextPage}
+          onRefresh={query.refetch}
+          tintColor={COLORS.zinc[400]}
+          colors={[COLORS.zinc[400]]}
+        />
+      }
       ListEmptyComponent={
-        <ListEmptyComponent isLoading={query.isLoading} isError={query.isError} refetch={query.refetch} />
+        <ListEmptyComponent
+          isLoading={query.isLoading}
+          isError={query.isError}
+          isRefetching={query.isRefetching}
+          emptyMessage="No received follow requests"
+        />
       }
       ListFooterComponent={
         <LoadingRetryFooter

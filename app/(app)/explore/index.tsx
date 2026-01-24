@@ -9,9 +9,9 @@ import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 import { getExplorePostsForQuery } from "@/api/post";
 import Button from "@/components/Button/Button";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -45,7 +45,7 @@ const ExploreScreen = () => {
 
   // Memoize the flattened posts data
   const dataToRender = useMemo(() => {
-    return explorePosts.data?.pages.flatMap((page) => page.results) ?? [];
+    return explorePosts.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [explorePosts.data]);
 
   // add search button to header
@@ -70,32 +70,6 @@ const ExploreScreen = () => {
       ),
     });
   }, [navigation, router, setLightOrDark]);
-
-  const emptyComponent =
-    explorePosts.isLoading || (explorePosts.isError && explorePosts.isRefetching) ? (
-      <PostTileSkeleton />
-    ) : explorePosts.isError ? (
-      <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
-          There was an error fetching your explore posts. Swipe down to try again.
-        </Text>
-      </View>
-    ) : !explorePosts.isRefetching ? (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <Text
-          style={{
-            fontSize: 20,
-            textAlign: "center",
-            paddingHorizontal: 36,
-            fontWeight: "300",
-          }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          There are no posts to display
-        </Text>
-      </View>
-    ) : null;
 
   return (
     <View style={{ flex: 1, paddingTop: 8 }}>
@@ -124,7 +98,16 @@ const ExploreScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        ListEmptyComponent={emptyComponent}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            isLoading={!explorePosts.data || explorePosts.isLoading}
+            isError={explorePosts.isError}
+            isRefetching={explorePosts.isRefetching}
+            loadingComponent={<PostTileSkeleton />}
+            errorMessage="There was an error fetching your explore posts."
+            emptyMessage="There are no posts to display"
+          />
+        }
         renderItem={({ item: post, index }) => (
           <PostTile
             post={post}

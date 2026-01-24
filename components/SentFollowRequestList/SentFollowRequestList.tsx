@@ -2,16 +2,16 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import React, { useEffect } from "react";
 import { useRef } from "react";
-import { StyleSheet } from "react-native";
+import { RefreshControl, StyleSheet } from "react-native";
 
+import { COLORS } from "@/constants/Colors";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { SentFollowRequestWithStatus as TSentFollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
 import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import SentFollowRequest from "../SentFollowRequest/SentFollowRequest";
-
-import ListEmptyComponent from "./components/ListEmptyComponent";
 
 const SentFollowRequestList = () => {
   const { sentRequests, cancelRequest, sentRequestsQuery: query } = useFollowRequestsContext();
@@ -51,8 +51,21 @@ const SentFollowRequestList = () => {
       contentContainerStyle={{ ...s.container, paddingBottom: tabBarHeight + 16 }}
       renderItem={({ item }) => <SentFollowRequest item={item} cancelRequest={handleCancelRequest} />}
       onEndReached={handleEndReached}
+      refreshControl={
+        <RefreshControl
+          refreshing={query.isRefetching && !query.isFetchingNextPage}
+          onRefresh={query.refetch}
+          tintColor={COLORS.zinc[400]}
+          colors={[COLORS.zinc[400]]}
+        />
+      }
       ListEmptyComponent={
-        <ListEmptyComponent isLoading={query.isLoading} isError={query.isError} refetch={query.refetch} />
+        <ListEmptyComponent
+          isLoading={query.isLoading}
+          isError={query.isError}
+          isRefetching={query.isRefetching}
+          emptyMessage="No sent follow requests"
+        />
       }
       ListFooterComponent={
         <LoadingRetryFooter

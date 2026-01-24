@@ -4,10 +4,11 @@ import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
-import { ActivityIndicator, RefreshControl, View, StyleSheet } from "react-native";
+import { RefreshControl, View, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
 import Pressable from "@/components/Pressable/Pressable";
@@ -60,35 +61,6 @@ const NotificationsScreen = () => {
       headerBackTitle: "Posts",
     });
   }, [navigation]);
-
-  const emptyComponent =
-    !initialFetchComplete || (hasInitialFetchError && refreshing) ? (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator color={COLORS.zinc[500]} />
-      </View>
-    ) : hasInitialFetchError ? (
-      <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
-          There was an error fetching your notifications. Swipe down to try again.
-        </Text>
-      </View>
-    ) : !refreshing ? (
-      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
-        <Text
-          style={{
-            fontSize: 18,
-            textAlign: "center",
-            paddingHorizontal: 36,
-            fontWeight: "300",
-            paddingTop: 96,
-          }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          No Notifications
-        </Text>
-      </View>
-    ) : null;
 
   return (
     <View style={{ flex: 1 }}>
@@ -144,7 +116,16 @@ const NotificationsScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        ListEmptyComponent={emptyComponent}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            isLoading={!initialFetchComplete}
+            isError={hasInitialFetchError}
+            isRefetching={refreshing}
+            errorMessage="There was an error fetching your notifications."
+            errorSubMessage="Swipe down to try again."
+            emptyMessage="No Notifications"
+          />
+        }
         renderItem={({ item, index }) => <NotificationListItem item={item} index={index} />}
         ListFooterComponent={
           <LoadingRetryFooter

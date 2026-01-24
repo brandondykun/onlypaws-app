@@ -3,15 +3,15 @@ import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useMemo, useRef } from "react";
-import { View, RefreshControl, Animated, StyleSheet } from "react-native";
+import { RefreshControl, Animated, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getFeedForQuery } from "@/api/post";
 import AnnouncementsHeader from "@/components/AnnouncementsHeader/AnnouncementsHeader";
 import LoadingRetryFooterWithEnd from "@/components/Footer/LoadingRetryFooterWithEnd/LoadingRetryFooterWithEnd";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -100,22 +100,9 @@ const FeedScreen = () => {
     router.push({ pathname: "/(app)/(index)/profileDetails", params: { profileId, username: username } });
   };
 
-  const emptyComponent = feedPosts.isFetching ? (
-    <>
-      <PostSkeleton />
-      <PostSkeleton />
-    </>
-  ) : (
-    <View style={s.emptyComponentContainer}>
-      <Text style={s.emptyComponentText} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-        Oh no! Your feed is empty. Follow some users to see their posts here!
-      </Text>
-    </View>
-  );
-
   // Memoize the flattened posts data
   const dataToRender = useMemo(() => {
-    return feedPosts.data?.pages.flatMap((page) => page.results) ?? [];
+    return feedPosts.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [feedPosts.data]);
 
   return (
@@ -147,13 +134,36 @@ const FeedScreen = () => {
       }
       ListFooterComponent={
         <LoadingRetryFooterWithEnd
-          showEndMessage={!feedPosts.hasNextPage && !feedPosts.isFetchingNextPage && !feedPosts.isLoading}
+          showEndMessage={
+            !feedPosts.hasNextPage &&
+            !feedPosts.isFetchingNextPage &&
+            !feedPosts.isLoading &&
+            feedPosts.data &&
+            !feedPosts.isError
+              ? true
+              : false
+          }
           isLoading={feedPosts.isFetchingNextPage}
           isError={feedPosts.isFetchNextPageError}
           fetchNextPage={feedPosts.fetchNextPage}
         />
       }
-      ListEmptyComponent={emptyComponent}
+      ListEmptyComponent={
+        <ListEmptyComponent
+          isLoading={!feedPosts.data || feedPosts.isLoading || feedPosts.isFetching}
+          isError={feedPosts.isError}
+          isRefetching={feedPosts.isRefetching}
+          loadingComponent={
+            <>
+              <PostSkeleton />
+              <PostSkeleton />
+              <PostSkeleton />
+            </>
+          }
+          emptyMessage="Oh no! Your feed is empty. Follow some users to see their posts here!"
+          containerStyle={s.emptyComponentContainer}
+        />
+      }
       onScroll={(event) => {
         const offsetY = event.nativeEvent.contentOffset.y;
         scrollY.setValue(offsetY);
@@ -178,12 +188,6 @@ const s = StyleSheet.create({
   emptyComponentContainer: {
     flex: 1,
     justifyContent: "center",
-  },
-  emptyComponentText: {
     marginTop: -100,
-    fontSize: 20,
-    textAlign: "center",
-    paddingHorizontal: 36,
-    fontWeight: "300",
   },
 });

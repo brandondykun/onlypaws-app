@@ -7,9 +7,9 @@ import { RefreshControl, View } from "react-native";
 
 import { getSavedPostsForQuery } from "@/api/post";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
+import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
@@ -37,33 +37,6 @@ const SavedPostsScreen = () => {
     return posts.data?.pages.flatMap((page) => page.results) ?? [];
   }, [posts.data]);
 
-  const emptyComponent =
-    posts.isLoading || (posts.isError && posts.isRefetching) ? (
-      <PostTileSkeleton />
-    ) : posts.isError ? (
-      <View style={{ paddingTop: 96, paddingHorizontal: 24 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.red[600] }}>
-          There was an error fetching your saved posts. Swipe down to try again.
-        </Text>
-      </View>
-    ) : !posts.isRefetching ? (
-      <View style={{ flex: 1, padding: 16, justifyContent: "center" }}>
-        <Text
-          style={{
-            fontSize: 18,
-            textAlign: "center",
-            paddingHorizontal: 36,
-            fontWeight: "300",
-            paddingTop: 96,
-          }}
-          darkColor={COLORS.zinc[400]}
-          lightColor={COLORS.zinc[600]}
-        >
-          You haven't saved any posts yet.
-        </Text>
-      </View>
-    ) : null;
-
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
@@ -85,7 +58,17 @@ const SavedPostsScreen = () => {
           colors={[COLORS.zinc[400]]}
         />
       }
-      ListEmptyComponent={emptyComponent}
+      ListEmptyComponent={
+        <ListEmptyComponent
+          isLoading={!posts.data || posts.isLoading}
+          isError={posts.isError}
+          isRefetching={posts.isRefetching}
+          loadingComponent={<PostTileSkeleton />}
+          errorMessage="There was an error fetching your saved posts."
+          errorSubMessage="Swipe down to try again."
+          emptyMessage="You haven't saved any posts yet."
+        />
+      }
       renderItem={({ item: post, index }) => (
         <PostTile
           post={post}

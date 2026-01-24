@@ -81,19 +81,9 @@ const FeedbackScreen = () => {
     );
   }
 
-  // content to be displayed when there are no feedback tickets
-  const emptyComponent = (
-    <View style={s.emptyComponentContainer}>
-      <Text style={s.emptyComponentTitle}>No feedback tickets found</Text>
-      <Text style={s.emptyComponentDescription} darkColor={COLORS.zinc[400]}>
-        Use the "Create" button to send feedback to the team.
-      </Text>
-    </View>
-  );
-
   // Memoize the flattened feedback tickets data
   const dataToRender = useMemo(() => {
-    return feedbackTickets.data?.pages.flatMap((page) => page.results) ?? [];
+    return feedbackTickets.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [feedbackTickets.data]);
 
   // initial fetch complete and data state
@@ -104,15 +94,16 @@ const FeedbackScreen = () => {
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
         extraData={feedbackTickets.dataUpdatedAt}
-        ListEmptyComponent={emptyComponent}
         showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+        renderItem={({ item }) => <FeedbackListItem item={item} />}
+        contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
+        refreshing={feedbackTickets.isRefetching}
         onEndReached={
           !feedbackTickets.isFetchingNextPage && !feedbackTickets.isFetchNextPageError && !feedbackTickets.isError
             ? () => feedbackTickets.fetchNextPage()
             : null
         }
-        refreshing={feedbackTickets.isRefetching}
         refreshControl={
           <RefreshControl
             refreshing={feedbackTickets.isRefetching}
@@ -121,7 +112,14 @@ const FeedbackScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        renderItem={({ item }) => <FeedbackListItem item={item} />}
+        ListEmptyComponent={
+          <View style={s.emptyComponentContainer}>
+            <Text style={s.emptyComponentTitle}>No feedback tickets found</Text>
+            <Text style={s.emptyComponentDescription} darkColor={COLORS.zinc[400]}>
+              Use the "Create" button to send feedback to the team.
+            </Text>
+          </View>
+        }
         ListFooterComponent={
           <LoadingRetryFooter
             isLoading={feedbackTickets.isFetchingNextPage}
@@ -130,7 +128,6 @@ const FeedbackScreen = () => {
             message="Oh no! There was an error fetching more feedback tickets!"
           />
         }
-        contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
       />
     );
   }

@@ -53,11 +53,11 @@ const s = StyleSheet.create({
   primaryText: {
     textAlign: "center",
     fontSize: 20,
-    fontWeight: "300",
+    fontWeight: "400",
   },
   secondaryText: {
     textAlign: "center",
     fontSize: 16,
-    fontWeight: "300",
+    fontWeight: "400",
   },
 });

@@ -81,7 +81,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
 
   // Memoize the flattened posts data
   const dataToRender = useMemo(() => {
-    return posts.data?.pages.flatMap((page) => page.results) ?? [];
+    return posts.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [posts.data]);
 
   useLayoutEffect(() => {
