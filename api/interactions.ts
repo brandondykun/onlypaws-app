@@ -67,6 +67,15 @@ export const getFollowers = async (profileId: number) => {
   return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
+export const getFollowersForQuery = async (profileId: number, pageParam: number | string, username?: string) => {
+  const params = new URLSearchParams({ page: String(pageParam) });
+  if (username) {
+    params.append("username", username);
+  }
+  const url = `/v1/interactions/followers/${profileId}/?${params.toString()}`;
+  return await axiosInstance.get<PaginatedResponse<FollowProfile>>(url);
+};
+
 export const getFollowing = async (profileId: number) => {
   const url = `/v1/interactions/following/${profileId}/`;
   return await axiosFetch<PaginatedResponse<FollowProfile>>(url);

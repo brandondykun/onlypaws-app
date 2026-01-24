@@ -12,7 +12,7 @@ type Props = {
   profile: FollowProfile;
 };
 
-const ICON_SIZE = 42;
+const ICON_SIZE = 52;
 
 const FollowListProfile = ({ profile }: Props) => {
   const { isDarkMode } = useColorMode();
@@ -51,13 +51,13 @@ const FollowListProfile = ({ profile }: Props) => {
             </View>
           )}
         </View>
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text style={{ fontWeight: "700", fontSize: 14 }}>{profile.username}</Text>
+        <View style={{ flex: 1, justifyContent: "center", gap: 2 }}>
+          <Text style={{ fontWeight: "700", fontSize: 16 }}>{profile.username}</Text>
           <Text
             style={{
               color: COLORS.zinc[500],
               fontStyle: profile.about ? "normal" : "italic",
-              fontSize: 13,
+              fontSize: 14,
             }}
             numberOfLines={1}
           >
