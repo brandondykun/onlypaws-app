@@ -5,9 +5,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 
 import { getSimilarPostsForQuery } from "@/api/post";
-import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Post from "@/components/Post/Post";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useAdsInList } from "@/hooks/useAdsInList";
@@ -62,6 +61,8 @@ const ExplorePostsListScreen = () => {
     renderItem: renderPost,
   });
 
+  const hasInitialFetchError = !similarPosts.isLoading && similarPosts.isError && !similarPosts.isFetchNextPageError;
+
   return (
     <FlashList
       data={data}
@@ -75,25 +76,11 @@ const ExplorePostsListScreen = () => {
         selectedExplorePost ? <Post post={selectedExplorePost} onProfilePress={onProfilePress} /> : null
       }
       ListFooterComponent={
-        !similarPosts.isLoading && similarPosts.isError && !similarPosts.isFetchingNextPage ? (
-          <RetryFetchFooter
-            fetchFn={() => similarPosts.refetch()}
-            message="Oh no! There was an error fetching posts!"
-            buttonText="Retry"
-          />
-        ) : similarPosts.isFetchNextPageError ? (
-          <RetryFetchFooter
-            fetchFn={() => similarPosts.fetchNextPage()}
-            message="Oh no! There was an error fetching more posts!"
-            buttonText="Retry"
-          />
-        ) : (
-          <FlatListLoadingFooter
-            nextUrl={similarPosts.hasNextPage}
-            fetchNextLoading={similarPosts.isFetchingNextPage}
-            initialFetchLoading={similarPosts.isLoading}
-          />
-        )
+        <LoadingRetryFooter
+          isLoading={similarPosts.isLoading || similarPosts.isFetchingNextPage}
+          isError={similarPosts.isError}
+          fetchNextPage={hasInitialFetchError ? similarPosts.refetch : similarPosts.fetchNextPage}
+        />
       }
     />
   );

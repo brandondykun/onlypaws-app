@@ -7,11 +7,10 @@ import { useLayoutEffect } from "react";
 import { ActivityIndicator, RefreshControl, View, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
 import Pressable from "@/components/Pressable/Pressable";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -61,17 +60,6 @@ const NotificationsScreen = () => {
       headerBackTitle: "Posts",
     });
   }, [navigation]);
-
-  // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
-    <LoadingFooter />
-  ) : hasFetchNextError ? (
-    <RetryFetchFooter
-      fetchFn={fetchNext}
-      message="Oh no! There was an error fetching notifications!"
-      buttonText="Retry"
-    />
-  ) : null;
 
   const emptyComponent =
     !initialFetchComplete || (hasInitialFetchError && refreshing) ? (
@@ -158,7 +146,14 @@ const NotificationsScreen = () => {
         }
         ListEmptyComponent={emptyComponent}
         renderItem={({ item, index }) => <NotificationListItem item={item} index={index} />}
-        ListFooterComponent={footerComponent}
+        ListFooterComponent={
+          <LoadingRetryFooter
+            isLoading={fetchNextLoading}
+            isError={hasFetchNextError}
+            fetchNextPage={fetchNext}
+            message="Oh no! There was an error fetching more notifications!"
+          />
+        }
       />
     </View>
   );

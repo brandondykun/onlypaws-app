@@ -6,10 +6,10 @@ import { StyleSheet } from "react-native";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { FollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ReceivedFollowRequest from "../ReceivedFollowRequest/ReceivedFollowRequest";
 
 import ListEmptyComponent from "./components/ListEmptyComponent";
-import ListFooterComponent from "./components/ListFooterComponent";
 
 const ReceivedFollowRequestList = () => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -50,10 +50,11 @@ const ReceivedFollowRequestList = () => {
         <ListEmptyComponent isLoading={query.isLoading} isError={query.isError} refetch={query.refetch} />
       }
       ListFooterComponent={
-        <ListFooterComponent
-          isFetchingNextPage={query.isFetchingNextPage}
-          isFetchNextPageError={query.isFetchNextPageError}
+        <LoadingRetryFooter
+          isLoading={query.isFetchingNextPage}
+          isError={query.isFetchNextPageError}
           fetchNextPage={query.fetchNextPage}
+          message="Oh no! There was an error fetching more follow requests!"
         />
       }
     />

@@ -9,8 +9,7 @@ import { getFeedbackTicketsForQuery } from "@/api/feedback";
 import Button from "@/components/Button/Button";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
 import FeedbackListItem from "@/components/Feedback/FeedbackListItem/FeedbackListItem";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -92,17 +91,6 @@ const FeedbackScreen = () => {
     </View>
   );
 
-  // content to be displayed in the footer
-  const footerComponent = feedbackTickets.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : feedbackTickets.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={feedbackTickets.fetchNextPage}
-      message="Oh no! There was an error fetching more feedback tickets!"
-      buttonText="Retry"
-    />
-  ) : null;
-
   // Memoize the flattened feedback tickets data
   const dataToRender = useMemo(() => {
     return feedbackTickets.data?.pages.flatMap((page) => page.results) ?? [];
@@ -134,7 +122,14 @@ const FeedbackScreen = () => {
           />
         }
         renderItem={({ item }) => <FeedbackListItem item={item} />}
-        ListFooterComponent={footerComponent}
+        ListFooterComponent={
+          <LoadingRetryFooter
+            isLoading={feedbackTickets.isFetchingNextPage}
+            isError={feedbackTickets.isFetchNextPageError}
+            fetchNextPage={feedbackTickets.fetchNextPage}
+            message="Oh no! There was an error fetching more feedback tickets!"
+          />
+        }
         contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
       />
     );

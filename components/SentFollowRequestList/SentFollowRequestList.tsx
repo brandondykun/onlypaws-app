@@ -8,10 +8,10 @@ import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { SentFollowRequestWithStatus as TSentFollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import SentFollowRequest from "../SentFollowRequest/SentFollowRequest";
 
 import ListEmptyComponent from "./components/ListEmptyComponent";
-import ListFooterComponent from "./components/ListFooterComponent";
 
 const SentFollowRequestList = () => {
   const { sentRequests, cancelRequest, sentRequestsQuery: query } = useFollowRequestsContext();
@@ -55,10 +55,11 @@ const SentFollowRequestList = () => {
         <ListEmptyComponent isLoading={query.isLoading} isError={query.isError} refetch={query.refetch} />
       }
       ListFooterComponent={
-        <ListFooterComponent
-          isFetchingNextPage={query.isFetchingNextPage}
-          isFetchNextPageError={query.isFetchNextPageError}
+        <LoadingRetryFooter
+          isLoading={query.isFetchingNextPage}
+          isError={query.isFetchNextPageError}
           fetchNextPage={query.fetchNextPage}
+          message="Oh no! There was an error fetching more follow requests!"
         />
       }
     />

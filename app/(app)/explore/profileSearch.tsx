@@ -6,8 +6,7 @@ import { useMemo } from "react";
 import { View, Platform, RefreshControl, ActivityIndicator } from "react-native";
 
 import { searchProfilesForQuery } from "@/api/profile";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -68,17 +67,6 @@ const ProfileSearchScreen = () => {
       params: { profileId: profileId.toString(), username: username },
     });
   };
-
-  // Footer component for loading and error states
-  const footerComponent = profileSearch.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : profileSearch.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={profileSearch.fetchNextPage}
-      message="There was an error loading more profiles."
-      buttonText="Retry"
-    />
-  ) : null;
 
   // Empty component when no results are found
   const emptyComponent =
@@ -158,7 +146,14 @@ const ProfileSearchScreen = () => {
             colors={[COLORS.zinc[400]]}
           />
         }
-        ListFooterComponent={footerComponent}
+        ListFooterComponent={
+          <LoadingRetryFooter
+            isLoading={profileSearch.isFetchingNextPage}
+            isError={profileSearch.isFetchNextPageError}
+            fetchNextPage={profileSearch.fetchNextPage}
+            message="Oh no! There was an error fetching more profiles!"
+          />
+        }
       />
     </View>
   );

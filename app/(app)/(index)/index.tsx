@@ -7,8 +7,8 @@ import { View, RefreshControl, Animated, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getFeedForQuery } from "@/api/post";
-import AnnouncementsHeader from "@/components/AnnouncementsHeader.tsx/AnnouncementsHeader";
-import FlatListLoadingFooter from "@/components/FlatListLoadingFooter/FlatListLoadingFooter";
+import AnnouncementsHeader from "@/components/AnnouncementsHeader/AnnouncementsHeader";
+import LoadingRetryFooterWithEnd from "@/components/Footer/LoadingRetryFooterWithEnd/LoadingRetryFooterWithEnd";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
@@ -146,9 +146,12 @@ const FeedScreen = () => {
         !feedPosts.isFetchingNextPage && !feedPosts.isFetching && feedPosts.hasNextPage ? feedPosts.fetchNextPage : null
       }
       ListFooterComponent={
-        dataToRender.length > 0 ? (
-          <FlatListLoadingFooter nextUrl={feedPosts.hasNextPage} fetchNextLoading={feedPosts.isFetchingNextPage} />
-        ) : null
+        <LoadingRetryFooterWithEnd
+          showEndMessage={!feedPosts.hasNextPage && !feedPosts.isFetchingNextPage && !feedPosts.isLoading}
+          isLoading={feedPosts.isFetchingNextPage}
+          isError={feedPosts.isFetchNextPageError}
+          fetchNextPage={feedPosts.fetchNextPage}
+        />
       }
       ListEmptyComponent={emptyComponent}
       onScroll={(event) => {

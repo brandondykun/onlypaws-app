@@ -11,10 +11,9 @@ import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { SearchedProfile } from "@/types";
 
 import Button from "../Button/Button";
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import HeaderSearchInput from "../HeaderSearchInput/HeaderSearchInput";
-import LoadingFooter from "../LoadingFooter/LoadingFooter";
 import Modal from "../Modal/Modal";
-import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
 import Text from "../Text/Text";
 
@@ -98,17 +97,6 @@ const ProfileSearchModal = ({
     </View>
   );
 
-  // content to be displayed in the footer
-  const footerComponent = fetchNextLoading ? (
-    <LoadingFooter />
-  ) : hasFetchNextError ? (
-    <RetryFetchFooter
-      fetchFn={fetchNext}
-      message="Oh no! There was an error fetching more profiles!"
-      buttonText="Retry"
-    />
-  ) : null;
-
   return (
     <Modal
       visible={visible}
@@ -162,7 +150,14 @@ const ProfileSearchModal = ({
           )}
           onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
           onEndReached={!fetchNextLoading ? () => fetchNext() : null} // prevent from being called twice
-          ListFooterComponent={footerComponent}
+          ListFooterComponent={
+            <LoadingRetryFooter
+              isLoading={fetchNextLoading}
+              isError={hasFetchNextError}
+              fetchNextPage={fetchNext}
+              message="Oh no! There was an error fetching more profiles!"
+            />
+          }
         />
       </View>
     </Modal>

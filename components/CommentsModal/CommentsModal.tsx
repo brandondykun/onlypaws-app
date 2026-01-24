@@ -23,9 +23,8 @@ import BottomSheetModal, { BottomSheetTextInput } from "../BottomSheet/BottomShe
 import { DARK_BORDER_COLOR } from "../BottomSheet/BottomSheet";
 import Button from "../Button/Button";
 import Comment from "../Comment/Comment";
-import LoadingFooter from "../LoadingFooter/LoadingFooter";
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
-import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 import Text from "../Text/Text";
 
 type Props = {
@@ -312,17 +311,6 @@ const CommentsModal = forwardRef(
         </View>
       ) : null;
 
-    // content to be displayed in the footer
-    const footerComponent = fetchNextLoading ? (
-      <LoadingFooter />
-    ) : hasFetchNextError ? (
-      <RetryFetchFooter
-        fetchFn={fetchNext}
-        message="Oh no! There was an error fetching more comments!"
-        buttonText="Retry"
-      />
-    ) : null;
-
     return (
       <BottomSheetModal ref={ref} onChange={handleSheetChanges} onDismiss={onClose} handleTitle="Comments">
         <BottomSheetFlatList
@@ -358,7 +346,14 @@ const CommentsModal = forwardRef(
               replyToCommentId={replyToComment?.id}
             />
           )}
-          ListFooterComponent={footerComponent}
+          ListFooterComponent={
+            <LoadingRetryFooter
+              isLoading={fetchNextLoading}
+              isError={hasFetchNextError}
+              fetchNextPage={fetchNext}
+              message="Oh no! There was an error fetching more comments!"
+            />
+          }
         />
         <View
           style={{

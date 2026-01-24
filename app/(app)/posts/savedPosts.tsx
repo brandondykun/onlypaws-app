@@ -6,10 +6,9 @@ import { useMemo } from "react";
 import { RefreshControl, View } from "react-native";
 
 import { getSavedPostsForQuery } from "@/api/post";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -37,17 +36,6 @@ const SavedPostsScreen = () => {
   const postsData = useMemo(() => {
     return posts.data?.pages.flatMap((page) => page.results) ?? [];
   }, [posts.data]);
-
-  // content to be displayed in the footer
-  const footerComponent = posts.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : posts.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={posts.fetchNextPage}
-      message="Oh no! There was an error fetching more posts!"
-      buttonText="Retry"
-    />
-  ) : null;
 
   const emptyComponent =
     posts.isLoading || (posts.isError && posts.isRefetching) ? (
@@ -105,7 +93,14 @@ const SavedPostsScreen = () => {
           onPress={() => router.push({ pathname: "/(app)/posts/savedPostsList", params: { initialIndex: index } })}
         />
       )}
-      ListFooterComponent={footerComponent}
+      ListFooterComponent={
+        <LoadingRetryFooter
+          isLoading={posts.isFetchingNextPage}
+          isError={posts.isFetchNextPageError}
+          fetchNextPage={posts.fetchNextPage}
+          message="Oh no! There was an error fetching more posts!"
+        />
+      }
     />
   );
 };

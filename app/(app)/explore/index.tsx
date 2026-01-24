@@ -8,10 +8,9 @@ import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 
 import { getExplorePostsForQuery } from "@/api/post";
 import Button from "@/components/Button/Button";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
@@ -71,17 +70,6 @@ const ExploreScreen = () => {
       ),
     });
   }, [navigation, router, setLightOrDark]);
-
-  // content to be displayed in the footer
-  const footerComponent = explorePosts.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : explorePosts.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={explorePosts.fetchNextPage}
-      message="Oh no! There was an error fetching more posts!"
-      buttonText="Retry"
-    />
-  ) : null;
 
   const emptyComponent =
     explorePosts.isLoading || (explorePosts.isError && explorePosts.isRefetching) ? (
@@ -147,7 +135,14 @@ const ExploreScreen = () => {
             }}
           />
         )}
-        ListFooterComponent={footerComponent}
+        ListFooterComponent={
+          <LoadingRetryFooter
+            isLoading={explorePosts.isFetchingNextPage}
+            isError={explorePosts.isFetchNextPageError}
+            fetchNextPage={explorePosts.fetchNextPage}
+            message="Oh no! There was an error fetching more posts!"
+          />
+        }
       />
     </View>
   );

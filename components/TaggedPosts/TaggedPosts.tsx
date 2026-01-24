@@ -8,10 +8,8 @@ import { RefreshControl } from "react-native";
 import { View } from "react-native";
 
 import { getTaggedPostsForQuery } from "@/api/post";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
@@ -19,6 +17,8 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { getNextPageParam } from "@/utils/utils";
 import { minutesToMilliseconds } from "@/utils/utils";
+
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 
 type Props = {
   profileId: string;
@@ -49,17 +49,6 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
   const dataToRender = useMemo(() => {
     return posts.data?.pages.flatMap((page) => page.results) ?? [];
   }, [posts.data]);
-
-  // content to be displayed in the footer
-  const footerComponent = posts.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : posts.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={posts.fetchNextPage}
-      message="Oh no! There was an error fetching more posts!"
-      buttonText="Retry"
-    />
-  ) : null;
 
   const emptyComponent =
     posts.isLoading || (posts.isError && posts.isRefetching) ? (
@@ -128,7 +117,14 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
       renderItem={({ item, index }) => {
         return <PostTile post={item} index={index} onPress={() => onPostPreviewPress(index)} />;
       }}
-      ListFooterComponent={footerComponent}
+      ListFooterComponent={
+        <LoadingRetryFooter
+          isLoading={posts.isFetchingNextPage}
+          isError={posts.isFetchNextPageError}
+          fetchNextPage={posts.fetchNextPage}
+          message="Oh no! There was an error fetching more posts!"
+        />
+      }
     />
   );
 };

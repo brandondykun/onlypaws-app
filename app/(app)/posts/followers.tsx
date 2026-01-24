@@ -8,8 +8,7 @@ import { View, ActivityIndicator, RefreshControl, StyleSheet, Pressable } from "
 import { getFollowersForQuery } from "@/api/interactions";
 import FollowListHeader from "@/components/FollowListHeader/FollowListHeader";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
-import LoadingFooter from "@/components/LoadingFooter/LoadingFooter";
-import RetryFetchFooter from "@/components/RetryFetchFooter/RetryFetchFooter";
+import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
@@ -67,17 +66,6 @@ const FollowersScreen = () => {
   const dataToRender = useMemo(() => {
     return isSearchActive ? searchResults : followers;
   }, [isSearchActive, searchResults, followers]);
-
-  // Footer component for loading and error states
-  const footerComponent = activeQuery.isFetchingNextPage ? (
-    <LoadingFooter />
-  ) : activeQuery.isFetchNextPageError ? (
-    <RetryFetchFooter
-      fetchFn={activeQuery.fetchNextPage}
-      message="There was an error loading more followers."
-      buttonText="Retry"
-    />
-  ) : null;
 
   // Empty component handling different states
   const emptyComponent =
@@ -159,7 +147,14 @@ const FollowersScreen = () => {
             <FollowListProfile profile={profile} />
           </Pressable>
         )}
-        ListFooterComponent={footerComponent}
+        ListFooterComponent={
+          <LoadingRetryFooter
+            isLoading={followersQuery.isFetchingNextPage}
+            isError={followersQuery.isFetchNextPageError}
+            fetchNextPage={followersQuery.fetchNextPage}
+            message="Oh no! There was an error fetching more followers!"
+          />
+        }
       />
     </View>
   );

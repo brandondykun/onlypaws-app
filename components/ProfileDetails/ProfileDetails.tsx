@@ -20,11 +20,11 @@ import { ProfileDetails as ProfileDetailsType } from "@/types";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
+import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 
 import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
-import FooterComponent from "./components/FooterComponent/FooterComponent";
 
 type Props = {
   profileId: number | string;
@@ -174,10 +174,11 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
           />
         }
         ListFooterComponent={
-          <FooterComponent
-            isFetchingNextPage={posts.isFetchingNextPage}
-            isFetchNextPageError={posts.isFetchNextPageError}
+          <LoadingRetryFooter
+            isLoading={posts.isFetchingNextPage}
+            isError={posts.isFetchNextPageError}
             fetchNextPage={posts.fetchNextPage}
+            message="Oh no! There was an error fetching more posts!"
           />
         }
         ListHeaderComponent={
