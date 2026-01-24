@@ -103,33 +103,28 @@ const ProfileSearchModal = ({
       onRequestClose={handleProfileSelectionCancel}
       animationType="slide"
       withScroll={false}
-      backgroundColor={setLightOrDark(COLORS.zinc[100], COLORS.zinc[950])}
+      backgroundColor={setLightOrDark(COLORS.zinc[200], COLORS.zinc[950])}
     >
-      <View style={{ paddingTop: insets.top, paddingBottom: insets.bottom, flexGrow: 1 }}>
+      <View style={{ paddingTop: insets.top + 10, paddingBottom: insets.bottom, flexGrow: 1 }}>
         <View style={{ marginBottom: 12, position: "relative" }}>
           <Text style={{ fontSize: 18, textAlign: "center", fontWeight: "600" }}>Search Profiles</Text>
-          <View style={{ position: "absolute", right: 12, top: 0 }}>
+          <View style={{ position: "absolute", left: 12, top: 0 }}>
             <Button
               variant="text"
               text="Cancel"
               onPress={handleProfileSelectionCancel}
-              buttonStyle={{ height: "auto" }}
-              textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]) }}
+              buttonStyle={{ height: "auto", paddingHorizontal: 8 }}
+              textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]), fontSize: 20, marginTop: -2 }}
             />
           </View>
         </View>
-        <View
-          style={{
-            paddingHorizontal: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
-          }}
-        >
+        <View style={{ paddingHorizontal: 16 }}>
           <HeaderSearchInput
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearch}
             placeholder="Search profiles..."
+            rootStyle={{ paddingRight: 0, marginTop: 16 }}
           />
         </View>
         <FlashList

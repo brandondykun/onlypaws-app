@@ -188,7 +188,7 @@ const EditImages = () => {
               style={[
                 s.reorderButton,
                 {
-                  backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]),
+                  backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
                 },
               ]}
             >

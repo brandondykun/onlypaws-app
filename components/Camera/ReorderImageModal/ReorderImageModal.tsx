@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useCallback, useEffect } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
 import Button from "@/components/Button/Button";
@@ -21,7 +22,8 @@ type Props = {
 };
 
 const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) => {
-  const { isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
+  const insets = useSafeAreaInsets();
 
   const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
     setImages((value) => reorderItems(value, from, to));
@@ -45,22 +47,25 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
       visible={visible}
       onRequestClose={() => setVisible(false)}
       withScroll={false}
-      backgroundColor={isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50]}
+      backgroundColor={setLightOrDark(COLORS.zinc[50], COLORS.zinc[950])}
     >
-      <View style={{ flex: 1, paddingTop: 54 }}>
+      <View style={{ flex: 1, paddingTop: insets.top + 10 }}>
         <View style={s.header}>
           <Pressable
             onPress={() => setVisible(false)}
             hitSlop={10}
             style={({ pressed }) => [pressed && { opacity: 0.6 }]}
           >
-            <Ionicons name="chevron-back-outline" size={30} color={isDarkMode ? COLORS.zinc[100] : COLORS.zinc[900]} />
+            <Ionicons
+              name="chevron-back-outline"
+              size={30}
+              color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+            />
           </Pressable>
           <Text
             style={{
-              color: isDarkMode ? COLORS.zinc[400] : COLORS.zinc[600],
               fontSize: 18,
-              fontWeight: "400",
+              fontWeight: "600",
               paddingLeft: 12,
             }}
           >
@@ -70,7 +75,8 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
             variant="text"
             text="Done"
             onPress={() => setVisible(false)}
-            textStyle={{ color: isDarkMode ? COLORS.sky[600] : COLORS.sky[500] }}
+            buttonStyle={{ height: "auto", paddingHorizontal: 8 }}
+            textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]), fontSize: 20, marginTop: -2 }}
             hitSlop={10}
           />
         </View>

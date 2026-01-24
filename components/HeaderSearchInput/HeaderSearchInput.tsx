@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -11,9 +11,10 @@ type Props = {
   onChangeText: (text: string) => void;
   onSubmitEditing: () => void;
   placeholder: string;
+  rootStyle?: StyleProp<ViewStyle>;
 };
 
-const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder }: Props) => {
+const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, rootStyle }: Props) => {
   const { setLightOrDark } = useColorMode();
 
   return (
@@ -24,7 +25,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder }
           backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
         },
       ]}
-      rootStyle={{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 16 }}
+      rootStyle={[{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 16 }, rootStyle]}
       placeholderTextColor={COLORS.zinc[500]}
       value={value}
       onChangeText={onChangeText}
