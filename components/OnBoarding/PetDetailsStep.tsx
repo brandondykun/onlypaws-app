@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { getPetTypeOptions } from "@/api/profile";
 import Button from "@/components/Button/Button";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
@@ -11,6 +10,7 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 
 type PetDetailsStepProps = {
   onNext: () => Promise<void>;
@@ -37,23 +37,7 @@ const PetDetailsStep = ({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
-
-  const fetchPetTypeOptions = useCallback(async () => {
-    const { error, data } = await getPetTypeOptions();
-    if (!error && data) {
-      const formatted = data.map((item) => {
-        return { ...item, title: item.name };
-      });
-      setPetTypeOptions(formatted);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!petTypeOptions) {
-      fetchPetTypeOptions();
-    }
-  }, [fetchPetTypeOptions, petTypeOptions]);
+  const { data: petTypeOptions } = usePetTypeOptions();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {

@@ -1,11 +1,11 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { createProfile, getPetTypeOptions } from "@/api/profile";
+import { createProfile } from "@/api/profile";
 import Button from "@/components/Button/Button";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
@@ -14,6 +14,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 
 const AddProfileScreen = () => {
   const { setActiveProfileId, addProfileOption } = useAuthUserContext();
@@ -28,24 +29,8 @@ const AddProfileScreen = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [breed, setBreed] = useState("");
   const [petType, setPetType] = useState<DropdownSelectOption | null>(null);
-  const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
 
-  const fetchPetTypeOptions = useCallback(async () => {
-    const { error, data } = await getPetTypeOptions();
-    if (!error && data) {
-      const formatted = data.map((item) => {
-        return { ...item, title: item.name };
-      });
-      setPetTypeOptions(formatted);
-    }
-    // TODO: handle error here
-  }, []);
-
-  useEffect(() => {
-    if (!petTypeOptions) {
-      fetchPetTypeOptions();
-    }
-  }, [fetchPetTypeOptions, petTypeOptions]);
+  const { data: petTypeOptions } = usePetTypeOptions();
 
   const handleCreateProfile = async () => {
     setUsernameError("");

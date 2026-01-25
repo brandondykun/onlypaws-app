@@ -7,15 +7,16 @@ import { View, StyleSheet, Switch } from "react-native";
 import { ScrollView } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
-import { getPetTypeOptions, updateProfile } from "@/api/profile";
+import { updateProfile } from "@/api/profile";
 import Button from "@/components/Button/Button";
-import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
+import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
 import PrivateProfileModal from "@/components/PrivateProfileModal/PrivateProfileModal";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import { PetTypeWithTitle } from "@/types";
 
 const EditProfileScreen = () => {
@@ -31,8 +32,9 @@ const EditProfileScreen = () => {
   const [breed, setBreed] = useState(authProfile.breed ? authProfile.breed : "");
   const [petType, setPetType] = useState<PetTypeWithTitle | null>(null);
   const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
-  const [petTypeOptions, setPetTypeOptions] = useState<DropdownSelectOption[] | null>(null);
   const [isPrivate, setIsPrivate] = useState(authProfile.is_private ? authProfile.is_private : false);
+
+  const { data: petTypeOptions } = usePetTypeOptions();
 
   const handleProfileUpdate = useCallback(async () => {
     if (authProfile?.id) {
@@ -90,27 +92,15 @@ const EditProfileScreen = () => {
     });
   }, [navigation, router, updateProfileLoading, setLightOrDark, handleProfileUpdate]);
 
-  const fetchPetTypeOptions = useCallback(async () => {
-    const { error, data } = await getPetTypeOptions();
-    if (!error && data) {
-      const formatted = data.map((item) => {
-        return { ...item, title: item.name };
-      });
-      setPetTypeOptions(formatted);
-      const selectedType = authProfile.pet_type?.id;
-      if (selectedType) {
-        const defaultSelected = formatted.find((item) => item.id === selectedType);
-        if (defaultSelected) {
-          setPetType(defaultSelected);
-        }
+  // Set default pet type when options are loaded
+  useEffect(() => {
+    if (petTypeOptions && authProfile.pet_type?.id && !petType) {
+      const defaultSelected = petTypeOptions.find((item) => item.id === authProfile.pet_type?.id);
+      if (defaultSelected) {
+        setPetType(defaultSelected);
       }
     }
-    // TODO: handle error here
-  }, [authProfile.pet_type?.id]);
-
-  useEffect(() => {
-    fetchPetTypeOptions();
-  }, [fetchPetTypeOptions]);
+  }, [petTypeOptions, authProfile.pet_type?.id, petType]);
 
   return (
     <ScrollView
