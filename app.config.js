@@ -25,7 +25,7 @@ export default {
     orientation: "portrait",
     icon: "./assets/icons/ios-light.png",
     splash: {
-      image: "./assets/icons/splash-icon-dark-small.png",
+      image: "./assets/icons/splash-icon-dark.png",
       resizeMode: "contain",
       backgroundColor: "#f4f4f5",
     },
@@ -84,7 +84,7 @@ export default {
         "expo-splash-screen",
         {
           backgroundColor: "#f4f4f5",
-          image: "./assets/icons/splash-icon-dark-small.png",
+          image: "./assets/icons/splash-icon-dark.png",
           dark: {
             image: "./assets/icons/splash-icon-light.png",
             backgroundColor: "#09090b",
