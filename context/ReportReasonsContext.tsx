@@ -1,10 +1,11 @@
-import { createContext, useCallback, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext } from "react";
 
 import { getReportReasons } from "@/api/report";
-import { useDataFetch } from "@/hooks/useDataFetch";
 import { ReportReason } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
+
 type ReportReasonsContextType = {
   data: ReportReason[];
   initialFetchComplete: boolean;
@@ -28,24 +29,18 @@ type Props = {
 const ReportReasonsContextProvider = ({ children }: Props) => {
   const { authProfile } = useAuthProfileContext();
 
-  const initialFetch = useCallback(async () => {
-    if (!authProfile.id) return { data: null, error: null };
-    return await getReportReasons();
-  }, [authProfile.id]);
-
-  const { data, initialFetchComplete, hasInitialFetchError, refresh, refreshing } = useDataFetch<ReportReason[]>(
-    initialFetch,
-    {
-      enabled: !!authProfile.id,
-    },
-  );
+  const { data, isFetched, isError, refetch, isRefetching } = useQuery({
+    queryKey: ["reportReasons", authProfile.id],
+    queryFn: () => getReportReasons(),
+    enabled: !!authProfile.id,
+  });
 
   // Reorder report reasons so that "Other" is last
   // The order of the reasons created here is the order they will be displayed in the UI
   const nonOtherReasons: ReportReason[] = [];
   const otherReason: ReportReason[] = [];
 
-  data?.forEach((reason) => {
+  data?.data?.forEach((reason) => {
     if (reason.name.toLowerCase() === "other") {
       otherReason.push(reason);
     } else {
@@ -55,10 +50,12 @@ const ReportReasonsContextProvider = ({ children }: Props) => {
 
   const value = {
     data: [...nonOtherReasons, ...otherReason],
-    initialFetchComplete,
-    hasInitialFetchError,
-    refetch: refresh,
-    refreshing,
+    initialFetchComplete: isFetched,
+    hasInitialFetchError: isError,
+    refetch: async () => {
+      await refetch();
+    },
+    refreshing: isRefetching,
   };
 
   return <ReportReasonsContext.Provider value={value}>{children}</ReportReasonsContext.Provider>;

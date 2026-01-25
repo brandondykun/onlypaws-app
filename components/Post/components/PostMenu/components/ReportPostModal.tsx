@@ -133,12 +133,12 @@ const ReportPostModal = ({ ref, postId }: Props) => {
               <ModalCard>
                 {reportReasons.map((reason, i) => {
                   return (
-                    <>
-                      <Pressable style={s.cardButton} onPress={() => handleReportReasonSelect(reason.id)} key={i}>
+                    <View key={reason.id}>
+                      <Pressable style={s.cardButton} onPress={() => handleReportReasonSelect(reason.id)}>
                         <Text style={{ textAlign: "center", fontSize: 18 }}>{reason.name}</Text>
                       </Pressable>
                       {i !== reportReasons.length - 1 ? <ModalCardItemSeparator /> : null}
-                    </>
+                    </View>
                   );
                 })}
               </ModalCard>
