@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import { getReportReasons } from "@/api/report";
 import { ReportReason } from "@/types";
 
-import { useAuthProfileContext } from "./AuthProfileContext";
+import { useAuthUserContext } from "./AuthUserContext";
 
 type ReportReasonsContextType = {
   data: ReportReason[];
@@ -27,12 +27,12 @@ type Props = {
 };
 
 const ReportReasonsContextProvider = ({ children }: Props) => {
-  const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthUserContext();
 
   const { data, isFetched, isError, refetch, isRefetching } = useQuery({
-    queryKey: ["reportReasons", authProfile.id],
+    queryKey: ["reportReasons", selectedProfileId],
     queryFn: () => getReportReasons(),
-    enabled: !!authProfile.id,
+    enabled: !!selectedProfileId,
   });
 
   // Reorder report reasons so that "Other" is last
