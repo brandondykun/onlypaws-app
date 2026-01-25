@@ -1,25 +1,25 @@
 import { FlashList } from "@shopify/flash-list";
-import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { searchProfiles } from "@/api/profile";
+import { searchProfilesForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
 import { SearchedProfile } from "@/types";
+import { getNextPageParam } from "@/utils/utils";
 
 import Button from "../Button/Button";
 import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import HeaderSearchInput from "../HeaderSearchInput/HeaderSearchInput";
+import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import Modal from "../Modal/Modal";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
 import Text from "../Text/Text";
 
 type Props = {
   visible: boolean;
-  setVisible: (visible: boolean) => void;
   handleProfileSelection: (profile: SearchedProfile) => void;
   handleProfileSelectionCancel: () => void;
   excludedProfileIds: number[];
@@ -27,7 +27,6 @@ type Props = {
 
 const ProfileSearchModal = ({
   visible,
-  setVisible,
   handleProfileSelection,
   handleProfileSelectionCancel,
   excludedProfileIds,
@@ -36,66 +35,50 @@ const ProfileSearchModal = ({
   const insets = useSafeAreaInsets();
 
   const [searchText, setSearchText] = useState("");
-
-  const initialFetch = useCallback(async () => {
-    const { data, error } = await searchProfiles(searchText);
-    return { data, error };
-  }, [searchText]);
+  const [submittedSearchText, setSubmittedSearchText] = useState("");
 
   useEffect(() => {
     setSearchText("");
+    setSubmittedSearchText("");
   }, [visible]);
 
-  const {
-    data,
-    fetchInitial,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextLoading,
-    hasFetchNextError,
-  } = usePaginatedFetch<SearchedProfile>(initialFetch, {
-    onRefresh: () => Haptics.impactAsync(),
-    enabled: false, // disable initially - search is manually called
+  const fetchProfiles = async ({ pageParam }: { pageParam: string }) => {
+    const res = await searchProfilesForQuery(submittedSearchText, pageParam);
+    return res.data;
+  };
+
+  const profileSearch = useInfiniteQuery({
+    queryKey: ["profileSearchModal", submittedSearchText],
+    queryFn: fetchProfiles,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
+    enabled: !!submittedSearchText,
   });
 
-  const handleSearch = useCallback(async () => {
-    await fetchInitial();
-  }, [fetchInitial]);
+  const data = useMemo(() => {
+    return profileSearch.data?.pages.flatMap((page) => page.results) ?? [];
+  }, [profileSearch.data]);
+
+  const handleSearch = useCallback(() => {
+    setSubmittedSearchText(searchText);
+  }, [searchText]);
+
+  const handleEndReached = () => {
+    const hasErrors = profileSearch.isError || profileSearch.isFetchNextPageError;
+    const isLoading = profileSearch.isLoading || profileSearch.isFetchingNextPage;
+    if (profileSearch.hasNextPage && !hasErrors && !isLoading) {
+      profileSearch.fetchNextPage();
+    }
+  };
 
   const filteredData = data.filter((profile) => !excludedProfileIds.includes(profile.id));
 
-  const emptyComponent = !initialFetchComplete ? (
+  // Custom empty component for when no search has been submitted yet
+  const searchEmptyComponent = !submittedSearchText ? (
     <View style={{ paddingTop: 72 }}>
-      <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "400", color: COLORS.zinc[500] }}>
-        Enter a username to search.
-      </Text>
+      <Text style={{ textAlign: "center", fontSize: 20, color: COLORS.zinc[500] }}>Enter a username to search.</Text>
     </View>
-  ) : hasInitialFetchError ? (
-    <View style={{ paddingTop: 72 }}>
-      <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "400", color: COLORS.red[600] }}>
-        There was an error with that search.
-      </Text>
-      <Text style={{ textAlign: "center", fontSize: 18, fontWeight: "400", color: COLORS.red[600] }}>
-        Please try again.
-      </Text>
-    </View>
-  ) : (
-    <View style={{ paddingTop: 72 }}>
-      <Text
-        style={{
-          fontSize: 18,
-          textAlign: "center",
-          paddingHorizontal: 36,
-          fontWeight: "400",
-        }}
-        darkColor={COLORS.zinc[400]}
-        lightColor={COLORS.zinc[600]}
-      >
-        No profiles found with that username.
-      </Text>
-    </View>
-  );
+  ) : undefined;
 
   return (
     <Modal
@@ -105,7 +88,7 @@ const ProfileSearchModal = ({
       withScroll={false}
       backgroundColor={setLightOrDark(COLORS.zinc[200], COLORS.zinc[950])}
     >
-      <View style={{ paddingTop: insets.top + 10, paddingBottom: insets.bottom, flexGrow: 1 }}>
+      <View style={{ paddingTop: insets.top + 10, flexGrow: 1 }}>
         <View style={{ marginBottom: 12, position: "relative" }}>
           <Text style={{ fontSize: 18, textAlign: "center", fontWeight: "600" }}>Search Profiles</Text>
           <View style={{ position: "absolute", left: 12, top: 0 }}>
@@ -128,12 +111,26 @@ const ProfileSearchModal = ({
           />
         </View>
         <FlashList
-          contentContainerStyle={{ paddingTop: Platform.OS === "android" ? 0 : 12, flexGrow: 1 }}
           data={filteredData}
+          contentContainerStyle={{ paddingTop: Platform.OS === "android" ? 0 : 12, flexGrow: 1 }}
           keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={emptyComponent}
+          onRefresh={profileSearch.refetch}
+          onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+          onEndReached={handleEndReached}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item: profile, index }) => (
+          ListEmptyComponent={
+            <ListEmptyComponent
+              isLoading={profileSearch.isLoading}
+              isError={profileSearch.isError}
+              isRefetching={profileSearch.isRefetching}
+              errorMessage="There was an error with that search."
+              errorSubMessage="Please try again."
+              emptyMessage="No profiles found with that username."
+              customEmptyComponent={searchEmptyComponent}
+              containerStyle={{ justifyContent: "flex-start", paddingTop: 24 }}
+            />
+          }
+          renderItem={({ item: profile }) => (
             <SearchedProfilePreview
               profile={profile}
               showFollowButtons={false}
@@ -143,13 +140,11 @@ const ProfileSearchModal = ({
               }}
             />
           )}
-          onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-          onEndReached={!fetchNextLoading ? () => fetchNext() : null} // prevent from being called twice
           ListFooterComponent={
             <LoadingRetryFooter
-              isLoading={fetchNextLoading}
-              isError={hasFetchNextError}
-              fetchNextPage={fetchNext}
+              isLoading={profileSearch.isFetchingNextPage}
+              isError={profileSearch.isFetchNextPageError}
+              fetchNextPage={profileSearch.fetchNextPage}
               message="Oh no! There was an error fetching more profiles!"
             />
           }

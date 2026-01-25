@@ -194,7 +194,6 @@ const TagImagesModal = ({
       </View>
       <ProfileSearchModal
         visible={searchModalVisible}
-        setVisible={setSearchModalVisible}
         handleProfileSelection={handleProfileSelection}
         handleProfileSelectionCancel={handleProfileSelectionCancel}
         excludedProfileIds={profilesToDisplay.map((profile) => profile.id)}
