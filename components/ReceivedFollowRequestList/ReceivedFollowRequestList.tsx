@@ -38,7 +38,7 @@ const ReceivedFollowRequestList = () => {
       extraData={receivedRequests}
       keyExtractor={(item) => item.id.toString()}
       showsVerticalScrollIndicator={false}
-      onEndReachedThreshold={0.4}
+      onEndReachedThreshold={0.3}
       onRefresh={query.refetch}
       refreshing={query.isRefetching}
       contentContainerStyle={{ ...s.container, paddingBottom: tabBarHeight + 16 }}

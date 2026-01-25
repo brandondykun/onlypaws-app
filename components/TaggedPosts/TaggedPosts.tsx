@@ -46,6 +46,15 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
     return posts.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [posts.data]);
 
+  const handleEndReached = () => {
+    const hasErrors = posts.isError || posts.isFetchNextPageError;
+    const isLoading = posts.isLoading || posts.isFetchingNextPage;
+
+    if (posts.hasNextPage && !hasErrors && !isLoading) {
+      posts.fetchNextPage();
+    }
+  };
+
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
@@ -54,11 +63,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
       contentContainerStyle={{ paddingBottom: tabBarHeight, flexGrow: 1 }}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-      onEndReached={
-        !posts.isFetchingNextPage && !posts.isLoading && !posts.isError && !posts.isFetchNextPageError
-          ? () => posts.fetchNextPage()
-          : null
-      }
+      onEndReached={handleEndReached}
       ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
       refreshing={posts.isRefetching}
       refreshControl={
@@ -72,7 +77,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
       ListEmptyComponent={
         <ListEmptyComponent
           isLoading={posts.isLoading}
-          isError={true}
+          isError={posts.isError}
           isRefetching={posts.isRefetching}
           errorMessage="There was an error fetching your tagged posts."
           errorSubMessage="Swipe down to try again."

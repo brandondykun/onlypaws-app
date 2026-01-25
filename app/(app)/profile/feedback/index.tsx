@@ -86,6 +86,15 @@ const FeedbackScreen = () => {
     return feedbackTickets.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [feedbackTickets.data]);
 
+  const handleEndReached = () => {
+    const hasErrors = feedbackTickets.isError || feedbackTickets.isFetchNextPageError;
+    const isLoading = feedbackTickets.isLoading || feedbackTickets.isFetchingNextPage;
+
+    if (feedbackTickets.hasNextPage && !hasErrors && !isLoading) {
+      feedbackTickets.fetchNextPage();
+    }
+  };
+
   // initial fetch complete and data state
   if (!feedbackTickets.isLoading && !feedbackTickets.isError) {
     content = (
@@ -99,11 +108,7 @@ const FeedbackScreen = () => {
         renderItem={({ item }) => <FeedbackListItem item={item} />}
         contentContainerStyle={[s.scrollView, { paddingBottom: tabBarHeight + 24 }]}
         refreshing={feedbackTickets.isRefetching}
-        onEndReached={
-          !feedbackTickets.isFetchingNextPage && !feedbackTickets.isFetchNextPageError && !feedbackTickets.isError
-            ? () => feedbackTickets.fetchNextPage()
-            : null
-        }
+        onEndReached={handleEndReached}
         refreshControl={
           <RefreshControl
             refreshing={feedbackTickets.isRefetching}

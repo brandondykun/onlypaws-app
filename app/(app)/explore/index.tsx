@@ -71,6 +71,15 @@ const ExploreScreen = () => {
     });
   }, [navigation, router, setLightOrDark]);
 
+  const handleEndReached = () => {
+    const hasErrors = explorePosts.isError || explorePosts.isFetchNextPageError;
+    const isLoading = explorePosts.isLoading || explorePosts.isFetchingNextPage;
+
+    if (explorePosts.hasNextPage && !hasErrors && !isLoading) {
+      explorePosts.fetchNextPage();
+    }
+  };
+
   return (
     <View style={{ flex: 1, paddingTop: 8 }}>
       <FlashList
@@ -80,14 +89,7 @@ const ExploreScreen = () => {
         contentContainerStyle={{ paddingBottom: tabBarHeight, flexGrow: 1 }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={
-          explorePosts.hasNextPage &&
-          !explorePosts.isFetchingNextPage &&
-          !explorePosts.isLoading &&
-          !explorePosts.isFetchNextPageError
-            ? () => explorePosts.fetchNextPage()
-            : null
-        }
+        onEndReached={handleEndReached}
         ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
         refreshing={explorePosts.isRefetching}
         refreshControl={

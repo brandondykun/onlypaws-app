@@ -105,6 +105,15 @@ const FeedScreen = () => {
     return feedPosts.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [feedPosts.data]);
 
+  const handleEndReached = () => {
+    const hasErrors = feedPosts.isError || feedPosts.isFetchNextPageError;
+    const isLoading = feedPosts.isLoading || feedPosts.isFetchingNextPage;
+
+    if (feedPosts.hasNextPage && !hasErrors && !isLoading) {
+      feedPosts.fetchNextPage();
+    }
+  };
+
   return (
     <FlashList
       data={dataToRender}
@@ -128,10 +137,8 @@ const FeedScreen = () => {
       }
       renderItem={({ item }) => <Post post={item} onProfilePress={handleProfilePress} />}
       keyExtractor={(item) => item.id.toString()}
-      onEndReachedThreshold={0.2} // Trigger when 20% from the bottom
-      onEndReached={
-        !feedPosts.isFetchingNextPage && !feedPosts.isFetching && feedPosts.hasNextPage ? feedPosts.fetchNextPage : null
-      }
+      onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+      onEndReached={handleEndReached}
       ListFooterComponent={
         <LoadingRetryFooterWithEnd
           showEndMessage={

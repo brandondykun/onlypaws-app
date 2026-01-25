@@ -63,14 +63,23 @@ const ExplorePostsListScreen = () => {
 
   const hasInitialFetchError = !similarPosts.isLoading && similarPosts.isError && !similarPosts.isFetchNextPageError;
 
+  const handleEndReached = () => {
+    const hasErrors = similarPosts.isError || similarPosts.isFetchNextPageError;
+    const isLoading = similarPosts.isLoading || similarPosts.isFetchingNextPage;
+
+    if (similarPosts.hasNextPage && !hasErrors && !isLoading) {
+      similarPosts.fetchNextPage();
+    }
+  };
+
   return (
     <FlashList
       data={data}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      onEndReachedThreshold={0.4} // Trigger when 40% from the bottom
-      onEndReached={!similarPosts.isFetchingNextPage ? similarPosts.fetchNextPage : null}
+      onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+      onEndReached={handleEndReached}
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={
         selectedExplorePost ? <Post post={selectedExplorePost} onProfilePress={onProfilePress} /> : null

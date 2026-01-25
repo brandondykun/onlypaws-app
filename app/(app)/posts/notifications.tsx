@@ -102,7 +102,7 @@ const NotificationsScreen = () => {
         numColumns={1}
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingHorizontal: 16 }}
         keyExtractor={(item) => item.id.toString()}
-        onEndReachedThreshold={0.5} // Trigger when 50% from the bottom
+        onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? fetchNext : null}
         ItemSeparatorComponent={() => (
           <View style={{ height: 1, backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[900]) }} />

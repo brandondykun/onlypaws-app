@@ -37,6 +37,15 @@ const SavedPostsScreen = () => {
     return posts.data?.pages.flatMap((page) => page.results) ?? [];
   }, [posts.data]);
 
+  const handleEndReached = () => {
+    const hasErrors = posts.isError || posts.isFetchNextPageError;
+    const isLoading = posts.isLoading || posts.isFetchingNextPage;
+
+    if (posts.hasNextPage && !hasErrors && !isLoading) {
+      posts.fetchNextPage();
+    }
+  };
+
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
@@ -44,10 +53,8 @@ const SavedPostsScreen = () => {
       numColumns={3}
       contentContainerStyle={{ paddingBottom: tabBarHeight }}
       keyExtractor={(item) => item.id.toString()}
-      onEndReachedThreshold={0.3} // Trigger when 10% from the bottom
-      onEndReached={
-        !posts.isFetchingNextPage && !posts.isFetchNextPageError && !posts.isError ? () => posts.fetchNextPage() : null
-      }
+      onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
+      onEndReached={handleEndReached}
       ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
       refreshing={posts.isRefetching}
       refreshControl={
