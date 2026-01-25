@@ -3,11 +3,12 @@
  * Provides global access to ads enable/disable state
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { createContext, useContext, useCallback, ReactNode } from "react";
 
 import { getAdsConfig, AdsConfig } from "@/api/ads";
 
-import { useAuthProfileContext } from "./AuthProfileContext";
+import { useAuthUserContext } from "./AuthUserContext";
 
 type AdsConfigContextType = {
   adsEnabled: boolean;
@@ -30,41 +31,41 @@ type AdsConfigProviderProps = {
 };
 
 export const AdsConfigProvider = ({ children }: AdsConfigProviderProps) => {
-  const { authProfile } = useAuthProfileContext();
-  const [config, setConfig] = useState<AdsConfig>(DEFAULT_CONFIG);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { selectedProfileId } = useAuthUserContext();
 
-  const fetchConfig = useCallback(async () => {
-    if (!authProfile.id) return;
+  const adsConfigQuery = useQuery({
+    queryKey: ["adsConfig"],
+    queryFn: async () => {
+      const { data, error } = await getAdsConfig();
 
-    setIsLoading(true);
-    setError(null);
+      console.log("ADS Data: ", data);
+      console.log("ADS Error: ", error);
 
-    const { data, error: fetchError } = await getAdsConfig();
+      if (data) {
+        return data;
+      }
 
-    if (data) {
-      setConfig(data);
-    } else {
-      setError(fetchError);
-      console.warn("Using default ads config due to error:", fetchError);
-      // Keep using default config on error
-    }
+      // Log error but return default config (preserves original behavior)
+      console.warn("Using default ads config due to error:", error);
+      return DEFAULT_CONFIG;
+    },
+    enabled: !!selectedProfileId,
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour - ads config rarely changes
+  });
 
-    setIsLoading(false);
-  }, [authProfile.id]);
+  // Use query data or fall back to default config
+  const config = adsConfigQuery.data ?? DEFAULT_CONFIG;
 
-  // Fetch config on mount
-  useEffect(() => {
-    fetchConfig();
-  }, [fetchConfig]);
+  const refetchConfig = useCallback(async () => {
+    await adsConfigQuery.refetch();
+  }, [adsConfigQuery]);
 
   const value: AdsConfigContextType = {
     adsEnabled: config.enabled,
     defaultAdInterval: config.adInterval,
-    isLoading,
-    error,
-    refetchConfig: fetchConfig,
+    isLoading: adsConfigQuery.isPending,
+    error: adsConfigQuery.error?.message ?? null,
+    refetchConfig,
   };
 
   return <AdsConfigContext.Provider value={value}>{children}</AdsConfigContext.Provider>;
