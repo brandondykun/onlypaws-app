@@ -9,7 +9,8 @@
  * maintenance mode, it only renders the MaintenanceModal (not the app).
  */
 
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { createContext, useContext, useState, useCallback, ReactNode, useMemo } from "react";
 
 import { getSystemStatus } from "@/api/status";
 import MaintenanceModal from "@/components/MaintenanceModal/MaintenanceModal";
@@ -44,58 +45,69 @@ type MaintenanceProviderProps = {
   children: ReactNode;
 };
 
+const MAINTENANCE_QUERY_KEY = ["systemStatus"];
+
 export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
-  const [state, setState] = useState<MaintenanceState>(DEFAULT_STATE);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // Track if we've already done initial check to avoid duplicate calls
-  const hasCheckedRef = useRef(false);
+  // Manual override state for when triggerMaintenance is called from interceptor
+  // This takes precedence over query data since 503 responses can come from any API call
+  const [manualOverride, setManualOverride] = useState<MaintenanceState | null>(null);
 
-  /**
-   * Check system status from the backend.
-   * Called early in app initialization.
-   */
-  const checkSystemStatus = useCallback(async () => {
-    // Prevent duplicate calls during development strict mode or re-renders
-    if (hasCheckedRef.current) {
-      return;
-    }
-    hasCheckedRef.current = true;
-
-    try {
+  // Query for initial system status check
+  const systemStatusQuery = useQuery({
+    queryKey: MAINTENANCE_QUERY_KEY,
+    queryFn: async () => {
       const { data, status } = await getSystemStatus();
 
       if (data) {
-        // Check if status is maintenance OR if we got a 503
         const isMaintenanceActive = data.status === "maintenance" || status === 503;
-
-        setState({
+        return {
           isInMaintenance: isMaintenanceActive,
           message: isMaintenanceActive ? data.message : null,
           estimatedEndTime: isMaintenanceActive ? data.estimated_end_time : null,
-        });
+        };
       }
-      // If data is null but no 503, system is likely operational or unreachable
+
+      // If data is null, system is likely operational or unreachable
       // We don't block the app for network errors on status check
-    } catch (error) {
-      // Log error but don't block app - maintenance mode is opt-in
-      console.error("Error checking system status:", error);
-    } finally {
-      setIsLoading(false);
+      return DEFAULT_STATE;
+    },
+    staleTime: 1000 * 60 * 5, // Consider stale after 5 minutes
+    retry: false, // Don't retry on failure - we don't want to block the app
+  });
+
+  // Compute the final maintenance state: manual override takes precedence
+  const state: MaintenanceState = useMemo(() => {
+    if (manualOverride) {
+      return manualOverride;
     }
-  }, []);
+    return systemStatusQuery.data ?? DEFAULT_STATE;
+  }, [manualOverride, systemStatusQuery.data]);
+
+  // Loading is true only during initial fetch (not re-fetches)
+  const isLoading = systemStatusQuery.isPending;
+
+  /**
+   * Check system status from the backend.
+   * Triggers a refetch of the query.
+   */
+  const checkSystemStatus = useCallback(async () => {
+    // Refetch first, then clear manual override so fresh query data takes effect
+    await systemStatusQuery.refetch();
+    setManualOverride(null);
+  }, [systemStatusQuery]);
 
   /**
    * Trigger maintenance mode manually (e.g., from 503 interceptor).
    * Used when any API call returns 503.
    */
   const triggerMaintenance = useCallback((response?: SystemStatusResponse) => {
-    setState({
+    setManualOverride({
       isInMaintenance: true,
       message: response?.message ?? "The app is currently undergoing maintenance. Please try again later.",
       estimatedEndTime: response?.estimated_end_time ?? null,
     });
-    setIsLoading(false);
   }, []);
 
   /**
@@ -103,14 +115,10 @@ export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
    * Called when user wants to retry after maintenance.
    */
   const clearMaintenance = useCallback(() => {
-    hasCheckedRef.current = false;
-    setState(DEFAULT_STATE);
-  }, []);
-
-  // Run initial status check on mount
-  useEffect(() => {
-    checkSystemStatus();
-  }, [checkSystemStatus]);
+    setManualOverride(null);
+    // Invalidate the query so it refetches on next check
+    queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
+  }, [queryClient]);
 
   const value: MaintenanceContextType = {
     ...state,

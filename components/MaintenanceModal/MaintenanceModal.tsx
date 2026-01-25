@@ -9,7 +9,6 @@ import React, { useState, useCallback } from "react";
 import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getSystemStatus } from "@/api/status";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useMaintenance } from "@/context/MaintenanceContext";
@@ -48,7 +47,7 @@ const formatEstimatedEndTime = (isoString: string): string | null => {
 };
 
 const MaintenanceModal = () => {
-  const { isInMaintenance, message, estimatedEndTime, clearMaintenance, triggerMaintenance } = useMaintenance();
+  const { isInMaintenance, message, estimatedEndTime, checkSystemStatus } = useMaintenance();
   const { setLightOrDark, isDarkMode } = useColorMode();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -63,37 +62,17 @@ const MaintenanceModal = () => {
   const formattedEndTime = estimatedEndTime ? formatEstimatedEndTime(estimatedEndTime) : null;
 
   /**
-   * Retry checking system status.
-   * If still in maintenance, update the message.
-   * If operational, clear maintenance state.
+   * Retry checking system status via the context.
+   * The context handles determining if still in maintenance or operational.
    */
   const handleRetry = useCallback(async () => {
     setIsRetrying(true);
-
     try {
-      const { data, status } = await getSystemStatus();
-
-      if (data) {
-        const stillInMaintenance = data.status === "maintenance" || status === 503;
-
-        if (stillInMaintenance) {
-          // Update with potentially new message/time
-          triggerMaintenance(data);
-        } else {
-          // Maintenance has ended
-          clearMaintenance();
-        }
-      } else {
-        // If we can't reach the server, assume maintenance continues
-        // But don't change the current message
-      }
-    } catch (error) {
-      console.error("Error retrying system status:", error);
-      // Keep current maintenance state on error
+      await checkSystemStatus();
     } finally {
       setIsRetrying(false);
     }
-  }, [clearMaintenance, triggerMaintenance]);
+  }, [checkSystemStatus]);
 
   if (!isInMaintenance) {
     return null;
