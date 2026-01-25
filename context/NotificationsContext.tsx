@@ -1,3 +1,4 @@
+import { useInfiniteQuery, useQueryClient, InfiniteData } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, AppStateStatus } from "react-native";
@@ -10,8 +11,8 @@ import {
   markNotificationAsRead as markNotificationAsReadAPI,
 } from "@/api/notifications";
 import { useAuthUserContext } from "@/context/AuthUserContext";
-import { usePaginatedFetch } from "@/hooks/usePaginatedFetch";
-import { DBNotification, WSNotification } from "@/types/notifications/base";
+import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
+import { getNextPageParam } from "@/utils/utils";
 
 export type NotificationContextType = {
   // WebSocket connection status
@@ -22,22 +23,25 @@ export type NotificationContextType = {
   allNotifications: (DBNotification | WSNotification)[];
   unreadCount: number;
 
-  // Pagination controls (exposed from usePaginatedFetch)
-  fetch: () => Promise<void>;
+  // Pagination controls (TanStack Query style)
   refresh: () => Promise<void>;
-  refreshing: boolean;
-  fetchNext: () => Promise<void>;
-  fetchNextLoading: boolean;
-  fetchNextUrl: string | null;
-  hasInitialFetchError: boolean;
-  hasFetchNextError: boolean;
-  initialFetchComplete: boolean;
+  isRefetching: boolean;
+  isPending: boolean;
+  isError: boolean;
+  fetchNextPage: () => Promise<void>;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  isFetchNextPageError: boolean;
+  isLoading: boolean;
 
   // Notification actions
   markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   markAllAsReadLoading: boolean;
   clearNotifications: () => void;
+
+  // Follow requests count (set by FollowRequestsContext)
+  setPendingFollowRequestsCount: (count: number) => void;
 
   // Helper functions
   formatNotificationMessage: (notification: WSNotification) => string;
@@ -55,22 +59,25 @@ const NotificationsContext = createContext<NotificationContextType>({
   allNotifications: [],
   unreadCount: 0,
 
-  // Pagination controls
-  fetch: async () => {},
+  // Pagination controls (TanStack Query style)
   refresh: async () => {},
-  refreshing: false,
-  fetchNext: async () => {},
-  fetchNextLoading: false,
-  fetchNextUrl: null,
-  hasInitialFetchError: false,
-  hasFetchNextError: false,
-  initialFetchComplete: false,
+  isRefetching: false,
+  isPending: true,
+  isError: false,
+  fetchNextPage: async () => {},
+  isFetchingNextPage: false,
+  hasNextPage: false,
+  isFetchNextPageError: false,
+  isLoading: true,
 
   // Notification actions
   markAsRead: async () => {},
   markAllAsRead: async () => {},
   markAllAsReadLoading: false,
   clearNotifications: () => {},
+
+  // Follow requests count (set by FollowRequestsContext)
+  setPendingFollowRequestsCount: () => {},
 
   // Helper functions
   formatNotificationMessage: (notification) => notification.message,
@@ -84,14 +91,10 @@ type Props = {
 
 const NotificationsContextProvider = ({ children }: Props) => {
   const { isAuthenticated, selectedProfileId } = useAuthUserContext();
+  const queryClient = useQueryClient();
 
-  // Initialize paginated fetch for DB notifications
-  // Include selectedProfileId so fetch resets when profile changes
-  const initialFetch = useCallback(async () => {
-    const { data, error } = await getNotifications();
-    return { data, error };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProfileId]);
+  // Query key for notifications - includes selectedProfileId so query resets when profile changes
+  const notificationsQueryKey = useMemo(() => [selectedProfileId, "notifications"], [selectedProfileId]);
 
   // Delay notifications fetch by 500ms on initial load to avoid racing with initial token refresh
   // The auth interceptor will handle 401s that occur during profile switches
@@ -108,36 +111,71 @@ const NotificationsContextProvider = ({ children }: Props) => {
     }
   }, [selectedProfileId, isAuthenticated]);
 
-  // Use paginated fetch hook for DB notifications
-  const {
-    fetchInitial,
-    data: dbNotifications,
-    setData: setDbNotifications,
-    refresh: refreshDbNotifications,
-    refreshing: refreshingDbNotifications,
-    initialFetchComplete: initialFetchCompleteDbNotifications,
-    hasInitialFetchError: hasInitialFetchErrorDbNotifications,
-    fetchNext: fetchNextDbNotifications,
-    fetchNextUrl: fetchNextUrlDbNotifications,
-    fetchNextLoading: fetchNextLoadingDbNotifications,
-    hasFetchNextError: hasFetchNextErrorDbNotifications,
-  } = usePaginatedFetch<DBNotification>(initialFetch, {
+  // Fetch function for useInfiniteQuery
+  const fetchNotifications = async ({ pageParam }: { pageParam: string }) => {
+    const res = await getNotifications(pageParam);
+    return res.data;
+  };
+
+  // Use infinite query for DB notifications
+  const dbNotificationsQuery = useInfiniteQuery({
+    queryKey: notificationsQueryKey,
+    queryFn: fetchNotifications,
+    initialPageParam: "1",
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
     enabled: enableNotificationsFetch,
   });
+
+  // Flatten paginated data into a single array
+  const dbNotifications = useMemo(
+    () => dbNotificationsQuery.data?.pages.flatMap((page) => page.results) ?? [],
+    [dbNotificationsQuery.data],
+  );
 
   // WebSocket notifications state (recent notifications received while app is open)
   const [wsNotifications, setWsNotifications] = useState<WSNotification[]>([]);
 
+  // Unread count from API - this is the authoritative count that we adjust locally
+  // It's initialized from the first page's extra_data.unread_count and adjusted when:
+  // - New WebSocket notifications arrive (increment)
+  // - Notifications are marked as read (decrement)
+  // - All notifications are marked as read (set to 0)
+  // - Query is refetched (reset to API value)
+  const [apiUnreadCount, setApiUnreadCount] = useState<number>(0);
+
+  // Track WebSocket notifications that haven't been persisted to DB yet
+  // These are counted separately since they're not included in the API's unread_count
+  const wsUnreadCount = useMemo(
+    () => wsNotifications.filter((n) => !n.is_read && n.notification_type !== "follow_request").length,
+    [wsNotifications],
+  );
+
+  // Pending follow requests count (set by FollowRequestsContext)
+  const [pendingFollowRequestsCount, setPendingFollowRequestsCount] = useState(0);
+
+  // Total unread count = API count + unread WS notifications + pending follow requests
+  // Only show the count after the initial notifications fetch completes to avoid count flickering
+  const unreadCount = dbNotificationsQuery.isPending ? 0 : apiUnreadCount + wsUnreadCount + pendingFollowRequestsCount;
+
+  // Update apiUnreadCount when query data changes (initial fetch or refetch)
+  useEffect(() => {
+    const firstPageUnreadCount = dbNotificationsQuery.data?.pages[0]?.extra_data?.unread_count;
+    if (firstPageUnreadCount !== undefined) {
+      setApiUnreadCount(firstPageUnreadCount);
+    }
+  }, [dbNotificationsQuery.data]);
+
   // Track the previous profile ID to detect profile switches
   const prevProfileIdRef = useRef<number | null>(null);
 
-  // Clear WebSocket notifications when profile changes
-  // DB notifications are automatically cleared by usePaginatedFetch when initialFetch changes
+  // Clear WebSocket notifications and reset unread count when profile changes
+  // DB notifications are automatically cleared by useInfiniteQuery when query key changes
   useEffect(() => {
     const isProfileSwitch = prevProfileIdRef.current !== null && prevProfileIdRef.current !== selectedProfileId;
 
     if (isProfileSwitch && selectedProfileId) {
       setWsNotifications([]);
+      setApiUnreadCount(0); // Reset until new profile's count is fetched
     }
 
     prevProfileIdRef.current = selectedProfileId;
@@ -210,18 +248,15 @@ const NotificationsContextProvider = ({ children }: Props) => {
     );
   }, [wsNotifications, dbNotifications]);
 
-  // Calculate total unread count from combined notifications
-  const unreadCount = allNotifications.filter((notification) => !notification.is_read).length;
-
   // Custom refresh function that also cleans up WebSocket notifications
   const refresh = useCallback(async () => {
-    await refreshDbNotifications();
+    await dbNotificationsQuery.refetch();
 
     // Remove WebSocket notifications that are now persisted in DB
     setWsNotifications((prev) =>
       prev.filter((wsNotif) => !dbNotifications.some((dbNotif) => dbNotif.id === wsNotif.id)),
     );
-  }, [refreshDbNotifications, dbNotifications]);
+  }, [dbNotificationsQuery, dbNotifications]);
 
   // Store the latest refresh function in ref to avoid dependency chain issues
   refreshRef.current = refresh;
@@ -526,19 +561,51 @@ const NotificationsContextProvider = ({ children }: Props) => {
           visibilityTime: 5000,
           autoHide: true,
         });
+        return; // Don't update local state if API call failed
       }
 
-      // Update WebSocket notifications
+      // Update WebSocket notifications (wsUnreadCount will automatically adjust via useMemo)
       setWsNotifications((prev) =>
         prev.map((notification) => (notification.id === numericId ? { ...notification, is_read: true } : notification)),
       );
 
-      // Update DB notifications in the paginated fetch data
-      setDbNotifications((prev) =>
-        prev.map((notification) => (notification.id === numericId ? { ...notification, is_read: true } : notification)),
-      );
+      // Check if this notification exists in DB and is currently unread
+      // We need this check because:
+      // 1. The notification might be a WS notification (not in DB) - don't decrement apiUnreadCount for those
+      // 2. Safety check in case the notification was already read
+      const currentData =
+        queryClient.getQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey);
+      let wasUnreadInDb = false;
+      if (currentData) {
+        for (const page of currentData.pages) {
+          const notification = page.results.find((n) => n.id === numericId);
+          if (notification && !notification.is_read) {
+            wasUnreadInDb = true;
+            break;
+          }
+        }
+      }
+
+      // Decrement apiUnreadCount only if this was an unread DB notification
+      if (wasUnreadInDb) {
+        setApiUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+
+      // Update DB notifications in the query cache
+      queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            results: page.results.map((notification) =>
+              notification.id === numericId ? { ...notification, is_read: true } : notification,
+            ),
+          })),
+        };
+      });
     },
-    [setDbNotifications],
+    [queryClient, notificationsQueryKey],
   );
 
   // Mark all notifications as read (both DB and WebSocket) with API call
@@ -555,20 +622,46 @@ const NotificationsContextProvider = ({ children }: Props) => {
         throw new Error("Failed to mark notifications as read");
       }
 
+      // Mark all WS notifications as read (wsUnreadCount will go to 0 via useMemo)
       setWsNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
-      setDbNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
+
+      // Set API unread count to 0 since all are now read
+      setApiUnreadCount(0);
+
+      // Update DB notifications in the query cache
+      queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            results: page.results.map((notification) => ({ ...notification, is_read: true })),
+          })),
+        };
+      });
     } catch (error) {
       throw error;
     } finally {
       setMarkAllAsReadLoading(false);
     }
-  }, [markAllAsReadLoading, setDbNotifications]);
+  }, [markAllAsReadLoading, queryClient, notificationsQueryKey]);
 
   // Clear all notifications (both WebSocket and DB)
   const clearNotifications = useCallback(() => {
     setWsNotifications([]);
-    setDbNotifications([]);
-  }, [setDbNotifications]);
+    setApiUnreadCount(0);
+    // Clear DB notifications from the query cache
+    queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          results: [],
+        })),
+      };
+    });
+  }, [queryClient, notificationsQueryKey]);
 
   // Handle app state changes (foreground/background)
   useEffect(() => {
@@ -661,6 +754,11 @@ const NotificationsContextProvider = ({ children }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, selectedProfileId, appStateVisible]);
 
+  // Wrapper for fetchNextPage to match expected interface type
+  const fetchNextPageWrapper = useCallback(async () => {
+    await dbNotificationsQuery.fetchNextPage();
+  }, [dbNotificationsQuery]);
+
   const value: NotificationContextType = {
     // WebSocket connection status
     isConnected,
@@ -670,22 +768,25 @@ const NotificationsContextProvider = ({ children }: Props) => {
     allNotifications,
     unreadCount,
 
-    // Pagination controls (exposed from usePaginatedFetch)
-    fetch: fetchInitial,
+    // Pagination controls (TanStack Query style)
     refresh,
-    refreshing: refreshingDbNotifications,
-    fetchNext: fetchNextDbNotifications,
-    fetchNextLoading: fetchNextLoadingDbNotifications,
-    fetchNextUrl: fetchNextUrlDbNotifications,
-    hasInitialFetchError: hasInitialFetchErrorDbNotifications,
-    hasFetchNextError: hasFetchNextErrorDbNotifications,
-    initialFetchComplete: initialFetchCompleteDbNotifications,
+    isRefetching: dbNotificationsQuery.isRefetching,
+    isPending: dbNotificationsQuery.isPending,
+    isError: dbNotificationsQuery.isError && !dbNotificationsQuery.data,
+    fetchNextPage: fetchNextPageWrapper,
+    isFetchingNextPage: dbNotificationsQuery.isFetchingNextPage,
+    hasNextPage: dbNotificationsQuery.hasNextPage,
+    isFetchNextPageError: dbNotificationsQuery.isFetchNextPageError,
+    isLoading: dbNotificationsQuery.isLoading,
 
     // Notification actions
     markAsRead,
     markAllAsRead,
     markAllAsReadLoading,
     clearNotifications,
+
+    // Follow requests count (set by FollowRequestsContext)
+    setPendingFollowRequestsCount,
 
     // Helper functions
     formatNotificationMessage,

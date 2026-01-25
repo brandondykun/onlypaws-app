@@ -49,7 +49,11 @@ export interface WSBaseNotification {
 }
 
 // Paginated notifications response
-export type PaginatedDBNotificationsResponse = PaginatedResponse<DBNotification>;
+export type PaginatedDBNotificationsResponse = PaginatedResponse<DBNotification> & {
+  extra_data: {
+    unread_count: number;
+  };
+};
 
 // Notification from relational database
 // the notifications can be of different types, but they will all have the same base fields

@@ -69,7 +69,7 @@ type Props = {
 
 const FollowRequestsContextProvider = ({ children }: Props) => {
   const { selectedProfileId } = useAuthUserContext();
-  const { wsNotifications } = useNotificationsContext();
+  const { wsNotifications, setPendingFollowRequestsCount } = useNotificationsContext();
   const { addFollower, addFollowing, authProfile } = useAuthProfileContext();
   const queryClient = useQueryClient();
   const profileDetailsManager = useProfileDetailsManagerContext();
@@ -158,6 +158,16 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
       return { ...req, status: reqWithStatus.status ?? "pending" };
     });
   }, [sentRequestsQuery.data]);
+
+  // Sync pending follow requests count with NotificationsContext
+  const pendingReceivedCount = useMemo(
+    () => receivedRequests.filter((req) => req.status === "pending").length,
+    [receivedRequests],
+  );
+
+  useEffect(() => {
+    setPendingFollowRequestsCount(pendingReceivedCount);
+  }, [pendingReceivedCount, setPendingFollowRequestsCount]);
 
   // ============================================================================
   // WebSocket Integration

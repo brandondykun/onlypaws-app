@@ -30,14 +30,16 @@ const NotificationsScreen = () => {
     allNotifications,
     unreadCount,
     refresh,
-    refreshing,
-    initialFetchComplete,
-    hasInitialFetchError,
-    fetchNext,
-    fetchNextLoading,
-    hasFetchNextError,
+    isRefetching,
+    isPending,
+    isError,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetchNextPageError,
     markAllAsRead,
     markAllAsReadLoading,
+    isLoading,
   } = useNotificationsContext();
 
   // Custom refresh function that triggers haptic feedback
@@ -62,6 +64,15 @@ const NotificationsScreen = () => {
     });
   }, [navigation]);
 
+  const handleEndReached = () => {
+    const hasErrors = isError || isFetchNextPageError;
+    const loading = isLoading || isFetchingNextPage;
+
+    if (hasNextPage && !hasErrors && !loading) {
+      fetchNextPage();
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <NotificationsScreenHeader
@@ -82,7 +93,7 @@ const NotificationsScreen = () => {
             View Follow Requests
           </Text>
           <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
-            {hasReceivedRequests || hasSentRequests ? (
+            {hasReceivedRequests ? (
               <View
                 style={{
                   height: 10,
@@ -103,14 +114,14 @@ const NotificationsScreen = () => {
         contentContainerStyle={{ paddingBottom: tabBarHeight, paddingHorizontal: 16 }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
-        onEndReached={!fetchNextLoading && !hasFetchNextError && !hasInitialFetchError ? fetchNext : null}
+        onEndReached={handleEndReached}
         ItemSeparatorComponent={() => (
           <View style={{ height: 1, backgroundColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[900]) }} />
         )}
-        refreshing={refreshing}
+        refreshing={isRefetching}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
+            refreshing={isRefetching}
             onRefresh={handleRefresh}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
@@ -118,9 +129,9 @@ const NotificationsScreen = () => {
         }
         ListEmptyComponent={
           <ListEmptyComponent
-            isLoading={!initialFetchComplete}
-            isError={hasInitialFetchError}
-            isRefetching={refreshing}
+            isLoading={isPending}
+            isError={isError}
+            isRefetching={isRefetching}
             errorMessage="There was an error fetching your notifications."
             errorSubMessage="Swipe down to try again."
             emptyMessage="No Notifications"
@@ -129,9 +140,9 @@ const NotificationsScreen = () => {
         renderItem={({ item, index }) => <NotificationListItem item={item} index={index} />}
         ListFooterComponent={
           <LoadingRetryFooter
-            isLoading={fetchNextLoading}
-            isError={hasFetchNextError}
-            fetchNextPage={fetchNext}
+            isLoading={isFetchingNextPage}
+            isError={isFetchNextPageError}
+            fetchNextPage={fetchNextPage}
             message="Oh no! There was an error fetching more notifications!"
           />
         }
