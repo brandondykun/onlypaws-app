@@ -20,7 +20,7 @@ const AddPostTagsSection = ({ taggedUsernames, setTagImagesModalVisible, isEdit 
         marginBottom: 36,
         borderTopWidth: 3,
         borderBottomWidth: 3,
-        borderColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]),
+        borderColor: setLightOrDark(COLORS.zinc[100], COLORS.zinc[900]),
         paddingVertical: 24,
         paddingHorizontal: 16,
       }}
