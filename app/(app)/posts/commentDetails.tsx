@@ -1,11 +1,12 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { View, ScrollView, ActivityIndicator } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { getCommentChain } from "@/api/interactions";
+import { getCommentChainForQuery } from "@/api/interactions";
 import Button from "@/components/Button/Button";
 import MainComment from "@/components/Comment/MainComment";
 import ReplyComment from "@/components/Comment/ReplyComment";
@@ -13,7 +14,6 @@ import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { CommentChainResponse } from "@/types/post/post";
 import { ImageAspectRatio } from "@/types/post/post";
 
 const CommentDetailsScreen = () => {
@@ -21,27 +21,23 @@ const CommentDetailsScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const { isDarkMode } = useColorMode();
   const scrollViewRef = useRef<ScrollView>(null);
-
-  const [commentChain, setCommentChain] = useState<CommentChainResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showTagPopovers, setShowTagPopovers] = useState(false);
 
-  const fetchCommentChain = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const { data, error } = await getCommentChain(commentId);
-    if (data && !error) {
-      setCommentChain(data);
-    } else {
-      setError(error || "Error fetching comment chain");
-    }
-    setLoading(false);
-  }, [commentId]);
+  const fetchCommentChain = async (commentId: string) => {
+    const res = await getCommentChainForQuery(commentId);
+    return res.data;
+  };
 
-  useEffect(() => {
-    fetchCommentChain();
-  }, [commentId, fetchCommentChain]);
+  const {
+    data: commentChain,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["commentChain", commentId],
+    queryFn: () => fetchCommentChain(commentId),
+    enabled: !!commentId,
+  });
 
   // scroll to the bottom of the screen when the comment chain is loaded
   useEffect(() => {
@@ -61,8 +57,8 @@ const CommentDetailsScreen = () => {
     });
   }, []);
 
-  if (loading) return <Loading />;
-  if (error || !commentChain) return <RetryErrorMessage fetchFn={fetchCommentChain} />;
+  if (isLoading) return <Loading />;
+  if (isError || !commentChain) return <RetryErrorMessage fetchFn={refetch} />;
 
   // check if the comment is a top level comment
   const isTopLevelComment = commentChain && commentChain?.root_parent_comment === null;
@@ -138,10 +134,19 @@ const Loading = () => {
   );
 };
 
-const RetryErrorMessage = ({ fetchFn }: { fetchFn: () => void }) => {
+const RetryErrorMessage = ({ fetchFn }: { fetchFn: () => void | Promise<unknown> }) => {
   const { setLightOrDark } = useColorMode();
+  const tabBarHeight = useBottomTabBarHeight();
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 24,
+        paddingBottom: tabBarHeight + 48,
+      }}
+    >
       <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>We A-paw-logize!</Text>
       <Text style={{ fontSize: 16, color: setLightOrDark(COLORS.zinc[700], COLORS.zinc[400]) }}>
         There was an error fetching this comment.

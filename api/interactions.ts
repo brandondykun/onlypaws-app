@@ -52,6 +52,11 @@ export const getCommentChain = async (commentId: string | number) => {
   return await axiosFetch<CommentChainResponse>(url);
 };
 
+export const getCommentChainForQuery = async (commentId: string | number) => {
+  const url = `/v1/interactions/comment/${commentId}/chain/`;
+  return await axiosInstance.get<CommentChainResponse>(url);
+};
+
 export const likeComment = async (commentId: number, profileId: number) => {
   const url = `/v1/interactions/like/comment/${commentId}/`;
   return await axiosPost<CommentLike>(url, { profileId });
