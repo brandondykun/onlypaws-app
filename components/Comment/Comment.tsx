@@ -1,17 +1,17 @@
 import { BottomSheetFlatListMethods } from "@gorhom/bottom-sheet";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
-import { useCallback, useState } from "react";
-import React from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { axiosFetch } from "@/api/config";
-import { deleteCommentLike, getCommentReplies, likeComment } from "@/api/interactions";
+import { deleteCommentLike, getCommentRepliesForQuery, likeComment as likeCommentApi } from "@/api/interactions";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
-import { PaginatedResponse } from "@/types/shared/pagination";
+import { getNextPageParam } from "@/utils/utils";
 
 import FetchRepliesRetry from "./FetchRepliesRetry";
 import HideRepliesButton from "./HideRepliesButton";
@@ -23,48 +23,57 @@ import ShowRepliesButton from "./ShowRepliesButton";
 
 type Props = {
   comment: PostCommentDetailed;
-  onLike: (commentId: number) => void;
-  onUnlike: (commentId: number) => void;
   onReplyPress: (parentComment: PostCommentDetailed, replyingToComment: PostCommentDetailed) => void;
-  handleAddReplies: (parentCommentId: number, replies: PostCommentDetailed[]) => void;
-  handleHideReplies: (parentCommentId: number) => void;
-  onLikeReply: (commentId: number, replyId: number) => void;
-  onUnlikeReply: (commentId: number, replyId: number) => void;
   commentIndex: number;
   listRef: React.RefObject<BottomSheetFlatListMethods>;
   replyToCommentId?: number;
+  commentsQueryKey: readonly unknown[];
 };
 
-const Comment = ({
-  comment,
-  onLike,
-  onUnlike,
-  onReplyPress,
-  handleAddReplies,
-  handleHideReplies,
-  onLikeReply,
-  onUnlikeReply,
-  listRef,
-  commentIndex,
-  replyToCommentId,
-}: Props) => {
+const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentId, commentsQueryKey }: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
+  const queryClient = useQueryClient();
 
-  const [fetchRepliesLoading, setFetchRepliesLoading] = useState(false);
-  const [fetchNextUrl, setFetchNextUrl] = useState<string | null>(null);
-  const [fetchNextLoading, setFetchNextLoading] = useState(false);
-  const [hasFetchNextError, setHasFetchNextError] = useState(false);
-  const [hasFetchRepliesError, setHasFetchRepliesError] = useState(false);
-  const [initialReplyFetchComplete, setInitialReplyFetchComplete] = useState(false);
+  // State to track if user has requested to show replies
+  const [showReplies, setShowReplies] = useState(false);
 
-  // handle liking a top level comment
+  // Query key for this comment's replies
+  const repliesQueryKey = useMemo(() => ["comment-replies", comment.id] as const, [comment.id]);
+
+  // Cache updaters for the comments
+  const { likeComment, unlikeComment, addReplies, hideReplies, likeReply, unlikeReply } =
+    useCommentsCacheUpdaters(commentsQueryKey);
+
+  // Query for fetching replies using useInfiniteQuery
+  const repliesQuery = useInfiniteQuery({
+    queryKey: repliesQueryKey,
+    queryFn: async ({ pageParam }) => {
+      const response = await getCommentRepliesForQuery(comment.id, pageParam);
+      return response.data;
+    },
+    initialPageParam: "1",
+    getNextPageParam: (lastPage) => getNextPageParam(lastPage),
+    enabled: showReplies && comment.replies_count > comment.replies.length,
+  });
+
+  // Sync fetched replies to main comments cache when data changes
+  useEffect(() => {
+    if (repliesQuery.data) {
+      const allReplies = repliesQuery.data.pages.flatMap((page) => page.results);
+      if (allReplies.length > 0) {
+        addReplies(comment.id, allReplies);
+      }
+    }
+  }, [repliesQuery.data, comment.id, addReplies]);
+
+  // Handle liking a top level comment
   const handleLike = async (commentId: number) => {
     Haptics.impactAsync();
-    onLike(commentId); // optimistic like
-    const { error } = await likeComment(commentId, authProfile.id);
+    likeComment(commentId); // optimistic like
+    const { error } = await likeCommentApi(commentId, authProfile.id);
     if (error) {
-      onUnlike(commentId); // revert like on error
+      unlikeComment(commentId); // revert like on error
       Toast.show({
         type: "error",
         text1: "Error",
@@ -73,13 +82,13 @@ const Comment = ({
     }
   };
 
-  // handle un-liking a top level comment
+  // Handle un-liking a top level comment
   const handleUnlike = async (commentId: number) => {
     Haptics.selectionAsync();
-    onUnlike(commentId); // optimistic unlike
+    unlikeComment(commentId); // optimistic unlike
     const { error } = await deleteCommentLike(commentId);
     if (error) {
-      onLike(commentId); // revert unlike on error
+      likeComment(commentId); // revert unlike on error
       Toast.show({
         type: "error",
         text1: "Error",
@@ -88,7 +97,7 @@ const Comment = ({
     }
   };
 
-  // wrapper function to call either like or unlike comment
+  // Wrapper function to call either like or unlike comment
   const handleHeartPress = (commentId: number) => {
     if (comment.liked) {
       handleUnlike(commentId);
@@ -97,58 +106,61 @@ const Comment = ({
     }
   };
 
-  // fetch replies for the comment
-  const fetchReplies = async () => {
-    setFetchRepliesLoading(true);
-    setHasFetchRepliesError(false);
-    const { error, data } = await getCommentReplies(comment.id);
-    if (!error && data) {
-      setFetchNextUrl(data.next);
-      handleAddReplies(comment.id, data.results);
-      setInitialReplyFetchComplete(true);
-    } else {
-      setHasFetchRepliesError(true);
-    }
-    setFetchRepliesLoading(false);
-  };
+  // Show replies by enabling the query
+  const fetchReplies = useCallback(() => {
+    setShowReplies(true);
+  }, []);
 
-  // fetch next paginated list of replies
-  const fetchNext = useCallback(async () => {
-    if (fetchNextUrl) {
-      setFetchNextLoading(true);
-      setHasFetchNextError(false);
-      const { error, data } = await axiosFetch<PaginatedResponse<PostCommentDetailed>>(fetchNextUrl);
-      if (!error && data) {
-        handleAddReplies(comment.id, data.results);
-        setFetchNextUrl(data.next);
-      } else {
-        setHasFetchNextError(true);
-      }
-      setFetchNextLoading(false);
+  // Fetch next page of replies
+  const fetchNext = useCallback(() => {
+    if (repliesQuery.hasNextPage && !repliesQuery.isFetchingNextPage) {
+      repliesQuery.fetchNextPage();
     }
-  }, [fetchNextUrl, comment.id, handleAddReplies]);
+  }, [repliesQuery]);
 
-  // handle liking a nested reply comment
+  // Retry fetching replies after an error
+  const retryFetchReplies = useCallback(() => {
+    if (repliesQuery.isFetchNextPageError) {
+      repliesQuery.fetchNextPage();
+    } else if (repliesQuery.isError) {
+      repliesQuery.refetch();
+    }
+  }, [repliesQuery]);
+
+  // Hide replies and reset state
+  const handleHideReplies = useCallback(() => {
+    hideReplies(comment.id);
+    setShowReplies(false);
+    // Clear the replies query cache so it refetches when shown again
+    queryClient.removeQueries({ queryKey: repliesQueryKey });
+  }, [hideReplies, comment.id, queryClient, repliesQueryKey]);
+
+  // Handle liking a nested reply comment
   const handleLikeReply = async (id: number) => {
     Haptics.impactAsync();
-    onLikeReply(comment.id, id);
-    const { error } = await likeComment(id, authProfile.id);
+    likeReply(comment.id, id);
+    const { error } = await likeCommentApi(id, authProfile.id);
     if (error) {
-      onUnlikeReply(comment.id, id);
+      unlikeReply(comment.id, id);
     }
   };
 
-  // handle un-liking a nested reply comment
+  // Handle un-liking a nested reply comment
   const handleUnlikeReply = async (id: number) => {
     Haptics.selectionAsync();
-    onUnlikeReply(comment.id, id);
+    unlikeReply(comment.id, id);
     const { error } = await deleteCommentLike(id);
     if (error) {
-      onLikeReply(comment.id, id);
+      likeReply(comment.id, id);
     }
   };
 
   const bgColor = getCommentBgColor(replyToCommentId, comment.id, isDarkMode);
+
+  // Determine loading and error states from useInfiniteQuery
+  const isLoadingReplies = repliesQuery.isLoading || repliesQuery.isFetchingNextPage;
+  const hasError = repliesQuery.isError || repliesQuery.isFetchNextPageError;
+  const hasMoreReplies = comment.replies_count !== comment.replies.length;
 
   return (
     <View style={[s.root]}>
@@ -186,27 +198,21 @@ const Comment = ({
             })}
           </View>
           <View style={{ marginTop: 6, paddingLeft: 16, marginBottom: 12 }}>
-            {hasFetchNextError || hasFetchRepliesError ? (
-              <FetchRepliesRetry onPress={hasFetchRepliesError ? fetchReplies : fetchNext} />
-            ) : fetchNextLoading || fetchRepliesLoading ? (
+            {hasError ? (
+              <FetchRepliesRetry onPress={retryFetchReplies} />
+            ) : isLoadingReplies ? (
               <ActivityIndicator
                 color={COLORS.zinc[500]}
                 style={{ alignItems: "flex-start", paddingLeft: 56, height: 14, width: 14 }}
               />
-            ) : comment.replies_count !== comment.replies.length ? (
+            ) : hasMoreReplies ? (
               <ShowRepliesButton
-                onPress={initialReplyFetchComplete ? fetchNext : fetchReplies}
+                onPress={showReplies ? fetchNext : fetchReplies}
                 commentRepliesCount={comment.replies_count}
                 commentRepliesLength={comment.replies.length}
               />
             ) : (
-              <HideRepliesButton
-                onPress={() => {
-                  handleHideReplies(comment.id);
-                  setFetchNextUrl(null);
-                  setInitialReplyFetchComplete(false);
-                }}
-              />
+              <HideRepliesButton onPress={handleHideReplies} />
             )}
           </View>
         </>
@@ -224,7 +230,7 @@ const s = StyleSheet.create({
   },
 });
 
-// get the background color to highlight a comment or reply comment if user is replying to that comment
+// Get the background color to highlight a comment or reply comment if user is replying to that comment
 const getCommentBgColor = (replyToCommentId: number | undefined, commentId: number, isDarkMode: boolean) => {
   if (replyToCommentId && replyToCommentId === commentId) {
     return isDarkMode ? COLORS.sky[975] : COLORS.sky[100];

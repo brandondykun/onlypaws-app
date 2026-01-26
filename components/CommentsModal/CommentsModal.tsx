@@ -53,8 +53,7 @@ const CommentsModal = forwardRef(
     const commentsQueryKey = useMemo(() => ["comments", postId] as const, [postId]);
 
     // Cache updaters for comments
-    const { likeComment, unlikeComment, addReply, addReplies, hideReplies, likeReply, unlikeReply, prependComment } =
-      useCommentsCacheUpdaters(commentsQueryKey);
+    const { addReply, prependComment } = useCommentsCacheUpdaters(commentsQueryKey);
 
     // Fetch comments using useInfiniteQuery
     const commentsQuery = useInfiniteQuery({
@@ -181,16 +180,11 @@ const CommentsModal = forwardRef(
           renderItem={({ item, index }: { item: PostCommentDetailed; index: number }) => (
             <Comment
               comment={item}
-              onLike={likeComment}
-              onUnlike={unlikeComment}
               onReplyPress={handleReplyPress}
-              handleAddReplies={addReplies}
-              handleHideReplies={hideReplies}
-              onLikeReply={likeReply}
-              onUnlikeReply={unlikeReply}
               commentIndex={index}
               listRef={flatListRef as React.RefObject<BottomSheetFlatListMethods>}
               replyToCommentId={replyToComment?.id}
+              commentsQueryKey={commentsQueryKey}
             />
           )}
           ListFooterComponent={
