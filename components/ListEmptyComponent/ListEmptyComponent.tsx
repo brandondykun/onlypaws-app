@@ -13,7 +13,7 @@ const useSafeBottomTabBarHeight = () => {
   }
 };
 
-type Props = {
+type BaseProps = {
   // Required state flags
   isLoading: boolean;
   isError: boolean;
@@ -21,19 +21,44 @@ type Props = {
   // Optional state flags
   isRefetching?: boolean; // Prevents flashing empty state during refresh
 
-  // Messages
-  emptyMessage: string;
-  emptySubMessage?: string;
-  errorMessage?: string; // Defaults to generic error
-  errorSubMessage?: string;
-
   // Custom components
   loadingComponent?: React.ReactNode; // Defaults to ActivityIndicator
-  customEmptyComponent?: React.ReactNode; // Overrides emptyMessage when provided
 
   // Styling
   containerStyle?: ViewStyle;
 };
+
+// Empty state - either custom component OR messages (not both)
+type CustomEmptyProps = {
+  customEmptyComponent: React.ReactNode;
+  emptyMessage?: never;
+  emptySubMessage?: never;
+};
+
+type DefaultEmptyProps = {
+  customEmptyComponent?: never;
+  emptyMessage: string;
+  emptySubMessage?: string;
+};
+
+type EmptyProps = CustomEmptyProps | DefaultEmptyProps;
+
+// Error state - either custom component OR messages (not both)
+type CustomErrorProps = {
+  customErrorComponent: React.ReactNode;
+  errorMessage?: never;
+  errorSubMessage?: never;
+};
+
+type DefaultErrorProps = {
+  customErrorComponent?: never;
+  errorMessage: string;
+  errorSubMessage?: string;
+};
+
+type ErrorProps = CustomErrorProps | DefaultErrorProps;
+
+type Props = BaseProps & EmptyProps & ErrorProps;
 
 const ListEmptyComponent = ({
   isLoading,
@@ -41,10 +66,11 @@ const ListEmptyComponent = ({
   isRefetching = false,
   emptyMessage,
   emptySubMessage,
-  errorMessage = "Oh no! There was an error.",
-  errorSubMessage = "Swipe down to try again.",
+  errorMessage,
+  errorSubMessage,
   loadingComponent,
   customEmptyComponent,
+  customErrorComponent,
   containerStyle,
 }: Props) => {
   const tabBarHeight = useSafeBottomTabBarHeight();
@@ -65,6 +91,10 @@ const ListEmptyComponent = ({
 
   // Error state (not refetching)
   if (isError) {
+    // Custom error component takes precedence
+    if (customErrorComponent) {
+      return <>{customErrorComponent}</>;
+    }
     return (
       <View style={[s.errorContainer, { paddingBottom: tabBarHeight }, containerStyle]}>
         <Text style={s.errorText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[700]}>

@@ -102,7 +102,6 @@ const FollowingScreen = () => {
             isError={activeQuery.isError}
             isRefetching={activeQuery.isRefetching}
             errorMessage="There was an error loading following."
-            emptyMessage="You are not following any profiles. Get out there and find some profiles to follow!"
             customEmptyComponent={searchEmptyComponent}
           />
         }

@@ -169,6 +169,8 @@ const FeedScreen = () => {
           }
           emptyMessage="Oh no! Your feed is empty. Follow some users to see their posts here!"
           containerStyle={s.emptyComponentContainer}
+          errorMessage="There was an error fetching your feed."
+          errorSubMessage="Swipe down to try again."
         />
       }
       onScroll={(event) => {

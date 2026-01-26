@@ -103,7 +103,6 @@ const FollowersScreen = () => {
             isRefetching={activeQuery.isRefetching}
             errorMessage="There was an error."
             errorSubMessage="Swipe down to retry."
-            emptyMessage="You don't have any followers yet. Keep posting great content to gain some followers!"
             customEmptyComponent={searchEmptyComponent}
           />
         }

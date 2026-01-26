@@ -125,7 +125,6 @@ const ProfileSearchModal = ({
               isRefetching={profileSearch.isRefetching}
               errorMessage="There was an error with that search."
               errorSubMessage="Please try again."
-              emptyMessage="No profiles found with that username."
               customEmptyComponent={searchEmptyComponent}
               containerStyle={{ justifyContent: "flex-start", paddingTop: 24 }}
             />

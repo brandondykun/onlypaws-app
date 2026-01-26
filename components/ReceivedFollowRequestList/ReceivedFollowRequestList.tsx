@@ -59,7 +59,8 @@ const ReceivedFollowRequestList = () => {
           isLoading={query.isLoading}
           isError={query.isError}
           isRefetching={query.isRefetching}
-          emptyMessage="No received follow requests"
+          emptyMessage="No received follow requests."
+          errorMessage="There was an error fetching your follow requests."
         />
       }
       ListFooterComponent={
