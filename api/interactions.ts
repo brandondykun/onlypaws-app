@@ -32,6 +32,11 @@ export const getPostComments = async (postId: number) => {
   return await axiosFetch<PaginatedResponse<PostCommentDetailed>>(url);
 };
 
+export const getPostCommentsForQuery = async (postId: number, pageParam: string) => {
+  const url = `/v1/interactions/comment/post/${postId}/list/?page=${pageParam}`;
+  return await axiosInstance.get<PaginatedResponse<PostCommentDetailed>>(url);
+};
+
 export const getCommentReplies = async (commentId: number) => {
   const url = `/v1/interactions/comment/${commentId}/replies/`;
   return await axiosFetch<PaginatedResponse<PostCommentDetailed>>(url);
