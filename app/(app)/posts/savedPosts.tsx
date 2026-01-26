@@ -51,7 +51,7 @@ const SavedPostsScreen = () => {
       showsVerticalScrollIndicator={false}
       data={postsData ?? []}
       numColumns={3}
-      contentContainerStyle={{ paddingBottom: tabBarHeight }}
+      contentContainerStyle={{ paddingBottom: tabBarHeight, flexGrow: 1 }}
       keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
       onEndReached={handleEndReached}
