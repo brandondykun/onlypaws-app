@@ -105,9 +105,9 @@ const SearchedProfilePreview = ({
       </Pressable>
       {showFollowButtons && profile.has_requested_follow && (
         <Button
-          text="cancel"
-          textStyle={{ fontSize: 12 }}
-          buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+          text="Cancel"
+          textStyle={{ fontSize: 13 }}
+          buttonStyle={{ height: 30, width: 70 }}
           variant="outline"
           onPress={() => handleCancelFollowRequest?.(profile.id)}
           testID={`${profile.username}-cancel-request`}
@@ -117,18 +117,18 @@ const SearchedProfilePreview = ({
         <View>
           {profile.is_following ? (
             <Button
-              text="unfollow"
-              textStyle={{ fontSize: 12 }}
-              buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+              text="Unfollow"
+              textStyle={{ fontSize: 13 }}
+              buttonStyle={{ height: 30, width: 70 }}
               variant="outline"
               onPress={() => handleUnfollowPress?.(profile.id)}
               testID={`${profile.username}-unfollow`}
             />
           ) : (
             <Button
-              text="follow"
-              textStyle={{ fontSize: 12 }}
-              buttonStyle={{ paddingHorizontal: 4, height: 28, width: 65, borderRadius: 6 }}
+              text="Follow"
+              textStyle={{ fontSize: 13 }}
+              buttonStyle={{ height: 30, width: 70 }}
               onPress={() => handleFollowPress?.(profile)}
               testID={`${profile.username}-follow`}
             />

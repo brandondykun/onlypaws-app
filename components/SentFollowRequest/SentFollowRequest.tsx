@@ -71,10 +71,10 @@ const SentFollowRequest = ({ item, cancelRequest }: Props) => {
       {item.status === "pending" && (
         <View>
           <Button
-            textStyle={{ fontSize: 14 }}
+            textStyle={{ fontSize: 13 }}
             text="Cancel"
             onPress={handleCancel}
-            buttonStyle={{ paddingHorizontal: 8, height: 30, width: 65 }}
+            buttonStyle={{ height: 30, width: 70 }}
             loading={cancelLoading}
             loadingIconSize={12}
             loadingIconScale={0.7}

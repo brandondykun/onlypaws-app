@@ -82,20 +82,20 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
       {item.status === "pending" && (
         <View style={{ flexDirection: "row", gap: 8 }}>
           <Button
-            textStyle={{ fontSize: 14 }}
+            textStyle={{ fontSize: 13 }}
             text="Accept"
             onPress={handleAcceptRequest}
-            buttonStyle={{ paddingHorizontal: 8, height: 30, width: 65 }}
+            buttonStyle={{ height: 30, width: 70 }}
             loading={acceptLoading}
             loadingIconSize={12}
             loadingIconScale={0.7}
             disabled={acceptLoading || declineLoading}
           />
           <Button
-            textStyle={{ fontSize: 14 }}
+            textStyle={{ fontSize: 13 }}
             text="Decline"
             onPress={handleDeclineRequest}
-            buttonStyle={{ paddingHorizontal: 8, height: 30, width: 65 }}
+            buttonStyle={{ height: 30, width: 70 }}
             loading={declineLoading}
             loadingIconSize={12}
             loadingIconScale={0.7}
