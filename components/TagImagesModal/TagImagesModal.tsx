@@ -1,4 +1,5 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
+import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
   useWindowDimensions,
@@ -78,6 +79,7 @@ const TagImagesModal = ({
     const currentImage = images[currentIndex];
     const tagToRemove = currentImage.tags.find((tag) => tag.tagged_profile.id === profile.id);
     if (tagToRemove) {
+      Haptics.impactAsync();
       removeTag(tagToRemove?.id.toString());
     }
   };
