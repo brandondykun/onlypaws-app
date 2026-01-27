@@ -65,6 +65,13 @@ const NotificationListItem = ({ item, index }: Props) => {
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the post details
       router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_id } });
+    } else if (item.notification_type === "follow_request_accepted") {
+      if (!item.is_read) markAsRead(item.id.toString()); // Mark the notification as read
+      // Navigate to the profile details
+      router.push({
+        pathname: "/(app)/posts/profileDetails",
+        params: { profileId: item.extra_data.followed_id, username: item.extra_data.followed_username },
+      });
     }
   };
 
