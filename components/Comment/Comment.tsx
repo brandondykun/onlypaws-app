@@ -131,7 +131,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
   const handleHideReplies = useCallback(() => {
     hideReplies(comment.id);
     setShowReplies(false);
-    // Clear the replies query cache so it refetches when shown again
+    // Clear the replies query cache so it re-fetches when shown again
     queryClient.removeQueries({ queryKey: repliesQueryKey });
   }, [hideReplies, comment.id, queryClient, repliesQueryKey]);
 
@@ -163,7 +163,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
   const hasMoreReplies = comment.replies_count !== comment.replies.length;
 
   return (
-    <View style={[s.root]}>
+    <View style={s.root}>
       <MainComment comment={comment} handleHeartPress={handleHeartPress} bgColor={bgColor} />
       <MainCommentReplyButton
         onReplyPress={() => {
@@ -226,7 +226,7 @@ export default Comment;
 const s = StyleSheet.create({
   root: {
     minHeight: 62,
-    marginBottom: 8,
+    marginBottom: 16,
   },
 });
 

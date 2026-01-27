@@ -14,7 +14,7 @@ const HideRepliesButton = ({ onPress }: Props) => {
   return (
     <Pressable style={({ pressed }) => [pressed && { opacity: 0.6 }]} onPress={onPress} hitSlop={8}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={{ width: 24, height: 1, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[300] }} />
+        <View style={{ width: 24, height: 1, backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[400] }} />
         <Text lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]} style={s.buttonText}>
           hide replies
         </Text>

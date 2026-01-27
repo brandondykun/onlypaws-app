@@ -1,3 +1,4 @@
+import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { View, StyleSheet, Pressable } from "react-native";
 
@@ -5,7 +6,7 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { PostCommentDetailed } from "@/types";
 import { ChainComment } from "@/types/post/post";
-import { abbreviateNumber } from "@/utils/utils";
+import { abbreviateNumber, getTimeSince } from "@/utils/utils";
 
 import Text from "../Text/Text";
 
@@ -17,13 +18,21 @@ type Props = {
 
 const MainComment = ({ comment, handleHeartPress, bgColor }: Props) => {
   const { isDarkMode } = useColorMode();
+  const timeSinceFormatted = getTimeSince(comment.created_at);
+
   return (
     <View style={[s.root, { backgroundColor: bgColor }]}>
       <View style={s.header}>
-        <Text style={s.username} lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]}>
-          {comment.profile.username}
-        </Text>
-        <Text lightColor={COLORS.zinc[950]} style={s.comment}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 4 }}>
+          <Text style={s.username} lightColor={COLORS.zinc[900]} darkColor={COLORS.zinc[300]}>
+            {comment.profile.username}
+          </Text>
+          <Entypo name="dot-single" size={12} color={COLORS.zinc[500]} />
+          <Text style={s.timeSinceText} darkColor={COLORS.zinc[500]} lightColor={COLORS.zinc[600]}>
+            {timeSinceFormatted}
+          </Text>
+        </View>
+        <Text lightColor={COLORS.zinc[950]} darkColor={COLORS.zinc[300]} style={s.comment}>
           {comment.text}
         </Text>
       </View>
@@ -61,9 +70,8 @@ const s = StyleSheet.create({
     flex: 1,
   },
   username: {
-    fontWeight: "600",
-    marginBottom: 3,
-    fontSize: 12,
+    fontWeight: "700",
+    fontSize: 13,
   },
   likeContainer: {
     marginTop: 4,
@@ -71,7 +79,11 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   comment: {
-    fontSize: 16,
+    fontSize: 14,
+  },
+  timeSinceText: {
+    fontSize: 13,
+    fontWeight: "400",
   },
   buttonContainer: {
     alignItems: "center",

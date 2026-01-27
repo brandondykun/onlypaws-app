@@ -8,7 +8,7 @@ type Props = {
 
 const MainCommentReplyButton = ({ onReplyPress }: Props) => {
   return (
-    <View style={{ marginBottom: 6, paddingLeft: 12, alignItems: "flex-start" }}>
+    <View style={{ marginBottom: 3, paddingLeft: 12, alignItems: "flex-start" }}>
       <ReplyButton onReplyPress={onReplyPress} />
     </View>
   );
