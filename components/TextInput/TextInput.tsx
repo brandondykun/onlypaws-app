@@ -138,7 +138,14 @@ const TextInput = forwardRef(
             {label}
           </Text>
         ) : null}
-        <View style={{ position: "relative", overflow: "hidden" }}>
+        <View
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            zIndex: 1,
+            borderRadius: 25,
+          }}
+        >
           {icon ? <View style={s.icon}>{icon}</View> : null}
           {withClearButton ? (
             <Animated.View
@@ -302,6 +309,6 @@ const s = StyleSheet.create({
     width: 40,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 3,
+    zIndex: 1,
   },
 });
