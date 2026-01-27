@@ -6,10 +6,10 @@ import { useMemo } from "react";
 import { View, RefreshControl, Pressable } from "react-native";
 
 import { getFollowersForQuery } from "@/api/interactions";
-import FollowListHeader from "@/components/FollowListHeader/FollowListHeader";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
+import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
@@ -106,9 +106,7 @@ const FollowersScreen = () => {
             customEmptyComponent={searchEmptyComponent}
           />
         }
-        ListHeaderComponent={
-          <FollowListHeader title={isSearchActive ? `Search results for "${submittedSearchText}"` : "All followers"} />
-        }
+        ListHeaderComponent={<SearchListHeader defaultText="All followers" searchText={submittedSearchText} />}
         refreshControl={
           isSearchActive ? undefined : (
             <RefreshControl

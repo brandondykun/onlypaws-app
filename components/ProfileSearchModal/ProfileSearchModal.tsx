@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { searchProfilesForQuery } from "@/api/profile";
@@ -16,6 +16,7 @@ import HeaderSearchInput from "../HeaderSearchInput/HeaderSearchInput";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import Modal from "../Modal/Modal";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
+import SearchListHeader from "../SearchListHeader/SearchListHeader";
 import Text from "../Text/Text";
 
 type Props = {
@@ -73,12 +74,14 @@ const ProfileSearchModal = ({
 
   const filteredData = data.filter((profile) => !excludedProfileIds.includes(profile.id));
 
-  // Custom empty component for when no search has been submitted yet
-  const searchEmptyComponent = !submittedSearchText ? (
-    <View style={{ paddingTop: 72 }}>
-      <Text style={{ textAlign: "center", fontSize: 20, color: COLORS.zinc[500] }}>Enter a username to search.</Text>
+  // Custom empty component for search states
+  const searchEmptyComponent = (
+    <View style={{ marginTop: 48 }}>
+      <Text style={{ textAlign: "center", fontSize: 20, color: COLORS.zinc[500] }}>
+        {!submittedSearchText ? "Enter a username to search" : "No results found"}
+      </Text>
     </View>
-  ) : undefined;
+  );
 
   return (
     <Modal
@@ -112,12 +115,13 @@ const ProfileSearchModal = ({
         </View>
         <FlashList
           data={filteredData}
-          contentContainerStyle={{ paddingTop: Platform.OS === "android" ? 0 : 12, flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 64 }}
           keyExtractor={(item) => item.id.toString()}
           onRefresh={profileSearch.refetch}
           onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
           onEndReached={handleEndReached}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={<SearchListHeader defaultText="" searchText={submittedSearchText} />}
           ListEmptyComponent={
             <ListEmptyComponent
               isLoading={profileSearch.isLoading}

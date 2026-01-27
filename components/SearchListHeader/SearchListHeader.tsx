@@ -4,17 +4,24 @@ import { COLORS } from "@/constants/Colors";
 
 import Text from "../Text/Text";
 
-const FollowListHeader = ({ title }: { title: string }) => {
+type SearchListHeaderProps = {
+  defaultText: string;
+  searchText: string;
+};
+
+const SearchListHeader = ({ defaultText, searchText }: SearchListHeaderProps) => {
+  const displayText = searchText ? `Search results for "${searchText}"` : defaultText;
+
   return (
     <View style={s.root}>
       <Text style={s.text} darkColor={COLORS.zinc[300]} lightColor={COLORS.zinc[600]}>
-        {title}
+        {displayText}
       </Text>
     </View>
   );
 };
 
-export default FollowListHeader;
+export default SearchListHeader;
 
 const s = StyleSheet.create({
   root: {

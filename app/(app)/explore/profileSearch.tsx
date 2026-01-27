@@ -3,12 +3,13 @@ import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { View, Platform, RefreshControl } from "react-native";
+import { View, RefreshControl } from "react-native";
 
 import { searchProfilesForQuery } from "@/api/profile";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
+import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
@@ -69,16 +70,14 @@ const ProfileSearchScreen = () => {
     });
   };
 
-  // Initial state - no search submitted yet
-  if (!submittedSearchText) {
-    return (
-      <View style={{ flex: 1, alignItems: "center", paddingTop: Platform.OS === "android" ? 0 : 30 }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "400", color: COLORS.zinc[500] }}>
-          Enter a username to search.
-        </Text>
-      </View>
-    );
-  }
+  // Custom empty component for search states
+  const searchEmptyComponent = (
+    <View style={{ marginTop: 48 }}>
+      <Text style={{ textAlign: "center", fontSize: 20, color: COLORS.zinc[500] }}>
+        {!submittedSearchText ? "Enter a username to search" : "No results found"}
+      </Text>
+    </View>
+  );
 
   const handleEndReached = () => {
     const hasErrors = profileSearch.isError || profileSearch.isFetchNextPageError;
@@ -92,7 +91,7 @@ const ProfileSearchScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <FlashList
-        contentContainerStyle={{ paddingBottom: tabBarHeight, paddingTop: Platform.OS === "android" ? 0 : 24 }}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
         data={dataToRender}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={
@@ -102,10 +101,11 @@ const ProfileSearchScreen = () => {
             isRefetching={profileSearch.isRefetching}
             errorMessage="There was an error with that search."
             errorSubMessage="Swipe down to try again."
-            emptyMessage="No profiles found with that username."
+            customEmptyComponent={searchEmptyComponent}
           />
         }
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={<SearchListHeader defaultText="" searchText={submittedSearchText} />}
         renderItem={({ item: profile }) => (
           <SearchedProfilePreview
             profile={profile}
@@ -122,7 +122,7 @@ const ProfileSearchScreen = () => {
         refreshControl={
           <RefreshControl
             refreshing={profileSearch.isRefetching}
-            onRefresh={profileSearch.refetch}
+            onRefresh={submittedSearchText ? profileSearch.refetch : undefined}
             tintColor={COLORS.zinc[400]}
             colors={[COLORS.zinc[400]]}
           />
