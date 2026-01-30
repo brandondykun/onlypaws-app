@@ -72,6 +72,7 @@ export type SearchedProfile = {
   profile_type: ProfileType;
   has_requested_follow: boolean;
   is_private: boolean;
+  follows_you: boolean;
 };
 
 export type MyInfo = {
@@ -197,6 +198,7 @@ export type ProfileDetails = {
   is_private: boolean;
   can_view_posts: boolean;
   has_requested_follow: boolean;
+  follows_you: boolean;
 };
 
 export type FollowProfile = {

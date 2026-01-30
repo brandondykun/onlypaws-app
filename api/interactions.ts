@@ -77,6 +77,11 @@ export const unfollowProfile = async (profileId: number) => {
   return await axiosDelete(url);
 };
 
+export const removeFollower = async (profileId: number) => {
+  const url = `/v1/interactions/follower/${profileId}/remove/`;
+  return await axiosDelete(url);
+};
+
 export const getFollowers = async (profileId: number) => {
   const url = `/v1/interactions/followers/${profileId}/`;
   return await axiosFetch<PaginatedResponse<FollowProfile>>(url);

@@ -52,6 +52,7 @@ const defaultProfile: ProfileDetailsType = {
   is_private: false,
   can_view_posts: true,
   has_requested_follow: false,
+  follows_you: false,
 };
 
 const AuthProfileContext = createContext<AuthProfileContextType>({

@@ -2,8 +2,10 @@ import { View, StyleSheet } from "react-native";
 
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import Text from "@/components/Text/Text";
+import { COLORS } from "@/constants/Colors";
 import { ProfileDetails } from "@/types";
 
+import FollowIndicator from "./FollowIndicator";
 import ProfileStats from "./ProfileStats";
 
 type Props = {
@@ -17,9 +19,11 @@ const ProfileImageAndStats = ({ profileData, postsCount, handleFollowersPress, h
   return (
     <View style={s.root}>
       <ProfileDetailsHeaderImage size={100} image={profileData?.image || null} />
-      <View style={s.nameAndStatsContainer}>
+      <View style={{ ...s.nameAndStatsContainer, gap: profileData.follows_you ? 8 : 0 }}>
         <View style={s.nameContainer}>
-          <Text style={s.nameText}>{profileData?.name}</Text>
+          <Text style={s.nameText} lightColor={COLORS.zinc[950]}>
+            {profileData?.name}
+          </Text>
         </View>
         <ProfileStats
           postsCount={postsCount}
@@ -27,6 +31,11 @@ const ProfileImageAndStats = ({ profileData, postsCount, handleFollowersPress, h
           handleFollowingPress={handleFollowingPress}
           profileData={profileData}
         />
+        {profileData.follows_you && (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <FollowIndicator followsYou={profileData.follows_you} isFollowing={profileData.is_following} />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -37,8 +46,8 @@ export default ProfileImageAndStats;
 const s = StyleSheet.create({
   root: {
     flexDirection: "row",
-    gap: 20,
-    paddingBottom: 8,
+    gap: 16,
+    marginBottom: 8,
   },
   nameAndStatsContainer: {
     flex: 1,
@@ -49,7 +58,7 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   nameText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600",
   },
 });

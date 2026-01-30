@@ -1,4 +1,5 @@
 import { SimpleLineIcons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -24,6 +25,7 @@ import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter"
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 
+import ConfirmRemoveFollowerSheet from "./components/ConfirmRemoveFollowerSheet/ConfirmRemoveFollowerSheet";
 import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
 
 type Props = {
@@ -38,11 +40,12 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
+  const confirmRemoveFollowerSheetRef = useRef<RNBottomSheetModal>(null);
 
   const { isDarkMode } = useColorMode();
   const { authProfile } = useAuthProfileContext();
   const { selectedProfileId } = useAuthUserContext();
-  const { followProfile, unfollowProfile } = useProfileDetailsManagerContext();
+  const { followProfile, unfollowProfile, removeFollower } = useProfileDetailsManagerContext();
 
   const fetchProfile = async (id: number | string) => {
     const res = await getProfileDetailsForQuery(id);
@@ -89,7 +92,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
       title: profile.data ? `@${profile.data.username}` : username ? `@${username}` : "",
       headerRight: () => {
         if (profile.data?.id === authProfile.id) {
-          // only show if user is looking at own profile
+          // show if user is looking at own profile
           return (
             <Pressable
               onPressOut={() => optionsModalRef.current?.present()}
@@ -100,12 +103,27 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
               <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
             </Pressable>
           );
+        } else if (profile.data?.follows_you) {
+          // show if the profile being viewed follows the logged in profile
+          return (
+            <Pressable
+              onPress={handleShowConfirmRemoveFollowerSheet}
+              style={({ pressed }) => [pressed && { opacity: 0.7 }, { padding: 8 }]}
+              hitSlop={20}
+            >
+              <Entypo name="dots-three-horizontal" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
+            </Pressable>
+          );
         } else {
           return null;
         }
       },
     });
   }, [profile.data, navigation, isDarkMode, authProfile.id, username]);
+
+  const handleShowConfirmRemoveFollowerSheet = () => {
+    confirmRemoveFollowerSheetRef.current?.present();
+  };
 
   const handlePostPreviewPress = (index: number) => {
     onPostPreviewPress(index);
@@ -131,6 +149,11 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
     if (Number(profileId) === authProfile.id) {
       router.push("/(app)/posts/following");
     }
+  };
+
+  const handleRemoveFollowerPress = () => {
+    removeFollower(Number(profileId));
+    confirmRemoveFollowerSheetRef.current?.dismiss();
   };
 
   const handleRefresh = () => {
@@ -205,6 +228,10 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
             colors={[COLORS.zinc[400]]}
           />
         }
+      />
+      <ConfirmRemoveFollowerSheet
+        confirmRemoveFollowerSheetRef={confirmRemoveFollowerSheetRef}
+        onRemoveFollowerPress={handleRemoveFollowerPress}
       />
       <BottomSheetModal handleTitle="Options" ref={optionsModalRef} enableDynamicSizing={true} snapPoints={[]}>
         <BottomSheetView style={s.bottomSheetView}>

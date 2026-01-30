@@ -2,7 +2,11 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useCallback } from "react";
 import Toast from "react-native-toast-message";
 
-import { followProfile as followProfileApi, unfollowProfile as unfollowProfileApi } from "@/api/interactions";
+import {
+  followProfile as followProfileApi,
+  unfollowProfile as unfollowProfileApi,
+  removeFollower as removeFollowerApi,
+} from "@/api/interactions";
 import { ProfileDetails, SearchedProfile } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
 
@@ -26,6 +30,7 @@ type ProfileDetailsManagerContextType = {
   unfollowProfile: (profileId: number) => void;
   cancelFollowRequest: (profileId: number) => void;
   onFollowRequestAccepted: (profileId: number) => void;
+  removeFollower: (profileId: number) => void;
 };
 
 const ProfileDetailsManagerContext = createContext<ProfileDetailsManagerContextType>({
@@ -33,6 +38,7 @@ const ProfileDetailsManagerContext = createContext<ProfileDetailsManagerContextT
   unfollowProfile: () => {},
   cancelFollowRequest: () => {},
   onFollowRequestAccepted: () => {},
+  removeFollower: () => {},
 });
 
 type Props = { children: React.ReactNode };
@@ -40,7 +46,12 @@ type Props = { children: React.ReactNode };
 type ProfileSearchQueryData = InfiniteData<PaginatedResponse<SearchedProfile>>;
 
 const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
-  const { addFollowing, removeFollowing } = useAuthProfileContext();
+  const {
+    addFollowing,
+    removeFollowing,
+    removeFollower: removeFollowerAuthProfile,
+    addFollower: addFollowerAuthProfile,
+  } = useAuthProfileContext();
   const { selectedProfileId } = useAuthUserContext();
 
   const queryClient = useQueryClient();
@@ -262,7 +273,76 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
     [updateProfileSearchCache, queryClient, selectedProfileId],
   );
 
-  const value = { followProfile, unfollowProfile, cancelFollowRequest, onFollowRequestAccepted };
+  const removeFollower = useCallback(
+    async (profileId: number) => {
+      // optimistic update
+      removeFollowerAuthProfile();
+      updateProfileDetailsCache(profileId, (profile) => ({
+        ...profile,
+        follows_you: false,
+        following_count: profile.following_count - 1,
+      }));
+      updateProfileSearchCache(profileId, (profile) => ({
+        ...profile,
+        follows_you: false,
+      }));
+
+      // make API call
+      const { error } = await removeFollowerApi(profileId);
+      if (error) {
+        // revert on failure
+        addFollowerAuthProfile();
+        updateProfileDetailsCache(profileId, (profile) => ({
+          ...profile,
+          follows_you: true,
+          following_count: profile.following_count + 1,
+        }));
+        updateProfileSearchCache(profileId, (profile) => ({
+          ...profile,
+          follows_you: true,
+        }));
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "There was an error removing that follower.",
+        });
+      } else {
+        // remove follower from followers list on the followers screen
+        // the removed profile might not be loaded on that screen, but check to be sure
+        queryClient.setQueriesData<InfiniteData<PaginatedResponse<ProfileDetails>>>(
+          { queryKey: [selectedProfileId, "followers"] },
+          (oldData) => {
+            if (!oldData?.pages) return oldData;
+            // Handle infinite query structure
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => {
+                return {
+                  ...page,
+                  results: page.results.filter((result) => result.id !== profileId),
+                };
+              }),
+            };
+          },
+        );
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Follower removed successfully.",
+        });
+      }
+    },
+    [
+      removeFollowerAuthProfile,
+      updateProfileDetailsCache,
+      updateProfileSearchCache,
+      queryClient,
+      selectedProfileId,
+      addFollowerAuthProfile,
+    ],
+  );
+
+  const value = { followProfile, unfollowProfile, cancelFollowRequest, onFollowRequestAccepted, removeFollower };
 
   return <ProfileDetailsManagerContext.Provider value={value}>{children}</ProfileDetailsManagerContext.Provider>;
 };
