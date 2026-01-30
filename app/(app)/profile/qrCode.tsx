@@ -18,13 +18,11 @@ import QrCodeScannerModal from "@/components/QrCodeScannerModal/QrCodeScannerMod
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
 const QrCodeScreen = () => {
-  const { selectedProfileId } = useAuthUserContext();
-  const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId, authProfile } = useAuthProfileContext();
   const { setLightOrDark, isDarkMode } = useColorMode();
   const { width } = useWindowDimensions();
 
@@ -94,7 +92,7 @@ const QrCodeScreen = () => {
   // create a deep link url for the profile details screen
   const deepLinkUrl = Linking.createURL(`profile/profileDetails`, {
     queryParams: {
-      profileId: selectedProfileId!.toString(),
+      profileId: selectedProfileId.toString(),
     },
   });
 

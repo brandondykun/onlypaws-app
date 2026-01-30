@@ -7,7 +7,7 @@ import { useCallback, useMemo } from "react";
 import { getSimilarPostsForQuery } from "@/api/post";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Post from "@/components/Post/Post";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useAdsInList } from "@/hooks/useAdsInList";
 import { PostDetailed } from "@/types";
@@ -16,7 +16,7 @@ import { getNextPageParam } from "@/utils/utils";
 const ExplorePostsListScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { selectedExplorePost } = useExplorePostsContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
@@ -31,7 +31,6 @@ const ExplorePostsListScreen = () => {
     queryFn: fetchSimilarPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

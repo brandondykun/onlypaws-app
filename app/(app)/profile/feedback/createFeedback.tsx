@@ -12,7 +12,7 @@ import { createFeedbackTicket } from "@/api/feedback";
 import Button from "@/components/Button/Button";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import TextInput from "@/components/TextInput/TextInput";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { FeedbackTicket } from "@/types/feedback/feedback";
 import { PaginatedResponse } from "@/types/shared/pagination";
 import { getFeedbackType } from "@/utils/utils";
@@ -24,7 +24,7 @@ const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
 ];
 
 const CreateFeedbackScreen = () => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();

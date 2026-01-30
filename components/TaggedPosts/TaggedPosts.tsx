@@ -10,7 +10,6 @@ import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 import { minutesToMilliseconds } from "@/utils/utils";
 
@@ -23,8 +22,7 @@ type Props = {
 };
 
 const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
-  const { authProfile } = useAuthProfileContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { authProfile, selectedProfileId } = useAuthProfileContext();
 
   const tabBarHeight = useBottomTabBarHeight();
 
@@ -39,7 +37,6 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
     staleTime: profileId === authProfile.id.toString() ? 0 : minutesToMilliseconds(5),
-    enabled: !!selectedProfileId,
   });
 
   const dataToRender = useMemo(() => {

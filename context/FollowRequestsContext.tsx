@@ -23,7 +23,6 @@ import { WSFollowRequestAcceptedNotification } from "@/types/notifications/follo
 import { getNextPageParam } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useAuthUserContext } from "./AuthUserContext";
 import { useNotificationsContext } from "./NotificationsContext";
 import { useProfileDetailsManagerContext } from "./ProfileDetailsManagerContext";
 
@@ -68,9 +67,8 @@ type Props = {
 };
 
 const FollowRequestsContextProvider = ({ children }: Props) => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId, addFollower, addFollowing, authProfile } = useAuthProfileContext();
   const { wsNotifications, setPendingFollowRequestsCount } = useNotificationsContext();
-  const { addFollower, addFollowing, authProfile } = useAuthProfileContext();
   const queryClient = useQueryClient();
   const profileDetailsManager = useProfileDetailsManagerContext();
 
@@ -116,7 +114,6 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
     queryFn: fetchReceivedRequests,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId && !!authProfile.id,
   });
 
   const sentRequestsQuery = useInfiniteQuery({
@@ -124,7 +121,6 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
     queryFn: fetchSentRequests,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId && !!authProfile.id,
   });
 
   // ============================================================================

@@ -8,7 +8,7 @@ import { deletePostImage, updatePost as updatePostApi } from "@/api/post";
 import { createPostImageTag, deletePostImageTag } from "@/api/post";
 import { getProfilePostsForQuery } from "@/api/profile";
 import CreateEditPostScreen from "@/components/CreateEditPostScreen/CreateEditPostScreen";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { PostImage, SearchedProfile } from "@/types";
 import { ImageAssetWithTags } from "@/types/post/post";
@@ -17,14 +17,14 @@ import { getImageHeightAspectAware, getNextPageParam } from "@/utils/utils";
 const EditPost = () => {
   const postId = useLocalSearchParams<{ postId: string }>().postId;
 
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   const router = useRouter();
   const screenWidth = useWindowDimensions().width;
 
   const { removeImageFromPost, updatePost } = usePostsContext();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getProfilePostsForQuery(selectedProfileId!, pageParam);
+    const res = await getProfilePostsForQuery(selectedProfileId, pageParam);
     return res.data;
   };
 
@@ -33,7 +33,6 @@ const EditPost = () => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

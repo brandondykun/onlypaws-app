@@ -1,20 +1,27 @@
 import { InfiniteData, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { createContext, useContext, useState } from "react";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 import { getProfileDetailsForQuery } from "@/api/profile";
+import { COLORS } from "@/constants/Colors";
 import { PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
 
 import { useAuthUserContext } from "./AuthUserContext";
+import { useColorMode } from "./ColorModeContext";
 
 // Context for the auth profile details.
 // This is the profile details of the user who is currently logged in.
 // It is used to display the profile details on the profile screen and to update the profile details.
 // Since users can have multiple profiles, this context manages the currently selected profile.
+//
+// This context acts as a guard - it won't render children until the profile is loaded.
+// This guarantees that selectedProfileId and authProfile are always valid (non-null).
 
 type AuthProfileContextType = {
+  // Guaranteed non-null - this context guards children until these are loaded
+  selectedProfileId: number;
   authProfile: ProfileDetailsType;
-  loading: boolean;
   updateProfileImage: (image: ProfileImage) => void;
   updateAboutText: (aboutText: string) => void;
   removeFollowing: () => void;
@@ -36,48 +43,7 @@ type AuthProfileContextType = {
   removeFollower: () => void;
 };
 
-const defaultProfile: ProfileDetailsType = {
-  id: null!,
-  username: "",
-  name: "",
-  about: "",
-  image: null,
-  is_following: false,
-  posts_count: 0,
-  followers_count: 0,
-  following_count: 0,
-  breed: "",
-  pet_type: null,
-  profile_type: "regular",
-  is_private: false,
-  can_view_posts: true,
-  has_requested_follow: false,
-  follows_you: false,
-};
-
-const AuthProfileContext = createContext<AuthProfileContextType>({
-  authProfile: defaultProfile,
-  loading: false,
-  updateProfileImage: (image: ProfileImage) => {},
-  updateAboutText: (aboutText: string) => {},
-  removeFollowing: () => {},
-  addFollowing: () => {},
-  updatePostsCount: (action: "add" | "subtract", amount: number) => {},
-  updateName: (name: string) => {},
-  updateAuthProfile: (
-    name: string,
-    about: string | null,
-    breed: string | null,
-    petType: PetType | null,
-    isPrivate: boolean,
-  ) => {},
-  updateUsername: (username: string) => {},
-  refetch: () => Promise.resolve(),
-  refreshing: false,
-  backgroundRefreshing: false,
-  addFollower: () => {},
-  removeFollower: () => {},
-});
+const AuthProfileContext = createContext<AuthProfileContextType | null>(null);
 
 type Props = {
   children: React.ReactNode;
@@ -87,6 +53,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { selectedProfileId, authLoading } = useAuthUserContext();
+  const { isDarkMode } = useColorMode();
   const queryClient = useQueryClient();
 
   const fetchProfile = async (id: number) => {
@@ -108,12 +75,21 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     placeholderData: (previousData) => previousData, // Keep previous profile data while fetching new one
   });
 
-  const authProfile = profileData || defaultProfile;
+  // Guard: Don't render children until we have both selectedProfileId and profile data
+  // This guarantees that all child components receive valid, non-null values
+  if (!selectedProfileId || !profileData) {
+    return (
+      <View style={[s.loadingView, { backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[100] }]}>
+        <ActivityIndicator size="large" color={COLORS.zinc[500]} />
+      </View>
+    );
+  }
+
+  // At this point, both selectedProfileId and profileData are guaranteed non-null
+  const authProfile = profileData;
 
   // Helper function to update the cache
   const updateCache = (updater: (prev: ProfileDetailsType) => ProfileDetailsType) => {
-    if (!selectedProfileId) return;
-
     // Use the exact same format as the useQuery key
     const queryKey = [selectedProfileId, "profile", selectedProfileId.toString()];
 
@@ -162,8 +138,6 @@ const AuthProfileContextProvider = ({ children }: Props) => {
   };
 
   const updateUsername = (username: string) => {
-    if (!selectedProfileId) return;
-
     // Update the profile cache
     updateCache((prev) => ({ ...prev, username }));
 
@@ -230,9 +204,9 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     }));
   };
 
-  const value = {
+  const value: AuthProfileContextType = {
+    selectedProfileId,
     authProfile,
-    loading: isLoading,
     updateProfileImage,
     updateAboutText,
     removeFollowing,
@@ -255,5 +229,22 @@ export default AuthProfileContextProvider;
 
 export const useAuthProfileContext = () => {
   const context = useContext(AuthProfileContext);
+  if (!context) {
+    throw new Error("useAuthProfileContext must be used within AuthProfileContextProvider");
+  }
   return context;
 };
+
+const s = StyleSheet.create({
+  loadingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  loadingViewText: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "300",
+  },
+});

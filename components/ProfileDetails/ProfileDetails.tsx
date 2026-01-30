@@ -14,7 +14,6 @@ import { getProfileDetailsForQuery, getProfilePostsForQuery } from "@/api/profil
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { ProfileDetails as ProfileDetailsType } from "@/types";
@@ -43,8 +42,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
   const confirmRemoveFollowerSheetRef = useRef<RNBottomSheetModal>(null);
 
   const { isDarkMode } = useColorMode();
-  const { authProfile } = useAuthProfileContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { authProfile, selectedProfileId } = useAuthProfileContext();
   const { followProfile, unfollowProfile, removeFollower } = useProfileDetailsManagerContext();
 
   const fetchProfile = async (id: number | string) => {
@@ -52,7 +50,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
     return res.data;
   };
 
-  const isOwnProfile = profileId.toString() === selectedProfileId?.toString();
+  const isOwnProfile = profileId.toString() === selectedProfileId.toString();
   // Use the same query key as AuthProfileContext when viewing own profile
   // This ensures cache updates from the context are reflected here
   const profileQueryKey = [selectedProfileId, "profile", profileId.toString()];
@@ -61,7 +59,6 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
     queryKey: profileQueryKey,
     queryFn: () => fetchProfile(profileId),
     staleTime: isOwnProfile ? 0 : minutesToMilliseconds(5),
-    enabled: !!selectedProfileId,
   });
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
@@ -79,7 +76,6 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
     staleTime: isOwnProfile ? 0 : minutesToMilliseconds(5),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

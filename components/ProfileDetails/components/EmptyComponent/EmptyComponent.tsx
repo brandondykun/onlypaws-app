@@ -1,5 +1,5 @@
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 
 import EmptyPostsMessage from "./components/EmptyPostsMessage";
 import PostsErrorMessage from "./components/PostsErrorMessage";
@@ -15,7 +15,7 @@ type Props = {
 };
 
 const EmptyComponent = ({ postsIsLoading, postsIsRefetching, postsIsError, canViewPosts, profileId, error }: Props) => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   // If profile is private, show the private profile message immediately
   if (canViewPosts !== undefined && !canViewPosts && selectedProfileId !== profileId) {
     return <PrivateProfileMessage />;

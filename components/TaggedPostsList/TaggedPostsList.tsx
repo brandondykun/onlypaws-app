@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 
 import { getSavedPostsForQuery } from "@/api/post";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { getNextPageParam } from "@/utils/utils";
 import { minutesToMilliseconds } from "@/utils/utils";
 
@@ -15,7 +15,7 @@ type Props = {
 };
 
 const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Props) => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const router = useRouter();
 
@@ -29,8 +29,7 @@ const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Prop
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    staleTime: profileId === selectedProfileId?.toString() ? 0 : minutesToMilliseconds(5),
-    enabled: !!selectedProfileId,
+    staleTime: profileId === selectedProfileId.toString() ? 0 : minutesToMilliseconds(5),
   });
 
   // Memoize the flattened posts data

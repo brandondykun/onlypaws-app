@@ -12,24 +12,24 @@ import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyCompone
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const FollowingScreen = () => {
+  const { selectedProfileId } = useAuthProfileContext();
   const { submittedSearchText } = useAuthProfileFollowingContext();
-  const { selectedProfileId } = useAuthUserContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
 
   // Fetch functions
   const fetchFollowing = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getFollowingForQuery(selectedProfileId!, pageParam);
+    const res = await getFollowingForQuery(selectedProfileId, pageParam);
     return res.data;
   };
 
   const fetchSearchResults = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getFollowingForQuery(selectedProfileId!, pageParam, submittedSearchText);
+    const res = await getFollowingForQuery(selectedProfileId, pageParam, submittedSearchText);
     return res.data;
   };
 
@@ -39,7 +39,6 @@ const FollowingScreen = () => {
     queryFn: fetchFollowing,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Search query
@@ -48,7 +47,7 @@ const FollowingScreen = () => {
     queryFn: fetchSearchResults,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId && !!submittedSearchText,
+    enabled: !!submittedSearchText,
   });
 
   // Flattened data

@@ -7,17 +7,15 @@ import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 
 const PostsScreen = () => {
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, selectedProfileId } = useAuthProfileContext();
   const router = useRouter();
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
-  const { selectedProfileId } = useAuthUserContext();
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });

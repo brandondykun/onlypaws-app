@@ -12,24 +12,24 @@ import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyCompone
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const FollowersScreen = () => {
+  const { selectedProfileId } = useAuthProfileContext();
   const { submittedSearchText } = useAuthProfileFollowersContext();
-  const { selectedProfileId } = useAuthUserContext();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
 
   // Fetch functions
   const fetchFollowers = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getFollowersForQuery(selectedProfileId!, pageParam);
+    const res = await getFollowersForQuery(selectedProfileId, pageParam);
     return res.data;
   };
 
   const fetchSearchResults = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getFollowersForQuery(selectedProfileId!, pageParam, submittedSearchText);
+    const res = await getFollowersForQuery(selectedProfileId, pageParam, submittedSearchText);
     return res.data;
   };
 
@@ -39,7 +39,6 @@ const FollowersScreen = () => {
     queryFn: fetchFollowers,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Search query
@@ -48,7 +47,7 @@ const FollowersScreen = () => {
     queryFn: fetchSearchResults,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId && !!submittedSearchText,
+    enabled: !!submittedSearchText,
   });
 
   // Flattened data

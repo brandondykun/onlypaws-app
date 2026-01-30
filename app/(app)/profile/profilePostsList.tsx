@@ -5,12 +5,10 @@ import { useMemo } from "react";
 import { getProfilePostsForQuery } from "@/api/profile";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const ExploreProfilePostsListScreen = () => {
-  const { authProfile } = useAuthProfileContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { authProfile, selectedProfileId } = useAuthProfileContext();
   const { initialIndex, profileId } = useLocalSearchParams<{ initialIndex: string; profileId: string }>();
 
   const router = useRouter();
@@ -36,7 +34,6 @@ const ExploreProfilePostsListScreen = () => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

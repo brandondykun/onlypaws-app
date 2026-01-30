@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 
 import { PostDetailed, PostsDetailedPage } from "@/types";
 
-import { useAuthUserContext } from "./AuthUserContext";
+import { useAuthProfileContext } from "./AuthProfileContext";
 import { useExplorePostsContext } from "./ExplorePostsContext";
 
 // Post manager for all posts in the app
@@ -37,7 +37,7 @@ type Props = {
 
 const PostManagerContextProvider = ({ children }: Props) => {
   const explorePosts = useExplorePostsContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const queryClient = useQueryClient();
 

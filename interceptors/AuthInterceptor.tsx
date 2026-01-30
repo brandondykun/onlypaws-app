@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useMaintenance } from "@/context/MaintenanceContext";
 import * as tokenService from "@/services/tokenService";
@@ -15,7 +14,6 @@ type Props = {
 
 const AuthInterceptor = ({ children }: Props) => {
   const { logOut, selectedProfileId } = useAuthUserContext();
-  const { loading } = useAuthProfileContext();
   const { triggerMaintenance, isInMaintenance } = useMaintenance();
   const router = useRouter();
 
@@ -103,13 +101,6 @@ const AuthInterceptor = ({ children }: Props) => {
       axiosInstance.interceptors.request.eject(requestInterceptor);
     };
   }, [selectedProfileId]);
-
-  // Block rendering until initial profile load completes
-  // This prevents requests from firing before the user's first profile is authenticated
-  // Note: Profile switches use backgroundRefresh so loading stays false
-  if (loading) {
-    return null;
-  }
 
   return children;
 };

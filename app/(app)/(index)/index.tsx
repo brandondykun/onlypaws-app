@@ -14,7 +14,6 @@ import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import { getNextPageParam } from "@/utils/utils";
@@ -26,8 +25,7 @@ const FeedScreen = () => {
   const navigation = useNavigation();
   const { isDarkMode } = useColorMode();
   const insets = useSafeAreaInsets();
-  const { selectedProfileId } = useAuthUserContext();
-  const { authProfile } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
     const res = await getFeedForQuery(pageParam);
@@ -39,7 +37,6 @@ const FeedScreen = () => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId && !!authProfile.id,
   });
 
   const scrollY = useRef(new Animated.Value(0)).current;

@@ -11,13 +11,13 @@ import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyCompone
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { getNextPageParam } from "@/utils/utils";
 
 const SavedPostsScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
     const res = await getSavedPostsForQuery(pageParam);
@@ -29,7 +29,6 @@ const SavedPostsScreen = () => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

@@ -11,12 +11,12 @@ import FeedbackComment from "@/components/Feedback/FeedbackComment/FeedbackComme
 import FeedbackTypeBubble from "@/components/Feedback/FeedbackTypeBubble/FeedbackTypeBubble";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   const tabBarHeight = useBottomTabBarHeight();
 
   const fetchFeedbackTicket = async () => {
@@ -27,7 +27,6 @@ const FeedbackDetailScreen = () => {
   const data = useQuery({
     queryKey: [selectedProfileId, "feedback-ticket", id],
     queryFn: () => fetchFeedbackTicket(),
-    enabled: !!selectedProfileId,
     staleTime: minutesToMilliseconds(5),
   });
 

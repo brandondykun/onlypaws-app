@@ -11,7 +11,6 @@ import { ProfileDetails, SearchedProfile } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useAuthUserContext } from "./AuthUserContext";
 import { useProfileSearchContext } from "./ProfileSearchContext";
 
 // Profile details manager for profiles throughout the app.
@@ -51,8 +50,8 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
     removeFollowing,
     removeFollower: removeFollowerAuthProfile,
     addFollower: addFollowerAuthProfile,
+    selectedProfileId,
   } = useAuthProfileContext();
-  const { selectedProfileId } = useAuthUserContext();
 
   const queryClient = useQueryClient();
 

@@ -4,7 +4,6 @@ import { createContext, useContext } from "react";
 import { PostDetailed, PostsDetailedPage } from "@/types";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useAuthUserContext } from "./AuthUserContext";
 
 type PostContextType = {
   addPost: (data: PostDetailed) => void;
@@ -27,8 +26,7 @@ type Props = {
 };
 
 const PostsContextProvider = ({ children }: Props) => {
-  const { updatePostsCount } = useAuthProfileContext();
-  const { selectedProfileId } = useAuthUserContext();
+  const { updatePostsCount, selectedProfileId } = useAuthProfileContext();
   const queryClient = useQueryClient();
 
   const addPost = (data: PostDetailed) => {

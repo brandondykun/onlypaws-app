@@ -13,7 +13,7 @@ import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyCompone
 import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { getNextPageParam } from "@/utils/utils";
@@ -26,7 +26,7 @@ const ExploreScreen = () => {
 
   const { setLightOrDark } = useColorMode();
   const tabBarHeight = useBottomTabBarHeight();
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const { setSelectedExplorePost } = useExplorePostsContext();
 
@@ -40,7 +40,6 @@ const ExploreScreen = () => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
   });
 
   // Memoize the flattened posts data

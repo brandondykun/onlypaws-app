@@ -10,6 +10,7 @@ import {
   markAllAsRead as markAllAsReadAPI,
   markNotificationAsRead as markNotificationAsReadAPI,
 } from "@/api/notifications";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
 import { getNextPageParam } from "@/utils/utils";
@@ -90,7 +91,8 @@ type Props = {
 };
 
 const NotificationsContextProvider = ({ children }: Props) => {
-  const { isAuthenticated, selectedProfileId } = useAuthUserContext();
+  const { isAuthenticated } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   const queryClient = useQueryClient();
 
   // Query key for notifications - includes selectedProfileId so query resets when profile changes

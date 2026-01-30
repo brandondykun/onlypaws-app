@@ -12,13 +12,13 @@ import FeedbackListItem from "@/components/Feedback/FeedbackListItem/FeedbackLis
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { FeedbackTicket } from "@/types/feedback/feedback";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackScreen = () => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   const { setLightOrDark } = useColorMode();
 
   const router = useRouter();
@@ -37,7 +37,6 @@ const FeedbackScreen = () => {
     queryFn: fetchFeedbackTickets,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    enabled: !!selectedProfileId,
     staleTime: minutesToMilliseconds(5),
   });
 
