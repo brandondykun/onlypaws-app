@@ -143,6 +143,7 @@ const FeedScreen = () => {
             !feedPosts.isFetchingNextPage &&
             !feedPosts.isLoading &&
             feedPosts.data &&
+            feedPosts.data.pages[0].count > 0 &&
             !feedPosts.isError
               ? true
               : false
@@ -194,6 +195,6 @@ const s = StyleSheet.create({
   emptyComponentContainer: {
     flex: 1,
     justifyContent: "center",
-    marginTop: -100,
+    marginTop: -20,
   },
 });
