@@ -10,7 +10,6 @@ import {
   markAllAsRead as markAllAsReadAPI,
   markNotificationAsRead as markNotificationAsReadAPI,
 } from "@/api/notifications";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
 import { updateAllInfiniteItems, updateInfiniteItemById } from "@/utils/query/cacheUtils";
@@ -94,12 +93,15 @@ type Props = {
 };
 
 const NotificationsContextProvider = ({ children }: Props) => {
-  const { isAuthenticated } = useAuthUserContext();
-  const { selectedProfileId } = useAuthProfileContext();
+  const { isAuthenticated, selectedProfileId } = useAuthUserContext();
   const queryClient = useQueryClient();
 
   // Query key for notifications - includes selectedProfileId so query resets when profile changes
-  const notificationsQueryKey = useMemo(() => queryKeys.notifications.root(selectedProfileId), [selectedProfileId]);
+  // Use 0 as fallback when null (query won't run anyway due to enabled check)
+  const notificationsQueryKey = useMemo(
+    () => queryKeys.notifications.root(selectedProfileId ?? 0),
+    [selectedProfileId],
+  );
 
   // Delay notifications fetch by 500ms on initial load to avoid racing with initial token refresh
   // The auth interceptor will handle 401s that occur during profile switches
@@ -173,18 +175,21 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // Track the previous profile ID to detect profile switches
   const prevProfileIdRef = useRef<number | null>(null);
 
-  // Clear WebSocket notifications and reset unread count when profile changes
-  // DB notifications are automatically cleared by useInfiniteQuery when query key changes
+  // Clear WebSocket notifications, reset unread count, and invalidate query cache when profile changes
   useEffect(() => {
     const isProfileSwitch = prevProfileIdRef.current !== null && prevProfileIdRef.current !== selectedProfileId;
 
     if (isProfileSwitch && selectedProfileId) {
       setWsNotifications([]);
       setApiUnreadCount(0); // Reset until new profile's count is fetched
+
+      // Remove cached notifications for the new profile to force a fresh fetch
+      // This ensures we always get up-to-date notifications when switching profiles
+      queryClient.removeQueries({ queryKey: notificationsQueryKey });
     }
 
     prevProfileIdRef.current = selectedProfileId;
-  }, [selectedProfileId]);
+  }, [selectedProfileId, queryClient, notificationsQueryKey]);
 
   // WebSocket connection state
   const [isConnected, setIsConnected] = useState(false);
