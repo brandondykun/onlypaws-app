@@ -69,13 +69,13 @@ const FollowingScreen = () => {
   }, [isSearchActive, searchResults, following]);
 
   // Search empty component for when search has no results
-  const searchEmptyComponent = isSearchActive ? (
-    <View style={{ marginTop: 48 }}>
+  const searchEmptyComponent = (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingBottom: tabBarHeight + 32 }}>
       <Text style={{ textAlign: "center", fontSize: 20 }} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
-        No results found
+        {isSearchActive ? "No results found" : "You're not following anyone yet!"}
       </Text>
     </View>
-  ) : undefined;
+  );
 
   const handleEndReached = () => {
     const hasErrors = activeQuery.isError || activeQuery.isFetchNextPageError;
@@ -87,57 +87,55 @@ const FollowingScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlashList
-        data={dataToRender}
-        keyExtractor={(item) => item.id.toString()}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: tabBarHeight }}
-        onEndReachedThreshold={0.3}
-        onEndReached={handleEndReached}
-        refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
-        ListEmptyComponent={
-          <ListEmptyComponent
-            isLoading={activeQuery.isLoading}
-            isError={activeQuery.isError}
-            isRefetching={activeQuery.isRefetching}
-            errorMessage="There was an error loading following."
-            customEmptyComponent={searchEmptyComponent}
+    <FlashList
+      data={dataToRender}
+      keyExtractor={(item) => item.id.toString()}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: tabBarHeight }}
+      onEndReachedThreshold={0.3}
+      onEndReached={handleEndReached}
+      refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
+      ListEmptyComponent={
+        <ListEmptyComponent
+          isLoading={activeQuery.isLoading}
+          isError={activeQuery.isError}
+          isRefetching={activeQuery.isRefetching}
+          errorMessage="There was an error loading following."
+          customEmptyComponent={searchEmptyComponent}
+        />
+      }
+      ListHeaderComponent={<SearchListHeader defaultText="All following" searchText={submittedSearchText} />}
+      refreshControl={
+        isSearchActive ? undefined : (
+          <RefreshControl
+            refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
+            onRefresh={activeQuery.refetch}
+            tintColor={COLORS.zinc[400]}
+            colors={[COLORS.zinc[400]]}
           />
-        }
-        ListHeaderComponent={<SearchListHeader defaultText="All following" searchText={submittedSearchText} />}
-        refreshControl={
-          isSearchActive ? undefined : (
-            <RefreshControl
-              refreshing={activeQuery.isRefetching && !activeQuery.isFetchingNextPage}
-              onRefresh={activeQuery.refetch}
-              tintColor={COLORS.zinc[400]}
-              colors={[COLORS.zinc[400]]}
-            />
-          )
-        }
-        renderItem={({ item: profile }) => (
-          <Pressable
-            onPress={() => {
-              router.push({
-                pathname: "/(app)/posts/profileDetails",
-                params: { profileId: profile.id, username: profile.username },
-              });
-            }}
-          >
-            <FollowListProfile profile={profile} />
-          </Pressable>
-        )}
-        ListFooterComponent={
-          <LoadingRetryFooter
-            isLoading={followingQuery.isFetchingNextPage}
-            isError={followingQuery.isFetchNextPageError}
-            fetchNextPage={followingQuery.fetchNextPage}
-            message="Oh no! There was an error fetching more following!"
-          />
-        }
-      />
-    </View>
+        )
+      }
+      renderItem={({ item: profile }) => (
+        <Pressable
+          onPress={() => {
+            router.push({
+              pathname: "/(app)/posts/profileDetails",
+              params: { profileId: profile.id, username: profile.username },
+            });
+          }}
+        >
+          <FollowListProfile profile={profile} />
+        </Pressable>
+      )}
+      ListFooterComponent={
+        <LoadingRetryFooter
+          isLoading={followingQuery.isFetchingNextPage}
+          isError={followingQuery.isFetchNextPageError}
+          fetchNextPage={followingQuery.fetchNextPage}
+          message="Oh no! There was an error fetching more following!"
+        />
+      }
+    />
   );
 };
 
