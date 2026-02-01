@@ -1,6 +1,5 @@
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useCallback } from "react";
-import Toast from "react-native-toast-message";
 
 import {
   followProfile as followProfileApi,
@@ -12,6 +11,7 @@ import { PaginatedResponse } from "@/types/shared/pagination";
 import { removeInfiniteItemById } from "@/utils/query/cacheUtils";
 import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 import { useProfileSearchContext } from "./ProfileSearchContext";
@@ -195,11 +195,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       if (error) {
         // Revert on failure
         revertFollow(profileId, isPrivate);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error following that account.",
-        });
+        toast.error("There was an error following that account.");
       } else {
         // Success - trigger side effects only for public profiles (already following)
         if (!isPrivate) {
@@ -224,11 +220,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       if (error) {
         // Revert on failure
         revertUnfollow(profileId);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error unfollowing that account.",
-        });
+        toast.error("There was an error unfollowing that account.");
       } else {
         // Success - refresh feed to remove unfollowed profile's posts
         queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
@@ -297,11 +289,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
           ...profile,
           follows_you: true,
         }));
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error removing that follower.",
-        });
+        toast.error("There was an error removing that follower.");
       } else {
         // remove follower from followers list on the followers screen
         // the removed profile might not be loaded on that screen, but check to be sure
@@ -309,11 +297,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
           { queryKey: queryKeys.profile.followers(selectedProfileId, selectedProfileId) },
           (oldData) => removeInfiniteItemById(oldData, profileId),
         );
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Follower removed successfully.",
-        });
+        toast.success("Follower removed successfully.");
       }
     },
     [

@@ -4,7 +4,6 @@ import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { login, getMyInfo } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
@@ -16,6 +15,7 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import PawLogo from "@/svg/PawLogo";
+import toast from "@/utils/toast";
 
 const LoginScreen = () => {
   const { authenticate, logOut } = useAuthUserContext();
@@ -65,28 +65,13 @@ const LoginScreen = () => {
         }
       } else {
         logOut();
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error logging you in. Please try again",
-          visibilityTime: 10000,
-        });
+        toast.error("There was an error logging you in. Please try again", { visibilityTime: 10000 });
       }
     } else {
       if (status === 401) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Invalid credentials. Please try again.",
-          visibilityTime: 10000,
-        });
+        toast.error("Invalid credentials. Please try again.", { visibilityTime: 10000 });
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error logging you in. Please try again",
-          visibilityTime: 10000,
-        });
+        toast.error("There was an error logging you in. Please try again", { visibilityTime: 10000 });
       }
     }
     setLoginLoading(false);

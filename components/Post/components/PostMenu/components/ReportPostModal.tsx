@@ -1,7 +1,6 @@
 import { BottomSheetModal as RNBottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useRef, useState } from "react";
 import { Animated, Dimensions, StyleSheet, TextInput as RNTextInput, View, Easing } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { reportPost } from "@/api/report";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
@@ -14,6 +13,7 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { useReportReasonsContext } from "@/context/ReportReasonsContext";
+import toast from "@/utils/toast";
 
 type Props = {
   ref: React.RefObject<RNBottomSheetModal | null>;
@@ -55,12 +55,7 @@ const ReportPostModal = ({ ref, postId }: Props) => {
       // this makes the ux smoother and more natural
       setTimeout(() => {
         resetReportState();
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "That post has been reported. Thank you!",
-          visibilityTime: 7000,
-        });
+        toast.success("That post has been reported. Thank you!", { visibilityTime: 7000 });
       }, 500);
     } else {
       setReportPostError("There was an error reporting that post. Please try again.");

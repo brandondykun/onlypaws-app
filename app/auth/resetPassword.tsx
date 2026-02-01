@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { OtpInputRef } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { resetPassword } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
@@ -15,6 +14,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import toast from "@/utils/toast";
 
 const ResetPasswordScreen = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
@@ -88,21 +88,11 @@ const ResetPasswordScreen = () => {
         setNewPasswordError("Password must be at least 9 characters long.");
       } else {
         // handle other errors
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "An error occurred while resetting your password. Please try again.",
-          visibilityTime: 10000,
-        });
+        toast.error("An error occurred while resetting your password. Please try again.", { visibilityTime: 10000 });
       }
     } else {
       router.push("/auth/login");
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Password reset successful. You can now log in with your new password.",
-        visibilityTime: 10000,
-      });
+      toast.success("Password reset successful. You can now log in with your new password.", { visibilityTime: 10000 });
     }
     setLoading(false);
   };

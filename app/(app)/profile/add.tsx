@@ -3,7 +3,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { createProfile } from "@/api/profile";
 import Button from "@/components/Button/Button";
@@ -15,6 +14,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
+import toast from "@/utils/toast";
 
 const AddProfileScreen = () => {
   const { setActiveProfileId, addProfileOption } = useAuthUserContext();
@@ -47,17 +47,9 @@ const AddProfileScreen = () => {
       setActiveProfileId(data.id);
       addProfileOption({ id: data.id, username: data.username, image: null, name: data.name, profile_type: "regular" });
       router.back();
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: `New profile created! You are now using your new profile ${username}.`,
-      });
+      toast.success(`New profile created! You are now using your new profile ${username}.`);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error creating your new profile.",
-      });
+      toast.error("There was an error creating your new profile.");
       if (error?.username) {
         setUsernameError(error.username[0]);
       }

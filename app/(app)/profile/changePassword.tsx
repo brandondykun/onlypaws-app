@@ -2,7 +2,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { changePassword } from "@/api/auth";
 import Button from "@/components/Button/Button";
@@ -10,6 +9,7 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import toast from "@/utils/toast";
 
 const ChangePasswordScreen = () => {
   const { setLightOrDark } = useColorMode();
@@ -53,17 +53,9 @@ const ChangePasswordScreen = () => {
         setNewPasswordError(res.error.new_password[0]);
       }
     } else if (res.status === 500) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "An error occurred while changing your password. Please try again.",
-      });
+      toast.error("An error occurred while changing your password. Please try again.");
     } else {
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Your password has been updated.",
-      });
+      toast.success("Your password has been updated.");
       router.back();
     }
     setSubmitLoading(false);

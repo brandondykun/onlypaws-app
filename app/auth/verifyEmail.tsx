@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { OtpInputRef } from "react-native-otp-entry";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { verifyEmail, resendVerifyEmail } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
@@ -14,6 +13,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import toast from "@/utils/toast";
 
 const VerifyEmailScreen = () => {
   const { user, updateEmailVerified } = useAuthUserContext();
@@ -62,12 +62,7 @@ const VerifyEmailScreen = () => {
     if (user.id) {
       const { error, status } = await resendVerifyEmail(user.id);
       if (!error && status === 201) {
-        Toast.show({
-          type: "success",
-          text1: "Email Sent",
-          text2: "Please check your email for the new code.",
-          visibilityTime: 7000,
-        });
+        toast.success("Please check your email for the new code.", { visibilityTime: 7000 });
       } else if (error) {
         setResendError(error);
       }

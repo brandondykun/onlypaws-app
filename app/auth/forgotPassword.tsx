@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { requestResetPasswordToken } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
@@ -13,6 +12,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import toast from "@/utils/toast";
 
 const ForgotPasswordScreen = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
@@ -39,10 +39,7 @@ const ForgotPasswordScreen = () => {
     const { error, status } = await requestResetPasswordToken(email);
     if (error) {
       if (status === 500) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "An error occurred while requesting a password reset. Please try again.",
+        toast.error("An error occurred while requesting a password reset. Please try again.", {
           visibilityTime: 10000,
         });
       } else {

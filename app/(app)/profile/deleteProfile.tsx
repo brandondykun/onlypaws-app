@@ -6,7 +6,6 @@ import LottieView from "lottie-react-native";
 import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { deleteProfile } from "@/api/profile";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
@@ -18,6 +17,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import toast from "@/utils/toast";
 
 const ICON_SIZE = 36;
 
@@ -53,12 +53,7 @@ const DeleteProfileScreen = () => {
       bottomSheetRef.current?.close();
       // give enough time for the bottom sheet to close before showing the toast
       setTimeout(() => {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error deleting that profile. Please try again.",
-          visibilityTime: 5000,
-        });
+        toast.error("There was an error deleting that profile. Please try again.", { visibilityTime: 5000 });
       }, 350);
     } else {
       // remove profile from profileOptions context
@@ -71,11 +66,7 @@ const DeleteProfileScreen = () => {
           setActiveProfileId(autoSelectedProfile.id);
         }
       }
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Profile deleted successfully.",
-      });
+      toast.success("Profile deleted successfully.");
       setSelectedProfileId(null);
     }
     setLoading(false);

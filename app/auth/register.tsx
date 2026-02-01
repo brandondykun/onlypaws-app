@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { login, registerUser } from "@/api/auth";
 import { getMyInfo } from "@/api/auth";
@@ -15,6 +14,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import toast from "@/utils/toast";
 
 const RegisterScreen = () => {
   const { authenticate } = useAuthUserContext();
@@ -82,19 +82,11 @@ const RegisterScreen = () => {
           // Navigate to email verification
           router.replace("/auth/verifyEmail");
         } else {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "Your account was created, but there was an error logging you in. Please log in manually.",
-          });
+          toast.error("Your account was created, but there was an error logging you in. Please log in manually.");
           router.replace("/auth/login");
         }
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Your account was created, but there was an error logging you in. Please log in manually.",
-        });
+        toast.error("Your account was created, but there was an error logging you in. Please log in manually.");
         router.replace("/auth/login");
       }
     } else {
@@ -105,12 +97,7 @@ const RegisterScreen = () => {
       if (error?.password) {
         setPasswordError(error.password[0]);
       }
-
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error creating your account. Please try again.",
-      });
+      toast.error("There was an error creating your account. Please try again.");
     }
     setSubmitLoading(false);
   };

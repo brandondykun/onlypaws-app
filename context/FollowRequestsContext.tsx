@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useQueryClient, InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import Toast from "react-native-toast-message";
 
 import {
   getFollowRequests,
@@ -22,6 +21,7 @@ import { WSFollowRequestNotification } from "@/types/notifications/follow-reques
 import { WSFollowRequestAcceptedNotification } from "@/types/notifications/follow-request-accepted";
 import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
@@ -292,12 +292,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         addFollower();
       } catch (error) {
         console.error("Failed to accept follow request:", error);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Failed to accept follow request",
-          visibilityTime: 3000,
-        });
+        toast.error("Failed to accept follow request", { visibilityTime: 3000 });
         throw error;
       }
     },
@@ -320,11 +315,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         });
       } catch (error) {
         console.error("Failed to decline follow request:", error);
-        Toast.show({
-          type: "error",
-          text1: "Failed to decline follow request",
-          visibilityTime: 3000,
-        });
+        toast.error("Failed to decline follow request", { visibilityTime: 3000 });
         throw error;
       }
     },
@@ -342,11 +333,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         });
       } catch (error) {
         console.error("Failed to cancel follow request:", error);
-        Toast.show({
-          type: "error",
-          text1: "Failed to cancel follow request",
-          visibilityTime: 3000,
-        });
+        toast.error("Failed to cancel follow request", { visibilityTime: 3000 });
         throw error;
       }
     },

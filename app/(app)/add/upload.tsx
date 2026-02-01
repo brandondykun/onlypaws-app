@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React from "react";
 import { useWindowDimensions } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { createPost } from "@/api/post";
 import CreateEditPostScreen from "@/components/CreateEditPostScreen/CreateEditPostScreen";
@@ -10,6 +9,7 @@ import { useAddPostContext } from "@/context/AddPostContext";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { SearchedProfile } from "@/types";
+import toast from "@/utils/toast";
 import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
@@ -71,11 +71,7 @@ const AddPostScreen = () => {
     }
 
     if (images.length === 0) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please add at least one image.",
-      });
+      toast.error("Please add at least one image.");
       hasErrors = true;
     }
 
@@ -141,18 +137,10 @@ const AddPostScreen = () => {
         // Navigate to the posts screen
         setTimeout(() => {
           router.navigate("/(app)/posts");
-          Toast.show({
-            type: "success",
-            text1: "Success",
-            text2: "Post successfully created!",
-          });
+          toast.success("Post successfully created!");
         }, 50);
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error creating that post. Please try again.",
-        });
+        toast.error("There was an error creating that post. Please try again.");
       }
     }
     setSubmitLoading(false);

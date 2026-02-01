@@ -3,12 +3,12 @@ import * as Haptics from "expo-haptics";
 import { useState, useRef, useCallback, useMemo } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
 
 import { addLike, removeLike } from "@/api/interactions";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { PostDetailed } from "@/types";
+import { toast } from "@/utils/toast";
 
 import CommentsModal from "../CommentsModal/CommentsModal";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
@@ -82,11 +82,7 @@ const Post = ({
         if (error) {
           // roll back if error
           onUnlike(postId);
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error liking that post.",
-          });
+          toast.error("There was an error liking that post.");
         }
       } else {
         // haptic feedback
@@ -113,11 +109,7 @@ const Post = ({
         if (error) {
           // roll back if error
           onLike(postId);
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error removing that like.",
-          });
+          toast.error("There was an error removing that like.");
         }
       }
       setLikeLoading(false);

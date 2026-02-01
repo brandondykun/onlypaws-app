@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { View, ScrollView, ActivityIndicator } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { getCommentChainForQuery } from "@/api/interactions";
 import Button from "@/components/Button/Button";
@@ -17,6 +16,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ImageAspectRatio } from "@/types/post/post";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 
 const CommentDetailsScreen = () => {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
@@ -55,11 +55,7 @@ const CommentDetailsScreen = () => {
   }, [commentChain]);
 
   const handleHeartPress = useCallback(() => {
-    Toast.show({
-      type: "info",
-      text1: "Info",
-      text2: "Sorry! You can't interact with comments from this screen yet.",
-    });
+    toast.info("Sorry! You can't interact with comments from this screen yet.");
   }, []);
 
   if (isLoading) return <Loading />;

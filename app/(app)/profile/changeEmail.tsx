@@ -2,13 +2,13 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { requestEmailChange } from "@/api/auth";
 import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
+import toast from "@/utils/toast";
 
 const ChangeEmailScreen = () => {
   const router = useRouter();
@@ -41,11 +41,7 @@ const ChangeEmailScreen = () => {
         if (error?.error?.email) {
           setNewEmailError(error.error.email);
         } else if (error?.error?.other) {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: error.error.other,
-          });
+          toast.error(error.error.other);
         }
       }
     }

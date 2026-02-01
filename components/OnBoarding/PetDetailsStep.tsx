@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
-import Toast from "react-native-toast-message";
 
 import Button from "@/components/Button/Button";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
@@ -11,6 +10,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
+import toast from "@/utils/toast";
 
 type PetDetailsStepProps = {
   onNext: () => Promise<void>;
@@ -59,11 +59,7 @@ const PetDetailsStep = ({
 
   const handleNext = async () => {
     if (!name) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please enter your pet's name.",
-      });
+      toast.error("Please enter your pet's name.");
       return;
     }
 

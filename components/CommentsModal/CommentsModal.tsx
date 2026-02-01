@@ -16,6 +16,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
@@ -134,11 +135,7 @@ const CommentsModal = forwardRef(
             setParentComment(null);
             setReplyToComment(null);
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Error",
-              text2: "There was an error adding that comment.",
-            });
+            toast.error("There was an error adding that comment.");
           }
           setAddCommentLoading(false);
         }

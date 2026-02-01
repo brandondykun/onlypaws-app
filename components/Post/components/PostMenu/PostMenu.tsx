@@ -2,7 +2,6 @@ import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom
 import { ForwardedRef, forwardRef, useRef, useState } from "react";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { deletePost as deletePostApiCall } from "@/api/post";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
@@ -12,6 +11,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { PostReportPreview } from "@/types";
+import toast from "@/utils/toast";
 
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import OwnPostOptions from "./components/OwnPostOptions";
@@ -56,17 +56,9 @@ const PostMenu = forwardRef(
           confirmDeleteModalRef.current?.dismiss();
           ref?.current?.dismiss();
         }
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Post successfully deleted.",
-        });
+        toast.success("Post successfully deleted.");
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error deleting that post.",
-        });
+        toast.error("There was an error deleting that post.");
       }
       setDeleteLoading(false);
     };

@@ -5,7 +5,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { View, StyleSheet, Switch } from "react-native";
 import { ScrollView } from "react-native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 import { updateProfile } from "@/api/profile";
 import Button from "@/components/Button/Button";
@@ -18,6 +17,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import { PetTypeWithTitle } from "@/types";
+import toast from "@/utils/toast";
 
 const EditProfileScreen = () => {
   const { authProfile, updateAuthProfile } = useAuthProfileContext();
@@ -51,11 +51,7 @@ const EditProfileScreen = () => {
         updateAuthProfile(data.name, data.about, data.breed, data.pet_type, data.is_private);
         router.back();
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error updating your profile.",
-        });
+        toast.error("There was an error updating your profile.");
       }
       setUpdateProfileLoading(false);
     }

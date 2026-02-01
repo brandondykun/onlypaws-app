@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { ProgressSteps, ProgressStep } from "react-native-progress-steps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
 import { createProfile, updateUsername, updateProfile } from "@/api/profile";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
@@ -12,6 +11,7 @@ import { COLORS } from "@/constants/Colors";
 import { SHOW_WELCOME_ANNOUNCEMENT_KEY } from "@/context/AnnouncementsContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import toast from "@/utils/toast";
 
 import AboutStep from "../../components/OnBoarding/AboutStep";
 import PetDetailsStep from "../../components/OnBoarding/PetDetailsStep";
@@ -68,11 +68,7 @@ const OnboardingMainScreen = () => {
         return error;
       } else {
         setStepLoading(false);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error updating your username. Please try again.",
-        });
+        toast.error("There was an error updating your username. Please try again.");
         return "There was an error updating your username. Please try again.";
       }
     } else {
@@ -101,11 +97,7 @@ const OnboardingMainScreen = () => {
         return error.username[0];
       } else {
         setStepLoading(false);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was an error creating your profile. Please try again.",
-        });
+        toast.error("There was an error creating your profile. Please try again.");
         return "There was an error creating your profile. Please try again.";
       }
     }
@@ -114,20 +106,12 @@ const OnboardingMainScreen = () => {
   // Step 2: Pet Details
   const handlePetDetailsNext = async () => {
     if (!name) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please enter your pet's name.",
-      });
+      toast.error("Please enter your pet's name.");
       return;
     }
 
     if (!profileId) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Profile not found. Please restart the onboarding process.",
-      });
+      toast.error("Profile not found. Please restart the onboarding process.");
       return;
     }
 
@@ -147,11 +131,7 @@ const OnboardingMainScreen = () => {
       // Move to next step
       setCurrentStep(2);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error updating your pet's information. Please try again.",
-      });
+      toast.error("There was an error updating your pet's information. Please try again.");
     }
 
     setStepLoading(false);
@@ -160,11 +140,7 @@ const OnboardingMainScreen = () => {
   // Step 3: About (Final step)
   const handleAboutSubmit = async () => {
     if (!profileId) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Profile not found. Please restart the onboarding process.",
-      });
+      toast.error("Profile not found. Please restart the onboarding process.");
       return;
     }
 
@@ -209,11 +185,7 @@ const OnboardingMainScreen = () => {
         router.replace("/(app)/(index)");
       }, 3000); // 1000ms fade-in + 2000ms display = 3000ms total
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error finalizing your profile. Please try again.",
-      });
+      toast.error("There was an error finalizing your profile. Please try again.");
       setStepLoading(false);
     }
   };

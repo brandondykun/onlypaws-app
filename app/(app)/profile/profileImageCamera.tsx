@@ -5,7 +5,6 @@ import * as SecureStore from "expo-secure-store";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
 import { Camera, useCameraDevice, useCameraPermission, Point, useCameraFormat } from "react-native-vision-camera";
 import { scheduleOnRN } from "react-native-worklets";
 
@@ -20,6 +19,7 @@ import CropProfileImageModal from "@/components/CropProfileImageModal/CropProfil
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { ImageAsset } from "@/types/post/post";
+import toast from "@/utils/toast";
 import { getImageUri } from "@/utils/utils";
 
 // Max images for a post
@@ -138,11 +138,7 @@ const ProfileImageCamera = () => {
           setCropModalVisible(false);
           router.back();
         } else {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error updating your profile picture.",
-          });
+          toast.error("There was an error updating your profile picture.");
         }
       } else {
         // create new profile image
@@ -153,20 +149,12 @@ const ProfileImageCamera = () => {
           setCropModalVisible(false);
           router.back();
         } else {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "There was an error updating your profile picture.",
-          });
+          toast.error("There was an error updating your profile picture.");
         }
       }
       setSaveImageLoading(false);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error updating your profile picture.",
-      });
+      toast.error("There was an error updating your profile picture.");
     }
   };
 

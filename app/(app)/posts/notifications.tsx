@@ -5,7 +5,6 @@ import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
 import { RefreshControl, View, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
 
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
@@ -17,6 +16,7 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
+import toast from "@/utils/toast";
 
 const NotificationsScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -54,7 +54,7 @@ const NotificationsScreen = () => {
       await markAllAsRead();
       // Success - no need to do anything as context handles state updates
     } catch {
-      Toast.show({ type: "error", text1: "error", text2: "Failed to update notifications. Please try again." });
+      toast.error("Failed to update notifications. Please try again.");
     }
   };
 

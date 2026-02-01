@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { ScrollView } from "react-native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 import { updateUsername as updateUsernameApi } from "@/api/profile";
 import Button from "@/components/Button/Button";
@@ -15,6 +14,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import toast from "@/utils/toast";
 import { verifyUsername } from "@/utils/utils";
 
 const EditUsernameScreen = () => {
@@ -47,11 +47,7 @@ const EditUsernameScreen = () => {
     const { data, error } = await updateUsernameApi(authProfile.id, username);
     if (!error && data) {
       updateUsername(username);
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Username updated successfully.",
-      });
+      toast.success("Username updated successfully.");
       router.back();
     } else {
       setError(error);

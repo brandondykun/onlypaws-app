@@ -2,7 +2,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as Haptics from "expo-haptics";
 import { useState, useRef } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
@@ -10,6 +9,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { PostDetailed } from "@/types";
+import toast from "@/utils/toast";
 
 type Props = {
   post: PostDetailed;
@@ -54,11 +54,7 @@ const SaveButton = ({ post }: Props) => {
       if (error) {
         // rollback if error
         savePost(post);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Error un-saving that post.",
-        });
+        toast.error("There was an error un-saving that post.");
       }
       // do not show success toast message when un-saving a post
     } else {
@@ -86,20 +82,10 @@ const SaveButton = ({ post }: Props) => {
       if (error) {
         // rollback if error
         unSavePost(post.id);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Error saving that post.",
-        });
+        toast.error("There was an error saving that post.");
       } else {
         // show success toast message
-        Toast.show({
-          type: "savePost",
-          position: "bottom",
-          props: {
-            imageUri: post.images[0].image,
-          },
-        });
+        toast.savePost({ imageUri: post.images[0].image });
       }
     }
     setSaveLoading(false);

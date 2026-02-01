@@ -2,7 +2,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { deletePostImage, updatePost as updatePostApi } from "@/api/post";
 import { createPostImageTag, deletePostImageTag } from "@/api/post";
@@ -13,6 +12,7 @@ import { usePostsContext } from "@/context/PostsContext";
 import { PostImage, SearchedProfile } from "@/types";
 import { ImageAssetWithTags } from "@/types/post/post";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getImageHeightAspectAware, getNextPageParam } from "@/utils/utils";
 
 const EditPost = () => {
@@ -67,17 +67,9 @@ const EditPost = () => {
     if (data && !error) {
       updatePost(postToEdit.id, { ...postToEdit, caption, contains_ai: aiGenerated });
       router.back();
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Post successfully updated!",
-      });
+      toast.success("Post successfully updated!");
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error updating your post. Please try again.",
-      });
+      toast.error("There was an error updating your post. Please try again.");
     }
     setUpdateLoading(false);
   };
@@ -95,17 +87,9 @@ const EditPost = () => {
     const { error } = await deletePostImage(image.id);
     if (!error) {
       removeImageFromPost(postToEdit.id, image.id);
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Image successfully deleted from post.",
-      });
+      toast.success("Image successfully deleted from post.");
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error deleting that image. Please try again.",
-      });
+      toast.error("There was an error deleting that image. Please try again.");
     }
     setRemoveImageLoading(false);
   };
@@ -136,11 +120,7 @@ const EditPost = () => {
         }),
       });
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error deleting the tag. Please try again.",
-      });
+      toast.error("There was an error deleting the tag. Please try again.");
     }
     setRemoveTagLoading(false);
   };
@@ -174,11 +154,7 @@ const EditPost = () => {
         }),
       });
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error adding the tag. Please try again.",
-      });
+      toast.error("There was an error adding the tag. Please try again.");
     }
     setAddTagLoading(false);
   };

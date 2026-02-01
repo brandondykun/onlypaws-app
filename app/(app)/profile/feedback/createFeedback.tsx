@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { ScrollView } from "react-native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 import { createFeedbackTicket } from "@/api/feedback";
 import Button from "@/components/Button/Button";
@@ -17,6 +16,7 @@ import { FeedbackTicket } from "@/types/feedback/feedback";
 import { PaginatedResponse } from "@/types/shared/pagination";
 import { upsertInfiniteItem } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getFeedbackType } from "@/utils/utils";
 
 const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
@@ -46,11 +46,7 @@ const CreateFeedbackScreen = () => {
     setDescriptionError("");
 
     if (!feedbackType) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Feedback type is required.",
-      });
+      toast.error("Feedback type is required.");
       return;
     }
 
@@ -90,18 +86,9 @@ const CreateFeedbackScreen = () => {
 
       // Navigate back to the feedback screen
       router.back();
-
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Your feedback ticket has been created! Thank you for your feedback.",
-      });
+      toast.success("Your feedback ticket has been created! Thank you for your feedback.");
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error creating your feedback ticket. Please try again.",
-      });
+      toast.error("There was an error creating your feedback ticket. Please try again.");
     }
     setSubmitLoading(false);
   };

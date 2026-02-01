@@ -2,7 +2,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { verifyEmailChange } from "@/api/auth";
 import Button from "@/components/Button/Button";
@@ -10,6 +9,7 @@ import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
+import toast from "@/utils/toast";
 
 const VerifyEmailScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -36,20 +36,12 @@ const VerifyEmailScreen = () => {
       changeEmail(newEmail as string);
       router.back();
       router.back();
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Email updated successfully!",
-      });
+      toast.success("Email updated successfully!");
     } else {
       if (error?.error?.token) {
         setError(error.error.token);
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "There was en error verifying your email. Please try again.",
-        });
+        toast.error("There was an error verifying your email. Please try again.");
       }
     }
 

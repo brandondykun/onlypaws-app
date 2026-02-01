@@ -8,7 +8,6 @@ import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useState, useRef } from "react";
 import { View, StyleSheet, useWindowDimensions, ScrollView, Pressable } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import Toast from "react-native-toast-message";
 import ViewShot from "react-native-view-shot";
 
 import Button from "@/components/Button/Button";
@@ -20,6 +19,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import toast from "@/utils/toast";
 
 const QrCodeScreen = () => {
   const { selectedProfileId, authProfile } = useAuthProfileContext();
@@ -58,11 +58,7 @@ const QrCodeScreen = () => {
     let { status } = await MediaLibrary.requestPermissionsAsync();
 
     if (status !== "granted") {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Sorry, we need camera roll permissions to make this work!",
-      });
+      toast.error("Sorry, we need camera roll permissions to make this work!");
       return;
     }
 
@@ -71,19 +67,11 @@ const QrCodeScreen = () => {
         .capture()
         .then((uri: string) => {
           MediaLibrary.createAssetAsync(uri);
-          Toast.show({
-            type: "success",
-            text1: "Success",
-            text2: "QR code downloaded to your camera roll!",
-          });
+          toast.success("QR code downloaded to your camera roll!");
         })
         .catch((error) => {
           console.log(error);
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "Error downloading QR code to your camera roll",
-          });
+          toast.error("Error downloading QR code to your camera roll");
         });
     }
     bottomSheetRef.current?.close();

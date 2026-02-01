@@ -3,7 +3,6 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 import { deleteCommentLike, getCommentRepliesForQuery, likeComment as likeCommentApi } from "@/api/interactions";
 import { COLORS } from "@/constants/Colors";
@@ -12,6 +11,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 import FetchRepliesRetry from "./FetchRepliesRetry";
@@ -78,11 +78,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
     const { error } = await likeCommentApi(commentId, authProfile.id);
     if (error) {
       unlikeComment(commentId); // revert like on error
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error liking that comment.",
-      });
+      toast.error("There was an error liking that comment.");
     }
   };
 
@@ -93,11 +89,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
     const { error } = await deleteCommentLike(commentId);
     if (error) {
       likeComment(commentId); // revert unlike on error
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "There was an error removing that like.",
-      });
+      toast.error("There was an error removing that like.");
     }
   };
 

@@ -15,6 +15,7 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
 import { updateAllInfiniteItems, updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
+import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 export type NotificationContextType = {
@@ -559,12 +560,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
       if (error) {
         console.error("Failed to mark notification as read:", error);
-        Toast.show({
-          type: "error",
-          text1: "Failed to mark notification as read",
-          visibilityTime: 5000,
-          autoHide: true,
-        });
+        toast.error("Failed to mark notification as read.", { visibilityTime: 5000 });
         return; // Don't update local state if API call failed
       }
 
