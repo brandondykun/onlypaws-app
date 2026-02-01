@@ -13,6 +13,8 @@ import {
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
+import { updateAllInfiniteItems, updateInfiniteItemById } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 export type NotificationContextType = {
@@ -96,7 +98,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const queryClient = useQueryClient();
 
   // Query key for notifications - includes selectedProfileId so query resets when profile changes
-  const notificationsQueryKey = useMemo(() => [selectedProfileId, "notifications"], [selectedProfileId]);
+  const notificationsQueryKey = useMemo(() => queryKeys.notifications.root(selectedProfileId), [selectedProfileId]);
 
   // Delay notifications fetch by 500ms on initial load to avoid racing with initial token refresh
   // The auth interceptor will handle 401s that occur during profile switches
@@ -595,16 +597,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
       // Update DB notifications in the query cache
       queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((notification) =>
-              notification.id === numericId ? { ...notification, is_read: true } : notification,
-            ),
-          })),
-        };
+        return updateInfiniteItemById(oldData, numericId, (notification) => ({ ...notification, is_read: true }));
       });
     },
     [queryClient, notificationsQueryKey],
@@ -631,16 +624,9 @@ const NotificationsContextProvider = ({ children }: Props) => {
       setApiUnreadCount(0);
 
       // Update DB notifications in the query cache
-      queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((notification) => ({ ...notification, is_read: true })),
-          })),
-        };
-      });
+      queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) =>
+        updateAllInfiniteItems(oldData, (notification) => ({ ...notification, is_read: true })),
+      );
     } catch (error) {
       throw error;
     } finally {
@@ -653,16 +639,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
     setWsNotifications([]);
     setApiUnreadCount(0);
     // Clear DB notifications from the query cache
-    queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page) => ({
-          ...page,
-          results: [],
-        })),
-      };
-    });
+    queryClient.removeQueries({ queryKey: notificationsQueryKey });
   }, [queryClient, notificationsQueryKey]);
 
   // Handle app state changes (foreground/background)

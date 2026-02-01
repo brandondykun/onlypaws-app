@@ -6,6 +6,7 @@ import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { getProfileDetailsForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
 import { PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthUserContext } from "./AuthUserContext";
 import { useColorMode } from "./ColorModeContext";
@@ -68,7 +69,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     isFetching,
     refetch: queryRefetch,
   } = useQuery({
-    queryKey: [selectedProfileId, "profile", selectedProfileId?.toString()],
+    queryKey: queryKeys.profile.details(selectedProfileId!, selectedProfileId?.toString() as string),
     queryFn: () => fetchProfile(selectedProfileId!),
     enabled: !!selectedProfileId && !authLoading,
     staleTime: 0, // Always refetch to get latest data
@@ -164,7 +165,7 @@ const AuthProfileContextProvider = ({ children }: Props) => {
 
     // Update username in all posts for this profile (authProfile posts)
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "profile", selectedProfileId.toString()] },
+      { queryKey: queryKeys.posts.profile(selectedProfileId, selectedProfileId) },
       updatePostsUsername,
     );
   };

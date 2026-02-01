@@ -13,14 +13,19 @@ import ReplyComment from "@/components/Comment/ReplyComment";
 import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { ImageAspectRatio } from "@/types/post/post";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 const CommentDetailsScreen = () => {
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
-  const tabBarHeight = useBottomTabBarHeight();
+  const { selectedProfileId } = useAuthProfileContext();
   const { isDarkMode } = useColorMode();
+
+  const tabBarHeight = useBottomTabBarHeight();
   const scrollViewRef = useRef<ScrollView>(null);
+
   const [showTagPopovers, setShowTagPopovers] = useState(false);
 
   const fetchCommentChain = async (commentId: string) => {
@@ -34,7 +39,7 @@ const CommentDetailsScreen = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["commentChain", commentId],
+    queryKey: queryKeys.commentChain.root(selectedProfileId, commentId),
     queryFn: () => fetchCommentChain(commentId),
     enabled: !!commentId,
   });

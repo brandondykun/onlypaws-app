@@ -5,6 +5,7 @@ import { useEffect, useMemo } from "react";
 import { getSavedPostsForQuery } from "@/api/post";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const SavedPostsListScreen = () => {
@@ -19,7 +20,7 @@ const SavedPostsListScreen = () => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "saved"],
+    queryKey: queryKeys.posts.saved(selectedProfileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

@@ -3,8 +3,7 @@ import { createContext, useContext } from "react";
 
 import { getReportReasons } from "@/api/report";
 import { ReportReason } from "@/types";
-
-import { useAuthProfileContext } from "./AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 type ReportReasonsContextType = {
   data: ReportReason[];
@@ -27,10 +26,8 @@ type Props = {
 };
 
 const ReportReasonsContextProvider = ({ children }: Props) => {
-  const { selectedProfileId } = useAuthProfileContext();
-
   const { data, isFetched, isError, refetch, isRefetching } = useQuery({
-    queryKey: ["reportReasons", selectedProfileId],
+    queryKey: queryKeys.reportReasons.root,
     queryFn: () => getReportReasons(),
   });
 

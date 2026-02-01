@@ -2,6 +2,8 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
 import { PostDetailed, PostsDetailedPage } from "@/types";
+import { removeInfiniteItemById, updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 import { useExplorePostsContext } from "./ExplorePostsContext";
@@ -43,6 +45,7 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
   // save a post wherever it appears in the app
   const savePost = (postData: PostDetailed) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postData.id) {
         return { ...prev, is_saved: true };
@@ -50,73 +53,32 @@ const PostManagerContextProvider = ({ children }: Props) => {
       return prev;
     });
 
-    // Update all post queries for current profile EXCEPT saved posts (we'll handle that separately)
-    // Note: We can't use partial queryKey matching here because we need to exclude "saved" posts
-    const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
-      predicate: (query) => {
-        const key = query.queryKey;
-        // Only match queries for current profile, excluding saved posts
-        return key[0] === selectedProfileId && key[1] === "posts" && !key.includes("saved");
+    // Update all post queries for current profile EXCEPT saved posts (that is handled separately)
+    // Note: predicate is used to explicitly exclude "saved" posts
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      {
+        queryKey: queryKeys.posts.root(selectedProfileId),
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === selectedProfileId && key[1] === "posts" && !key.includes("saved");
+        },
       },
-    });
-
-    allPostQueries.forEach(([queryKey, oldData]) => {
-      if (!oldData?.pages) return;
-
-      queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKey, {
-        ...oldData,
-        pages: oldData.pages.map((page) => ({
-          ...page,
-          results:
-            page.results?.map((post) => (post.id === postData.id ? { ...post, is_saved: true } : post)) ?? page.results,
-        })),
-      });
-    });
+      (oldData) => {
+        return updateInfiniteItemById(oldData, postData.id, (post) => ({ ...post, is_saved: true }));
+      },
+    );
 
     // Special case to add a saved post to the saved posts cache.
     // This ensure that the saved posts are updated locally without having to refetch the posts.
-    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>([selectedProfileId, "posts", "saved"], (oldData) => {
-      if (!oldData) return oldData;
-
-      // Check if post already exists in saved posts
-      const currentIds: number[] = [];
-      if (oldData.pages) {
-        for (const page of oldData.pages) {
-          if (page.results) {
-            currentIds.push(...page.results.map((post) => post.id));
-          }
-        }
-      }
-
-      if (currentIds.includes(postData.id)) {
-        // Post already exists, just update it
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results:
-              page.results?.map((post) => (post.id === postData.id ? { ...post, is_saved: true } : post)) ??
-              page.results,
-          })),
-        };
-      }
-
-      // Add the new post to the beginning of the first page
-      const firstPage = oldData.pages[0];
-      const updatedFirstPage = {
-        ...firstPage,
-        results: [{ ...postData, is_saved: true }, ...(firstPage?.results || [])],
-      };
-
-      return {
-        ...oldData,
-        pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-      };
+    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKeys.posts.saved(selectedProfileId), (oldData) => {
+      const updated = { ...postData, is_saved: true };
+      return upsertInfiniteItem(oldData, updated);
     });
   };
 
   // unsave a post wherever it appears in the app
   const unSavePost = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, is_saved: false };
@@ -127,26 +89,15 @@ const PostManagerContextProvider = ({ children }: Props) => {
     // Update all post queries for current profile including saved posts
     // For saved posts, we update is_saved to false but don't remove the post
     // It will be removed on the next refetch to avoid abrupt UI changes
-    const allPostQueries = queryClient.getQueriesData<InfiniteData<PostsDetailedPage>>({
-      queryKey: [selectedProfileId, "posts"],
-    });
-
-    allPostQueries.forEach(([queryKey, oldData]) => {
-      if (!oldData?.pages) return;
-
-      queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKey, {
-        ...oldData,
-        pages: oldData.pages.map((page) => ({
-          ...page,
-          results:
-            page.results?.map((post) => (post.id === postId ? { ...post, is_saved: false } : post)) ?? page.results,
-        })),
-      });
-    });
+    queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
+      (oldData) => updateInfiniteItemById(oldData, postId, (post) => ({ ...post, is_saved: false })),
+    );
   };
 
   // like a post wherever it appears in the app
   const onLike = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, liked: true, likes_count: prev.likes_count + 1 };
@@ -156,35 +107,20 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, liked: true, likes_count: post.likes_count + 1 };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({
+          ...post,
+          liked: true,
+          likes_count: post.likes_count + 1,
+        }));
       },
     );
   };
 
   // unlike a post wherever it appears in the app
   const onUnlike = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, liked: false, likes_count: prev.likes_count - 1 };
@@ -194,35 +130,20 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, liked: false, likes_count: post.likes_count - 1 };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({
+          ...post,
+          liked: false,
+          likes_count: post.likes_count - 1,
+        }));
       },
     );
   };
 
   // add a comment to post wherever it appears in the app
   const onComment = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, comments_count: prev.comments_count + 1 };
@@ -232,35 +153,19 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, comments_count: post.comments_count + 1 };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({
+          ...post,
+          comments_count: post.comments_count + 1,
+        }));
       },
     );
   };
 
   // toggle is_hidden true or false for post wherever it appears in the app
   const onToggleHidden = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, is_hidden: !prev.is_hidden };
@@ -270,35 +175,14 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
-      (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, is_hidden: !post.is_hidden };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
-      },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
+      (oldData) => updateInfiniteItemById(oldData, postId, (post) => ({ ...post, is_hidden: !post.is_hidden })),
     );
   };
 
   // remove post wherever it appears in the app
   const removePostFromData = (postId: number) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return null;
@@ -308,28 +192,14 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
-      (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.filter((post) => post.id !== postId) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
-      },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
+      (oldData) => removeInfiniteItemById(oldData, postId),
     );
   };
 
   // toggle is_reported true for post wherever it appears in the app
   const onReportPost = (postId: number, is_inappropriate_content: boolean) => {
+    // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
       if (prev && prev.id === postId) {
         return { ...prev, is_hidden: true, is_reported: true };
@@ -339,29 +209,9 @@ const PostManagerContextProvider = ({ children }: Props) => {
 
     // Update all queries for the current profile only
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts"] },
+      { queryKey: queryKeys.posts.root(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, is_hidden: true, is_reported: true };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({ ...post, is_hidden: true, is_reported: true }));
       },
     );
 

@@ -14,6 +14,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const FollowersScreen = () => {
@@ -35,7 +36,7 @@ const FollowersScreen = () => {
 
   // Main followers query
   const followersQuery = useInfiniteQuery({
-    queryKey: [selectedProfileId, "followers", selectedProfileId],
+    queryKey: queryKeys.profile.followers(selectedProfileId, selectedProfileId),
     queryFn: fetchFollowers,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
@@ -43,7 +44,7 @@ const FollowersScreen = () => {
 
   // Search query
   const searchQuery = useInfiniteQuery({
-    queryKey: [selectedProfileId, "followers", "search", submittedSearchText],
+    queryKey: queryKeys.followers.search(selectedProfileId, submittedSearchText),
     queryFn: fetchSearchResults,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),

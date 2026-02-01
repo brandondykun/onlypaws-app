@@ -15,6 +15,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode, use
 import { getSystemStatus } from "@/api/status";
 import MaintenanceModal from "@/components/MaintenanceModal/MaintenanceModal";
 import { SystemStatusResponse } from "@/types/status/status";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 type MaintenanceState = {
   isInMaintenance: boolean;
@@ -45,8 +46,6 @@ type MaintenanceProviderProps = {
   children: ReactNode;
 };
 
-const MAINTENANCE_QUERY_KEY = ["systemStatus"];
-
 export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
   const queryClient = useQueryClient();
 
@@ -56,7 +55,7 @@ export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
 
   // Query for initial system status check
   const systemStatusQuery = useQuery({
-    queryKey: MAINTENANCE_QUERY_KEY,
+    queryKey: queryKeys.systemStatus.root,
     queryFn: async () => {
       const { data, status } = await getSystemStatus();
 
@@ -116,8 +115,8 @@ export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
    */
   const clearMaintenance = useCallback(() => {
     setManualOverride(null);
-    // Invalidate the query so it refetches on next check
-    queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
+    // Invalidate the query so it re-fetches on next check
+    queryClient.invalidateQueries({ queryKey: queryKeys.systemStatus.root });
   }, [queryClient]);
 
   const value: MaintenanceContextType = {

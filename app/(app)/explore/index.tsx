@@ -16,6 +16,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const screenWidth = Dimensions.get("window").width;
@@ -36,7 +37,7 @@ const ExploreScreen = () => {
   };
 
   const explorePosts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "explore"],
+    queryKey: queryKeys.posts.explore(selectedProfileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

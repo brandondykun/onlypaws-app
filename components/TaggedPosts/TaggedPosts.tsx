@@ -10,6 +10,7 @@ import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 import { minutesToMilliseconds } from "@/utils/utils";
 
@@ -32,7 +33,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "tagged", profileId.toString()],
+    queryKey: queryKeys.posts.tagged(selectedProfileId, profileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

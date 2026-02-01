@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { getProfilePostsForQuery } from "@/api/profile";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const FeedProfilePostsListScreen = () => {
@@ -30,7 +31,7 @@ const FeedProfilePostsListScreen = () => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "profile", profileId.toString()],
+    queryKey: queryKeys.posts.profile(selectedProfileId, profileId.toString()),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

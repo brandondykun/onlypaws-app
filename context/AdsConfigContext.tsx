@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useCallback, ReactNode } from "react";
 
 import { getAdsConfig, AdsConfig } from "@/api/ads";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthUserContext } from "./AuthUserContext";
 
@@ -34,7 +35,7 @@ export const AdsConfigProvider = ({ children }: AdsConfigProviderProps) => {
   const { selectedProfileId } = useAuthUserContext();
 
   const adsConfigQuery = useQuery({
-    queryKey: ["adsConfig"],
+    queryKey: queryKeys.adsConfig.root,
     queryFn: async () => {
       const { data, error } = await getAdsConfig();
 

@@ -15,6 +15,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { FeedbackTicket } from "@/types/feedback/feedback";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackScreen = () => {
@@ -33,7 +34,7 @@ const FeedbackScreen = () => {
   };
 
   const feedbackTickets = useInfiniteQuery({
-    queryKey: [selectedProfileId, "feedback-tickets"],
+    queryKey: queryKeys.feedbackTicket.root(selectedProfileId),
     queryFn: fetchFeedbackTickets,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

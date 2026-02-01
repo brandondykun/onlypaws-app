@@ -15,6 +15,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
@@ -44,13 +45,16 @@ const CommentsModal = forwardRef(
     // specific comment being replied to
     const [replyToComment, setReplyToComment] = useState<PostCommentDetailed | null>(null);
 
-    const { authProfile } = useAuthProfileContext();
+    const { authProfile, selectedProfileId } = useAuthProfileContext();
     const queryClient = useQueryClient();
     const commentInputFooterRef = useRef<CommentInputFooterRef>(null);
     const flatListRef = useRef<BottomSheetFlatListMethods>(null); // ref to comments flat list
 
     // Query key for comments
-    const commentsQueryKey = useMemo(() => ["comments", postId] as const, [postId]);
+    const commentsQueryKey = useMemo(
+      () => queryKeys.comments.post(selectedProfileId, postId as number),
+      [postId, selectedProfileId],
+    );
 
     // Cache updaters for comments
     const { addReply, prependComment } = useCommentsCacheUpdaters(commentsQueryKey);

@@ -17,6 +17,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { ProfileDetails as ProfileDetailsType } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
@@ -53,7 +54,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
   const isOwnProfile = profileId.toString() === selectedProfileId.toString();
   // Use the same query key as AuthProfileContext when viewing own profile
   // This ensures cache updates from the context are reflected here
-  const profileQueryKey = [selectedProfileId, "profile", profileId.toString()];
+  const profileQueryKey = queryKeys.profile.details(selectedProfileId, profileId);
 
   const profile = useQuery({
     queryKey: profileQueryKey,
@@ -68,7 +69,7 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
 
   // NOTE: We compare with selectedProfileId directly (not authProfile.id) because authProfile
   // uses placeholderData which can return stale data during profile switches
-  const postsQueryKey = [selectedProfileId, "posts", "profile", profileId.toString()];
+  const postsQueryKey = queryKeys.posts.profile(selectedProfileId, profileId);
 
   const posts = useInfiniteQuery({
     queryKey: postsQueryKey,

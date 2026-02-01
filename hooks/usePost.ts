@@ -3,6 +3,7 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { getPostForQuery } from "@/api/post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { PostDetailed } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 type UsePostResult = UseQueryResult<PostDetailed, Error>;
 
@@ -29,7 +30,7 @@ export function usePost(postId: number | string): UsePostResult {
   };
 
   const post = useQuery({
-    queryKey: [selectedProfileId, "posts", "post", postId],
+    queryKey: queryKeys.posts.details(selectedProfileId, postId),
     queryFn: () => fetchPost(postId),
   });
 

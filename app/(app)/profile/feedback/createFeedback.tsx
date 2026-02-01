@@ -15,6 +15,8 @@ import TextInput from "@/components/TextInput/TextInput";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { FeedbackTicket } from "@/types/feedback/feedback";
 import { PaginatedResponse } from "@/types/shared/pagination";
+import { upsertInfiniteItem } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getFeedbackType } from "@/utils/utils";
 
 const FEEDBACK_TYPE_OPTIONS: DropdownSelectOption[] = [
@@ -82,23 +84,8 @@ const CreateFeedbackScreen = () => {
     if (data && !error) {
       // Update the feedback tickets query data to include the new feedback ticket
       queryClient.setQueryData<InfiniteData<PaginatedResponse<FeedbackTicket>>>(
-        [selectedProfileId, "feedback-tickets"],
-        (oldData) => {
-          if (!oldData?.pages) return oldData;
-
-          const firstPage = oldData.pages[0];
-          const updatedFirstPage = {
-            ...firstPage,
-            count: firstPage?.count + 1,
-            results: [data, ...(firstPage?.results || [])],
-          };
-
-          // Handle infinite query structure
-          return {
-            ...oldData,
-            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-          };
-        },
+        queryKeys.feedbackTicket.root(selectedProfileId),
+        (oldData) => upsertInfiniteItem(oldData, data),
       );
 
       // Navigate back to the feedback screen

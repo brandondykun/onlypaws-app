@@ -11,6 +11,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 import FetchRepliesRetry from "./FetchRepliesRetry";
@@ -32,14 +33,17 @@ type Props = {
 
 const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentId, commentsQueryKey }: Props) => {
   const { isDarkMode } = useColorMode();
-  const { authProfile } = useAuthProfileContext();
+  const { authProfile, selectedProfileId } = useAuthProfileContext();
   const queryClient = useQueryClient();
 
   // State to track if user has requested to show replies
   const [showReplies, setShowReplies] = useState(false);
 
   // Query key for this comment's replies
-  const repliesQueryKey = useMemo(() => ["comment-replies", comment.id] as const, [comment.id]);
+  const repliesQueryKey = useMemo(
+    () => queryKeys.commentReplies.comment(selectedProfileId, comment.id),
+    [comment.id, selectedProfileId],
+  );
 
   // Cache updaters for the comments
   const { likeComment, unlikeComment, addReplies, hideReplies, likeReply, unlikeReply } =

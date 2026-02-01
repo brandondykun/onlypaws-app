@@ -9,6 +9,9 @@ import {
 } from "@/api/interactions";
 import { ProfileDetails, SearchedProfile } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
+import { removeInfiniteItemById } from "@/utils/query/cacheUtils";
+import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 import { useProfileSearchContext } from "./ProfileSearchContext";
@@ -62,30 +65,24 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
     (profileId: number, updater: (profile: SearchedProfile) => SearchedProfile) => {
       if (!submittedSearchText) return;
 
-      queryClient.setQueryData<ProfileSearchQueryData>(["profileSearch", submittedSearchText], (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((profile) => (profile.id === profileId ? updater(profile) : profile)),
-          })),
-        };
+      const queryKey = queryKeys.profileSearch.results(selectedProfileId, submittedSearchText);
+
+      queryClient.setQueryData<ProfileSearchQueryData>(queryKey, (oldData) => {
+        return updateInfiniteItemById(oldData, profileId, updater);
       });
     },
-    [queryClient, submittedSearchText],
+    [queryClient, submittedSearchText, selectedProfileId],
   );
 
   // Helper to update profile details cache
   const updateProfileDetailsCache = useCallback(
     (profileId: number, updater: (profile: ProfileDetails) => ProfileDetails) => {
-      queryClient.setQueryData(
-        [selectedProfileId, "profile", profileId.toString()],
-        (oldData: ProfileDetails | undefined) => {
-          if (!oldData) return oldData;
-          return updater(oldData);
-        },
-      );
+      const queryKey = queryKeys.profile.details(selectedProfileId, profileId);
+
+      queryClient.setQueryData(queryKey, (oldData: ProfileDetails | undefined) => {
+        if (!oldData) return oldData;
+        return updater(oldData);
+      });
     },
     [queryClient, selectedProfileId],
   );
@@ -206,10 +203,10 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       } else {
         // Success - trigger side effects only for public profiles (already following)
         if (!isPrivate) {
-          queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "feed"] });
+          queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
         }
         // Always refetch sent follow requests (for private profiles this shows the pending request)
-        queryClient.refetchQueries({ queryKey: [selectedProfileId, "follow-requests", "sent"] });
+        queryClient.refetchQueries({ queryKey: queryKeys.followRequests.sent(selectedProfileId) });
       }
     },
     [applyFollowOptimistic, revertFollow, queryClient, selectedProfileId],
@@ -234,7 +231,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
         });
       } else {
         // Success - refresh feed to remove unfollowed profile's posts
-        queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "feed"] });
+        queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
       }
     },
     [applyUnfollowOptimistic, revertUnfollow, queryClient, selectedProfileId],
@@ -265,9 +262,9 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
       }));
 
       // Refresh queries to get updated data
-      queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "feed"] });
-      queryClient.refetchQueries({ queryKey: [selectedProfileId, "profile", profileId.toString()] });
-      queryClient.refetchQueries({ queryKey: [selectedProfileId, "posts", "profile", profileId.toString()] });
+      queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
+      queryClient.refetchQueries({ queryKey: queryKeys.profile.details(selectedProfileId, profileId.toString()) });
+      queryClient.refetchQueries({ queryKey: queryKeys.posts.profile(selectedProfileId, profileId.toString()) });
     },
     [updateProfileSearchCache, queryClient, selectedProfileId],
   );
@@ -309,20 +306,8 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
         // remove follower from followers list on the followers screen
         // the removed profile might not be loaded on that screen, but check to be sure
         queryClient.setQueriesData<InfiniteData<PaginatedResponse<ProfileDetails>>>(
-          { queryKey: [selectedProfileId, "followers"] },
-          (oldData) => {
-            if (!oldData?.pages) return oldData;
-            // Handle infinite query structure
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page) => {
-                return {
-                  ...page,
-                  results: page.results.filter((result) => result.id !== profileId),
-                };
-              }),
-            };
-          },
+          { queryKey: queryKeys.profile.followers(selectedProfileId, selectedProfileId) },
+          (oldData) => removeInfiniteItemById(oldData, profileId),
         );
         Toast.show({
           type: "success",

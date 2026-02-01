@@ -12,6 +12,7 @@ import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const SavedPostsScreen = () => {
@@ -25,7 +26,7 @@ const SavedPostsScreen = () => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "saved"],
+    queryKey: queryKeys.posts.saved(selectedProfileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

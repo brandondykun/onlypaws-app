@@ -6,8 +6,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { searchProfilesForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { SearchedProfile } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 import Button from "../Button/Button";
@@ -32,6 +34,7 @@ const ProfileSearchModal = ({
   handleProfileSelectionCancel,
   excludedProfileIds,
 }: Props) => {
+  const { selectedProfileId } = useAuthProfileContext();
   const { setLightOrDark } = useColorMode();
   const insets = useSafeAreaInsets();
 
@@ -49,7 +52,7 @@ const ProfileSearchModal = ({
   };
 
   const profileSearch = useInfiniteQuery({
-    queryKey: ["profileSearchModal", submittedSearchText],
+    queryKey: queryKeys.profileSearch.tags(selectedProfileId, submittedSearchText),
     queryFn: fetchProfiles,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),

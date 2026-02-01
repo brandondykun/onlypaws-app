@@ -12,6 +12,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { PostImage, SearchedProfile } from "@/types";
 import { ImageAssetWithTags } from "@/types/post/post";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getImageHeightAspectAware, getNextPageParam } from "@/utils/utils";
 
 const EditPost = () => {
@@ -29,7 +30,7 @@ const EditPost = () => {
   };
 
   const posts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "authProfile"],
+    queryKey: queryKeys.posts.authProfile(selectedProfileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

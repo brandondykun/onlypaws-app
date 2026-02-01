@@ -2,6 +2,8 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
 import { PostDetailed, PostsDetailedPage } from "@/types";
+import { removeInfiniteItemById, updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
 
@@ -31,49 +33,16 @@ const PostsContextProvider = ({ children }: Props) => {
 
   const addPost = (data: PostDetailed) => {
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
-      (oldData) => {
-        if (!oldData) return oldData;
-
-        const firstPage = oldData.pages[0];
-        const updatedFirstPage = {
-          ...firstPage,
-          results: [{ ...data }, ...(firstPage?.results || [])],
-        };
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          return {
-            ...oldData,
-            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-          };
-        }
-
-        return oldData;
-      },
+      { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
+      (oldData) => upsertInfiniteItem(oldData, data),
     );
   };
 
   const deletePost = (id: number) => {
     // Update all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
-      (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.filter((post) => post.id !== id) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
-      },
+      { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
+      (oldData) => removeInfiniteItemById(oldData, id),
     );
     // update auth profile post count
     updatePostsCount("subtract", 1);
@@ -82,29 +51,12 @@ const PostsContextProvider = ({ children }: Props) => {
   const addToCommentCount = (postId: number) => {
     // Update the comment count for the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
+      { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, comments_count: post.comments_count + 1 };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({
+          ...post,
+          comments_count: post.comments_count + 1,
+        }));
       },
     );
   };
@@ -112,29 +64,12 @@ const PostsContextProvider = ({ children }: Props) => {
   const removeImageFromPost = (postId: number, imageId: number) => {
     // Remove an image from the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
+      { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...post, images: post.images.filter((image) => image.id !== imageId) };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({
+          ...post,
+          images: post.images.filter((image) => image.id !== imageId),
+        }));
       },
     );
   };
@@ -142,29 +77,9 @@ const PostsContextProvider = ({ children }: Props) => {
   const updatePost = (postId: number, data: PostDetailed) => {
     // Update the post in all queries that might contain posts
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: [selectedProfileId, "posts", "authProfile"] },
+      { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
       (oldData) => {
-        if (!oldData) return oldData;
-
-        // Handle infinite query structure
-        if (oldData.pages) {
-          const updatePost = (post: PostDetailed) => {
-            if (post.id === postId) {
-              return { ...data };
-            }
-            return post;
-          };
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              results: page.results?.map(updatePost) ?? page.results,
-            })),
-          };
-        }
-
-        return oldData;
+        return updateInfiniteItemById(oldData, postId, (post) => ({ ...post, ...data }));
       },
     );
   };

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getPetTypeOptions } from "@/api/profile";
 import { PetTypeWithTitle } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 /**
  * Hook to fetch and cache pet type options for dropdowns.
@@ -9,7 +10,7 @@ import { PetTypeWithTitle } from "@/types";
  */
 export const usePetTypeOptions = () => {
   return useQuery({
-    queryKey: ["petTypeOptions"],
+    queryKey: queryKeys.petTypeOptions.root,
     queryFn: async (): Promise<PetTypeWithTitle[]> => {
       const { data, error } = await getPetTypeOptions();
       if (error || !data) {

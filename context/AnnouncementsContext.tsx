@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 
 import { getAnnouncements } from "@/api/announcements";
 import { Announcement } from "@/types/announcements/announcements";
+import { queryKeys } from "@/utils/query/queryKeys";
 
 type AnnouncementsContextType = {
   announcements: Announcement[];
@@ -57,7 +58,7 @@ const AnnouncementsContextProvider = ({ children }: Props) => {
   }, []);
 
   const { data, isLoading: isQueryLoading } = useQuery({
-    queryKey: ["announcements", includeWelcome],
+    queryKey: queryKeys.announcements.root(includeWelcome),
     queryFn: () => getAnnouncements(!includeWelcome), // excludeWelcome = !includeWelcome
     enabled: isInitialized, // Only run query after we've checked the welcome flag
   });

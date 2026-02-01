@@ -3,6 +3,7 @@ import { useCallback } from "react";
 
 import { PostCommentDetailed } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
+import { updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
 
 // Type alias for infinite query data structure
 type CommentsInfiniteData = InfiniteData<PaginatedResponse<PostCommentDetailed>>;
@@ -18,19 +19,11 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const likeComment = useCallback(
     (commentId: number) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === commentId) {
-                return { ...comment, liked: true, likes_count: comment.likes_count + 1 };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, commentId, (comment) => ({
+          ...comment,
+          liked: true,
+          likes_count: comment.likes_count + 1,
+        }));
       });
     },
     [queryClient, commentsQueryKey],
@@ -40,19 +33,11 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const unlikeComment = useCallback(
     (commentId: number) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === commentId) {
-                return { ...comment, liked: false, likes_count: comment.likes_count - 1 };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, commentId, (comment) => ({
+          ...comment,
+          liked: false,
+          likes_count: comment.likes_count - 1,
+        }));
       });
     },
     [queryClient, commentsQueryKey],
@@ -63,23 +48,11 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const addReply = useCallback(
     (parentCommentId: number, reply: PostCommentDetailed) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === parentCommentId) {
-                return {
-                  ...comment,
-                  replies_count: comment.replies_count + 1,
-                  replies: [...comment.replies, reply],
-                };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, parentCommentId, (comment) => ({
+          ...comment,
+          replies_count: comment.replies_count + 1,
+          replies: [...comment.replies, reply],
+        }));
       });
     },
     [queryClient, commentsQueryKey],
@@ -90,25 +63,18 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const addReplies = useCallback(
     (parentCommentId: number, replies: PostCommentDetailed[]) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === parentCommentId) {
-                // Filter added replies to remove duplicates
-                // This can happen if a user adds a comment and then fetches more comments.
-                // It will eventually return the newly added comment that was added
-                // on the front end without an API call
-                const currentReplies = comment.replies.map((reply) => reply.id);
-                const newFilteredReplies = replies.filter((reply) => !currentReplies.includes(reply.id));
-                return { ...comment, replies: [...comment.replies, ...newFilteredReplies] };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, parentCommentId, (comment) => {
+          // Filter added replies to remove duplicates
+          // This can happen if a user adds a comment and then fetches more comments.
+          // It will eventually return the newly added comment that was added
+          // on the front end without an API call
+          const currentReplies = comment.replies.map((reply) => reply.id);
+          const newFilteredReplies = replies.filter((reply) => !currentReplies.includes(reply.id));
+          return {
+            ...comment,
+            replies: [...comment.replies, ...newFilteredReplies],
+          };
+        });
       });
     },
     [queryClient, commentsQueryKey],
@@ -118,19 +84,7 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const hideReplies = useCallback(
     (parentCommentId: number) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === parentCommentId) {
-                return { ...comment, replies: [] };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, parentCommentId, (comment) => ({ ...comment, replies: [] }));
       });
     },
     [queryClient, commentsQueryKey],
@@ -140,27 +94,15 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const likeReply = useCallback(
     (commentId: number, replyId: number) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === commentId) {
-                return {
-                  ...comment,
-                  replies: comment.replies.map((reply) => {
-                    if (reply.id === replyId) {
-                      return { ...reply, liked: true, likes_count: reply.likes_count + 1 };
-                    }
-                    return reply;
-                  }),
-                };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, commentId, (comment) => ({
+          ...comment,
+          replies: comment.replies.map((reply) => {
+            if (reply.id === replyId) {
+              return { ...reply, liked: true, likes_count: reply.likes_count + 1 };
+            }
+            return reply;
+          }),
+        }));
       });
     },
     [queryClient, commentsQueryKey],
@@ -170,47 +112,26 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
   const unlikeReply = useCallback(
     (commentId: number, replyId: number) => {
       queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((comment) => {
-              if (comment.id === commentId) {
-                return {
-                  ...comment,
-                  replies: comment.replies.map((reply) => {
-                    if (reply.id === replyId) {
-                      return { ...reply, liked: false, likes_count: reply.likes_count - 1 };
-                    }
-                    return reply;
-                  }),
-                };
-              }
-              return comment;
-            }),
-          })),
-        };
+        return updateInfiniteItemById(oldData, commentId, (comment) => ({
+          ...comment,
+          replies: comment.replies.map((reply) => {
+            if (reply.id === replyId) {
+              return { ...reply, liked: false, likes_count: reply.likes_count - 1 };
+            }
+            return reply;
+          }),
+        }));
       });
     },
     [queryClient, commentsQueryKey],
   );
 
-  // Prepend a new top-level comment to the first page
+  // Add a new top-level comment (prepends to first page, or updates if already exists)
   const prependComment = useCallback(
     (comment: PostCommentDetailed) => {
-      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page, index) => {
-            if (index === 0) {
-              return { ...page, results: [comment, ...page.results] };
-            }
-            return page;
-          }),
-        };
-      });
+      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) =>
+        upsertInfiniteItem(oldData, comment),
+      );
     },
     [queryClient, commentsQueryKey],
   );

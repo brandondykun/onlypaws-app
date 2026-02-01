@@ -12,18 +12,22 @@ import SearchedProfilePreview from "@/components/SearchedProfilePreview/Searched
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
 import { SearchedProfile } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const ProfileSearchScreen = () => {
+  const { selectedProfileId } = useAuthProfileContext();
   const { submittedSearchText } = useProfileSearchContext();
   const { followProfile, unfollowProfile, cancelFollowRequest } = useProfileDetailsManagerContext();
+  const { cancelRequest } = useFollowRequestsContext();
+
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
-  const { cancelRequest } = useFollowRequestsContext();
 
   const fetchProfiles = async ({ pageParam }: { pageParam: string }) => {
     const res = await searchProfilesForQuery(submittedSearchText, pageParam);
@@ -31,7 +35,7 @@ const ProfileSearchScreen = () => {
   };
 
   const profileSearch = useInfiniteQuery({
-    queryKey: ["profileSearch", submittedSearchText],
+    queryKey: queryKeys.profileSearch.results(selectedProfileId, submittedSearchText),
     queryFn: fetchProfiles,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),

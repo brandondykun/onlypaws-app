@@ -12,6 +12,7 @@ import FeedbackTypeBubble from "@/components/Feedback/FeedbackTypeBubble/Feedbac
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { minutesToMilliseconds } from "@/utils/utils";
 
 const FeedbackDetailScreen = () => {
@@ -25,7 +26,7 @@ const FeedbackDetailScreen = () => {
   };
 
   const data = useQuery({
-    queryKey: [selectedProfileId, "feedback-ticket", id],
+    queryKey: queryKeys.feedbackTicket.details(selectedProfileId, id),
     queryFn: () => fetchFeedbackTicket(),
     staleTime: minutesToMilliseconds(5),
   });

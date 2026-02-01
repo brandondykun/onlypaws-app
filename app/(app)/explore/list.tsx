@@ -11,6 +11,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { useAdsInList } from "@/hooks/useAdsInList";
 import { PostDetailed } from "@/types";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const ExplorePostsListScreen = () => {
@@ -27,7 +28,7 @@ const ExplorePostsListScreen = () => {
   };
 
   const similarPosts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "explore", "similar", postId.toString()],
+    queryKey: queryKeys.posts.similar(selectedProfileId, postId),
     queryFn: fetchSimilarPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),

@@ -20,6 +20,8 @@ import {
 } from "@/types/follow-requests/follow-requests";
 import { WSFollowRequestNotification } from "@/types/notifications/follow-request";
 import { WSFollowRequestAcceptedNotification } from "@/types/notifications/follow-request-accepted";
+import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
@@ -67,7 +69,7 @@ type Props = {
 };
 
 const FollowRequestsContextProvider = ({ children }: Props) => {
-  const { selectedProfileId, addFollower, addFollowing, authProfile } = useAuthProfileContext();
+  const { selectedProfileId, addFollower, addFollowing } = useAuthProfileContext();
   const { wsNotifications, setPendingFollowRequestsCount } = useNotificationsContext();
   const queryClient = useQueryClient();
   const profileDetailsManager = useProfileDetailsManagerContext();
@@ -85,11 +87,11 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
   // ============================================================================
 
   const receivedRequestsQueryKey = useMemo(
-    () => [selectedProfileId, "follow-requests", "received"],
+    () => queryKeys.followRequests.received(selectedProfileId),
     [selectedProfileId],
   );
 
-  const sentRequestsQueryKey = useMemo(() => [selectedProfileId, "follow-requests", "sent"], [selectedProfileId]);
+  const sentRequestsQueryKey = useMemo(() => queryKeys.followRequests.sent(selectedProfileId), [selectedProfileId]);
 
   // ============================================================================
   // Fetch Functions
@@ -225,16 +227,10 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         addFollowing(); // add following to auth profile to update following count in the profile header
         profileDetailsManager.onFollowRequestAccepted(extraData.followed_id); // update the profile details throughout the app to show the accepted request
         queryClient.setQueryData<InfiniteData<ListSentFollowRequestsResponse>>(sentRequestsQueryKey, (oldData) => {
-          if (!oldData) return oldData;
-
-          const newPages = oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((req) =>
-              req.target.id === extraData.followed_id ? { ...req, status: "accepted" as const } : req,
-            ),
+          return updateInfiniteItemById(oldData, extraData.followed_id, (req) => ({
+            ...req,
+            status: "accepted" as const,
           }));
-
-          return { ...oldData, pages: newPages };
         });
 
         processedNotificationIds.current.add(processedKey);
@@ -290,14 +286,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
 
         // Update status in received requests cache
         queryClient.setQueryData<InfiniteData<ListFollowRequestsResponse>>(receivedRequestsQueryKey, (oldData) => {
-          if (!oldData) return oldData;
-
-          const newPages = oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((req) => (req.id === requestId ? { ...req, status: "accepted" as const } : req)),
-          }));
-
-          return { ...oldData, pages: newPages };
+          return updateInfiniteItemById(oldData, requestId, (req) => ({ ...req, status: "accepted" as const }));
         });
         // Add follower to auth profile to update followers count in the profile header
         addFollower();
@@ -327,14 +316,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
 
         // Update status in received requests cache
         queryClient.setQueryData<InfiniteData<ListFollowRequestsResponse>>(receivedRequestsQueryKey, (oldData) => {
-          if (!oldData) return oldData;
-
-          const newPages = oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((req) => (req.id === requestId ? { ...req, status: "declined" as const } : req)),
-          }));
-
-          return { ...oldData, pages: newPages };
+          return updateInfiniteItemById(oldData, requestId, (req) => ({ ...req, status: "declined" as const }));
         });
       } catch (error) {
         console.error("Failed to decline follow request:", error);
@@ -356,16 +338,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
 
         // Remove from sent requests cache
         queryClient.setQueryData<InfiniteData<ListSentFollowRequestsResponse>>(sentRequestsQueryKey, (oldData) => {
-          if (!oldData) return oldData;
-
-          const newPages = oldData.pages.map((page) => ({
-            ...page,
-            results: page.results.map((req) =>
-              req.target.id === profileId ? { ...req, status: "cancelled" as const } : req,
-            ),
-          }));
-
-          return { ...oldData, pages: newPages };
+          return updateInfiniteItemById(oldData, profileId, (req) => ({ ...req, status: "cancelled" as const }));
         });
       } catch (error) {
         console.error("Failed to cancel follow request:", error);

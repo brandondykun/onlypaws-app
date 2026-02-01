@@ -16,6 +16,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
+import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
 const HEADER_HEIGHT = 90;
@@ -33,7 +34,7 @@ const FeedScreen = () => {
   };
 
   const feedPosts = useInfiniteQuery({
-    queryKey: [selectedProfileId, "posts", "feed"],
+    queryKey: queryKeys.posts.feed(selectedProfileId),
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage) => getNextPageParam(lastPage),
