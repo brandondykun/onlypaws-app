@@ -57,7 +57,7 @@ const FollowButton = ({ profileData, followLoading, handleUnfollowPress, handleF
         <Button
           text={profileData.follows_you ? "Follow Back" : "Follow"}
           textStyle={s.followButtonText}
-          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.sky[500], COLORS.sky[600]) }]}
+          buttonStyle={[s.headerButton, { backgroundColor: setLightOrDark(COLORS.sky[500], COLORS.sky[700]) }]}
           onPress={() => handleFollowPress(profileData)}
           loading={followLoading}
           loadingIconSize={12}
