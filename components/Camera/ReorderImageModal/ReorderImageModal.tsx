@@ -1,7 +1,6 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
 import { useCallback, useEffect } from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "react-native-reorderable-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
@@ -48,37 +47,28 @@ const ReorderImageModal = ({ visible, setVisible, images, setImages }: Props) =>
       onRequestClose={() => setVisible(false)}
       withScroll={false}
       backgroundColor={setLightOrDark(COLORS.zinc[50], COLORS.zinc[950])}
+      animationType="slide"
     >
       <View style={{ flex: 1, paddingTop: insets.top + 10 }}>
         <View style={s.header}>
-          <Pressable
-            onPress={() => setVisible(false)}
-            hitSlop={10}
-            style={({ pressed }) => [pressed && { opacity: 0.6 }]}
-          >
-            <Ionicons
-              name="chevron-back-outline"
-              size={30}
-              color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[100])}
+          <View style={{ position: "absolute", left: 12, top: 0 }}>
+            <Button
+              variant="text"
+              text="Done"
+              onPress={() => setVisible(false)}
+              buttonStyle={{ height: "auto", paddingHorizontal: 8 }}
+              textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]), fontSize: 20, marginTop: -2 }}
+              hitSlop={10}
             />
-          </Pressable>
+          </View>
           <Text
             style={{
               fontSize: 18,
               fontWeight: "600",
-              paddingLeft: 12,
             }}
           >
             Drag to reorder
           </Text>
-          <Button
-            variant="text"
-            text="Done"
-            onPress={() => setVisible(false)}
-            buttonStyle={{ height: "auto", paddingHorizontal: 8 }}
-            textStyle={{ color: setLightOrDark(COLORS.sky[600], COLORS.sky[500]), fontSize: 20, marginTop: -2 }}
-            hitSlop={10}
-          />
         </View>
         <ReorderableList
           data={images}
@@ -102,7 +92,7 @@ const s = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 16,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
   },
