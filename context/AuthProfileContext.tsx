@@ -69,7 +69,9 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     isFetching,
     refetch: queryRefetch,
   } = useQuery({
-    queryKey: queryKeys.profile.details(selectedProfileId!, selectedProfileId?.toString() as string),
+    queryKey: selectedProfileId
+      ? queryKeys.profile.details(selectedProfileId, selectedProfileId.toString())
+      : ["profile", "pending"],
     queryFn: () => fetchProfile(selectedProfileId!),
     enabled: !!selectedProfileId && !authLoading,
     staleTime: 0, // Always refetch to get latest data
