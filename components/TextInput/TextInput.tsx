@@ -143,7 +143,6 @@ const TextInput = forwardRef(
             position: "relative",
             overflow: "hidden",
             zIndex: 1,
-            borderRadius: 25,
           }}
         >
           {icon ? <View style={s.icon}>{icon}</View> : null}
