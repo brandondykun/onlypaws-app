@@ -1,3 +1,4 @@
+import { CompletePostRequest, PrepareUploadResponse } from "@/types/post/post";
 import { PaginatedResponse } from "@/types/shared/pagination";
 
 import { PostDetailed, SavedPost, PostImageTag } from "../types";
@@ -110,4 +111,47 @@ export const deletePostImageTag = async (id: number | string) => {
 export const getTaggedPostsForQuery = async (profileId: number | string, pageParam: number | string) => {
   const url = `/v1/profile/${profileId}/tagged/?page=${pageParam}`;
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
+};
+
+// ============================================================================
+// Presigned URL Upload Functions
+// ============================================================================
+
+// Step 1: Request presigned URLs for image uploads
+export const prepareUpload = async (imageCount: number) => {
+  const url = "/v1/post/prepare-upload/";
+  return await axiosPost<PrepareUploadResponse>(url, { image_count: imageCount });
+};
+
+// Step 2: Upload image directly to R2 using presigned URL
+export const uploadImageToR2 = async (
+  presignedUrl: string,
+  imageUri: string,
+  mimeType: string = "image/jpeg",
+): Promise<void> => {
+  // Convert local file URI to blob
+  const response = await fetch(imageUri);
+  const blob = await response.blob();
+
+  // Upload directly to R2 using presigned URL
+  const uploadResponse = await fetch(presignedUrl, {
+    method: "PUT",
+    body: blob,
+    headers: { "Content-Type": mimeType },
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error(`Upload failed: ${uploadResponse.status}`);
+  }
+};
+
+// Step 3: Complete post with metadata after images are uploaded
+export const completePost = async (postId: number, data: CompletePostRequest) => {
+  const url = `/v1/post/${postId}/`;
+  return await axiosPatch<PostDetailed>(url, {
+    caption: data.caption,
+    aspect_ratio: data.aspect_ratio,
+    ai_generated: data.ai_generated,
+    tags: data.tags,
+  });
 };

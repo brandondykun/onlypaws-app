@@ -33,9 +33,16 @@ type Props = {
   onPostPreviewPress: (index: number) => void;
   onTaggedPostsPress: () => void;
   username?: string;
+  skipInitialRefetch?: boolean;
 };
 
-const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, username }: Props) => {
+const ProfileDetails = ({
+  profileId,
+  onPostPreviewPress,
+  onTaggedPostsPress,
+  username,
+  skipInitialRefetch = false,
+}: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
@@ -69,7 +76,9 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
 
   // NOTE: We compare with selectedProfileId directly (not authProfile.id) because authProfile
   // uses placeholderData which can return stale data during profile switches
-  const postsQueryKey = queryKeys.posts.profile(selectedProfileId, profileId);
+  const postsQueryKey = isOwnProfile
+    ? queryKeys.posts.authProfile(selectedProfileId)
+    : queryKeys.posts.profile(selectedProfileId, profileId);
 
   const posts = useInfiniteQuery({
     queryKey: postsQueryKey,
@@ -77,6 +86,8 @@ const ProfileDetails = ({ profileId, onPostPreviewPress, onTaggedPostsPress, use
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
     staleTime: isOwnProfile ? 0 : minutesToMilliseconds(5),
+    // Skip initial refetch when coming from post creation to preserve local images
+    refetchOnMount: skipInitialRefetch ? false : true,
   });
 
   // Memoize the flattened posts data

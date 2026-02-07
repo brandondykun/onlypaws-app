@@ -56,3 +56,45 @@ export type ImageAssetWithTags = PhotoFileWithTags | ImagePickerAssetWithTags | 
 export type ImageAsset = PhotoFile | ImagePickerAsset | CropperImage;
 
 export type ImageAspectRatio = "1:1" | "4:5";
+
+// ============================================================================
+// Presigned URL Upload Types
+// ============================================================================
+
+// Step 1: Prepare Upload
+export type PrepareUploadRequest = {
+  image_count: number;
+};
+
+export type UploadUrl = {
+  url: string;
+  key: string;
+  order: number;
+};
+
+export type PrepareUploadResponse = {
+  post_id: number;
+  upload_urls: UploadUrl[];
+};
+
+// Step 3: Complete Post
+export type ImageTagRequest = {
+  taggedProfileId: number;
+  xPosition: number;
+  yPosition: number;
+  originalWidth: number;
+  originalHeight: number;
+};
+
+export type CompletePostRequest = {
+  caption: string;
+  aspect_ratio: ImageAspectRatio;
+  ai_generated: boolean;
+  tags?: Record<string, ImageTagRequest[]>;
+};
+
+export type PostReadyNotification = {
+  type: "post_ready";
+  post_id: number;
+  message: string;
+};

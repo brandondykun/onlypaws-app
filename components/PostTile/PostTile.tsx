@@ -10,6 +10,8 @@ import { PostDetailed } from "@/types";
 
 import Text from "../Text/Text";
 
+import ProcessingIndicator from "./components/ProcessingIndicator";
+
 type Props = {
   post: PostDetailed;
   index: number;
@@ -31,6 +33,14 @@ const PostTile = ({ post, index, onPress }: Props) => {
   const isRightColumnImage = (index - 2) % 3 === 0;
   // make right column image one pixel wider to avoid single pixel gap along right edge
   const width = isRightColumnImage ? itemSize + 1 : itemSize;
+
+  // Use medium scaled image if available, otherwise fall back to original
+  const mediumImage = post.images[0]?.scaled_images?.find((img) => img.scale === "medium");
+  const imageUri = mediumImage?.image || post.images[0]?.image || undefined;
+
+  if (imageUri) {
+    Image.prefetch(imageUri);
+  }
 
   return (
     <View style={{ position: "relative" }}>
@@ -60,7 +70,15 @@ const PostTile = ({ post, index, onPress }: Props) => {
             </Text>
           </View>
         ) : (
-          <Image key={post.id} source={{ uri: post.images[0].image }} style={{ height: itemSize, width: width }} />
+          <>
+            <Image
+              key={post.id}
+              source={{ uri: imageUri }}
+              style={{ height: itemSize, width: width }}
+              transition={150}
+            />
+            <ProcessingIndicator postStatus={post.status} />
+          </>
         )}
       </Pressable>
     </View>

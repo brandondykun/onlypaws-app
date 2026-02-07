@@ -11,11 +11,16 @@ import {
   markNotificationAsRead as markNotificationAsReadAPI,
 } from "@/api/notifications";
 import { useAuthUserContext } from "@/context/AuthUserContext";
+import { PostsDetailedPage } from "@/types";
+import { PostStatus } from "@/types";
 import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
+import { PostReadyNotification } from "@/types/post/post";
 import { updateAllInfiniteItems, updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
+
+import { useAuthProfileContext } from "./AuthProfileContext";
 
 export type NotificationContextType = {
   // WebSocket connection status
@@ -93,7 +98,8 @@ type Props = {
 };
 
 const NotificationsContextProvider = ({ children }: Props) => {
-  const { isAuthenticated, selectedProfileId } = useAuthUserContext();
+  const { isAuthenticated } = useAuthUserContext();
+  const { selectedProfileId } = useAuthProfileContext();
   const queryClient = useQueryClient();
 
   // Query key for notifications - includes selectedProfileId so query resets when profile changes
@@ -347,6 +353,32 @@ const NotificationsContextProvider = ({ children }: Props) => {
     [formatNotificationMessage],
   );
 
+  // Show notification using toast
+  const showPostReadyToast = useCallback(
+    (notification: PostReadyNotification) => {
+      // Don't show notification if one is already being displayed
+      if (isShowingNotificationRef.current) {
+        return;
+      }
+
+      isShowingNotificationRef.current = true;
+
+      // Show toast notification only when app is in foreground
+      if (appStateVisible === "active") {
+        Toast.show({
+          type: "notification",
+          text1: "Your post is ready!",
+          visibilityTime: 3000,
+          autoHide: true,
+          onHide: () => {
+            isShowingNotificationRef.current = false;
+          },
+        });
+      }
+    },
+    [appStateVisible],
+  );
+
   // Handle incoming WebSocket notifications with deduplication and auto-cleanup
   const handleIncomingNotification = useCallback(
     (notificationData: WSNotification) => {
@@ -393,6 +425,24 @@ const NotificationsContextProvider = ({ children }: Props) => {
       }
     },
     [appStateVisible, showNotification],
+  );
+
+  // Handle incoming post ready notification to mark new posts as ready
+  const handleIncomingPostReady = useCallback(
+    (postId: number) => {
+      console.log("Post ready:", postId);
+      queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
+        { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
+        (oldData) =>
+          updateInfiniteItemById(oldData, postId, (post) => ({
+            ...post,
+            is_ready: true,
+            status: "READY" as PostStatus,
+          })),
+      );
+      showPostReadyToast({ type: "post_ready", post_id: postId, message: "Your post is ready!" });
+    },
+    [queryClient, selectedProfileId, showPostReadyToast],
   );
 
   // Connect to WebSocket
@@ -447,6 +497,8 @@ const NotificationsContextProvider = ({ children }: Props) => {
           const data = JSON.parse(event.data);
           if (data.type === "notification") {
             handleIncomingNotification(data.notification);
+          } else if (data.type === "post_ready") {
+            handleIncomingPostReady(data.post_id);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);

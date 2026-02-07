@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 
@@ -16,6 +16,7 @@ const PostsScreen = () => {
   const navigation = useNavigation();
   const { setLightOrDark } = useColorMode();
   const { unreadCount } = useNotificationsContext();
+  const { skipRefetch } = useLocalSearchParams<{ skipRefetch?: string }>();
 
   const handlePostPreviewPress = (index: number) => {
     router.push({ pathname: "/(app)/posts/list", params: { initialIndex: index } });
@@ -58,6 +59,7 @@ const PostsScreen = () => {
       profileId={authProfile.id}
       onPostPreviewPress={handlePostPreviewPress}
       onTaggedPostsPress={handleTaggedPostsPress}
+      skipInitialRefetch={skipRefetch === "true"}
     />
   );
 };

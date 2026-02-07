@@ -72,9 +72,50 @@ export const getImageUri = (image: PhotoFile | ImagePickerAsset | PostImage | Pr
       return `file://${image.path}`;
     }
   }
-  if (isPostImage(image)) return image.image;
+  // For PostImage, use localImageUri as fallback when image is null (during processing)
+  if (isPostImage(image)) return image.image || image.localImageUri || null;
   if (isProfileImage(image)) return image.image;
   return image.uri;
+};
+
+// Get MIME type from file extension
+const getMimeTypeFromExtension = (path: string): string => {
+  const extension = path.split(".").pop()?.toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    heic: "image/heic",
+    heif: "image/heif",
+    bmp: "image/bmp",
+    tiff: "image/tiff",
+    tif: "image/tiff",
+  };
+  return mimeTypes[extension || ""] || "image/jpeg";
+};
+
+// Get MIME type from an image asset
+export const getImageMimeType = (image: PhotoFile | ImagePickerAsset | PostImage | ProfileImage | Image): string => {
+  // CropperImage has a `mime` property
+  if (isCropperImage(image) && image.mime) {
+    return image.mime;
+  }
+
+  // ImagePickerAsset has a `mimeType` property
+  if ("mimeType" in image && typeof image.mimeType === "string") {
+    return image.mimeType;
+  }
+
+  // Fall back to inferring from file path/URI
+  const uri = getImageUri(image);
+  if (uri) {
+    return getMimeTypeFromExtension(uri);
+  }
+
+  // Default to JPEG
+  return "image/jpeg";
 };
 
 // Convert readable string feed back type to the type string needed for the API

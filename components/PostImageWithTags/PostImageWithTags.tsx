@@ -38,12 +38,13 @@ const PostImageWithTags = ({
   const { width } = useWindowDimensions();
   const tagsToDisplay = item.tags;
   const hasTags = tagsToDisplay.length > 0;
+  const imageUri = getImageUri(item) ?? "";
 
   if (!handleCoordinatesPress) {
     return (
       <View style={{ position: "relative", zIndex: 50 }}>
         <ImageLoader
-          uri={getImageUri(item)}
+          uri={imageUri}
           width={width}
           height={getImageHeightAspectAware(width, aspectRatio)}
           style={s.image}
@@ -59,7 +60,7 @@ const PostImageWithTags = ({
             />
             {tagsToDisplay.map((tag) => (
               <PopoverTag
-                key={`${getImageUri(item)}-${tag.tagged_profile.id}`}
+                key={`${imageUri}-${tag.tagged_profile.id}`}
                 tag={tag}
                 visible={showTagPopovers}
                 setVisible={setShowTagPopovers}
@@ -75,7 +76,7 @@ const PostImageWithTags = ({
   return (
     <Pressable onPress={handleCoordinatesPress} style={{ position: "relative" }}>
       <ImageLoader
-        uri={getImageUri(item)}
+        uri={imageUri}
         width={width}
         height={getImageHeightAspectAware(width, aspectRatio)}
         style={s.image}
@@ -91,7 +92,7 @@ const PostImageWithTags = ({
       )}
       {tagsToDisplay.map((tag) => (
         <PopoverTag
-          key={`${getImageUri(item)}-${tag.tagged_profile.id}`}
+          key={`${imageUri}-${tag.tagged_profile.id}`}
           tag={tag}
           visible={showTagPopovers}
           setVisible={setShowTagPopovers}

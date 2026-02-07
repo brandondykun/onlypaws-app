@@ -99,12 +99,29 @@ export type PostImageTag = {
   created_at: string;
 };
 
+// Post status for processing state
+export type PostStatus = "PENDING_UPLOAD" | "PROCESSING" | "READY" | "FAILED";
+
+// Scale options for scaled images
+export type ImageScale = "small" | "medium";
+
+// Scaled image variant
+export type PostImageScaled = {
+  id: number;
+  scale: ImageScale;
+  image: string;
+  width: number;
+  height: number;
+};
+
 export type PostImage = {
   id: number;
   post: number;
-  image: string;
+  image: string | null; // May be null during processing
   order: number;
   tags: PostImageTag[];
+  scaled_images: PostImageScaled[];
+  localImageUri?: string; // Temporary local URI for optimistic display before processing completes
 };
 
 export type PostLike = {
@@ -173,6 +190,7 @@ export type PostDetailed = {
   contains_ai: boolean;
   tagged_profiles: SearchedProfile[];
   aspect_ratio: ImageAspectRatio;
+  status: PostStatus;
 };
 
 // Define the shape of a page in your infinite query

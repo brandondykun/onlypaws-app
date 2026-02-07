@@ -1,23 +1,23 @@
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import React from "react";
 import { useWindowDimensions } from "react-native";
 
-import { createPost } from "@/api/post";
+import { prepareUpload, uploadImageToR2, completePost } from "@/api/post";
 import CreateEditPostScreen from "@/components/CreateEditPostScreen/CreateEditPostScreen";
 import { useAddPostContext } from "@/context/AddPostContext";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostsContext } from "@/context/PostsContext";
 import { SearchedProfile } from "@/types";
+import { ImageTagRequest } from "@/types/post/post";
 import toast from "@/utils/toast";
-import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
+import { getImageHeightAspectAware, getImageMimeType, getImageUri } from "@/utils/utils";
 
 const AddPostScreen = () => {
   const router = useRouter();
   const screenWidth = useWindowDimensions().width;
 
   const { addPost } = usePostsContext();
-  const { authProfile, updatePostsCount } = useAuthProfileContext();
+  const { updatePostsCount } = useAuthProfileContext();
   const {
     setImages,
     addTag: addTagToState,
@@ -55,7 +55,7 @@ const AddPostScreen = () => {
     removeTagFromState(tagId);
   };
 
-  // Handle creating post
+  // Handle creating post using presigned URL workflow
   const handleCreatePost = async () => {
     setCaptionError("");
 
@@ -77,72 +77,107 @@ const AddPostScreen = () => {
 
     if (hasErrors) return;
 
-    const formData = new FormData();
-    formData.append("caption", caption.trim());
-    formData.append("profileId", authProfile.id.toString());
-    formData.append("aiGenerated", aiGenerated.toString());
-    formData.append("aspectRatio", aspectRatio);
+    setSubmitLoading(true);
 
-    // Format tags as an object with image indices as keys
-    const tagsFormatted: { [key: string]: any[] } = {};
-    const imageHeight = Math.round(getImageHeightAspectAware(screenWidth, aspectRatio));
+    try {
+      // Step 1: Prepare upload - get presigned URLs
+      const { data: prepareData, error: prepareError } = await prepareUpload(images.length);
 
-    images.forEach((image, index) => {
-      if (image.tags && image.tags.length > 0) {
-        tagsFormatted[index.toString()] = image.tags.map((tag) => {
-          console.log("TAG: ", tag);
-          console.log("TAG X POSITION: ", tag.x_position);
-          console.log("TAG Y POSITION: ", tag.y_position);
-          return {
+      if (prepareError || !prepareData) {
+        toast.error("There was an error creating that post. Please try again.");
+        setSubmitLoading(false);
+        return;
+      }
+
+      const { post_id: postId, upload_urls: uploadUrls } = prepareData;
+
+      // Step 2: Upload images directly to R2 in parallel
+      try {
+        await Promise.all(
+          uploadUrls.map((uploadUrl) => {
+            const image = images[uploadUrl.order];
+            const imageUri = getImageUri(image);
+            if (!imageUri) {
+              throw new Error(`Missing image URI for image at index ${uploadUrl.order}`);
+            }
+            const mimeType = getImageMimeType(image);
+            return uploadImageToR2(uploadUrl.url, imageUri, mimeType);
+          }),
+        );
+      } catch (uploadError) {
+        console.error("Image upload failed:", uploadError);
+        toast.error("There was an error creating that post. Please try again.");
+        setSubmitLoading(false);
+        return;
+      }
+
+      // Step 3: Complete post with metadata
+      // Format tags as an object with image indices as keys
+      const tagsFormatted: Record<string, ImageTagRequest[]> = {};
+      const imageHeight = Math.round(getImageHeightAspectAware(screenWidth, aspectRatio));
+
+      images.forEach((image, index) => {
+        if (image.tags && image.tags.length > 0) {
+          tagsFormatted[index.toString()] = image.tags.map((tag) => ({
             taggedProfileId: tag.tagged_profile.id,
             xPosition: parseFloat(tag.x_position.toFixed(2)),
             yPosition: parseFloat(tag.y_position.toFixed(2)),
             originalHeight: imageHeight,
             originalWidth: screenWidth,
-          };
-        });
-      }
-    });
+          }));
+        }
+      });
 
-    // Only append tags if there are any
-    if (Object.keys(tagsFormatted).length > 0) {
-      formData.append("tags", JSON.stringify(tagsFormatted));
-    }
+      const { data: completeData, error: completeError } = await completePost(postId, {
+        caption: caption.trim(),
+        aspect_ratio: aspectRatio,
+        ai_generated: aiGenerated,
+        tags: Object.keys(tagsFormatted).length > 0 ? tagsFormatted : undefined,
+      });
 
-    images.forEach((image, i) => {
-      formData.append("images", {
-        uri: getImageUri(image),
-        name: `image_${i}.jpeg`,
-        type: "image/jpeg",
-        mimeType: "multipart/form-data",
-      } as any);
-
-      formData.append("order", i.toString());
-    });
-
-    setSubmitLoading(true);
-    const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
-    if (accessToken) {
-      const { error, data } = await createPost(formData, accessToken);
-      if (data && !error) {
-        addPost(data);
-        updatePostsCount("add", 1);
-        setCaption("");
-        setImages([]);
-        setAiGenerated(false);
-        // Dismiss all existing modals/stacks
-        router.dismissAll();
-        // Replace the current history with the root route
-        router.replace("/");
-        // Navigate to the posts screen
-        setTimeout(() => {
-          router.navigate("/(app)/posts");
-          toast.success("Post successfully created!");
-        }, 50);
-      } else {
+      if (completeError || !completeData) {
         toast.error("There was an error creating that post. Please try again.");
+        setSubmitLoading(false);
+        return;
       }
+
+      // Set local image URIs directly in the image field for optimistic display
+      // This allows the post to show local images while server processes them
+      const postWithLocalImages = {
+        ...completeData,
+        images: completeData.images.map((postImage) => {
+          const localImage = images[postImage.order];
+          const localUri = localImage ? getImageUri(localImage) : null;
+          return {
+            ...postImage,
+            // Use local URI if server image is null (during processing)
+            image: postImage.image || localUri,
+          };
+        }),
+      };
+
+      // Success - update local state and navigate
+      addPost(postWithLocalImages);
+      updatePostsCount("add", 1);
+      setCaption("");
+      setImages([]);
+      setAiGenerated(false);
+
+      // Dismiss all existing modals/stacks
+      router.dismissAll();
+      // Replace the current history with the root route
+      router.replace("/");
+      // Navigate to the posts screen with flag to skip initial refetch
+      setTimeout(() => {
+        router.navigate({ pathname: "/(app)/posts", params: { skipRefetch: "true" } });
+        // Note: Post may still be processing, but will appear in user's profile
+        toast.success("Post created! Processing images...");
+      }, 50);
+    } catch (error) {
+      console.error("Post creation failed:", error);
+      toast.error("There was an error creating that post. Please try again.");
     }
+
     setSubmitLoading(false);
   };
 
