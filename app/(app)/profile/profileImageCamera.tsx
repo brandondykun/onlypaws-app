@@ -1,14 +1,13 @@
 import { useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useRef, useState, useCallback } from "react";
 import { StyleSheet, useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Camera, useCameraDevice, useCameraPermission, Point, useCameraFormat } from "react-native-vision-camera";
 import { scheduleOnRN } from "react-native-worklets";
 
-import { addProfileImage, editProfileImage } from "@/api/profile";
+import { getProfileImageUploadUrl, uploadFileToPresignedUrl, confirmProfileImageUpload } from "@/api/profile";
 import CameraBackground from "@/components/Camera/CameraBackground/CameraBackground";
 import CameraFooter from "@/components/Camera/CameraFooter/CameraFooter";
 import CameraHeader from "@/components/Camera/CameraHeader/CameraHeader";
@@ -20,7 +19,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { ImageAsset } from "@/types/post/post";
 import toast from "@/utils/toast";
-import { getImageUri } from "@/utils/utils";
+import { getImageUri, getImageMimeType } from "@/utils/utils";
 
 // Max images for a post
 const MAX_IMAGES = 1;
@@ -116,45 +115,63 @@ const ProfileImageCamera = () => {
   const handleSavePress = async () => {
     if (!image) return;
 
-    const formData = new FormData();
-    formData.append("profileId", authProfile.id.toString());
+    setSaveImageLoading(true);
 
-    formData.append("image", {
-      uri: getImageUri(image),
-      name: `profile_image.jpeg`,
-      type: "image/jpeg",
-      mimeType: "multipart/form-data",
-    } as any);
-
-    const accessToken = await SecureStore.getItemAsync("ACCESS_TOKEN");
-    if (accessToken) {
-      setSaveImageLoading(true);
-      if (authProfile.image) {
-        // edit profile image
-        const { error, data } = await editProfileImage(authProfile.image.id, formData, accessToken);
-        if (!error && data) {
-          updateProfileImage(data);
-          setImage(null);
-          setCropModalVisible(false);
-          router.back();
-        } else {
-          toast.error("There was an error updating your profile picture.");
-        }
-      } else {
-        // create new profile image
-        const { error, data } = await addProfileImage(formData, accessToken);
-        if (!error && data) {
-          updateProfileImage(data);
-          setImage(null);
-          setCropModalVisible(false);
-          router.back();
-        } else {
-          toast.error("There was an error updating your profile picture.");
-        }
+    try {
+      // Step 1: Get presigned upload URL (same for create and update)
+      const { data: uploadUrlData, error: urlError } = await getProfileImageUploadUrl(authProfile.id);
+      if (urlError || !uploadUrlData) {
+        toast.error("We couldn't prepare your photo. Please try again.");
+        setSaveImageLoading(false);
+        return;
       }
+
+      const { upload_url, key } = uploadUrlData;
+      const fileUri = getImageUri(image);
+      if (!fileUri) {
+        toast.error("We couldn't use this photo. Please try choosing or taking another one.");
+        setSaveImageLoading(false);
+        return;
+      }
+      const contentType = getImageMimeType(image);
+
+      // Step 2: Upload file to storage (raw PUT, no auth)
+      const { ok: uploadOk, error: uploadError } = await uploadFileToPresignedUrl(upload_url, fileUri, contentType);
+      if (!uploadOk || uploadError) {
+        toast.error("Your photo couldn't be uploaded. Please check your connection and try again.");
+        setSaveImageLoading(false);
+        return;
+      }
+
+      // Step 3: Confirm upload (backend links file to profile; returns 201 new / 200 update)
+      const { data: confirmData, error: confirmError } = await confirmProfileImageUpload(authProfile.id, key);
+      if (confirmError || !confirmData) {
+        toast.error("We couldn't save your new profile picture. Please try again.");
+        setSaveImageLoading(false);
+        return;
+      }
+
+      // Optimistic update with local image so we don't rely on the confirm response URL (it may be deleted after processing)
+      const localUri = getImageUri(image);
+      const optimisticProfileImage = {
+        ...confirmData,
+        image: localUri ?? confirmData.image,
+      };
+      updateProfileImage(optimisticProfileImage);
+
+      if (confirmData.processing_status === "FAILED") {
+        toast.error("Something went wrong while preparing your photo. Please try again.");
+        setSaveImageLoading(false);
+        return;
+      }
+
+      // Navigate back immediately; server processing continues in background (like post uploads)
       setSaveImageLoading(false);
-    } else {
-      toast.error("There was an error updating your profile picture.");
+      toast.success("Profile picture updated!");
+      router.back();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+      setSaveImageLoading(false);
     }
   };
 

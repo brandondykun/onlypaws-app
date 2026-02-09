@@ -33,12 +33,30 @@ export type ProfileOption = {
   profile_type: ProfileType;
 };
 
+export type ProfileImageProcessingStatus = "UPLOADED" | "PROCESSING" | "READY" | "FAILED" | "PENDING_UPLOAD";
+
+export type ProfileImageScaledVariant = {
+  id: number;
+  scale: "small" | "medium";
+  image: string;
+  width?: number;
+  height?: number;
+};
+
 export type ProfileImage = {
   id: number;
   image: string;
   profile: number;
   created_at: string;
   updated_at: string;
+  processing_status?: ProfileImageProcessingStatus;
+  scaled_images?: ProfileImageScaledVariant[];
+};
+
+export type ProfileImageUploadUrlResponse = {
+  upload_url: string;
+  key: string;
+  expires_in: number;
 };
 
 export type PetType = {

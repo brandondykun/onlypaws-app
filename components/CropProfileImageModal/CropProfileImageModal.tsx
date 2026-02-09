@@ -35,7 +35,8 @@ const CropProfileImageModal = ({ visible, setVisible, image, setImage, onSave, s
   const [cropHistoryStack, setCropHistoryStack] = useState<ImageAsset[]>([]);
 
   // handle image press that initiates the crop process
-  const handleImagePress = (uri: string) => {
+  const handleImagePress = (uri: string | null) => {
+    if (!uri) return;
     ImageCropPicker.openCropper({
       path: uri,
       width: 1080,

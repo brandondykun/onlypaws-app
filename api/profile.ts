@@ -2,9 +2,17 @@ import { AxiosError } from "axios";
 
 import { PaginatedResponse } from "@/types/shared/pagination";
 
-import { ProfileDetails, ProfileImage, Profile, CreateProfileResponse, PostDetailed, SearchedProfile } from "../types";
+import {
+  ProfileDetails,
+  ProfileImage,
+  ProfileImageUploadUrlResponse,
+  Profile,
+  CreateProfileResponse,
+  PostDetailed,
+  SearchedProfile,
+} from "../types";
 
-import { axiosFetch, axiosPost, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
+import { axiosFetch, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
 
 export const getProfileDetails = async (profileId: number | string) => {
   const url = `/v1/profile/${profileId}/`;
@@ -36,26 +44,59 @@ export const searchProfilesForQuery = async (username: string, pageParam: number
   return await axiosInstance.get<PaginatedResponse<SearchedProfile>>(url);
 };
 
-export const addProfileImage = async (postData: FormData, accessToken: string) => {
-  const config = {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-  const url = "/v1/profile/image/";
-  return await axiosPost<ProfileImage>(url, postData, config);
+/** Step 1: Get presigned upload URL for profile image (create or update). Auth + AUTH-PROFILE-ID from interceptor. */
+export const getProfileImageUploadUrl = async (
+  profileId: number,
+): Promise<{ data: ProfileImageUploadUrlResponse | null; error: string | null }> => {
+  try {
+    const res = await axiosInstance.post<ProfileImageUploadUrlResponse>("/v1/profile/image/upload-url/", {
+      profileId,
+    });
+    return { data: res.data, error: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: (error.response?.data as { detail?: string })?.detail ?? error.message };
+  }
 };
 
-export const editProfileImage = async (imageId: number, postData: FormData, accessToken: string) => {
-  const config = {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-  const url = `/v1/profile/image/${imageId}/`;
-  return await axiosPatch<ProfileImage>(url, postData, config);
+/** Step 2: Upload raw file to presigned URL. No auth header; URL is already authorized. */
+export const uploadFileToPresignedUrl = async (
+  uploadUrl: string,
+  fileUri: string,
+  contentType: string,
+): Promise<{ ok: boolean; error: string | null }> => {
+  try {
+    const response = await fetch(fileUri);
+    const blob = await response.blob();
+    const putResponse = await fetch(uploadUrl, {
+      method: "PUT",
+      body: blob,
+      headers: { "Content-Type": contentType },
+    });
+    if (!putResponse.ok) {
+      const text = await putResponse.text();
+      return { ok: false, error: text || `Upload failed: ${putResponse.status}` };
+    }
+    return { ok: true, error: null };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: message };
+  }
+};
+
+/** Step 3: Confirm upload so backend attaches the file to the profile. Returns 201 (new) or 200 (update). Auth + AUTH-PROFILE-ID from interceptor. */
+export const confirmProfileImageUpload = async (
+  profileId: number,
+  key: string,
+): Promise<{ data: ProfileImage | null; error: string | null; status?: number }> => {
+  try {
+    const res = await axiosInstance.post<ProfileImage>("/v1/profile/image/confirm-upload/", { profileId, key });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as { detail?: string };
+    return { data: null, error: data?.detail ?? error.message, status: error.response?.status };
+  }
 };
 
 export const updateProfile = async (data: any, profileId: number) => {
