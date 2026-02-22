@@ -19,8 +19,8 @@ export const getProfileDetails = async (profileId: number | string) => {
   return await axiosFetch<ProfileDetails>(url);
 };
 
-export const getProfileDetailsForQuery = async (profileId: number | string) => {
-  const url = `/v1/profile/${profileId}/`;
+export const getProfileDetailsForQuery = async (publicId: string) => {
+  const url = `/v1/profile/${publicId}/`;
   return await axiosInstance.get<ProfileDetails>(url);
 };
 
@@ -99,12 +99,12 @@ export const confirmProfileImageUpload = async (
   }
 };
 
-export const updateProfile = async (data: any, profileId: number) => {
+export const updateProfile = async (data: any, profileId: string) => {
   const url = `/v1/profile/${profileId}/`;
   return await axiosPatch<Profile>(url, data);
 };
 
-export const updateUsername = async (profileId: number, username: string) => {
+export const updateUsername = async (profileId: string, username: string) => {
   const url = `/v1/profile/${profileId}/`;
   return await axiosPatchCustomError<Profile>(url, { username });
 };
@@ -133,7 +133,7 @@ export const getPetTypeOptions = async () => {
   return await axiosFetch<{ id: number; name: string }[]>(url);
 };
 
-export const deleteProfile = async (profileId: number) => {
+export const deleteProfile = async (profileId: string) => {
   const url = `/v1/profile/${profileId}/`;
   try {
     const res = await axiosInstance.delete(url);

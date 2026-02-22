@@ -29,7 +29,7 @@ import ConfirmRemoveFollowerSheet from "./components/ConfirmRemoveFollowerSheet/
 import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
 
 type Props = {
-  profileId: number | string;
+  profileId: string;
   onPostPreviewPress: (index: number) => void;
   onTaggedPostsPress: () => void;
   username?: string;
@@ -53,12 +53,12 @@ const ProfileDetails = ({
   const { authProfile, selectedProfileId } = useAuthProfileContext();
   const { followProfile, unfollowProfile, removeFollower } = useProfileDetailsManagerContext();
 
-  const fetchProfile = async (id: number | string) => {
-    const res = await getProfileDetailsForQuery(id);
+  const fetchProfile = async (public_id: string) => {
+    const res = await getProfileDetailsForQuery(public_id);
     return res.data;
   };
 
-  const isOwnProfile = profileId.toString() === selectedProfileId.toString();
+  const isOwnProfile = profileId === selectedProfileId;
   // Use the same query key as AuthProfileContext when viewing own profile
   // This ensures cache updates from the context are reflected here
   const profileQueryKey = queryKeys.profile.details(selectedProfileId, profileId);
@@ -137,30 +137,30 @@ const ProfileDetails = ({
     onPostPreviewPress(index);
   };
 
-  const handleUnfollowPress = (profileId: number) => {
+  const handleUnfollowPress = (profileId: string) => {
     unfollowProfile(profileId);
   };
 
   const handleFollowPress = (targetProfile: ProfileDetailsType) => {
-    followProfile(targetProfile.id, { isPrivate: targetProfile.is_private });
+    followProfile(targetProfile.public_id, { isPrivate: targetProfile.is_private });
   };
 
   const handleFollowersPress = () => {
     // only enabled for logged in user on profile screen
-    if (Number(profileId) === authProfile.id) {
+    if (profileId === authProfile.public_id) {
       router.push("/(app)/posts/followers");
     }
   };
 
   const handleFollowingPress = () => {
     // only enabled for logged in user on profile screen
-    if (Number(profileId) === authProfile.id) {
+    if (profileId === authProfile.public_id) {
       router.push("/(app)/posts/following");
     }
   };
 
   const handleRemoveFollowerPress = () => {
-    removeFollower(Number(profileId));
+    removeFollower(profileId);
     confirmRemoveFollowerSheetRef.current?.dismiss();
   };
 

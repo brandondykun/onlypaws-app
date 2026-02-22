@@ -11,7 +11,7 @@ import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePre
 
 type Props = {
   taggedProfiles: SearchedProfile[];
-  onProfilePress?: ((profileId: number) => void) | undefined;
+  onProfilePress?: ((profileId: string) => void) | undefined;
 };
 
 const PostTagsModal = forwardRef(({ taggedProfiles, onProfilePress }: Props, ref: ForwardedRef<RNBottomSheetModal>) => {

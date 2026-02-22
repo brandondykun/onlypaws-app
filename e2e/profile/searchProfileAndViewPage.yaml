@@ -8,16 +8,21 @@ appId: com.bdykun.onlypawsapp.dev
 ---
 - launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 
 - tapOn: Explore
 - tapOn: "Search profiles..."
-- inputText: "user"
+- inputText: "hus"
 - pressKey: enter
 
-- tapOn: usereight, Idk why everyone thinks I'm scary. My ears are pretty awesome.
+- tapOn: husky123, I have a thick coat and I prefer the cold.
 
-- assertVisible: "@usereight"
+- assertVisible: "@husky123"
 - assertVisible: "POSTS"
 - assertVisible: .*FOLLOWERS
 - assertVisible: .*FOLLOWING
+
+- assertVisible: Cooper
+- assertVisible: I have a thick coat and I prefer the cold.
+- assertVisible: Dog
+- assertVisible: Husky

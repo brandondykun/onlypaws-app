@@ -1,0 +1,117 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# navigate to the explore tab
+- tapOn: .*EXPLORE
+
+# search for private profile
+- tapOn: Explore
+- tapOn: Search profiles...
+- inputText: "K9"
+- pressKey: enter
+
+# tap on profile to navigate to profile details screen
+- tapOn: K9Historian.*
+
+# assert that the app navigated to the profile details screen
+- assertVisible: The Historian
+- assertVisible: "6" # post count is visible
+- assertVisible: I share pictures of dogs from the past.
+- assertVisible: Dog
+- assertVisible: Old Dogs
+
+# the profile should display as private
+- assertVisible: This profile is private
+
+# tap on followers to try to view followers - nothing should happen (no navigation)
+- tapOn: .*FOLLOWERS
+- assertVisible: This profile is private
+
+# tap on following to try to view following - nothing should happen (no navigation)
+- tapOn: .*FOLLOWING
+- assertVisible: This profile is private
+
+# tap on taggged posts button - nothing should happen (no navigation)
+- tapOn: .*Tagged Posts
+- assertVisible: This profile is private
+
+# confirm starting followers count
+- assertVisible: 0, FOLLOWERS
+
+# follow the profile by tapping the follow button
+- tapOn: Follow
+
+# assert that the button changes to follow requested
+- assertVisible: Follow Requested
+
+# followers count should not increase
+- assertVisible: 0, FOLLOWERS
+
+# assert that posts are still not visible until the follow request is accepted
+- assertVisible: This profile is private
+
+# tap on back button
+- tapOn: Search
+
+# assert that the follow button on searched profile has updated to cancel
+- assertVisible: Cancel
+
+# navigate to posts tab
+- tapOn: .*POSTS
+
+# open notifications menu
+- tapOn:
+    id: notifications-menu-button
+
+# assert that the view follow requests option is now visible
+- assertVisible: View Follow Requests.*
+
+# tap on view follow requests option
+- tapOn: View Follow Requests.*
+
+# assert that the app navigated to the follow requests screen and both tabs are visible
+- tapOn: Follow Requests
+- assertVisible: Sent
+
+# tap on sent tab
+- tapOn: Sent
+
+# assert that the new follow request shows up in the list
+- assertVisible: K9Historian.*
+
+# tap on profile in list
+- tapOn: K9Historian.*
+
+# confirm app navigated to profile details screen
+- assertVisible: "@K9Historian"
+- assertVisible: Follow Requested
+- assertVisible: This profile is private
+
+# press back button
+- tapOn: Follow Requests
+
+# cancel the follow request
+- tapOn: Cancel
+
+# assert that the button is now replaced with Cancelled text
+- assertVisible: Cancelled
+
+# navigate back to notifications screen
+- tapOn: Notifications
+
+# view follow requests button should not be visible
+- assertNotVisible: View Follow Requests.*
+
+# navigate back to explore tab
+- tapOn: .*EXPLORE
+
+# confirm that follow button says Follow in profile search
+- assertVisible: Follow
+
+# navigate to profile details and confirm button says Follow since request has been cancelled
+- tapOn: K9Historian.*
+- assertVisible: Follow
+
+# confirm followers count still says 0
+- assertVisible: 0, FOLLOWERS

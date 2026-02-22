@@ -10,15 +10,15 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # Navigate to explore tab
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 
 # Tap on Post
 - tapOn:
-    id: "post-tile-pressable-51"
+    id: "post-tile-pressable-96"
 
 # Tap on Post comment button
 - tapOn:
-    id: "post-comment-button-51"
+    id: "post-comment-button-96"
 
 # Comments modal should be empty with no comments
 - assertVisible: "No comments yet."

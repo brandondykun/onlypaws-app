@@ -12,12 +12,12 @@ import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";
 
 type Props = {
-  item: FollowRequestWithStatus;
+  followRequest: FollowRequestWithStatus;
   acceptRequest: (requestId: number) => Promise<void>;
   declineRequest: (requestId: number) => Promise<void>;
 };
 
-const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) => {
+const ReceivedFollowRequest = ({ followRequest, acceptRequest, declineRequest }: Props) => {
   const router = useRouter();
 
   const [acceptLoading, setAcceptLoading] = useState(false);
@@ -25,13 +25,13 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
 
   const handleAcceptRequest = async () => {
     setAcceptLoading(true);
-    await acceptRequest(item.id);
+    await acceptRequest(followRequest.id);
     setAcceptLoading(false);
   };
 
   const handleDeclineRequest = async () => {
     setDeclineLoading(true);
-    await declineRequest(item.id);
+    await declineRequest(followRequest.id);
     setDeclineLoading(false);
   };
 
@@ -42,16 +42,16 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
         onPress={() =>
           router.push({
             pathname: "/(app)/posts/profileDetails",
-            params: { profileId: item.requester.id, username: item.requester.username },
+            params: { profileId: followRequest.requester.public_id, username: followRequest.requester.username },
           })
         }
       >
         <View style={{ justifyContent: "center" }}>
-          <ProfileImage image={item?.requester?.image?.image ?? null} size={40} iconSize={24} />
+          <ProfileImage image={followRequest?.requester?.image?.image ?? null} size={40} iconSize={24} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 16, fontWeight: "600" }} numberOfLines={1}>
-            {item.requester.username}
+            {followRequest.requester.username}
           </Text>
           <Text
             style={{ fontSize: 14, fontWeight: "400" }}
@@ -59,11 +59,11 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
             darkColor={COLORS.zinc[400]}
             lightColor={COLORS.zinc[600]}
           >
-            {item.requester.about}
+            {followRequest.requester.about}
           </Text>
         </View>
       </Pressable>
-      {item.status === "accepted" && (
+      {followRequest.status === "accepted" && (
         <View style={{ flexDirection: "row", gap: 6, alignItems: "center", width: 100 }}>
           <AntDesign name="check-circle" size={18} color={COLORS.lime[500]} />
           <Text style={{ fontSize: 17, fontWeight: "500" }} darkColor={COLORS.lime[500]} lightColor={COLORS.lime[500]}>
@@ -71,7 +71,7 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
           </Text>
         </View>
       )}
-      {item.status === "declined" && (
+      {followRequest.status === "declined" && (
         <View style={{ flexDirection: "row", gap: 6, alignItems: "center", width: 100 }}>
           <AntDesign name="close-circle" size={18} color={COLORS.red[600]} />
           <Text style={{ fontSize: 17, fontWeight: "500" }} darkColor={COLORS.red[600]} lightColor={COLORS.red[500]}>
@@ -79,7 +79,7 @@ const ReceivedFollowRequest = ({ item, acceptRequest, declineRequest }: Props) =
           </Text>
         </View>
       )}
-      {item.status === "pending" && (
+      {followRequest.status === "pending" && (
         <View style={{ flexDirection: "row", gap: 8 }}>
           <Button
             textStyle={{ fontSize: 13 }}

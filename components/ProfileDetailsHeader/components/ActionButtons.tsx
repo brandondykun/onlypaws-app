@@ -13,7 +13,7 @@ type Props = {
   profileData: ProfileDetails;
   authProfile: ProfileDetails;
   followLoading: boolean;
-  handleUnfollowPress: (profileId: number) => void;
+  handleUnfollowPress: (profileId: string) => void;
   handleFollowPress: (profile: ProfileDetails) => void;
   handleTaggedPostsPress: () => void;
 };

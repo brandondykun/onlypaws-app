@@ -56,7 +56,7 @@ const PostsScreen = () => {
 
   return (
     <ProfileDetails
-      profileId={authProfile.id}
+      profileId={selectedProfileId}
       onPostPreviewPress={handlePostPreviewPress}
       onTaggedPostsPress={handleTaggedPostsPress}
       skipInitialRefetch={skipRefetch === "true"}

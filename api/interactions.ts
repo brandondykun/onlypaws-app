@@ -67,18 +67,18 @@ export const deleteCommentLike = async (commentId: number) => {
   return await axiosDelete(url);
 };
 
-export const followProfile = async (profileId: number) => {
+export const followProfile = async (publicId: string) => {
   const url = "/v1/interactions/follow/";
-  return await axiosPost<Follow>(url, { profileId });
+  return await axiosPost<Follow>(url, { profileId: publicId });
 };
 
-export const unfollowProfile = async (profileId: number) => {
-  const url = `/v1/interactions/follow/${profileId}/`;
+export const unfollowProfile = async (publicId: string) => {
+  const url = `/v1/interactions/follow/${publicId}/`;
   return await axiosDelete(url);
 };
 
-export const removeFollower = async (profileId: number) => {
-  const url = `/v1/interactions/follower/${profileId}/remove/`;
+export const removeFollower = async (publicId: string) => {
+  const url = `/v1/interactions/follower/${publicId}/remove/`;
   return await axiosDelete(url);
 };
 
@@ -87,7 +87,7 @@ export const getFollowers = async (profileId: number) => {
   return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
-export const getFollowersForQuery = async (profileId: number, pageParam: number | string, username?: string) => {
+export const getFollowersForQuery = async (profileId: string, pageParam: number | string, username?: string) => {
   const params = new URLSearchParams({ page: String(pageParam) });
   if (username) {
     params.append("username", username);
@@ -101,7 +101,7 @@ export const getFollowing = async (profileId: number) => {
   return await axiosFetch<PaginatedResponse<FollowProfile>>(url);
 };
 
-export const getFollowingForQuery = async (profileId: number, pageParam: number | string, username?: string) => {
+export const getFollowingForQuery = async (profileId: string, pageParam: number | string, username?: string) => {
   const params = new URLSearchParams({ page: String(pageParam) });
   if (username) {
     params.append("username", username);
@@ -130,7 +130,7 @@ export const declineFollowRequest = async (requestId: number) => {
   return await axiosDelete(url);
 };
 
-export const cancelFollowRequest = async (profileId: number) => {
+export const cancelFollowRequest = async (profileId: string) => {
   const url = `/v1/interactions/follow-request/${profileId}/cancel/`;
   return await axiosDelete(url);
 };

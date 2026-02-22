@@ -1,0 +1,69 @@
+appId: com.bdykun.onlypawsapp.dev
+onFlowStart:
+  - runFlow: ../auth/logOut.yaml
+---
+- launchApp
+
+# navigate to login screen
+- tapOn: Log in
+
+# log in as user three
+- tapOn: youremail@email.com
+- inputText: "userthree@email.com"
+- tapOn:
+    id: login-password
+- inputText: "password"
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+- tapOn: Log In
+
+# navigate to explore screen
+- tapOn: .*EXPLORE
+
+# scroll to post that has a tag
+- scrollUntilVisible:
+    element:
+      id: post-tile-pressable-99
+
+# top on post preview
+- tapOn:
+    id: post-tile-pressable-99
+
+# swipe to second image in the post
+- swipe:
+    from:
+      id: __CAROUSEL_ITEM_0__
+    direction: LEFT
+
+# assert the show tags button is visible
+- assertVisible:
+    id: show-tags-button-210
+
+# tap on image to show the tags
+- tapOn:
+    id: __CAROUSEL_ITEM_1__
+
+# tag should be visible
+- assertVisible: admin_dog
+
+# tap on image to close the tags
+- tapOn:
+    id: __CAROUSEL_ITEM_1__
+
+# tag should not be visible
+- assertNotVisible: admin_dog
+
+# tap on show tags button to open tags modal
+- tapOn:
+    id: show-tags-button-210
+
+# tags modal should open and display tagged profiles
+- assertVisible: admin_dog.*
+
+# tap on the tagged profile
+- tapOn: admin_dog.*
+
+# assert the app was navigated to profile details screen
+- assertVisible: "@admin_dog"
+- assertVisible: Linus

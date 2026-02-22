@@ -39,12 +39,15 @@ const NotificationListItem = ({ item, index }: Props) => {
       // Mark the notification as read
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the follower's profile
-      router.push({ pathname: "/(app)/posts/profileDetails", params: { profileId: item.extra_data.follower_id } });
+      router.push({
+        pathname: "/(app)/posts/profileDetails",
+        params: { profileId: item.extra_data.follower_public_id },
+      });
     } else if (item.notification_type === "like_post") {
       // Mark the notification as read
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the post details
-      router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_id } });
+      router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_public_id } });
     } else if (item.notification_type === "like_comment") {
       // Mark the notification as read
       if (!item.is_read) markAsRead(item.id.toString());
@@ -64,13 +67,13 @@ const NotificationListItem = ({ item, index }: Props) => {
       // Mark the notification as read
       if (!item.is_read) markAsRead(item.id.toString());
       // Navigate to the post details
-      router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_id } });
+      router.push({ pathname: "/(app)/posts/postDetails", params: { postId: item.extra_data.post_public_id } });
     } else if (item.notification_type === "follow_request_accepted") {
       if (!item.is_read) markAsRead(item.id.toString()); // Mark the notification as read
       // Navigate to the profile details
       router.push({
         pathname: "/(app)/posts/profileDetails",
-        params: { profileId: item.extra_data.followed_id, username: item.extra_data.followed_username },
+        params: { profileId: item.extra_data.followed_public_id, username: item.extra_data.followed_username },
       });
     }
   };

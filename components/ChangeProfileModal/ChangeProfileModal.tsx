@@ -24,13 +24,13 @@ const ChangeProfileModal = forwardRef(
     const {
       profileOptions,
       changeSelectedProfileId,
-      selectedProfileId: authUserSelectedProfileId,
+      selectedProfilePublicId: authUserSelectedProfileId,
     } = useAuthUserContext();
     const { authProfile, backgroundRefreshing: authProfileLoading } = useAuthProfileContext();
     const { isDarkMode, setLightOrDark } = useColorMode();
     const insets = useSafeAreaInsets();
 
-    const handleChangeProfile = async (profileId: number) => {
+    const handleChangeProfile = async (profileId: string) => {
       await changeSelectedProfileId(profileId);
     };
 
@@ -60,13 +60,13 @@ const ChangeProfileModal = forwardRef(
           >
             {profileOptions?.map((profile, index) => {
               const isSelected = profile.id === authProfile.id;
-              const isSelectedButLoading = authUserSelectedProfileId === profile.id && authProfileLoading;
+              const isSelectedButLoading = authUserSelectedProfileId === profile.public_id && authProfileLoading;
               return (
                 <Pressable
                   key={profile.id}
                   style={({ pressed }) => [pressed && !isSelected && { opacity: 0.7 }]}
                   disabled={isSelected || authProfileLoading}
-                  onPress={() => handleChangeProfile(profile.id)}
+                  onPress={() => handleChangeProfile(profile.public_id)}
                 >
                   <View
                     style={[

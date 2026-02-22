@@ -9,7 +9,7 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # Navigate to the Profile tab
-- tapOn: Profile, tab, 5 of 5
+- tapOn: .*PROFILE
 
 # Open menu
 - tapOn:

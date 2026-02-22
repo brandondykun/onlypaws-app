@@ -121,7 +121,7 @@ const FollowersScreen = () => {
           onPress={() => {
             router.push({
               pathname: "/(app)/posts/profileDetails",
-              params: { profileId: profile.id, username: profile.username },
+              params: { profileId: profile.public_id, username: profile.username },
             });
           }}
         >

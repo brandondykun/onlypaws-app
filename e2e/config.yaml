@@ -1,27 +1,41 @@
 # config.yaml
 appId: com.bdykun.onlypawsapp.dev
+flows:
+  - 'auth/*'
+  - 'feedback/*'
+  - 'follow/*'
+  - 'notifications/*'
+  - 'posts/*'
+  - 'profile/*'
+  - 'report/*'
+  - 'taggedPosts/*'
+  - 'user/*'
 
 executionOrder:
   continueOnFailure: false # default is true
   flowsOrder:
-    - loginError
-    - login
-    - searchAndFollowProfile
-    - exploreFollowProfile
-    - searchProfileAndViewPage
-    - addPostComment
-    - savePost
-    - likePost
-    - addPostCommentLike
-    - addPostCommentReply
-    - ownPostsShowReports
-    - viewCommentLikeNotification # this has to be first in notification tests
-    - viewCommentReplyNotification
-    - viewFollowNotification
-    - viewCommentNestedReply
-    - createFeedback
-    - changeProfile
-    - editProfile
-    - feedReportedPostHidden
-    - createNewProfile
-    - logOut
+    - user/createUser
+    - auth/loginError
+    - auth/login
+    - config/viewAppDetails
+    - follow/searchAndFollowProfile
+    - follow/exploreFollowProfile
+    - profile/searchProfileAndViewPage
+    - posts/addPostComment
+    - posts/savePost
+    - posts/likePost
+    - posts/addPostCommentLike
+    - posts/addPostCommentReply
+    - report/ownPostsShowReports
+    - notifications/viewCommentLikeNotification # this has to be first in notification tests
+    - notifications/viewCommentReplyNotification
+    - notifications/viewFollowNotification
+    - feedback/createFeedback
+    - profile/togglePrivateProfile
+    - profile/changeProfile
+    - profile/editProfile
+    - report/feedReportedPostHidden
+    - profile/createNewProfile
+    - profile/deleteProfile
+    - taggedPosts/viewOwnTaggedPosts
+    - auth/logOut

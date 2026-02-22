@@ -44,7 +44,7 @@ const ReceivedFollowRequestList = () => {
       contentContainerStyle={{ ...s.container, paddingBottom: tabBarHeight + 16 }}
       onEndReached={handleEndReached}
       renderItem={({ item }) => (
-        <ReceivedFollowRequest item={item} acceptRequest={acceptRequest} declineRequest={declineRequest} />
+        <ReceivedFollowRequest followRequest={item} acceptRequest={acceptRequest} declineRequest={declineRequest} />
       )}
       refreshControl={
         <RefreshControl
@@ -59,7 +59,7 @@ const ReceivedFollowRequestList = () => {
           isLoading={query.isLoading}
           isError={query.isError}
           isRefetching={query.isRefetching}
-          emptyMessage="No received follow requests."
+          emptyMessage="No received follow requests"
           errorMessage="There was an error fetching your follow requests."
         />
       }

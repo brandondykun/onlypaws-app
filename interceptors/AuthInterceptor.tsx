@@ -13,7 +13,7 @@ type Props = {
 };
 
 const AuthInterceptor = ({ children }: Props) => {
-  const { logOut, selectedProfileId } = useAuthUserContext();
+  const { logOut, selectedProfilePublicId: selectedProfileId } = useAuthUserContext();
   const { triggerMaintenance, isInMaintenance } = useMaintenance();
   const router = useRouter();
 

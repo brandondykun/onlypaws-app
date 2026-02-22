@@ -179,7 +179,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
   }, [dbNotificationsQuery.data]);
 
   // Track the previous profile ID to detect profile switches
-  const prevProfileIdRef = useRef<number | null>(null);
+  const prevProfileIdRef = useRef<string | null>(null);
 
   // Clear WebSocket notifications, reset unread count, and invalidate query cache when profile changes
   useEffect(() => {
@@ -211,8 +211,8 @@ const NotificationsContextProvider = ({ children }: Props) => {
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const serverErrorCountRef = useRef(0);
-  const wsConnectedProfileIdRef = useRef<number | null>(null); // Track which profile the WebSocket is connected for
-  const selectedProfileIdRef = useRef<number | null>(selectedProfileId); // Track current selected profile to avoid closure issues
+  const wsConnectedProfileIdRef = useRef<string | null>(null); // Track which profile the WebSocket is connected for
+  const selectedProfileIdRef = useRef<string | null>(selectedProfileId); // Track current selected profile to avoid closure issues
   const connectionIdRef = useRef(0); // Unique ID for each connection to prevent old connections from processing messages
   const maxReconnectAttempts = 10;
   const maxServerErrors = 5; // Disable after 5 consecutive server errors
@@ -430,7 +430,6 @@ const NotificationsContextProvider = ({ children }: Props) => {
   // Handle incoming post ready notification to mark new posts as ready
   const handleIncomingPostReady = useCallback(
     (postId: number) => {
-      console.log("Post ready:", postId);
       queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
         { queryKey: queryKeys.posts.authProfile(selectedProfileId) },
         (oldData) =>
@@ -643,17 +642,38 @@ const NotificationsContextProvider = ({ children }: Props) => {
         }
       }
 
-      // Decrement apiUnreadCount only if this was an unread DB notification
-      if (wasUnreadInDb) {
+      // If the notification was in WS list, wsUnreadCount already dropped above; don't double-decrement apiUnreadCount
+      const wasInWs = wsNotifications.some((n) => n.id === numericId);
+      if (wasUnreadInDb && !wasInWs) {
         setApiUnreadCount((prev) => Math.max(0, prev - 1));
       }
 
-      // Update DB notifications in the query cache
+      // Update DB notifications in the query cache and decrement cached unread_count
+      // so the effect that syncs apiUnreadCount from cache doesn't overwrite our decrement
       queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
-        return updateInfiniteItemById(oldData, numericId, (notification) => ({ ...notification, is_read: true }));
+        let wasUnread = false;
+        const updated = updateInfiniteItemById(oldData, numericId, (notification) => {
+          if (!notification.is_read) wasUnread = true;
+          return { ...notification, is_read: true };
+        });
+        if (!updated || !wasUnread) return updated ?? oldData;
+        return {
+          ...updated,
+          pages: updated.pages.map((page, index) =>
+            index === 0 && page.extra_data
+              ? {
+                  ...page,
+                  extra_data: {
+                    ...page.extra_data,
+                    unread_count: Math.max(0, page.extra_data.unread_count - 1),
+                  },
+                }
+              : page,
+          ),
+        };
       });
     },
-    [queryClient, notificationsQueryKey],
+    [queryClient, notificationsQueryKey, wsNotifications],
   );
 
   // Mark all notifications as read (both DB and WebSocket) with API call

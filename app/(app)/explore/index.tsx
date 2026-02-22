@@ -116,7 +116,7 @@ const ExploreScreen = () => {
             index={index}
             onPress={() => {
               setSelectedExplorePost(post);
-              router.push({ pathname: "/(app)/explore/list", params: { postId: post.id.toString() } });
+              router.push({ pathname: "/(app)/explore/list", params: { postId: post.public_id } });
             }}
           />
         )}

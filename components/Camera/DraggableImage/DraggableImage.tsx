@@ -83,10 +83,16 @@ const DraggableImage = ({ item, index, setImages }: Props) => {
         </Text>
       </View>
       <View style={s.imageContainer}>
-        <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(item))}>
+        <Pressable
+          style={s.removeButton}
+          onPress={() => {
+            const uri = getImageUri(item);
+            if (uri) handleRemove(uri);
+          }}
+        >
           <Ionicons name="close-outline" size={24} color="black" />
         </Pressable>
-        <ImageLoader uri={getImageUri(item)} width={IMAGE_SIZE} height={IMAGE_SIZE} />
+        <ImageLoader uri={getImageUri(item) ?? ""} width={IMAGE_SIZE} height={IMAGE_SIZE} />
       </View>
       <View style={s.swapIconContainer}>
         <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>

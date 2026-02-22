@@ -111,7 +111,7 @@ const NotificationsScreen = () => {
         showsVerticalScrollIndicator={false}
         data={allNotifications}
         numColumns={1}
-        contentContainerStyle={{ paddingBottom: tabBarHeight, paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingBottom: tabBarHeight, paddingHorizontal: 16, flexGrow: 1 }}
         keyExtractor={(item) => item.id.toString()}
         onEndReachedThreshold={0.3} // Trigger when 30% from the bottom
         onEndReached={handleEndReached}
@@ -134,7 +134,7 @@ const NotificationsScreen = () => {
             isRefetching={isRefetching}
             errorMessage="There was an error fetching your notifications."
             errorSubMessage="Swipe down to try again."
-            emptyMessage="No Notifications"
+            emptyMessage="No notifications"
           />
         }
         renderItem={({ item, index }) => <NotificationListItem item={item} index={index} />}

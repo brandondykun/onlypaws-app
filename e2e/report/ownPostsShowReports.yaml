@@ -9,20 +9,28 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # navigate to posts screen
-- tapOn: Posts, tab, 4 of 5
+- tapOn: ".*Posts"
+
+# reported post should show reported icon
+- assertVisible:
+    id: post-98-reported-icon
 
 # tap on reported post
 # TODO: test that alert icon shows on tile
 - tapOn:
-    id: "post-tile-pressable-55"
+    id: "post-tile-pressable-98"
 
 # post should show message that it has been reported
 - assertVisible: "This post has been reported"
 - tapOn:
-    id: "post-menu-button-55"
+    id: "post-menu-button-98"
 
 # menu should show reasons why post was reported
 - assertVisible: "This post has been reported for:"
 - assertVisible: "Not Pet Related"
-- assertVisible: "Too Much Human"
-- assertVisible: Other users can still see this post, but the images are initially hidden.
+- assertVisible: "This post is under review."
+
+# menu should show edit and delete buttons for post
+- assertVisible: "Edit Post"
+- assertVisible: "Delete Post"
+

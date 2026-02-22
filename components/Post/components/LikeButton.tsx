@@ -12,7 +12,7 @@ type Props = {
   postId: number;
   isLiked: boolean;
   likesCount: number;
-  profileId: number;
+  profileId: string;
   likeLoading: boolean;
   isHidden: boolean;
   scaleValue: Animated.Value;
@@ -34,7 +34,7 @@ const LikeButton = ({
     <Pressable
       onPress={() => handleHeartPress(postId, isLiked)}
       style={({ pressed }) => [pressed && { opacity: 0.5 }, s.root]}
-      disabled={profileId === authProfile.id || likeLoading || isHidden}
+      disabled={profileId === authProfile.public_id || likeLoading || isHidden}
       testID={`post-like-button-${postId}-${isLiked}`}
       hitSlop={7}
     >

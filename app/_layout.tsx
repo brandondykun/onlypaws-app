@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 
+import { MaintenanceGate } from "@/components/MaintenanceGate/MaintenanceGate";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { AdsConfigProvider } from "@/context/AdsConfigContext";
@@ -64,28 +65,30 @@ const RootLayout = () => {
       <GestureHandlerRootView>
         <ColorModeContextProvider>
           <MaintenanceProvider>
-            <AuthUserContextProvider>
-              <AdsConfigProvider>
-                <AuthInterceptor>
-                  <Stack
-                    screenOptions={{
-                      headerStyle: {
-                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                      },
-                      headerShadowVisible: false, // applied here
-                      contentStyle: {
-                        backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
-                      },
-                    }}
-                  >
-                    <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
-                    <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
-                    <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
-                  </Stack>
-                  <Toast config={toastConfig} />
-                </AuthInterceptor>
-              </AdsConfigProvider>
-            </AuthUserContextProvider>
+            <MaintenanceGate>
+              <AuthUserContextProvider>
+                <AdsConfigProvider>
+                  <AuthInterceptor>
+                    <Stack
+                      screenOptions={{
+                        headerStyle: {
+                          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                        },
+                        headerShadowVisible: false, // applied here
+                        contentStyle: {
+                          backgroundColor: isDarkMode ? COLORS.zinc[950] : COLORS.zinc[50],
+                        },
+                      }}
+                    >
+                      <Stack.Screen name="auth" options={{ title: "", headerShown: false, animation: "default" }} />
+                      <Stack.Screen name="onboarding" options={{ title: "", headerShown: false }} />
+                      <Stack.Screen name="(app)" options={{ title: "Home", headerShown: false, animation: "fade" }} />
+                    </Stack>
+                    <Toast config={toastConfig} />
+                  </AuthInterceptor>
+                </AdsConfigProvider>
+              </AuthUserContextProvider>
+            </MaintenanceGate>
           </MaintenanceProvider>
         </ColorModeContextProvider>
       </GestureHandlerRootView>

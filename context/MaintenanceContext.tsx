@@ -13,7 +13,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { createContext, useContext, useState, useCallback, ReactNode, useMemo } from "react";
 
 import { getSystemStatus } from "@/api/status";
-import MaintenanceModal from "@/components/MaintenanceModal/MaintenanceModal";
 import { SystemStatusResponse } from "@/types/status/status";
 import { queryKeys } from "@/utils/query/queryKeys";
 
@@ -127,27 +126,8 @@ export const MaintenanceProvider = ({ children }: MaintenanceProviderProps) => {
     isLoading,
   };
 
-  // Block children until we know the maintenance status.
-  // This prevents AuthUserContext from running persistLogin before we know
-  // if the app is in maintenance mode, which would cause unnecessary logouts.
-  // The splash screen remains visible during this brief check.
-  if (isLoading) {
-    return <MaintenanceContext.Provider value={value}>{null}</MaintenanceContext.Provider>;
-  }
-
-  // When in maintenance mode, only render the maintenance modal.
-  // This completely blocks the app from mounting (including auth flows),
-  // preventing any API calls or logouts during maintenance.
-  // When maintenance ends and user clicks "Check Again", the app mounts fresh.
-  if (state.isInMaintenance) {
-    return (
-      <MaintenanceContext.Provider value={value}>
-        <MaintenanceModal />
-      </MaintenanceContext.Provider>
-    );
-  }
-
-  // System is operational - render the app normally
+  // Always provide context value. Conditional rendering (loading/maintenance/children)
+  // is handled by MaintenanceGate to avoid a require cycle with MaintenanceModal.
   return <MaintenanceContext.Provider value={value}>{children}</MaintenanceContext.Provider>;
 };
 

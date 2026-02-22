@@ -47,15 +47,15 @@ const ProfileSearchScreen = () => {
     return profileSearch.data?.pages.flatMap((page) => page.results) ?? undefined;
   }, [profileSearch.data]);
 
-  const handleUnfollowPress = (profileId: number) => {
+  const handleUnfollowPress = (profileId: string) => {
     unfollowProfile(profileId);
   };
 
   const handleFollowPress = (searchedProfile: SearchedProfile) => {
-    followProfile(searchedProfile.id, { isPrivate: searchedProfile.is_private });
+    followProfile(searchedProfile.public_id, { isPrivate: searchedProfile.is_private });
   };
 
-  const handleCancelFollowRequest = async (profileId: number) => {
+  const handleCancelFollowRequest = async (profileId: string) => {
     // Optimistic update
     cancelFollowRequest(profileId);
 
@@ -67,10 +67,10 @@ const ProfileSearchScreen = () => {
     }
   };
 
-  const handleProfilePress = (profileId: number, username?: string) => {
+  const handleProfilePress = (profileId: string, username?: string) => {
     router.push({
       pathname: "/(app)/explore/profileDetails",
-      params: { profileId: profileId.toString(), username: username },
+      params: { profileId: profileId, username: username },
     });
   };
 

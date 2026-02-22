@@ -100,7 +100,6 @@ export const requestEmailChange = async (newEmail: string) => {
   } catch (err) {
     const error = err as AxiosError;
     const data = error.response?.data as ReqEmailChangeResponse;
-    console.log("requestEmailChange error data: ", data);
     return { data: null, error: data, status: error.status };
   }
 };
@@ -120,7 +119,6 @@ export const verifyEmailChange = async (token: string) => {
   } catch (err) {
     const error = err as AxiosError;
     const data = error.response?.data as VerifyEmailChangeResponse;
-    console.log("verifyEmailChange error data: ", data);
     return { data: null, error: data, status: error.status };
   }
 };

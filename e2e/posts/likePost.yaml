@@ -9,44 +9,44 @@ appId: com.bdykun.onlypawsapp.dev
 ---
 - launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 - tapOn:
-    id: "post-tile-pressable-33"
+    id: "post-tile-pressable-94"
 
 # like post
 - tapOn:
-    id: "post-like-button-33-false"
+    id: "post-like-button-94-false"
 - assertVisible:
-    id: "post-like-button-33-true"
+    id: "post-like-button-94-true"
 
 # un-like post
 - tapOn:
-    id: "post-like-button-33-true"
+    id: "post-like-button-94-true"
 - assertVisible:
-    id: "post-like-button-33-false"
+    id: "post-like-button-94-false"
 
 # navigate to post in profile list
 - tapOn:
-    id: "post-username-button-33"
+    id: "post-username-button-94"
 - tapOn:
-    id: "post-tile-pressable-33"
+    id: "post-tile-pressable-94"
 
 # like post
 - assertVisible:
-    id: "post-like-button-33-false"
+    id: "post-like-button-94-false"
 - tapOn:
-    id: "post-like-button-33-false"
+    id: "post-like-button-94-false"
 - assertVisible:
-    id: "post-like-button-33-true"
+    id: "post-like-button-94-true"
 
 # navigate back to explore list
-- tapOn: "usereleven"
+- tapOn: "@GoldenMaple" # hidden text
 - tapOn: "Posts"
 
 # make sure post is liked from other screen and un-like post
 - assertVisible:
-    id: "post-like-button-33-true"
+    id: "post-like-button-94-true"
 - tapOn:
-    id: "post-like-button-33-true"
+    id: "post-like-button-94-true"
 - assertVisible:
-    id: "post-like-button-33-false"
+    id: "post-like-button-94-false"

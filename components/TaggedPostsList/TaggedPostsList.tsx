@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 
-import { getSavedPostsForQuery } from "@/api/post";
+import { getTaggedPostsForQuery } from "@/api/post";
 import PostScrollList from "@/components/PostScrollList/PostScrollList";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { queryKeys } from "@/utils/query/queryKeys";
@@ -12,7 +12,7 @@ import { minutesToMilliseconds } from "@/utils/utils";
 type Props = {
   profileId: string;
   initialIndex: string;
-  onProfilePress: (profileId: number, username?: string) => void;
+  onProfilePress: (profileId: string, username?: string) => void;
 };
 
 const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Props) => {
@@ -21,7 +21,7 @@ const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Prop
   const router = useRouter();
 
   const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
-    const res = await getSavedPostsForQuery(pageParam);
+    const res = await getTaggedPostsForQuery(profileId, pageParam);
     return res.data;
   };
 
@@ -30,7 +30,7 @@ const TaggedPostsListScreen = ({ profileId, initialIndex, onProfilePress }: Prop
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    staleTime: profileId === selectedProfileId.toString() ? 0 : minutesToMilliseconds(5),
+    staleTime: profileId === selectedProfileId ? 0 : minutesToMilliseconds(5),
   });
 
   // Memoize the flattened posts data

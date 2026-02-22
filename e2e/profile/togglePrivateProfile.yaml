@@ -1,0 +1,58 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# navigate to profile screen
+- tapOn: .*PROFILE
+
+# scroll down to view privacy section
+- scrollUntilVisible:
+    element:
+      text: Privacy
+
+# asser that profile displays as public
+- assertVisible: Your profile is public.*
+
+# open profile options modal
+- tapOn:
+    id: view-profile-options-button
+
+# tap on edit profile button
+- tapOn: Edit Profile.*
+
+# toggle private profile switch
+- tapOn:
+    id: private-profile-switch
+
+# press save button
+- tapOn: Save
+
+# scroll down to view privacy section
+- scrollUntilVisible:
+    element:
+      text: Privacy
+
+# assert profile now shows as private
+- assertVisible: Your profile is private.*
+
+# open profile options modal
+- tapOn:
+    id: view-profile-options-button
+
+# tap on edit profile button
+- tapOn: Edit Profile.*
+
+# toggle private profile switch
+- tapOn:
+    id: private-profile-switch
+
+# press save button
+- tapOn: Save
+
+# scroll down to view privacy section
+- scrollUntilVisible:
+    element:
+      text: Privacy
+
+# assert profile now shows as public again
+- assertVisible: Your profile is public.*

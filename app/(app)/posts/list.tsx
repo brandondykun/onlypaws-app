@@ -31,8 +31,8 @@ const PostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number, username?: string) => {
-    if (profileId === authProfile.id) {
+  const onProfilePress = (profileId: string, username?: string) => {
+    if (profileId === authProfile.public_id) {
       router.back();
       return;
     }

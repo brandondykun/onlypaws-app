@@ -2,7 +2,13 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
 import { PostDetailed, PostsDetailedPage } from "@/types";
-import { removeInfiniteItemById, updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
+import {
+  removeInfiniteItemById,
+  removeInfiniteItemByPublicId,
+  updateInfiniteItemById,
+  updateInfiniteItemByPublicId,
+  upsertInfiniteItem,
+} from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
@@ -18,7 +24,7 @@ type PostManagerContextType = {
   onUnlike: (postId: number) => void;
   onComment: (postId: number) => void;
   savePost: (postData: PostDetailed) => void;
-  unSavePost: (postId: number) => void;
+  unSavePost: (postId: string) => void;
   onToggleHidden: (postId: number) => void;
   onReportPost: (postId: number, is_inappropriate_content: boolean) => void;
 };
@@ -28,7 +34,7 @@ const PostManagerContext = createContext<PostManagerContextType>({
   onUnlike: (postId: number) => {},
   onComment: (postId: number) => {},
   savePost: (postData: PostDetailed) => {},
-  unSavePost: (postId: number) => {},
+  unSavePost: (postId: string) => {},
   onToggleHidden: (postId: number) => {},
   onReportPost: (postId: number, is_inappropriate_content: boolean) => {},
 });
@@ -64,7 +70,7 @@ const PostManagerContextProvider = ({ children }: Props) => {
         },
       },
       (oldData) => {
-        return updateInfiniteItemById(oldData, postData.id, (post) => ({ ...post, is_saved: true }));
+        return updateInfiniteItemByPublicId(oldData, postData.public_id, (post) => ({ ...post, is_saved: true }));
       },
     );
 
@@ -77,21 +83,30 @@ const PostManagerContextProvider = ({ children }: Props) => {
   };
 
   // unsave a post wherever it appears in the app
-  const unSavePost = (postId: number) => {
+  const unSavePost = (postId: string) => {
     // update the selected explore post, which is a post stored in state and not a query
     explorePosts.setSelectedExplorePost((prev) => {
-      if (prev && prev.id === postId) {
+      if (prev && prev.public_id === postId) {
         return { ...prev, is_saved: false };
       }
       return prev;
     });
 
-    // Update all post queries for current profile including saved posts
-    // For saved posts, we update is_saved to false but don't remove the post
-    // It will be removed on the next refetch to avoid abrupt UI changes
+    // Update all post queries for current profile EXCEPT saved posts (handled below)
     queryClient.setQueriesData<InfiniteData<PostsDetailedPage>>(
-      { queryKey: queryKeys.posts.root(selectedProfileId) },
-      (oldData) => updateInfiniteItemById(oldData, postId, (post) => ({ ...post, is_saved: false })),
+      {
+        queryKey: queryKeys.posts.root(selectedProfileId),
+        predicate: (query) => {
+          const key = query.queryKey;
+          return key[0] === selectedProfileId && key[1] === "posts" && !key.includes("saved");
+        },
+      },
+      (oldData) => updateInfiniteItemByPublicId(oldData, postId, (post) => ({ ...post, is_saved: false })),
+    );
+
+    // Remove the post from the saved posts cache so the list updates immediately
+    queryClient.setQueryData<InfiniteData<PostsDetailedPage>>(queryKeys.posts.saved(selectedProfileId), (oldData) =>
+      removeInfiniteItemByPublicId(oldData, postId),
     );
   };
 

@@ -27,7 +27,7 @@ const ExploreStack = () => {
           title: "Search",
           headerTitle: () => {
             return (
-              <View style={{ width: "100%", alignItems: "center" }}>
+              <View style={{ width: "100%", alignItems: "center", paddingRight: 16 }}>
                 <HeaderSearchInput
                   value={search.searchText}
                   onChangeText={search.setSearchText}

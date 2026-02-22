@@ -47,9 +47,9 @@ const SaveButton = ({ post }: Props) => {
       ]).start();
 
       // optimistic update
-      unSavePost(post.id);
+      unSavePost(post.public_id);
       // API call to un-save the post
-      const { error } = await unSavePostApi(post.id);
+      const { error } = await unSavePostApi(post.public_id);
 
       if (error) {
         // rollback if error
@@ -77,15 +77,16 @@ const SaveButton = ({ post }: Props) => {
       // optimistic update
       savePost(post);
       // API call to save the post
-      const { error } = await savePostApi(post.id, authProfile.id);
+      const { error } = await savePostApi(post.public_id, authProfile.id);
 
       if (error) {
         // rollback if error
-        unSavePost(post.id);
+        unSavePost(post.public_id);
         toast.error("There was an error saving that post.");
       } else {
-        // show success toast message
-        toast.savePost({ imageUri: post.images[0].image });
+        // show success toast message when we have an image to display
+        const imageUri = post.images[0]?.image;
+        if (imageUri) toast.savePost({ imageUri });
       }
     }
     setSaveLoading(false);

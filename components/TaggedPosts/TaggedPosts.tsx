@@ -37,7 +37,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
     queryFn: fetchPosts,
     initialPageParam: "1",
     getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
-    staleTime: profileId === authProfile.id.toString() ? 0 : minutesToMilliseconds(5),
+    staleTime: profileId === selectedProfileId ? 0 : minutesToMilliseconds(5),
   });
 
   const dataToRender = useMemo(() => {
@@ -81,7 +81,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
           errorSubMessage="Swipe down to try again."
           loadingComponent={<PostTileSkeleton />}
           emptyMessage={
-            authProfile.id.toString() === profileId
+            authProfile.public_id === profileId
               ? "You haven't been tagged in any posts yet!"
               : "This profile hasn't been tagged in any posts yet!"
           }

@@ -9,24 +9,26 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # navigate to post comments
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 - tapOn:
-    id: "post-tile-pressable-35"
+    id: "post-tile-pressable-93"
 - tapOn:
-    id: "post-comment-button-35"
+    id: "post-comment-button-93"
 
 # comment should not be liked to start
 - assertVisible:
-    id: "comment-like-button-10-false"
+    id: "comment-like-button-40-false"
 
 # like comment
 - tapOn:
-    id: "comment-like-button-10-false"
+    id: "comment-like-button-40-false"
 - assertVisible:
-    id: "comment-like-button-10-true"
+    id: "comment-like-button-40-true"
+- assertVisible: ".*1"
 
 # unlike comment
 - tapOn:
-    id: "comment-like-button-10-true"
+    id: "comment-like-button-40-true"
 - assertVisible:
-    id: "comment-like-button-10-false"
+    id: "comment-like-button-40-false"
+- assertNotVisible: ".*1"

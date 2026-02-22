@@ -6,11 +6,11 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # Navigate to posts tab
-- tapOn: Posts, tab, 4 of 5
+- tapOn: ".*Posts"
 
 # Assert notification count is displayed
 - assertVisible:
-    id: notifications-count-icon-9
+    id: notifications-count-icon-36
 
 # Press notification bell
 - doubleTapOn:
@@ -19,22 +19,27 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Assert correct initial number of notifications
 - assertVisible:
-    id: notifications-count-text-9
+    id: notifications-count-text-36
+
+# Scroll down until comment like notification is visible
+- scrollUntilVisible:
+    element:
+      text: "goldie, liked your comment.*"
 
 # Assert that the notification shows unread
 - assertVisible:
-    id: notification-indicator-71
+    id: notification-indicator-45
 
 # Tap on top notification (comment like notification)
 - tapOn:
-    text: .*userone.*
+    text: "goldie, liked your comment.*"
     index: 0
 
 # Assert correct notification details are displayed
 - assertVisible: Comment Details
 - assertVisible:
     id: __CAROUSEL_ITEM_0__
-- assertVisible: What a good boy!
+- assertVisible: Nice sweater!
 - assertVisible: .*1.*
 
 # Navigate back to notifications screen
@@ -42,11 +47,11 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Assert that the notification count has decreased
 - assertVisible:
-    id: notifications-count-text-8
+    id: notifications-count-text-35
 
 # Assert that the unread notification icon is gone for this notification
 - assertNotVisible:
-    id: notification-indicator-71
+    id: notification-indicator-45
 
 # Navigate back to posts screen
 - tapOn:
@@ -55,4 +60,4 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Assert notification count has been updated
 - assertVisible:
-    id: notifications-count-icon-8
+    id: notifications-count-icon-35

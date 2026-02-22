@@ -27,7 +27,7 @@ import PostTagsModal from "./PostTagsModal";
 
 type Props = {
   post: PostDetailed;
-  onProfilePress?: (profileId: number, username?: string) => void;
+  onProfilePress?: (profileId: string, username?: string) => void;
   captionDefaultExpanded?: boolean;
   captionExpandable?: boolean;
   headerVisible?: boolean;
@@ -134,7 +134,7 @@ const Post = ({
 
   // function for post menu
   const handleProfilePress = () => {
-    onProfilePress && onProfilePress(post.profile.id!, post.profile.username ?? undefined);
+    onProfilePress && onProfilePress(post.profile.public_id!, post.profile.username ?? undefined);
   };
 
   // function for post menu
@@ -153,7 +153,7 @@ const Post = ({
   };
 
   // handle tagged profile press to navigate to the profile details screen
-  const handleTaggedProfilePress = (profileId: number) => {
+  const handleTaggedProfilePress = (profileId: string) => {
     onProfilePress && onProfilePress(profileId);
     taggedProfilesModalRef.current?.dismiss();
   };
@@ -217,7 +217,7 @@ const Post = ({
         {/* Hidden message component to show when the post is hidden */}
         <HiddenMessage
           isHidden={post.is_hidden}
-          profileId={post.profile.id!}
+          profileId={post.profile.public_id}
           postId={post.id}
           isReported={post.is_reported}
           onToggleHidden={onToggleHidden}
@@ -243,7 +243,7 @@ const Post = ({
             postId={post.id}
             isLiked={post.liked}
             likesCount={post.likes_count}
-            profileId={post.profile.id!}
+            profileId={post.profile.public_id}
             likeLoading={likeLoading}
             isHidden={post.is_hidden}
             scaleValue={heartIconScaleValue}

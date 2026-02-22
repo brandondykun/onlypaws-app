@@ -32,7 +32,7 @@ type AdsConfigProviderProps = {
 };
 
 export const AdsConfigProvider = ({ children }: AdsConfigProviderProps) => {
-  const { selectedProfileId } = useAuthUserContext();
+  const { selectedProfilePublicId: selectedProfileId } = useAuthUserContext();
 
   const adsConfigQuery = useQuery({
     queryKey: queryKeys.adsConfig.root,

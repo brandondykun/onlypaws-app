@@ -44,7 +44,7 @@ const EditUsernameScreen = () => {
 
     setLoading(true);
 
-    const { data, error } = await updateUsernameApi(authProfile.id, username);
+    const { data, error } = await updateUsernameApi(authProfile.public_id, username);
     if (!error && data) {
       updateUsername(username);
       toast.success("Username updated successfully.");

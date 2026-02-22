@@ -9,31 +9,31 @@ appId: com.bdykun.onlypawsapp.dev
 ---
 - launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 
 - tapOn:
-    id: "post-tile-pressable-28"
+    id: "post-tile-pressable-92"
 - tapOn:
-    id: "post-comment-button-28"
+    id: "post-comment-button-92"
 
-- assertVisible: "Love the bandana! Where did you get it?"
+- assertVisible: "I love that jacket! Where did you get it?"
 
 # reply to comment
 - tapOn: "Reply"
-- assertVisible: "replying to @userone: Love the bandana! Where did you get it?"
-- tapOn: "Reply to @userone..."
+- assertVisible: "replying to @chewyyy: I love that jacket! Where did you get it?"
+- tapOn: "Reply to @chewyyy..."
 - inputText: "I want to know that too!"
 - tapOn:
     id: "add-comment-button"
 
 # assert comment was added
-- assertVisible: "@userone I want to know that too!"
+- assertVisible: "@chewyyy I want to know that too!"
 
 # hide replies
 - tapOn: "hide replies"
-- assertNotVisible: "@userone I want to know that too!"
+- assertNotVisible: "@chewyyy I want to know that too!"
 - assertVisible: "View 1 reply"
 
 # show replies
 - tapOn: "View 1 reply"
-- assertVisible: "@userone I want to know that too!"
+- assertVisible: "@chewyyy I want to know that too!"

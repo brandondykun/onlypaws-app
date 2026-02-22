@@ -8,7 +8,7 @@ appId: com.bdykun.onlypawsapp.dev
 ---
 - launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*Explore"
 
 # tap on first explore post
 - tapOn:
@@ -17,10 +17,10 @@ appId: com.bdykun.onlypawsapp.dev
 # top on first post username
 - tapOn:
     point: "23%,14%"
-- assertVisible: 1, FOLLOWERS
+- assertVisible: 0, FOLLOWERS
 - tapOn: "follow"
-- assertVisible: 2, FOLLOWERS
+- assertVisible: 1, FOLLOWERS
 - assertVisible: "unfollow"
 - tapOn: "unfollow"
-- assertVisible: 1, FOLLOWERS
+- assertVisible: 0, FOLLOWERS
 - assertVisible: "follow"

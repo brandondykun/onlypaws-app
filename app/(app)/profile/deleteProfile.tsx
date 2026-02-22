@@ -30,10 +30,10 @@ const DeleteProfileScreen = () => {
 
   const bottomSheetRef = useRef<RNBottomSheetModal>(null);
 
-  const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSelectProfile = (profileId: number) => {
+  const handleSelectProfile = (profileId: string) => {
     if (selectedProfileId === profileId) {
       setSelectedProfileId(null);
     } else {
@@ -60,10 +60,10 @@ const DeleteProfileScreen = () => {
       removeProfileOption(selectedProfileId);
 
       // if the profile deleted is the currently selected profile, auto select another profile
-      if (selectedProfileId === authProfile?.id) {
-        const autoSelectedProfile = profileOptions?.find((option) => option.id !== selectedProfileId);
+      if (selectedProfileId === authProfile?.public_id) {
+        const autoSelectedProfile = profileOptions?.find((option) => option.public_id !== selectedProfileId);
         if (autoSelectedProfile) {
-          setActiveProfileId(autoSelectedProfile.id);
+          setActiveProfileId(autoSelectedProfile.public_id);
         }
       }
       toast.success("Profile deleted successfully.");
@@ -72,7 +72,7 @@ const DeleteProfileScreen = () => {
     setLoading(false);
   };
 
-  const selectedProfile = profileOptions?.find((profile) => profile.id === selectedProfileId);
+  const selectedProfile = profileOptions?.find((profile) => profile.public_id === selectedProfileId);
 
   return (
     <ScrollView
@@ -99,7 +99,7 @@ const DeleteProfileScreen = () => {
             style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
             onPress={() => {
               if (profileOptions.length > 1) {
-                handleSelectProfile(profile.id);
+                handleSelectProfile(profile.public_id);
               }
             }}
           >
@@ -131,7 +131,7 @@ const DeleteProfileScreen = () => {
                   {profile?.name || "No name"}
                 </Text>
               </View>
-              <Checkbox isChecked={selectedProfileId === profile.id} testID={`checkbox-${profile.username}`} />
+              <Checkbox isChecked={selectedProfileId === profile.public_id} testID={`checkbox-${profile.username}`} />
             </View>
           </Pressable>
         ))}

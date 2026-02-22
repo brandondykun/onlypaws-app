@@ -8,6 +8,7 @@ export type ResultsPage<T> = {
 };
 
 type ItemWithId = { id: string | number };
+type ItemWithPublicId = { public_id: string };
 
 /**
  * Safely update a single item by id inside an infinite query
@@ -29,6 +30,25 @@ export function updateInfiniteItemById<P extends { results: ItemWithId[] | null 
 }
 
 /**
+ * Safely update a single item by public_id inside an infinite query
+ */
+export function updateInfiniteItemByPublicId<P extends { results: ItemWithPublicId[] | null }>(
+  data: InfiniteData<P> | undefined,
+  publicId: string,
+  updater: (item: NonNullable<P["results"]>[number]) => NonNullable<P["results"]>[number],
+): InfiniteData<P> | undefined {
+  if (!data?.pages) return data;
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      results: page.results?.map((item) => (item.public_id === publicId ? updater(item) : item)) ?? null,
+    })),
+  } as InfiniteData<P>;
+}
+
+/**
  * Remove an item by id from an infinite query
  */
 export function removeInfiniteItemById<P extends { results: ItemWithId[] | null }>(
@@ -42,6 +62,24 @@ export function removeInfiniteItemById<P extends { results: ItemWithId[] | null 
     pages: data.pages.map((page) => ({
       ...page,
       results: page.results?.filter((item) => String(item.id) !== String(id)) ?? null,
+    })),
+  } as InfiniteData<P>;
+}
+
+/**
+ * Remove an item by public_id from an infinite query
+ */
+export function removeInfiniteItemByPublicId<P extends { results: ItemWithPublicId[] | null }>(
+  data: InfiniteData<P> | undefined,
+  publicId: string,
+): InfiniteData<P> | undefined {
+  if (!data?.pages) return data;
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      results: page.results?.filter((item) => item.public_id !== publicId) ?? null,
     })),
   } as InfiniteData<P>;
 }

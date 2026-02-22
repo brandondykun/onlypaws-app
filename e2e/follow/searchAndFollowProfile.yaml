@@ -8,12 +8,12 @@ appId: com.bdykun.onlypawsapp.dev
 ---
 - launchApp
 
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: ".*EXPLORE"
 
-- tapOn: Explore
 - tapOn: "Search profiles..."
-- inputText: "user"
+- inputText: "a"
 - pressKey: enter
+- assertVisible: Search results for "a"
 - tapOn: "follow"
 - assertVisible: "unfollow"
 - tapOn: "unfollow"

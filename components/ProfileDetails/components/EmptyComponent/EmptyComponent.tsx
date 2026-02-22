@@ -10,7 +10,7 @@ type Props = {
   postsIsRefetching: boolean;
   postsIsError: boolean;
   canViewPosts: boolean | undefined;
-  profileId: number | string;
+  profileId: string;
   error: any | null;
 };
 

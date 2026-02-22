@@ -11,6 +11,9 @@ export interface PostTagExtraData {
   tagger_username: string;
   tagger_id: number;
   post_preview_image: string | null; // Full URL to post image
+  post_public_id: string;
+  post_image_public_id: string;
+  post_image_url: string;
 }
 
 // Post like notification from relational database

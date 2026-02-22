@@ -3,8 +3,7 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # Navigate to the profile tab
-- assertVisible: Profile, tab, 5 of 5
-- tapOn: Profile, tab, 5 of 5
+- tapOn: ".*Profile"
 
 # Open the menu
 - tapOn:

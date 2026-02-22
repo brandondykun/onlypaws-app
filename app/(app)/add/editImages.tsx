@@ -59,8 +59,10 @@ const EditImages = () => {
 
     const currentUri = getImageUri(imageToEdit);
 
+    if (!currentUri) return;
+
     ImagePicker.openCropper({
-      path: currentUri,
+      path: currentUri as string,
       width: 1080,
       height: aspectRatio === "4:5" ? 1340 : 1080,
       mediaType: "photo",
@@ -120,11 +122,17 @@ const EditImages = () => {
                 >
                   {({ pressed }) => (
                     <>
-                      <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(image))}>
+                      <Pressable
+                        style={s.removeButton}
+                        onPress={() => {
+                          const uri = getImageUri(image);
+                          if (uri) handleRemove(uri);
+                        }}
+                      >
                         <Ionicons name="close-outline" size={20} color="black" />
                       </Pressable>
                       <AnimatedImageWithScale
-                        source={{ uri: getImageUri(image) }}
+                        source={{ uri: getImageUri(image) ?? "" }}
                         style={{
                           borderRadius: 6,
                           width: screenWidth * 0.8,
@@ -153,11 +161,17 @@ const EditImages = () => {
             >
               {({ pressed }) => (
                 <>
-                  <Pressable style={s.removeButton} onPress={() => handleRemove(getImageUri(images[0]))}>
+                  <Pressable
+                    style={s.removeButton}
+                    onPress={() => {
+                      const uri = getImageUri(images[0]);
+                      if (uri) handleRemove(uri);
+                    }}
+                  >
                     <Ionicons name="close-outline" size={20} color="black" />
                   </Pressable>
                   <AnimatedImageWithScale
-                    source={{ uri: getImageUri(images[0]) }}
+                    source={{ uri: getImageUri(images[0]) ?? "" }}
                     style={{
                       borderRadius: 6,
                       width: screenWidth * 0.8,

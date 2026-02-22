@@ -4,7 +4,7 @@ appId: com.bdykun.onlypawsapp.dev
   # clearState: true
 
 # Navigate to the Profile tab
-- tapOn: Profile, tab, 5 of 5
+- tapOn: .*Profile
 
 # Open menu
 - tapOn:
@@ -16,7 +16,7 @@ appId: com.bdykun.onlypawsapp.dev
 - tapOn: Account Options.*
 
 # Assert that the correct number of profiles is displayed
-- assertVisible: Profiles (2)
+- assertVisible: Your account has 2 profiles
 
 # Navigate to add profile
 - tapOn: Add Profile.*
@@ -49,13 +49,12 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Enter a pet name
 - tapOn: Name
-- inputText: "Lucy"
+- inputText: "Lucy2"
 # Close the keyboard
 - tapOn: Awesome, having multiple pets is the best!
 - waitForAnimationToEnd
 
-# TODO: Select pet type
-# The dropdown is not opening
+# Select pet type
 - tapOn: Select a pet type.*
 - tapOn: Dog
 
@@ -96,17 +95,17 @@ appId: com.bdykun.onlypawsapp.dev
     timeout: 10000
 
 # Assert that the number of profiles has been updated
-- assertVisible: Profiles (3)
+- tapOn: Your account has 3 profiles
 
 # Assert that the new profile is listed in the profiles list
 - assertVisible: LucyGoosey
-- assertVisible: Lucy
+- assertVisible: Lucy2
 
 # Navigate back to Profile screen
-- tapOn: Profile
+- tapOn: .*Profile
 
 # Assert user is back on account screen and has been auto switched to newly created profile
-- assertVisible: Lucy
+- assertVisible: Lucy2
 - assertVisible: "@LucyGoosey"
 - assertVisible: ".*Dog.*"
 - assertVisible: ".*Pitbull.*"
@@ -119,7 +118,7 @@ appId: com.bdykun.onlypawsapp.dev
 - tapOn: .*Switch Profile
 
 # Assert that the new profile is an option
-- assertVisible: .*LucyGoosey, Lucy.*
+- assertVisible: .*LucyGoosey.*
 
 # Close the chnage profile modal
 - swipe:
@@ -128,14 +127,14 @@ appId: com.bdykun.onlypawsapp.dev
     direction: DOWN
 
 # Navigate to the Posts tab
-- tapOn: Posts, tab, 4 of 5
+- tapOn: .*Posts
 
 # Assert that the Posts tab has been swtiched to newly created profile
 - assertVisible: "@LucyGoosey"
-- assertVisible: Lucy
+- assertVisible: Lucy2
 - assertVisible: I am the creator of OnlyPaws.
 - assertVisible: ".*Dog.*"
 - assertVisible: .*Pitbull.*
 - assertVisible: 0, FOLLOWERS
 - assertVisible: 0, FOLLOWING
-- assertVisible: You don't have any posts yet! Add a post to see it here.
+- assertVisible: No posts yet! Add a post to see it here.

@@ -1,0 +1,22 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# navigate to profile tab
+- tapOn: .*PROFILE
+
+# tap on profile details modal
+- tapOn:
+    id: view-profile-options-button
+
+# press app details button
+- tapOn: App Details.*
+
+# assert that the app navigated to the app details screen
+- assertVisible: App Details
+- tapOn: "App Name:"
+- assertVisible: "App Version:"
+- assertVisible: "Device Model:"
+- assertVisible: "Manufacturer:"
+- assertVisible: "OS Name:"
+- assertVisible: "OS Version:"

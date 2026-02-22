@@ -11,7 +11,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 
 type Props = {
   isHidden: boolean;
-  profileId: number;
+  profileId: string;
   postId: number;
   isReported: boolean;
   onToggleHidden: (postId: number) => void;
@@ -24,7 +24,7 @@ const HiddenMessage = ({ isHidden, profileId, postId, isReported, onToggleHidden
   if (!isHidden) return null;
 
   // Show this when user is looking at someone else's post and it has been reported
-  if (profileId !== authProfile.id) {
+  if (profileId !== authProfile.public_id) {
     return (
       <BlurView
         intensity={90}

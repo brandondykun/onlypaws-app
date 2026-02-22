@@ -8,8 +8,7 @@ import {
 } from "@/api/interactions";
 import { ProfileDetails, SearchedProfile } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
-import { removeInfiniteItemById } from "@/utils/query/cacheUtils";
-import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
+import { removeInfiniteItemById, updateInfiniteItemByPublicId } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 
@@ -28,11 +27,11 @@ type FollowOptions = {
 };
 
 type ProfileDetailsManagerContextType = {
-  followProfile: (profileId: number, options?: FollowOptions) => void;
-  unfollowProfile: (profileId: number) => void;
-  cancelFollowRequest: (profileId: number) => void;
-  onFollowRequestAccepted: (profileId: number) => void;
-  removeFollower: (profileId: number) => void;
+  followProfile: (profileId: string, options?: FollowOptions) => void;
+  unfollowProfile: (profileId: string) => void;
+  cancelFollowRequest: (profileId: string) => void;
+  onFollowRequestAccepted: (profileId: string) => void;
+  removeFollower: (profileId: string) => void;
 };
 
 const ProfileDetailsManagerContext = createContext<ProfileDetailsManagerContextType>({
@@ -62,13 +61,13 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Helper function to update a profile in the search results cache
   const updateProfileSearchCache = useCallback(
-    (profileId: number, updater: (profile: SearchedProfile) => SearchedProfile) => {
+    (profileId: string, updater: (profile: SearchedProfile) => SearchedProfile) => {
       if (!submittedSearchText) return;
 
       const queryKey = queryKeys.profileSearch.results(selectedProfileId, submittedSearchText);
 
       queryClient.setQueryData<ProfileSearchQueryData>(queryKey, (oldData) => {
-        return updateInfiniteItemById(oldData, profileId, updater);
+        return updateInfiniteItemByPublicId(oldData, profileId, updater);
       });
     },
     [queryClient, submittedSearchText, selectedProfileId],
@@ -76,7 +75,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Helper to update profile details cache
   const updateProfileDetailsCache = useCallback(
-    (profileId: number, updater: (profile: ProfileDetails) => ProfileDetails) => {
+    (profileId: string, updater: (profile: ProfileDetails) => ProfileDetails) => {
       const queryKey = queryKeys.profile.details(selectedProfileId, profileId);
 
       queryClient.setQueryData(queryKey, (oldData: ProfileDetails | undefined) => {
@@ -89,7 +88,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Optimistic update for follow action
   const applyFollowOptimistic = useCallback(
-    (profileId: number, isPrivate: boolean) => {
+    (profileId: string, isPrivate: boolean) => {
       if (isPrivate) {
         // Private profile: set has_requested_follow
         updateProfileDetailsCache(profileId, (profile) => ({
@@ -119,7 +118,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Revert follow action
   const revertFollow = useCallback(
-    (profileId: number, wasPrivate: boolean) => {
+    (profileId: string, wasPrivate: boolean) => {
       if (wasPrivate) {
         // Revert private profile follow request
         updateProfileDetailsCache(profileId, (profile) => ({
@@ -149,7 +148,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Optimistic update for unfollow action
   const applyUnfollowOptimistic = useCallback(
-    (profileId: number) => {
+    (profileId: string) => {
       removeFollowing();
       updateProfileDetailsCache(profileId, (profile) => ({
         ...profile,
@@ -166,7 +165,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Revert unfollow action
   const revertUnfollow = useCallback(
-    (profileId: number) => {
+    (profileId: string) => {
       addFollowing();
       updateProfileDetailsCache(profileId, (profile) => ({
         ...profile,
@@ -183,7 +182,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Main follow function - handles API call, optimistic update, and revert
   const followProfile = useCallback(
-    async (profileId: number, options?: FollowOptions) => {
+    async (profileId: string, options?: FollowOptions) => {
       const isPrivate = options?.isPrivate ?? false;
 
       // Apply optimistic update
@@ -210,7 +209,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Main unfollow function - handles API call, optimistic update, and revert
   const unfollowProfile = useCallback(
-    async (profileId: number) => {
+    async (profileId: string) => {
       // Apply optimistic update
       applyUnfollowOptimistic(profileId);
 
@@ -231,7 +230,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Cancel a pending follow request
   const cancelFollowRequest = useCallback(
-    (profileId: number) => {
+    (profileId: string) => {
       updateProfileDetailsCache(profileId, (profile) => ({
         ...profile,
         has_requested_follow: false,
@@ -246,7 +245,7 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
   // Handle a private profile accepting a follow request
   const onFollowRequestAccepted = useCallback(
-    (profileId: number) => {
+    (profileId: string) => {
       updateProfileSearchCache(profileId, (profile) => ({
         ...profile,
         is_following: true,
@@ -255,14 +254,14 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
 
       // Refresh queries to get updated data
       queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
-      queryClient.refetchQueries({ queryKey: queryKeys.profile.details(selectedProfileId, profileId.toString()) });
-      queryClient.refetchQueries({ queryKey: queryKeys.posts.profile(selectedProfileId, profileId.toString()) });
+      queryClient.refetchQueries({ queryKey: queryKeys.profile.details(selectedProfileId, profileId) });
+      queryClient.refetchQueries({ queryKey: queryKeys.posts.profile(selectedProfileId, profileId) });
     },
     [updateProfileSearchCache, queryClient, selectedProfileId],
   );
 
   const removeFollower = useCallback(
-    async (profileId: number) => {
+    async (profileId: string) => {
       // optimistic update
       removeFollowerAuthProfile();
       updateProfileDetailsCache(profileId, (profile) => ({

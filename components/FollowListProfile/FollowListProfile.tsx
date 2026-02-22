@@ -17,6 +17,9 @@ const ICON_SIZE = 52;
 const FollowListProfile = ({ profile }: Props) => {
   const { isDarkMode } = useColorMode();
 
+  const profileImage =
+    profile.image?.scaled_images?.find((image) => image.scale === "small")?.image || profile.image?.image;
+
   return (
     <View
       style={{
@@ -31,9 +34,9 @@ const FollowListProfile = ({ profile }: Props) => {
     >
       <View style={{ flexDirection: "row", gap: 8, flex: 1 }} key={profile.id}>
         <View>
-          {profile.image ? (
+          {profileImage ? (
             <Image
-              source={{ uri: profile.image.image }}
+              source={{ uri: profileImage }}
               style={{ borderRadius: ICON_SIZE, height: ICON_SIZE, width: ICON_SIZE }}
             />
           ) : (

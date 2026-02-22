@@ -40,10 +40,10 @@ const ExplorePostsListScreen = () => {
   }, [similarPosts.data]);
 
   const onProfilePress = useMemo(
-    () => (profileId: number, username?: string) => {
+    () => (profileId: string, username?: string) => {
       router.push({
         pathname: "/(app)/explore/profileDetails",
-        params: { profileId: profileId.toString(), username: username },
+        params: { profileId: profileId, username: username },
       });
     },
     [router],

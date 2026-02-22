@@ -3,16 +3,16 @@ export const queryKeys = {
    * Query keys for profiles
    */
   profile: {
-    root: (selectedProfileId: number) => [selectedProfileId, "profile"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "profile"] as const,
 
-    details: (selectedProfileId: number, profileId: string | number) =>
-      [...queryKeys.profile.root(selectedProfileId), profileId.toString()] as const,
+    details: (selectedProfilePublicId: string, profileId: string | number) =>
+      [...queryKeys.profile.root(selectedProfilePublicId), profileId.toString()] as const,
 
-    followers: (selectedProfileId: number, profileId: string | number) =>
-      [...queryKeys.profile.details(selectedProfileId, profileId.toString()), "followers"] as const,
+    followers: (selectedProfilePublicId: string, profileId: string | number) =>
+      [...queryKeys.profile.details(selectedProfilePublicId, profileId.toString()), "followers"] as const,
 
-    following: (selectedProfileId: number, profileId: string | number) =>
-      [...queryKeys.profile.details(selectedProfileId, profileId.toString()), "following"] as const,
+    following: (selectedProfilePublicId: string, profileId: string | number) =>
+      [...queryKeys.profile.details(selectedProfilePublicId, profileId.toString()), "following"] as const,
   },
 
   /**
@@ -20,13 +20,13 @@ export const queryKeys = {
    */
 
   profileSearch: {
-    root: (selectedProfileId: number) => [selectedProfileId, "profileSearch"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "profileSearch"] as const,
 
-    results: (selectedProfileId: number, searchText: string) =>
-      [...queryKeys.profileSearch.root(selectedProfileId), searchText] as const,
+    results: (selectedProfilePublicId: string, searchText: string) =>
+      [...queryKeys.profileSearch.root(selectedProfilePublicId), searchText] as const,
 
-    tags: (selectedProfileId: number, searchText: string) =>
-      [...queryKeys.profileSearch.root(selectedProfileId), "tags", searchText] as const,
+    tags: (selectedProfilePublicId: string, searchText: string) =>
+      [...queryKeys.profileSearch.root(selectedProfilePublicId), "tags", searchText] as const,
   },
 
   /**
@@ -34,27 +34,29 @@ export const queryKeys = {
    */
 
   posts: {
-    root: (selectedProfileId: number) => [selectedProfileId, "posts"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "posts"] as const,
 
-    details: (selectedProfileId: number, postId: string | number) =>
-      [...queryKeys.posts.root(selectedProfileId), "post", postId.toString()] as const,
+    details: (selectedProfilePublicId: string, postId: string | number) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "post", postId.toString()] as const,
 
-    feed: (selectedProfileId: number) => [...queryKeys.posts.root(selectedProfileId), "feed"] as const,
+    feed: (selectedProfilePublicId: string) => [...queryKeys.posts.root(selectedProfilePublicId), "feed"] as const,
 
-    profile: (selectedProfileId: number, profileId: string | number) =>
-      [...queryKeys.posts.root(selectedProfileId), "profile", profileId.toString()] as const,
+    profile: (selectedProfilePublicId: string, profileId: string | number) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "profile", profileId.toString()] as const,
 
-    explore: (selectedProfileId: number) => [...queryKeys.posts.root(selectedProfileId), "explore"] as const,
+    explore: (selectedProfilePublicId: string) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "explore"] as const,
 
-    similar: (selectedProfileId: number, postId: string | number) =>
-      [...queryKeys.posts.root(selectedProfileId), "explore", "similar", postId.toString()] as const,
+    similar: (selectedProfilePublicId: string, postId: string | number) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "explore", "similar", postId.toString()] as const,
 
-    saved: (selectedProfileId: number) => [...queryKeys.posts.root(selectedProfileId), "saved"] as const,
+    saved: (selectedProfilePublicId: string) => [...queryKeys.posts.root(selectedProfilePublicId), "saved"] as const,
 
-    tagged: (selectedProfileId: number, profileId: string | number) =>
-      [...queryKeys.posts.root(selectedProfileId), "tagged", profileId.toString()] as const,
+    tagged: (selectedProfilePublicId: string, profileId: string | number) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "tagged", profileId.toString()] as const,
 
-    authProfile: (selectedProfileId: number) => [...queryKeys.posts.root(selectedProfileId), "authProfile"] as const,
+    authProfile: (selectedProfilePublicId: string) =>
+      [...queryKeys.posts.root(selectedProfilePublicId), "authProfile"] as const,
   },
 
   /**
@@ -62,10 +64,10 @@ export const queryKeys = {
    */
 
   comments: {
-    root: (selectedProfileId: number) => [selectedProfileId, "comments"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "comments"] as const,
 
-    post: (selectedProfileId: number, postId: string | number) =>
-      [...queryKeys.comments.root(selectedProfileId), postId.toString()] as const,
+    post: (selectedProfilePublicId: string, postId: string | number) =>
+      [...queryKeys.comments.root(selectedProfilePublicId), postId.toString()] as const,
   },
 
   /**
@@ -73,10 +75,10 @@ export const queryKeys = {
    */
 
   commentReplies: {
-    root: (selectedProfileId: number) => [selectedProfileId, "comment-replies"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "comment-replies"] as const,
 
-    comment: (selectedProfileId: number, commentId: string | number) =>
-      [...queryKeys.commentReplies.root(selectedProfileId), commentId.toString()] as const,
+    comment: (selectedProfilePublicId: string, commentId: string | number) =>
+      [...queryKeys.commentReplies.root(selectedProfilePublicId), commentId.toString()] as const,
   },
 
   /**
@@ -84,11 +86,13 @@ export const queryKeys = {
    */
 
   followRequests: {
-    root: (selectedProfileId: number) => [selectedProfileId, "follow-requests"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "follow-requests"] as const,
 
-    sent: (selectedProfileId: number) => [...queryKeys.followRequests.root(selectedProfileId), "sent"] as const,
+    sent: (selectedProfilePublicId: string) =>
+      [...queryKeys.followRequests.root(selectedProfilePublicId), "sent"] as const,
 
-    received: (selectedProfileId: number) => [...queryKeys.followRequests.root(selectedProfileId), "received"] as const,
+    received: (selectedProfilePublicId: string) =>
+      [...queryKeys.followRequests.root(selectedProfilePublicId), "received"] as const,
   },
 
   /**
@@ -96,7 +100,7 @@ export const queryKeys = {
    */
 
   notifications: {
-    root: (selectedProfileId: number) => [selectedProfileId, "notifications"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "notifications"] as const,
   },
 
   /**
@@ -104,8 +108,8 @@ export const queryKeys = {
    */
 
   commentChain: {
-    root: (selectedProfileId: number, commentId: string | number) =>
-      [selectedProfileId, "commentChain", commentId.toString()] as const,
+    root: (selectedProfilePublicId: string, commentId: string | number) =>
+      [selectedProfilePublicId, "commentChain", commentId.toString()] as const,
   },
 
   /**
@@ -113,10 +117,10 @@ export const queryKeys = {
    */
 
   followers: {
-    root: (selectedProfileId: number) => [selectedProfileId, "followers"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "followers"] as const,
 
-    search: (selectedProfileId: number, searchText: string) =>
-      [...queryKeys.followers.root(selectedProfileId), "search", searchText] as const,
+    search: (selectedProfilePublicId: string, searchText: string) =>
+      [...queryKeys.followers.root(selectedProfilePublicId), "search", searchText] as const,
   },
 
   /**
@@ -124,10 +128,10 @@ export const queryKeys = {
    */
 
   following: {
-    root: (selectedProfileId: number) => [selectedProfileId, "following"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "following"] as const,
 
-    search: (selectedProfileId: number, searchText: string) =>
-      [...queryKeys.following.root(selectedProfileId), "search", searchText] as const,
+    search: (selectedProfilePublicId: string, searchText: string) =>
+      [...queryKeys.following.root(selectedProfilePublicId), "search", searchText] as const,
   },
 
   /**
@@ -135,10 +139,10 @@ export const queryKeys = {
    */
 
   feedbackTicket: {
-    root: (selectedProfileId: number) => [selectedProfileId, "feedback-tickets"] as const,
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "feedback-tickets"] as const,
 
-    details: (selectedProfileId: number, ticketId: string | number) =>
-      [...queryKeys.feedbackTicket.root(selectedProfileId), ticketId.toString()] as const,
+    details: (selectedProfilePublicId: string, ticketId: string | number) =>
+      [...queryKeys.feedbackTicket.root(selectedProfilePublicId), ticketId.toString()] as const,
   },
 
   /**

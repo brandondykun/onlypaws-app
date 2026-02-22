@@ -7,23 +7,29 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Navigate to posts tab
 - tapOn:
-    text: Posts, tab, 4 of 5
+    text: ".*Posts"
     retryTapIfNoChange: true
 
 # Press notification bell
 - tapOn:
     id: notifications-menu-button
 
+# scroll down to notification
+- scrollUntilVisible:
+    element:
+      text: "pitbulpup, started following you.*"
+
 # Assert that the notification shows unread
 - assertVisible:
-    id: notification-indicator-69
+    id: notification-indicator-62
 
 # Tap on first follow notfication in the list
-- tapOn: userone, started following you.*
+- tapOn: "pitbulpup, started following you.*"
 
 # Assert that app navigated to the profile details of userone
-- assertVisible: "@userone"
-- assertVisible: Follow
+- assertVisible: "@pitbulpup"
+- assertVisible: Follows you
+- assertVisible: Follow Back
 - assertVisible: .*POSTS.*
 - assertVisible: .*FOLLOWERS.*
 - assertVisible: .*FOLLOWING.*
@@ -33,4 +39,4 @@ appId: com.bdykun.onlypawsapp.dev
 
 # Assert that the notification now shows read
 - assertNotVisible:
-    id: notification-indicator-69
+    id: notification-indicator-62

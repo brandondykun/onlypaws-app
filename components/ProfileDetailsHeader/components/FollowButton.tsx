@@ -11,7 +11,7 @@ type Props = {
   profileData: ProfileDetails;
   followLoading: boolean;
   handleFollowPress: (profile: ProfileDetails) => void;
-  handleUnfollowPress: (profileId: number) => void;
+  handleUnfollowPress: (profileId: string) => void;
 };
 
 const FollowButton = ({ profileData, followLoading, handleUnfollowPress, handleFollowPress }: Props) => {
@@ -48,7 +48,7 @@ const FollowButton = ({ profileData, followLoading, handleUnfollowPress, handleF
             },
           ]}
           variant="outline"
-          onPress={() => handleUnfollowPress(profileData.id)}
+          onPress={() => handleUnfollowPress(profileData.public_id)}
           loading={followLoading}
           loadingIconSize={12}
           loadingIconScale={0.7}

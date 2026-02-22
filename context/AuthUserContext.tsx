@@ -21,35 +21,35 @@ const DEFAULT_USER: User = {
 
 type AuthUserContextType = {
   user: User;
-  selectedProfileId: number | null;
+  selectedProfilePublicId: string | null;
   authenticate: (user: MyInfo) => void;
   isAuthenticated: boolean;
   authLoading: boolean;
   logOut: () => Promise<void>;
-  setActiveProfileId: (id: number) => void;
+  setActiveProfileId: (PublicId: string) => void;
   profileOptions: ProfileOption[] | null;
   addProfileOption: (option: ProfileOption) => void;
-  changeSelectedProfileId: (profileId: number) => Promise<void>;
+  changeSelectedProfileId: (publicId: string) => Promise<void>;
   updateEmailVerified: (value: boolean) => void;
   updateOnboardingCompleted: (profileType: "regular" | "business") => void;
-  removeProfileOption: (profileId: number) => void;
+  removeProfileOption: (publicId: string) => void;
   changeEmail: (newEmail: string) => void;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
   user: DEFAULT_USER,
-  selectedProfileId: null,
+  selectedProfilePublicId: null,
   authenticate: (user: MyInfo) => {},
   isAuthenticated: false,
   authLoading: true,
   logOut: () => Promise.resolve(),
-  setActiveProfileId: (id: number) => {},
+  setActiveProfileId: (publicId: string) => {},
   profileOptions: null,
   addProfileOption: (option: ProfileOption) => {},
-  changeSelectedProfileId: (profileId: number) => Promise.resolve(),
+  changeSelectedProfileId: (publicId: string) => Promise.resolve(),
   updateEmailVerified: (value: boolean) => {},
   updateOnboardingCompleted: (profileType: "regular" | "business") => {},
-  removeProfileOption: (profileId: number) => {},
+  removeProfileOption: (publicId: string) => {},
   changeEmail: (newEmail: string) => {},
 });
 
@@ -61,7 +61,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState<User>(DEFAULT_USER);
-  const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
+  const [selectedProfilePublicId, setSelectedProfilePublicId] = useState<string | null>(null);
   const [profileOptions, setProfileOptions] = useState<ProfileOption[] | null>(null);
 
   const router = useRouter();
@@ -86,18 +86,18 @@ const AuthUserContextProvider = ({ children }: Props) => {
     if (user.profiles && user.profiles.length > 0) {
       // fetch last active profile id and set as the current active profile - persist last profile
       const selectedId = await SecureStore.getItemAsync("SELECTED_PROFILE_ID");
-      if (selectedId && user.profiles.find((profile) => profile.id === Number(selectedId))) {
-        setSelectedProfileId(Number(selectedId));
+      if (selectedId && user.profiles.find((profile) => profile.public_id === selectedId)) {
+        setSelectedProfilePublicId(selectedId);
       } else {
         // as a default, set first profile as active
-        setSelectedProfileId(user.profiles[0].id);
+        setSelectedProfilePublicId(user.profiles[0].public_id);
       }
     }
   }, []);
 
   const logOut = useCallback(async () => {
     setUser(DEFAULT_USER);
-    setSelectedProfileId(null);
+    setSelectedProfilePublicId(null);
     setIsAuthenticated(false);
     await tokenService.clearTokens();
     // clear the query client to remove all queries
@@ -105,12 +105,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
     router.replace("/auth/login");
   }, [router, queryClient]);
 
-  const changeSelectedProfileId = async (profileId: number) => {
+  const changeSelectedProfileId = async (publicId: string) => {
     // No need to clear cache - query keys include selectedProfileId
     // so React Query will automatically treat this as a new query
     // save new selected profile id to persist profile selection between sessions
-    await SecureStore.setItemAsync("SELECTED_PROFILE_ID", profileId.toString());
-    setSelectedProfileId(profileId);
+    await SecureStore.setItemAsync("SELECTED_PROFILE_ID", publicId);
+    setSelectedProfilePublicId(publicId);
   };
 
   const updateEmailVerified = (value: boolean) => {
@@ -158,8 +158,8 @@ const AuthUserContextProvider = ({ children }: Props) => {
     persistLogin();
   }, [authenticate, logOut, isInMaintenance]);
 
-  const setActiveProfileId = (id: number) => {
-    setSelectedProfileId(id);
+  const setActiveProfileId = (publicId: string) => {
+    setSelectedProfilePublicId(publicId);
   };
 
   const addProfileOption = (option: ProfileOption) => {
@@ -177,17 +177,17 @@ const AuthUserContextProvider = ({ children }: Props) => {
   };
 
   // remove profile option if a profile if deleted
-  const removeProfileOption = (profileId: number) => {
+  const removeProfileOption = (publicId: string) => {
     setProfileOptions((prev) => {
       if (prev) {
-        return prev?.filter((profile) => profile.id !== profileId);
+        return prev?.filter((profile) => profile.public_id !== publicId);
       }
       return null;
     });
     // Also update the user.profiles array to keep in sync
     setUser((prev) => {
       const currentProfiles = prev.profiles || [];
-      const filtered = currentProfiles.filter((profile) => profile.id !== profileId);
+      const filtered = currentProfiles.filter((profile) => profile.public_id !== publicId);
       return { ...prev, profiles: filtered.length > 0 ? filtered : null };
     });
   };
@@ -200,7 +200,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
 
   const value = {
     user,
-    selectedProfileId,
+    selectedProfilePublicId,
     authenticate,
     isAuthenticated,
     authLoading,

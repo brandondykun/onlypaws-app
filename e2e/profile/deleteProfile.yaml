@@ -1,0 +1,56 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# navigate to profile tab
+- tapOn: .*PROFILE
+
+# open menu
+- tapOn:
+    id: view-profile-options-button
+
+# navigate to account options
+- tapOn: Account Options.*
+
+# assert account has 3 profiles to start
+- assertVisible: Your account has 3 profiles
+- assertVisible: admin_dog
+- assertVisible: LucyBelle
+- assertVisible: LucyGoosey
+
+# navigate to delete profile screen
+- tapOn: Delete Profile.*
+
+# select profile to delete
+- tapOn:
+    id: checkbox-LucyGoosey
+
+# press delete button
+- tapOn:
+    text: Delete Profile
+    index: 1
+
+# assert confirmation modal opens
+- assertVisible: Are you sure you want to delete this profile?
+
+# press delete profile button
+- tapOn:
+    text: Delete Profile
+    index: 1
+
+- assertVisible: .*Profile deleted successfully.*
+
+# Wait for toast notification to disappear
+- extendedWaitUntil:
+    notVisible: .*Profile deleted successfully.*
+    timeout: 10000
+
+# assert profile has been removed
+- assertNotVisible: LucyGoosey
+
+# tap on back button in top left
+- tapOn: Account
+
+# assert account has been removed
+- assertVisible: Your account has 2 profiles
+- assertNotVisible: LucyGoosey

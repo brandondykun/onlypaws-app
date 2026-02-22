@@ -1,0 +1,92 @@
+appId: com.bdykun.onlypawsapp.dev
+---
+- launchApp
+
+# navigate to posts tab
+- tapOn: .*POSTS
+
+# navigate to tagged posts screen
+- tapOn: .*Tagged Posts
+
+# tagged post should show up in list
+- assertVisible:
+    id: post-tile-pressable-99
+
+# tap on the tagged post
+- tapOn:
+    id: post-tile-pressable-99
+
+# assert app navigated to tagged posts list
+- assertVisible: LucyBelle
+- assertVisible: I got a new crate and then I took a nap with my brother!
+
+# swipe to view the second image
+- swipe:
+    from:
+      id: __CAROUSEL_ITEM_0__
+    direction: LEFT
+
+# assert show tags button is visible
+- assertVisible:
+    id: show-tags-button-210
+
+# tap on show tags button
+- tapOn:
+    id: show-tags-button-210
+
+# assert the tagged profiles modal opens
+- assertVisible: Tagged Profiles
+- assertVisible: You, I am the admin dog.
+
+# tap on the tagged profile
+- tapOn: You, I am the admin dog.
+
+# app should not navigate when tapping on own profile
+- assertVisible: Tagged Profiles
+
+# tap on screen to close the modal
+- tapOn:
+    point: 50%,50%
+
+# tap on the image
+- tapOn:
+    id: __CAROUSEL_ITEM_1__
+
+# tag should appear showing the tagged profile's username
+- assertVisible: admin_dog
+
+# tap on the image to close the tag
+- tapOn:
+    id: __CAROUSEL_ITEM_1__
+
+# tag should be closed
+- assertNotVisible: admin_dog
+
+# tap on the post username at the top of the post
+- tapOn: LucyBelle
+
+# app should navigate to profile details screen
+- assertVisible: "@LucyBelle"
+- assertVisible: Follow
+
+# press back button
+- tapOn: Tagged Posts
+
+# app should navigate back to tagged posts list
+- tapOn:
+    text: Tagged Posts
+    index: 1
+
+# press back button
+- tapOn: Tagged Posts
+
+# app should navigate back to tagged posts screen tile view
+- assertVisible:
+    id: post-tile-pressable-99
+
+# press back button
+- tapOn: "@admin_dog"
+
+# app should navigate back to posts index screen
+- assertVisible: "@admin_dog"
+- assertVisible: Linus

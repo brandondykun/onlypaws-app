@@ -14,6 +14,8 @@ export interface FollowRequestAcceptedNotificationExtraData {
   followed_breed?: string;
   // For business profiles:
   followed_business_category?: string | null;
+  followed_public_id: string;
+  follower_public_id: string; // the profile that accepted the follow request
 }
 
 // Follow request accepted notification from relational database

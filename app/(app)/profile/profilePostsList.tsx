@@ -14,14 +14,14 @@ const ExploreProfilePostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (id: number, username?: string) => {
-    if (id === authProfile.id || id === Number(profileId)) {
+  const onProfilePress = (publicId: string, username?: string) => {
+    if (publicId === authProfile.public_id || publicId === profileId) {
       router.back();
       return;
     }
     router.push({
       pathname: "/(app)/profile/profileDetails",
-      params: { profileId: id.toString(), username: username },
+      params: { profileId: publicId, username: username },
     });
   };
 

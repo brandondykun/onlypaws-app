@@ -231,7 +231,7 @@ const CreateEditPostScreen = ({
                     />
                   ) : (
                     <ImageLoader
-                      uri={getImageUri(image)}
+                      uri={getImageUri(image) ?? ""}
                       width={screenWidth}
                       height={getImageHeightAspectAware(screenWidth, aspectRatio)}
                       style={s.image}
@@ -391,7 +391,7 @@ const CreateEditPostScreen = ({
             <View style={{ alignItems: "center", marginVertical: 32 }}>
               {imageToDelete ? (
                 <ImageLoader
-                  uri={getImageUri(imageToDelete)}
+                  uri={getImageUri(imageToDelete) ?? ""}
                   width={screenWidth / 2}
                   height={screenWidth / 2}
                   style={{ borderRadius: 8 }}

@@ -46,12 +46,12 @@ export const getSavedPostsForQuery = async (pageParam: number | string) => {
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
-export const savePost = async (postId: number, profileId: number) => {
+export const savePost = async (postId: string, profileId: number) => {
   const url = `/v1/post/saved/`;
   return await axiosPost<SavedPost>(url, { profile: profileId, post: postId });
 };
 
-export const unSavePost = async (postId: number) => {
+export const unSavePost = async (postId: string) => {
   const url = `/v1/post/saved/${postId}/`;
   return await axiosDelete(url);
 };
@@ -76,12 +76,12 @@ export const getExplorePostsForQuery = async (pageParam: number | string) => {
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
-export const getSimilarPosts = async (postId: number) => {
-  const url = `/v1/post/${postId}/similar/`;
+export const getSimilarPosts = async (postPublicId: string) => {
+  const url = `/v1/post/${postPublicId}/similar/`;
   return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
-export const getSimilarPostsForQuery = async (postId: number | string, pageParam: number | string) => {
+export const getSimilarPostsForQuery = async (postId: string, pageParam: number | string) => {
   const url = `/v1/post/${postId}/similar/?page=${pageParam}`;
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
@@ -146,8 +146,8 @@ export const uploadImageToR2 = async (
 };
 
 // Step 3: Complete post with metadata after images are uploaded
-export const completePost = async (postId: number, data: CompletePostRequest) => {
-  const url = `/v1/post/${postId}/`;
+export const completePost = async (postPublicId: string, data: CompletePostRequest) => {
+  const url = `/v1/post/${postPublicId}/`;
   return await axiosPatch<PostDetailed>(url, {
     caption: data.caption,
     aspect_ratio: data.aspect_ratio,

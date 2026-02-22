@@ -1,0 +1,175 @@
+appId: com.bdykun.onlypawsapp.dev
+onFlowComplete:
+  - runFlow: ../auth/logOut.yaml
+---
+- launchApp
+
+# press create account button
+- tapOn: Create an Account
+
+# enter email
+- tapOn: youremail@email.com
+- inputText: "userthirty@email.com"
+
+# hide keyboard
+- tapOn:
+    point: 50%,10%
+
+# enter password
+- tapOn:
+    id: register-password
+- inputText: "userThirtyPassword123!"
+
+# hide keyboard
+- tapOn:
+    point: 50%,10%
+
+# enter confirm password
+- tapOn:
+    id: register-confirm-password
+- inputText: "userThirtyPassword123!"
+
+# hide keyboard
+- tapOn:
+    point: 50%,10%
+
+# press create account button
+- tapOn: Create Account
+
+# assert app navigated to confirm email screen
+- assertVisible: Email Verification
+- assertVisible: userthirty@email.com
+
+# tap on input
+- tapOn: OTP digit
+
+# enter email verification code
+- inputText: "123456"
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# press submit
+- tapOn: Submit
+
+# app should navigate to username screen
+- assertVisible: Choose your username
+
+# enter a username
+- tapOn: BarkTwain
+- inputText: e2eTestUser
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# press next button
+- tapOn: Next
+
+# screen should update to details section
+- assertVisible: Tell Us About Your Pet
+
+# enter a pet name
+- tapOn: Fido
+- inputText: Testy
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# select a pet type
+- tapOn: Select a pet type.*
+- tapOn: Dog
+
+# enter a breed
+- tapOn: Golden Retriever
+- inputText: "Black Lab"
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# press next button
+- tapOn: Next
+
+# screen should update to about section
+- assertVisible: ABOUT (OPTIONAL)
+
+# enter about text
+- tapOn: I am a great dog and I really love cheese...
+- inputText: "Best dog ever"
+
+# assert text count updated
+- assertVisible: 13/1000
+
+# hide keyboard
+- tapOn:
+    point: 50%,20%
+
+# press create profile button
+- tapOn: Create Profile
+
+# assert user logged in and quick tour displays
+- assertVisible: Quick Tour
+
+# press next
+- tapOn: Next
+
+# feed tab tour should display
+- assertVisible: Feed Tab
+
+# press next
+- tapOn: Next
+
+# explore tab tour should display
+- assertVisible: Explore Tab
+
+# press next
+- tapOn: Next
+
+# add post tab tour should display
+- assertVisible: Add Post Tab
+
+# press next
+- tapOn: Next
+
+# posts tab tour should display
+- assertVisible: Posts Tab
+
+# press next
+- tapOn: Next
+
+# profile tab tour should display
+- assertVisible: Profile Tab
+
+# press get started
+- tapOn: Get Started
+
+# navigate to posts tab
+- tapOn: .*POSTS
+
+# posts tab should display profile information and no posts
+- assertVisible: "@e2eTestUser"
+- assertVisible: Testy
+- assertVisible: Best dog ever
+- assertVisible: Dog
+- assertVisible: Black Lab
+- assertVisible: No posts yet! Add a post to see it here.
+
+# navigate to profile tab
+- tapOn: .*PROFILE
+
+# profile tab should display profile information
+- assertVisible: "@e2eTestUser"
+- assertVisible: Testy
+- assertVisible: Best dog ever
+- assertVisible: userthirty@email.com
+
+# scroll down to view privacy section
+- scrollUntilVisible:
+    element:
+      text: Privacy
+
+# profile should be public by default
+- assertVisible: Your profile is public.*

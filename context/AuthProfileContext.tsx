@@ -21,7 +21,7 @@ import { useColorMode } from "./ColorModeContext";
 
 type AuthProfileContextType = {
   // Guaranteed non-null - this context guards children until these are loaded
-  selectedProfileId: number;
+  selectedProfileId: string;
   authProfile: ProfileDetailsType;
   updateProfileImage: (image: ProfileImage) => void;
   updateAboutText: (aboutText: string) => void;
@@ -53,12 +53,12 @@ type Props = {
 const AuthProfileContextProvider = ({ children }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
-  const { selectedProfileId, authLoading } = useAuthUserContext();
+  const { selectedProfilePublicId: selectedProfileId, authLoading } = useAuthUserContext();
   const { isDarkMode } = useColorMode();
   const queryClient = useQueryClient();
 
-  const fetchProfile = async (id: number) => {
-    const res = await getProfileDetailsForQuery(id);
+  const fetchProfile = async (publicId: string) => {
+    const res = await getProfileDetailsForQuery(publicId);
     return res.data;
   };
 

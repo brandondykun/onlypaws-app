@@ -12,6 +12,8 @@ export interface CommentLikeExtraData {
   liker_username: string;
   liker_id: number;
   post_preview_image: string | null; // Full URL to post image
+  post_public_id: string;
+  liker_public_id: string;
 }
 
 // Comment like notification from relational database

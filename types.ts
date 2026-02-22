@@ -31,6 +31,7 @@ export type ProfileOption = {
   image: ProfileImage | null;
   name: string;
   profile_type: ProfileType;
+  public_id: string;
 };
 
 export type ProfileImageProcessingStatus = "UPLOADED" | "PROCESSING" | "READY" | "FAILED" | "PENDING_UPLOAD";
@@ -45,6 +46,7 @@ export type ProfileImageScaledVariant = {
 
 export type ProfileImage = {
   id: number;
+  public_id: string;
   image: string;
   profile: number;
   created_at: string;
@@ -70,6 +72,7 @@ export type PetTypeWithTitle = {
 
 export type Profile = {
   id: null | number;
+  public_id: string;
   username: null | string;
   about: null | string;
   image: null | ProfileImage;
@@ -82,6 +85,7 @@ export type Profile = {
 
 export type SearchedProfile = {
   id: number;
+  public_id: string;
   username: string;
   about: string;
   is_following: boolean;
@@ -126,6 +130,7 @@ export type ImageScale = "small" | "medium";
 // Scaled image variant
 export type PostImageScaled = {
   id: number;
+  public_id: string;
   scale: ImageScale;
   image: string;
   width: number;
@@ -134,6 +139,7 @@ export type PostImageScaled = {
 
 export type PostImage = {
   id: number;
+  public_id: string;
   post: number;
   image: string | null; // May be null during processing
   order: number;
@@ -180,6 +186,7 @@ export type PostCommentDetailed = {
 
 export type Post = {
   id: number;
+  public_id: string;
   caption: string;
   profile: number;
   created_at: string;
@@ -193,6 +200,7 @@ export type Post = {
 
 export type PostDetailed = {
   id: number;
+  public_id: string;
   caption: string;
   profile: Profile;
   created_at: string;
@@ -220,6 +228,7 @@ export type PostsDetailedPage = {
 
 export type ProfileDetails = {
   id: number;
+  public_id: string;
   username: string;
   name: string;
   about: string | null;
@@ -239,6 +248,7 @@ export type ProfileDetails = {
 
 export type FollowProfile = {
   id: number;
+  public_id: string;
   username: string;
   about: string;
   image: null | ProfileImage;
@@ -258,6 +268,7 @@ export type CreateProfileResponse = {
   user: number;
   username: string;
   name: string;
+  public_id: string;
 };
 
 export type SavedPost = {

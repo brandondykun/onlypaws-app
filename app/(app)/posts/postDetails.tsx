@@ -27,7 +27,7 @@ const PostDetailsScreen = () => {
       ) : !isError && post ? (
         <Post post={post} captionDefaultExpanded={true} captionExpandable={false} headerVisible={false} />
       ) : (
-        <View style={{ paddingVertical: 64, alignItems: "center", paddingHorizontal: 24 }}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}>
           <ErrorText>We A-paw-logize!</ErrorText>
           <ErrorText>There was an error fetching this post.</ErrorText>
           <Button
@@ -38,7 +38,7 @@ const PostDetailsScreen = () => {
             icon={
               <Ionicons name="refresh-outline" size={18} color={setLightOrDark(COLORS.sky[600], COLORS.sky[500])} />
             }
-            buttonStyle={{ marginLeft: -20 }}
+            buttonStyle={{ marginLeft: -20, marginTop: 12 }}
           />
         </View>
       )}
@@ -49,14 +49,13 @@ const PostDetailsScreen = () => {
 export default PostDetailsScreen;
 
 const ErrorText = ({ children }: { children: React.ReactNode }) => {
-  const { setLightOrDark, isDarkMode } = useColorMode();
+  const { setLightOrDark } = useColorMode();
   return (
     <Text
       style={{
         color: setLightOrDark(COLORS.zinc[700], COLORS.zinc[400]),
         textAlign: "center",
         fontSize: 20,
-        fontWeight: isDarkMode ? "300" : "400",
       }}
     >
       {children}

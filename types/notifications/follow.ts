@@ -11,6 +11,7 @@ export interface FollowExtraData {
   follower_name: string;
   follower_pet_type: string | null; // Pet type name, not the full object
   follower_breed: string;
+  follower_public_id: string;
 }
 
 // 1. Database Fetch (REST API) - uses NotificationSerializer

@@ -14,16 +14,16 @@ type Props =
   | {
       profile: SearchedProfile;
       handleFollowPress: (searchedProfile: SearchedProfile) => void;
-      handleUnfollowPress: (profileId: number) => void;
-      onPress?: ((profileId: number, username?: string) => void) | undefined;
+      handleUnfollowPress: (profileId: string) => void;
+      onPress?: ((profileId: string, username?: string) => void) | undefined;
       showFollowButtons?: true;
-      handleCancelFollowRequest: (profileId: number) => void;
+      handleCancelFollowRequest: (profileId: string) => void;
     }
   | {
       profile: SearchedProfile;
       handleFollowPress?: undefined;
       handleUnfollowPress?: undefined;
-      onPress?: ((profileId: number, username?: string) => void) | undefined;
+      onPress?: ((profileId: string, username?: string) => void) | undefined;
       showFollowButtons?: false;
       handleCancelFollowRequest?: undefined;
     };
@@ -43,11 +43,14 @@ const SearchedProfilePreview = ({
 
   const handlePress = () => {
     if (onPress && !isOwnProfile) {
-      onPress(profile.id, profile.username);
+      onPress(profile.public_id, profile.username);
     }
   };
 
   const isOwnProfile = authProfile.id === profile.id;
+
+  const profileImage =
+    profile.image?.scaled_images?.find((image) => image.scale === "small")?.image || profile.image?.image;
 
   return (
     <View
@@ -66,9 +69,9 @@ const SearchedProfilePreview = ({
       >
         <View style={{ flexDirection: "row", gap: 8, flex: 1 }}>
           <View>
-            {profile.image ? (
+            {profileImage ? (
               <Image
-                source={{ uri: profile.image.image }}
+                source={{ uri: profileImage }}
                 style={{ borderRadius: ICON_SIZE, height: ICON_SIZE, width: ICON_SIZE }}
               />
             ) : (
@@ -109,7 +112,7 @@ const SearchedProfilePreview = ({
           textStyle={{ fontSize: 13 }}
           buttonStyle={{ height: 30, width: 70 }}
           variant="outline"
-          onPress={() => handleCancelFollowRequest?.(profile.id)}
+          onPress={() => handleCancelFollowRequest?.(profile.public_id)}
           testID={`${profile.username}-cancel-request`}
         />
       )}
@@ -121,7 +124,7 @@ const SearchedProfilePreview = ({
               textStyle={{ fontSize: 13 }}
               buttonStyle={{ height: 30, width: 70 }}
               variant="outline"
-              onPress={() => handleUnfollowPress?.(profile.id)}
+              onPress={() => handleUnfollowPress?.(profile.public_id)}
               testID={`${profile.username}-unfollow`}
             />
           ) : (

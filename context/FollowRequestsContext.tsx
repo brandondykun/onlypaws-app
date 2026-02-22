@@ -46,12 +46,12 @@ type FollowRequestsContextType = {
   // Actions
   acceptRequest: (requestId: number) => Promise<void>;
   declineRequest: (requestId: number) => Promise<void>;
-  cancelRequest: (profileId: number) => Promise<void>;
+  cancelRequest: (profileId: string) => Promise<void>;
 
   // Helpers
-  hasPendingRequestFrom: (profileId: number) => boolean;
-  hasPendingRequestTo: (profileId: number) => boolean;
-  getPendingRequestTo: (profileId: number) => SentFollowRequest | undefined;
+  hasPendingRequestFrom: (profileId: string) => boolean;
+  hasPendingRequestTo: (profileId: string) => boolean;
+  getPendingRequestTo: (profileId: string) => SentFollowRequest | undefined;
 };
 
 // ============================================================================
@@ -69,7 +69,7 @@ type Props = {
 };
 
 const FollowRequestsContextProvider = ({ children }: Props) => {
-  const { selectedProfileId, addFollower, addFollowing } = useAuthProfileContext();
+  const { selectedProfileId, authProfile, addFollower, addFollowing } = useAuthProfileContext();
   const { wsNotifications, setPendingFollowRequestsCount } = useNotificationsContext();
   const queryClient = useQueryClient();
   const profileDetailsManager = useProfileDetailsManagerContext();
@@ -187,10 +187,12 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
           id: extraData.follow_request_id,
           requester: {
             id: extraData.requester_id,
+            public_id: extraData.requester_public_id,
             username: extraData.requester_username,
             image: extraData.requester_avatar
               ? {
                   id: 0,
+                  public_id: extraData.requester_public_id,
                   image: extraData.requester_avatar,
                   profile: extraData.requester_id,
                   created_at: followRequestNotification.created_at,
@@ -204,7 +206,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
             is_private: false,
             profile_type: extraData.requester_business_category ? "business" : "regular",
           },
-          target: selectedProfileId,
+          target: authProfile.id,
           created_at: followRequestNotification.created_at,
           status: "pending",
         };
@@ -225,7 +227,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         if (processedNotificationIds.current.has(processedKey)) return;
 
         addFollowing(); // add following to auth profile to update following count in the profile header
-        profileDetailsManager.onFollowRequestAccepted(extraData.followed_id); // update the profile details throughout the app to show the accepted request
+        profileDetailsManager.onFollowRequestAccepted(extraData.followed_public_id); // update the profile details throughout the app to show the accepted request
         queryClient.setQueryData<InfiniteData<ListSentFollowRequestsResponse>>(sentRequestsQueryKey, (oldData) => {
           return updateInfiniteItemById(oldData, extraData.followed_id, (req) => ({
             ...req,
@@ -234,12 +236,13 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
         });
 
         processedNotificationIds.current.add(processedKey);
-        profileDetailsManager.onFollowRequestAccepted(extraData.followed_id); // update the profile details throughout the app to show the accepted request
+        profileDetailsManager.onFollowRequestAccepted(extraData.followed_public_id); // update the profile details throughout the app to show the accepted request
       }
     });
   }, [
     wsNotifications,
     selectedProfileId,
+    authProfile.id,
     queryClient,
     receivedRequestsQueryKey,
     sentRequestsQueryKey,
@@ -277,7 +280,6 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
     async (requestId: number) => {
       try {
         const res = await acceptFollowRequest(requestId);
-        console.log("[FollowRequests] acceptRequest response:", res.data);
 
         // Update status in websocket requests state
         setWsFollowRequests((prev) =>
@@ -323,21 +325,34 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
   );
 
   const cancelRequest = useCallback(
-    async (profileId: number) => {
+    async (profileId: string) => {
       try {
         await cancelFollowRequest(profileId);
 
-        // Remove from sent requests cache
+        // Update sent requests cache: match by target.public_id (not item.id)
         queryClient.setQueryData<InfiniteData<ListSentFollowRequestsResponse>>(sentRequestsQueryKey, (oldData) => {
-          return updateInfiniteItemById(oldData, profileId, (req) => ({ ...req, status: "cancelled" as const }));
+          if (!oldData?.pages) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              results:
+                page.results?.map((req) =>
+                  req.target?.public_id === profileId ? { ...req, status: "cancelled" as const } : req,
+                ) ?? null,
+            })),
+          };
         });
+
+        // Update profile details and search caches so has_requested_follow is false
+        profileDetailsManager.cancelFollowRequest(profileId);
       } catch (error) {
         console.error("Failed to cancel follow request:", error);
         toast.error("Failed to cancel follow request", { visibilityTime: 3000 });
         throw error;
       }
     },
-    [queryClient, sentRequestsQueryKey],
+    [queryClient, sentRequestsQueryKey, profileDetailsManager],
   );
 
   // ============================================================================
@@ -345,22 +360,22 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
   // ============================================================================
 
   const hasPendingRequestFrom = useCallback(
-    (profileId: number) => {
-      return receivedRequests.some((req) => req.requester.id === profileId && req.status === "pending");
+    (profileId: string) => {
+      return receivedRequests.some((req) => req.requester.public_id === profileId && req.status === "pending");
     },
     [receivedRequests],
   );
 
   const hasPendingRequestTo = useCallback(
-    (profileId: number) => {
-      return sentRequests.some((req) => req.target.id === profileId);
+    (profileId: string) => {
+      return sentRequests.some((req) => req.target?.public_id === profileId);
     },
     [sentRequests],
   );
 
   const getPendingRequestTo = useCallback(
-    (profileId: number) => {
-      return sentRequests.find((req) => req.target.id === profileId);
+    (profileId: string) => {
+      return sentRequests.find((req) => req.target?.public_id === profileId);
     },
     [sentRequests],
   );

@@ -15,6 +15,8 @@ export interface FollowRequestNotificationExtraData {
   requester_breed?: string;
   // For business profiles:
   requester_business_category?: string | null;
+  requester_public_id: string;
+  target_public_id: string;
 }
 
 // Follow request notification from relational database

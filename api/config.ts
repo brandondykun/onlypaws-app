@@ -26,6 +26,15 @@ export const axiosPost = async <T>(url: string, data: any, config?: AxiosRequest
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
+    console.log("AxiosPost error: ", error);
+    console.log("AxiosPost error response: ", error.response);
+    console.log("AxiosPost error response data: ", error.response?.data);
+    console.log("AxiosPost error response status: ", error.response?.status);
+    console.log("AxiosPost error response headers: ", error.response?.headers);
+    console.log("AxiosPost error response config: ", error.response?.config);
+    console.log("AxiosPost error response request: ", error.response?.request);
+    console.log("AxiosPost error response statusText: ", error.response?.statusText);
+    console.log("AxiosPost error response headers: ", error.response?.headers);
     return { data: null, error: error.message, status: error.status };
   }
 };

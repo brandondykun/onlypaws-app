@@ -37,7 +37,7 @@ const EditProfileScreen = () => {
   const { data: petTypeOptions } = usePetTypeOptions();
 
   const handleProfileUpdate = useCallback(async () => {
-    if (authProfile?.id) {
+    if (authProfile?.public_id) {
       setUpdateProfileLoading(true);
       const updatedData = {
         about: aboutText,
@@ -46,7 +46,7 @@ const EditProfileScreen = () => {
         pet_type: petType ? petType.id : null,
         is_private: isPrivate,
       };
-      const { error, data } = await updateProfile(updatedData, authProfile.id);
+      const { error, data } = await updateProfile(updatedData, authProfile.public_id);
       if (!error && data) {
         updateAuthProfile(data.name, data.about, data.breed, data.pet_type, data.is_private);
         router.back();
@@ -55,7 +55,7 @@ const EditProfileScreen = () => {
       }
       setUpdateProfileLoading(false);
     }
-  }, [authProfile?.id, aboutText, profileName, breed, petType, updateAuthProfile, router, isPrivate]);
+  }, [authProfile?.public_id, aboutText, profileName, breed, petType, updateAuthProfile, router, isPrivate]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -180,7 +180,7 @@ const EditProfileScreen = () => {
                   />
                 </Text>
               </View>
-              <Switch value={isPrivate} onValueChange={(val) => setIsPrivate(val)} />
+              <Switch value={isPrivate} onValueChange={(val) => setIsPrivate(val)} testID="private-profile-switch" />
             </View>
           </View>
         </View>

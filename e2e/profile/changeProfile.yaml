@@ -9,18 +9,19 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # navigate to profile screen
-- tapOn: "Profile, tab, 5 of 5"
+- tapOn: .*Profile
 
 # assert correct starting state
 - assertVisible: "admin@email.com"
-- assertVisible: "@admin_profile"
+- assertVisible: "@admin_dog"
+- assertVisible: Linus
 
 # change profile
 - tapOn:
     id: "view-profile-options-button"
 - tapOn: .*Switch Profile
 - assertVisible: "Change Profile"
-- tapOn: LinusTheHighness.*
+- tapOn: LucyBelle.*
 
 # Close the modal
 - swipe:
@@ -29,14 +30,15 @@ appId: com.bdykun.onlypawsapp.dev
     direction: DOWN
 
 # assert profile changed
+- assertVisible: Lucy
+- assertVisible: "@LucyBelle"
 - assertVisible: "admin@email.com"
-- assertVisible: "@LinusTheHighness"
 
 # change profile
 - tapOn:
     id: "view-profile-options-button"
 - tapOn: .*Switch Profile
-- tapOn: admin_profile.*
+- tapOn: admin_dog.*
 
 # Close the modal
 - swipe:
@@ -45,5 +47,5 @@ appId: com.bdykun.onlypawsapp.dev
     direction: DOWN
 
 # assert profile changed
-- assertVisible: "@admin_profile"
+- assertVisible: "@admin_dog"
 - assertVisible: "Linus"

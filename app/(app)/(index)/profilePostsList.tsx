@@ -10,12 +10,12 @@ import { getNextPageParam } from "@/utils/utils";
 
 const FeedProfilePostsListScreen = () => {
   const { initialIndex, profileId } = useLocalSearchParams<{ initialIndex: string; profileId: string }>();
-  const { authProfile, selectedProfileId } = useAuthProfileContext();
+  const { selectedProfileId } = useAuthProfileContext();
 
   const router = useRouter();
 
-  const onProfilePress = (id: number, username?: string) => {
-    if (id === authProfile.id || id === Number(profileId)) {
+  const onProfilePress = (id: string, username?: string) => {
+    if (id === selectedProfileId || id === profileId) {
       router.back();
       return;
     }

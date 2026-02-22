@@ -25,7 +25,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, 
           backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
         },
       ]}
-      rootStyle={[{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 16 }, rootStyle]}
+      rootStyle={[{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 0 }, rootStyle]}
       placeholderTextColor={COLORS.zinc[500]}
       value={value}
       onChangeText={onChangeText}
@@ -37,6 +37,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, 
       autoCorrect={false}
       withClearButton={true}
       hideErrorAndTextCount={true}
+      testID="header-search-input"
     />
   );
 };

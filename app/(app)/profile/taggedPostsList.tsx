@@ -7,10 +7,10 @@ const TaggedPostsListScreen = () => {
 
   const router = useRouter();
 
-  const onProfilePress = (profileId: number, username?: string) => {
+  const onProfilePress = (publicId: string, username?: string) => {
     router.push({
       pathname: "/(app)/profile/profileDetails",
-      params: { profileId: profileId.toString(), username: username },
+      params: { profileId: publicId, username: username },
     });
   };
 

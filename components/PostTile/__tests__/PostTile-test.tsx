@@ -11,9 +11,13 @@ describe("<PostTile />", () => {
 
     const mockPost: PostDetailed = {
       id: 1,
+      public_id: "post-1",
       caption: "Test Mock Post",
       profile: {
         id: 2,
+        public_id: "12345",
+        is_private: false,
+        profile_type: "regular",
         username: "test_username",
         about: "Test about.",
         image: null,
@@ -23,7 +27,18 @@ describe("<PostTile />", () => {
       },
       created_at: "12345",
       updated_at: "56789",
-      images: [{ id: 5, post: 3, image: "images/1234.jpg" }],
+      images: [
+        {
+          id: 5,
+          post: 3,
+          image: "images/1234.jpg",
+          localImageUri: "file://images/1234.jpg",
+          public_id: "12345",
+          order: 1,
+          tags: [],
+          scaled_images: [],
+        },
+      ],
       comments_count: 1,
       likes_count: 1,
       liked: false,
@@ -32,6 +47,9 @@ describe("<PostTile />", () => {
       is_hidden: false,
       is_reported: false,
       contains_ai: false,
+      tagged_profiles: [],
+      aspect_ratio: "1:1",
+      status: "READY",
     };
 
     render(<PostTile post={mockPost} index={1} onPress={mockOnPress} />);

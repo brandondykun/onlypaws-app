@@ -10,6 +10,8 @@ export interface PostLikeExtraData {
   post_caption: string;
   post_id: number;
   post_preview_image: string | null; // Full URL to post image
+  post_public_id: string;
+  liker_public_id: string;
 }
 
 // Post like notification from relational database

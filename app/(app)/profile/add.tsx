@@ -44,8 +44,15 @@ const AddProfileScreen = () => {
     const { error, data } = await createProfile(username, about, name, breed, petType?.id);
 
     if (!error && data) {
-      setActiveProfileId(data.id);
-      addProfileOption({ id: data.id, username: data.username, image: null, name: data.name, profile_type: "regular" });
+      setActiveProfileId(data.public_id);
+      addProfileOption({
+        id: data.id,
+        username: data.username,
+        image: null,
+        name: data.name,
+        profile_type: "regular",
+        public_id: data.public_id,
+      });
       router.back();
       toast.success(`New profile created! You are now using your new profile ${username}.`);
     } else {

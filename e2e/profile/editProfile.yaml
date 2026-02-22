@@ -9,13 +9,12 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # Navigate to profile screen
-- tapOn: "Profile, tab, 5 of 5"
+- tapOn: .*Profile
 
 # Assert correct initial state
 - assertVisible: "Linus"
-- scrollUntilVisible:
-    element: "Admin profile."
-    direction: DOWN
+- assertVisible: "I am the admin dog..*"
+- assertVisible: Your profile is public.*
 
 # Open profile menu
 - tapOn:
@@ -36,15 +35,16 @@ appId: com.bdykun.onlypawsapp.dev
 - tapOn: Name # close keyboard
 
 # Select pet type from dropdown
-- tapOn: Select a pet type.*
-- tapOn: Dog
+- tapOn: .*Dog.*
+- tapOn: Fish
 
 # Edit breed
-- tapOn: "ex: Golden Retriever"
+- tapOn: Cavi
+- eraseText: 30
 - inputText: "New Breed"
 
 # Edit about
-- tapOn: "Admin profile."
+- tapOn: I am the admin dog.
 - eraseText
 - inputText: "New About"
 
@@ -53,10 +53,10 @@ appId: com.bdykun.onlypawsapp.dev
     point: 50%,20%
 
 # Submit changes
-- tapOn: "Submit"
+- tapOn: "Save"
 
 # Assert that the profile is updated
 - assertVisible: "New name"
 - assertVisible: .*New Breed.*
 - assertVisible: "New About"
-- assertVisible: .*Dog.*
+- assertVisible: .*Fish.*

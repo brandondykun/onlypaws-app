@@ -24,7 +24,7 @@ const OnboardingMainScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   // Profile state
-  const [profileId, setProfileId] = useState<number | null>(null);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [name, setName] = useState("");
@@ -51,7 +51,7 @@ const OnboardingMainScreen = () => {
 
     // If profile already exists (user came back), update username
     if (profileId) {
-      const { error, data } = await updateUsername(profileId, username);
+      const { error, data } = await updateUsername(profileId, username.trim());
 
       if (!error && data) {
         // Don't move to next step yet - wait for fade out animation to complete
@@ -73,11 +73,10 @@ const OnboardingMainScreen = () => {
       }
     } else {
       // Create new profile with username only (other fields will be updated later)
-      const { error, data } = await createProfile(username, "", "", "", undefined);
-
+      const { error, data } = await createProfile(username.trim(), "", "", "", undefined);
       if (!error && data) {
         // Store profile ID in context for subsequent steps
-        setProfileId(data.id);
+        setProfileId(data.public_id);
 
         // DON'T add to user context yet - wait until onboarding is complete
         // This prevents the layout guard from thinking onboarding is done
@@ -157,11 +156,12 @@ const OnboardingMainScreen = () => {
     if (!error && data) {
       // NOW add the profile to user context (onboarding is complete!)
       addProfileOption({
-        id: profileId,
+        id: data?.id || 0,
         username: username,
         image: null,
         name: name,
         profile_type: "regular",
+        public_id: data.public_id,
       });
 
       // Set flag to show welcome announcement on first app entry for new users

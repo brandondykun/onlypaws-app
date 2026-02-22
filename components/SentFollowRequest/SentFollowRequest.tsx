@@ -13,7 +13,7 @@ import Text from "../Text/Text";
 
 type Props = {
   item: TSentFollowRequestWithStatus;
-  cancelRequest: (profileId: number) => Promise<void>;
+  cancelRequest: (profileId: string) => Promise<void>;
 };
 
 const SentFollowRequest = ({ item, cancelRequest }: Props) => {
@@ -22,10 +22,10 @@ const SentFollowRequest = ({ item, cancelRequest }: Props) => {
   const [cancelLoading, setCancelLoading] = useState(false);
 
   const handleCancel = async () => {
-    if (!item.target.id) return;
+    if (!item.target.public_id) return;
 
     setCancelLoading(true);
-    await cancelRequest(item.target.id);
+    await cancelRequest(item.target.public_id);
     setCancelLoading(false);
   };
 
@@ -36,7 +36,7 @@ const SentFollowRequest = ({ item, cancelRequest }: Props) => {
         onPress={() =>
           router.push({
             pathname: "/(app)/posts/profileDetails",
-            params: { profileId: item.target.id, username: item.target.username },
+            params: { profileId: item.target.public_id, username: item.target.username },
           })
         }
       >

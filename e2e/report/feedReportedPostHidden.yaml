@@ -9,95 +9,103 @@ appId: com.bdykun.onlypawsapp.dev
 - launchApp
 
 # navigate to profile screen
-- tapOn: Profile, tab, 5 of 5
+- tapOn: .*Profile
 
 # switch profiles
 - tapOn:
     id: view-profile-options-button
 - tapOn: .*Switch Profile
-- tapOn: LinusTheHighness.*
+- tapOn: LucyBelle.*
 
 # close modal
 - tapOn:
     point: 50%,10%
 
 # assert profile has been changed
-- assertVisible: "@LinusTheHighness"
+- assertVisible: "@LucyBelle"
 
 # follow admin_profile that has reported posts
-- tapOn: "Explore, tab, 2 of 5"
+- tapOn: .*Explore
 - tapOn: Explore # Search Profile... button at the top - not sure why it shows up as Explore
 - tapOn: "Search profiles..."
 - inputText: "admin"
 - pressKey: "enter"
-- tapOn: "follow"
-- assertVisible: "unfollow"
+
+# tap on searched profile and navigate to profile details screen
+- tapOn: admin_dog.*
+
+# post preview for reported post should be hidden
+- assertVisible:
+    id: post-tile-pressable-98-hidden
+
+# follow the profile
+- tapOn: Follow
+- assertVisible: Unfollow
 
 # navigate to feed screen
-- tapOn: Feed, tab, 1 of 5
+- tapOn: .*FEED
 
 - scrollUntilVisible:
     direction: DOWN
     element:
-      id: post-55-hidden-view
+      id: post-98-hidden-view
 
 # assert that post images are initially hidden
 - assertVisible:
-    id: post-55-hidden-view
+    id: post-98-hidden-view
 
 # assert that the show post button is visible
 - assertVisible:
-    id: post-55-show-post-button
+    id: post-98-show-post-button
 
 # show the post
 - tapOn:
-    id: post-55-show-post-button
+    id: post-98-show-post-button
 
 # assert that post images are now shown
 - assertNotVisible:
-    id: "post-55-hidden-view"
+    id: "post-98-hidden-view"
 
 # open post menu
 - tapOn:
-    id: "post-menu-button-55"
+    id: "post-menu-button-98"
 
 # assert reported post warning is displayed
 - assertVisible: "This post has been reported for:"
 - assertVisible: "Not Pet Related"
-- assertVisible: "Too Much Human"
 
 # hide the post from the menu - menu should close automatically
 - tapOn: "Hide Post"
 
 # post images should again be hidden
 - assertVisible:
-    id: "post-55-hidden-view"
+    id: "post-98-hidden-view"
 
 # like and comment button should be disabled while post is hidden
 - tapOn:
-    id: "post-like-button-55-false"
+    id: "post-like-button-98-false"
 - assertVisible:
-    id: "post-like-button-55-false"
+    id: "post-like-button-98-false"
 - tapOn:
-    id: "post-comment-button-55"
+    id: "post-comment-button-98"
 - assertNotVisible: "Comments"
 
 # unfollow admin_profile
 - tapOn:
-    id: "post-username-button-55"
-- assertVisible: ".*Hidden"
-- tapOn: "unfollow"
-- assertVisible: "follow"
+    id: "post-username-button-98"
+- assertVisible: .*Hidden
+- tapOn: Unfollow
+- assertVisible: Follow
 
 # change profiles back to admin_profile
 # navigate to profile screen
-- tapOn: Profile, tab, 5 of 5
+- tapOn: .*Profile
 
 # switch profiles
 - tapOn:
     id: view-profile-options-button
 - tapOn: .*Switch Profile
-- tapOn: admin_profile.*
+- tapOn: admin_dog.*
 
 # close modal
 - swipe:
@@ -106,4 +114,4 @@ appId: com.bdykun.onlypawsapp.dev
     direction: DOWN
 
 # assert profile has been changed
-- assertVisible: "@admin_profile"
+- assertVisible: "@admin_dog"

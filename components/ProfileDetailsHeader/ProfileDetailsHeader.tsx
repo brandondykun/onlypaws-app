@@ -21,7 +21,7 @@ type Props = {
   handleFollowersPress: () => void;
   handleFollowingPress: () => void;
   handleFollowPress: (profile: ProfileDetails) => void;
-  handleUnfollowPress: (profileId: number) => void;
+  handleUnfollowPress: (profileId: string) => void;
   handleTaggedPostsPress: () => void;
   profileLoading: boolean;
   followLoading?: boolean;

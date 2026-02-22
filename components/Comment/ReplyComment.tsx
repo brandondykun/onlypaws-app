@@ -54,6 +54,7 @@ const ReplyComment = ({ replyComment, handleLikeReply, handleUnlikeReply, bgColo
               handleLikeReply(replyComment.id);
             }
           }}
+          testID={`comment-reply-button-${replyComment.id}-false`}
         >
           <View style={s.buttonContainer}>
             <Ionicons

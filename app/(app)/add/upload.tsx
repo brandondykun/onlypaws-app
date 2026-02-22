@@ -89,7 +89,7 @@ const AddPostScreen = () => {
         return;
       }
 
-      const { post_id: postId, upload_urls: uploadUrls } = prepareData;
+      const { upload_urls: uploadUrls, post_public_id: postPublicId } = prepareData;
 
       // Step 2: Upload images directly to R2 in parallel
       try {
@@ -128,7 +128,7 @@ const AddPostScreen = () => {
         }
       });
 
-      const { data: completeData, error: completeError } = await completePost(postId, {
+      const { data: completeData, error: completeError } = await completePost(postPublicId, {
         caption: caption.trim(),
         aspect_ratio: aspectRatio,
         ai_generated: aiGenerated,

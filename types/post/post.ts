@@ -75,6 +75,7 @@ export type UploadUrl = {
 export type PrepareUploadResponse = {
   post_id: number;
   upload_urls: UploadUrl[];
+  post_public_id: string;
 };
 
 // Step 3: Complete Post

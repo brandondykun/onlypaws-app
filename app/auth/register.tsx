@@ -125,6 +125,7 @@ const RegisterScreen = () => {
               autoCapitalize="none"
               keyboardType="email-address"
               autoComplete="email"
+              testID="register-email"
             />
             <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
               * Choose an email you can access to verify your account.
@@ -143,6 +144,7 @@ const RegisterScreen = () => {
             icon={<Ionicons name="key-outline" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
             autoCapitalize="none"
             secureTextEntry
+            testID="register-password"
           />
           <View style={{ marginBottom: 24 }}>
             <TextInput
@@ -156,6 +158,7 @@ const RegisterScreen = () => {
               }
               autoCapitalize="none"
               secureTextEntry
+              testID="register-confirm-password"
             />
             <Text darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]} style={s.helperText}>
               * Password must be at least 9 characters.
