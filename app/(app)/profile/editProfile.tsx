@@ -33,12 +33,14 @@ const EditProfileScreen = () => {
   const [petType, setPetType] = useState<PetTypeWithTitle | null>(null);
   const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
   const [isPrivate, setIsPrivate] = useState(authProfile.is_private ? authProfile.is_private : false);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string>>>({});
 
   const { data: petTypeOptions } = usePetTypeOptions();
 
   const handleProfileUpdate = useCallback(async () => {
     if (authProfile?.public_id) {
       setUpdateProfileLoading(true);
+      setFieldErrors({});
       const updatedData = {
         about: aboutText,
         name: profileName,
@@ -46,10 +48,12 @@ const EditProfileScreen = () => {
         pet_type: petType ? petType.id : null,
         is_private: isPrivate,
       };
-      const { error, data } = await updateProfile(updatedData, authProfile.public_id);
+      const { error, data, fieldErrors: errors } = await updateProfile(updatedData, authProfile.public_id);
       if (!error && data) {
         updateAuthProfile(data.name, data.about, data.breed, data.pet_type, data.is_private);
         router.back();
+      } else if (errors) {
+        setFieldErrors(errors);
       } else {
         toast.error("There was an error updating your profile.");
       }
@@ -110,8 +114,12 @@ const EditProfileScreen = () => {
             <TextInput
               label="Name"
               value={profileName}
-              onChangeText={(val) => setProfileName(val)}
+              onChangeText={(val) => {
+                setProfileName(val);
+                if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+              }}
               placeholder="ex: Charlie"
+              error={fieldErrors.name}
             />
           </View>
           <View style={{ marginBottom: 12 }}>
@@ -127,20 +135,28 @@ const EditProfileScreen = () => {
             <TextInput
               label="Breed"
               value={breed}
-              onChangeText={(val) => setBreed(val)}
+              onChangeText={(val) => {
+                setBreed(val);
+                if (fieldErrors.breed) setFieldErrors((prev) => ({ ...prev, breed: undefined }));
+              }}
               placeholder="ex: Golden Retriever"
+              error={fieldErrors.breed}
             />
           </View>
           <View>
             <TextInput
               label="About"
               value={aboutText}
-              onChangeText={(val) => setAboutText(val)}
+              onChangeText={(val) => {
+                setAboutText(val);
+                if (fieldErrors.about) setFieldErrors((prev) => ({ ...prev, about: undefined }));
+              }}
               multiline
               numberOfLines={5}
               textAlignVertical="top"
               maxLength={1000}
               showCharCount
+              error={fieldErrors.about}
             />
           </View>
 

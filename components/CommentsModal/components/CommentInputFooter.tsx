@@ -21,10 +21,12 @@ type Props = {
   onClearReply: () => void;
   onSubmit: (text: string) => Promise<void>;
   isSubmitting: boolean;
+  errorText: string;
+  setErrorText: (error: string) => void;
 };
 
 const CommentInputFooter = forwardRef<CommentInputFooterRef, Props>(
-  ({ replyToComment, parentComment, onClearReply, onSubmit, isSubmitting }, ref) => {
+  ({ replyToComment, parentComment, onClearReply, onSubmit, isSubmitting, errorText, setErrorText }, ref) => {
     const { isDarkMode, setLightOrDark } = useColorMode();
     const commentInputRef = useRef<RNGHTextInput>(null);
     const inputValueRef = useRef("");
@@ -79,7 +81,7 @@ const CommentInputFooter = forwardRef<CommentInputFooterRef, Props>(
             </View>
           ) : null}
         </View>
-        <View style={[s.footerInputContainer, { paddingBottom: inputIsFocused ? 0 : 16 }]}>
+        <View style={s.footerInputContainer}>
           <View style={{ flex: 1 }}>
             <BottomSheetTextInput
               placeholder={replyToComment ? `Reply to @${replyToComment.profile.username}...` : "Add comment..."}
@@ -88,6 +90,7 @@ const CommentInputFooter = forwardRef<CommentInputFooterRef, Props>(
               onChangeText={(text) => {
                 inputValueRef.current = text;
                 setInputHasText(!!text);
+                if (errorText) setErrorText("");
               }}
               onBlur={handleBlur}
               onFocus={() => setInputIsFocused(true)}
@@ -138,6 +141,7 @@ const CommentInputFooter = forwardRef<CommentInputFooterRef, Props>(
             </View>
           </View>
         </View>
+        {errorText ? <Text style={[s.errorText, { paddingBottom: inputIsFocused ? 0 : 16 }]}>{errorText}</Text> : null}
       </View>
     );
   },
@@ -167,5 +171,10 @@ const s = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 25,
+  },
+  errorText: {
+    color: COLORS.red[600],
+    paddingHorizontal: 16,
+    paddingTop: 4,
   },
 });

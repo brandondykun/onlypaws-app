@@ -179,9 +179,6 @@ const CreateEditPostScreen = ({
     }
   });
 
-  // Make caption length color red if it is at max allowed length
-  const captionLengthColor = caption.length >= 1000 ? COLORS.red[500] : COLORS.zinc[500];
-
   // Check if the post is a PostImage (has numeric id)
   const isPostImage = (image: PostImage | ImageAssetWithTags): image is PostImage => {
     return "id" in image && typeof image.id === "number";
@@ -242,30 +239,43 @@ const CreateEditPostScreen = ({
             }}
           />
           <View style={{ paddingVertical: 16, paddingTop: 0, flex: 1 }}>
-            <View style={{ marginBottom: 16 }}>
-              <RNTextInput
+            <View style={{ marginBottom: 8, paddingBottom: 8 }}>
+              <TextInput
                 value={caption}
-                onChangeText={setCaption}
+                onChangeText={(val) => {
+                  setCaption(val);
+                  if (captionError) setCaptionError("");
+                }}
                 multiline
                 numberOfLines={undefined}
                 maxLength={1000}
+                showCharCount
                 textAlignVertical="top"
                 editable={!submitLoading}
                 scrollEnabled={false}
                 onFocus={handleFocus}
-                style={{
+                error={captionError}
+                inputStyle={{
+                  minHeight: 80,
+                  maxHeight: 800,
+                  backgroundColor: "transparent",
+                  borderColor: "transparent",
+                  borderRadius: 4,
                   fontSize: 16,
-                  padding: 16,
-                  color: setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
+                  paddingHorizontal: 16,
                 }}
+                focusedBorderColor={"transparent"}
+                errorStyle={{ paddingLeft: 12 }}
+                charCountPaddingRight={8}
               />
-              <Text style={[s.captionLength, { color: captionLengthColor }]}>{caption.length}/1000</Text>
             </View>
-            <AddPostTagsSection
-              taggedUsernames={taggedUsernames}
-              setTagImagesModalVisible={setTagImagesModalVisible}
-              isEdit={true}
-            />
+            <View style={{ marginTop: 16 }}>
+              <AddPostTagsSection
+                taggedUsernames={taggedUsernames}
+                setTagImagesModalVisible={setTagImagesModalVisible}
+                isEdit={true}
+              />
+            </View>
             <View style={{ paddingHorizontal: 16 }}>
               {aiGenerated !== undefined && setAiGenerated ? (
                 <AddPostAiSection aiModalRef={aiModalRef} aiGenerated={aiGenerated} setAiGenerated={setAiGenerated} />
@@ -284,11 +294,14 @@ const CreateEditPostScreen = ({
             handleCoordinatesPress={() => setShowTagPopovers((prev) => !prev)}
           />
           <View style={{ paddingVertical: 16, paddingTop: 0, flex: 1 }}>
-            <View style={{ marginBottom: 16 }}>
+            <View style={{ marginBottom: 8, paddingBottom: 8 }}>
               <TextInput
                 ref={textInputRef}
                 value={caption}
-                onChangeText={setCaption}
+                onChangeText={(val) => {
+                  setCaption(val);
+                  if (captionError) setCaptionError("");
+                }}
                 multiline={true}
                 placeholder="Paw-some caption goes here..."
                 numberOfLines={Platform.OS === "ios" ? 100 : 10}
@@ -307,16 +320,19 @@ const CreateEditPostScreen = ({
                   marginBottom: 6,
                   paddingHorizontal: 16,
                 }}
+                errorStyle={{ paddingLeft: 12 }}
                 focusedBorderColor={"transparent"}
                 charCountPaddingRight={8}
                 scrollEnabled={false}
               />
             </View>
-            <AddPostTagsSection
-              taggedUsernames={taggedUsernames}
-              setTagImagesModalVisible={setTagImagesModalVisible}
-              isEdit={false}
-            />
+            <View style={{ marginTop: 16 }}>
+              <AddPostTagsSection
+                taggedUsernames={taggedUsernames}
+                setTagImagesModalVisible={setTagImagesModalVisible}
+                isEdit={false}
+              />
+            </View>
             <View style={{ paddingHorizontal: 16 }}>
               {aiGenerated !== undefined && setAiGenerated ? (
                 <AddPostAiSection aiModalRef={aiModalRef} aiGenerated={aiGenerated} setAiGenerated={setAiGenerated} />
@@ -452,11 +468,5 @@ const s = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 48,
     paddingHorizontal: 16,
-  },
-  captionLength: {
-    fontSize: 12,
-    textAlign: "right",
-    paddingRight: 16,
-    paddingTop: 8,
   },
 });

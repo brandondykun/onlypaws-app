@@ -26,15 +26,6 @@ export const axiosPost = async <T>(url: string, data: any, config?: AxiosRequest
     return { data: res.data, error: null, status: res.status };
   } catch (err) {
     const error = err as AxiosError;
-    console.log("AxiosPost error: ", error);
-    console.log("AxiosPost error response: ", error.response);
-    console.log("AxiosPost error response data: ", error.response?.data);
-    console.log("AxiosPost error response status: ", error.response?.status);
-    console.log("AxiosPost error response headers: ", error.response?.headers);
-    console.log("AxiosPost error response config: ", error.response?.config);
-    console.log("AxiosPost error response request: ", error.response?.request);
-    console.log("AxiosPost error response statusText: ", error.response?.statusText);
-    console.log("AxiosPost error response headers: ", error.response?.headers);
     return { data: null, error: error.message, status: error.status };
   }
 };
@@ -83,8 +74,12 @@ export const axiosPatchCustomError = async <T>(url: string, data: any, config?: 
     const error = err as AxiosError;
     const data = error.response?.data as CustomErrorResponse;
     let errorMessage = data.error;
-    if (data.username && data.username[0] && data.username[0] === "profile with this username already exists.") {
-      errorMessage = "Username taken. Please try a different username.";
+    if (data?.username && data.username[0]) {
+      if (data.username[0] === "profile with this username already exists.") {
+        errorMessage = "Username taken. Please try a different username.";
+      } else {
+        errorMessage = data.username[0];
+      }
     }
     return { data: null, error: errorMessage, status: error.status };
   }

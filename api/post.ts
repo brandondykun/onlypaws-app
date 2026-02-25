@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import { CompletePostRequest, PrepareUploadResponse } from "@/types/post/post";
 import { PaginatedResponse } from "@/types/shared/pagination";
 
@@ -26,9 +28,24 @@ export const createPost = async (postData: FormData, accessToken: string) => {
   return await axiosPost<PostDetailed>(url, postData, config);
 };
 
-export const updatePost = async (postId: number, caption: string, containsAi: boolean) => {
-  const url = `/v1/post/${postId}/`;
-  return await axiosPatch<PostDetailed>(url, { caption: caption, contains_ai: containsAi });
+export const updatePost = async (publicId: string, caption: string, containsAi: boolean) => {
+  const url = `/v1/post/${publicId}/`;
+  try {
+    const res = await axiosInstance.patch<PostDetailed>(url, {
+      caption: caption,
+      contains_ai: containsAi,
+    });
+    return { data: res.data, error: null, captionError: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    const responseData = error.response?.data as { caption?: string[] } | undefined;
+    const captionError = responseData?.caption?.[0] ?? null;
+    return {
+      data: null,
+      error: captionError || error.message,
+      captionError,
+    };
+  }
 };
 
 export const deletePost = async (postId: number) => {

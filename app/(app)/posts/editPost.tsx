@@ -63,11 +63,13 @@ const EditPost = () => {
 
     // if Post changes were made, update the post
     setUpdateLoading(true);
-    const { error, data } = await updatePostApi(postToEdit.id, caption, aiGenerated);
+    const { error, data, captionError } = await updatePostApi(postToEdit.public_id, caption, aiGenerated);
     if (data && !error) {
       updatePost(postToEdit.id, { ...postToEdit, caption, contains_ai: aiGenerated });
       router.back();
       toast.success("Post successfully updated!");
+    } else if (captionError) {
+      setCaptionError(captionError);
     } else {
       toast.error("There was an error updating your post. Please try again.");
     }

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { useWindowDimensions } from "react-native";
 
+import { checkText } from "@/api/moderation";
 import { prepareUpload, uploadImageToR2, completePost } from "@/api/post";
 import CreateEditPostScreen from "@/components/CreateEditPostScreen/CreateEditPostScreen";
 import { useAddPostContext } from "@/context/AddPostContext";
@@ -76,6 +77,13 @@ const AddPostScreen = () => {
     }
 
     if (hasErrors) return;
+
+    // Pre-check caption for profanity before starting uploads
+    const { allowed, message } = await checkText(caption.trim());
+    if (!allowed) {
+      setCaptionError(message || "That caption contains inappropriate language.");
+      return;
+    }
 
     setSubmitLoading(true);
 

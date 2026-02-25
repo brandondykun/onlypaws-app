@@ -21,6 +21,10 @@ type PetDetailsStepProps = {
   setPetType: (petType: DropdownSelectOption) => void;
   breed: string;
   setBreed: (breed: string) => void;
+  nameError: string;
+  setNameError: (error: string) => void;
+  breedError: string;
+  setBreedError: (error: string) => void;
 };
 
 const PetDetailsStep = ({
@@ -32,6 +36,10 @@ const PetDetailsStep = ({
   setPetType,
   breed,
   setBreed,
+  nameError,
+  setNameError,
+  breedError,
+  setBreedError,
 }: PetDetailsStepProps) => {
   const { isDarkMode, setLightOrDark } = useColorMode();
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -46,6 +54,18 @@ const PetDetailsStep = ({
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  // Fade back in when errors arrive (step fades out before calling onNext)
+  useEffect(() => {
+    if (nameError || breedError) {
+      setIsTransitioning(false);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [nameError, breedError, fadeAnim]);
 
   const fadeOut = useCallback(() => {
     return new Promise<void>((resolve) => {
@@ -92,9 +112,13 @@ const PetDetailsStep = ({
         <TextInput
           label="Pet Name"
           value={name}
-          onChangeText={setName}
+          onChangeText={(val) => {
+            setName(val);
+            if (nameError) setNameError("");
+          }}
           placeholder="Fido"
           icon={<Ionicons name="paw" size={20} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[500])} />}
+          error={nameError}
         />
         <View style={{ marginBottom: 16 }}>
           <DropdownSelect
@@ -110,7 +134,16 @@ const PetDetailsStep = ({
             }}
           />
         </View>
-        <TextInput label="Breed (optional)" value={breed} onChangeText={setBreed} placeholder="Golden Retriever" />
+        <TextInput
+          label="Breed (optional)"
+          value={breed}
+          onChangeText={(val) => {
+            setBreed(val);
+            if (breedError) setBreedError("");
+          }}
+          placeholder="Golden Retriever"
+          error={breedError}
+        />
       </View>
       <Button text="Next" onPress={handleNext} loading={loading || isTransitioning} />
     </Animated.View>

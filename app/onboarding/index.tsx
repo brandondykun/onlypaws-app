@@ -31,6 +31,10 @@ const OnboardingMainScreen = () => {
   const [petType, setPetType] = useState<DropdownSelectOption | null>(null);
   const [breed, setBreed] = useState("");
   const [about, setAbout] = useState("");
+  // Field error state
+  const [nameError, setNameError] = useState("");
+  const [breedError, setBreedError] = useState("");
+  const [aboutError, setAboutError] = useState("");
   // Step state
   const [currentStep, setCurrentStep] = useState(0);
   const [stepLoading, setStepLoading] = useState(false);
@@ -105,7 +109,7 @@ const OnboardingMainScreen = () => {
   // Step 2: Pet Details
   const handlePetDetailsNext = async () => {
     if (!name) {
-      toast.error("Please enter your pet's name.");
+      setNameError("Please enter your pet's name.");
       return;
     }
 
@@ -115,9 +119,11 @@ const OnboardingMainScreen = () => {
     }
 
     setStepLoading(true);
+    setNameError("");
+    setBreedError("");
 
     // Update the profile with pet details
-    const { error, data } = await updateProfile(
+    const { error, data, fieldErrors } = await updateProfile(
       {
         name,
         breed: breed || "",
@@ -129,8 +135,11 @@ const OnboardingMainScreen = () => {
     if (!error && data) {
       // Move to next step
       setCurrentStep(2);
+    } else if (fieldErrors) {
+      if (fieldErrors.name) setNameError(fieldErrors.name);
+      if (fieldErrors.breed) setBreedError(fieldErrors.breed);
     } else {
-      toast.error("There was an error updating your pet's information. Please try again.");
+      toast.error("There was an error adding your pet's information. Please try again.");
     }
 
     setStepLoading(false);
@@ -144,9 +153,10 @@ const OnboardingMainScreen = () => {
     }
 
     setStepLoading(true);
+    setAboutError("");
 
     // Update the profile with about text (final step)
-    const { error, data } = await updateProfile(
+    const { error, data, fieldErrors } = await updateProfile(
       {
         about: about || "",
       },
@@ -184,6 +194,9 @@ const OnboardingMainScreen = () => {
         // Layout guard will now see user has a profile and allow access
         router.replace("/(app)/(index)");
       }, 3000); // 1000ms fade-in + 2000ms display = 3000ms total
+    } else if (fieldErrors?.about) {
+      setAboutError(fieldErrors.about);
+      setStepLoading(false);
     } else {
       toast.error("There was an error finalizing your profile. Please try again.");
       setStepLoading(false);
@@ -240,10 +253,22 @@ const OnboardingMainScreen = () => {
             setPetType={setPetType}
             breed={breed}
             setBreed={setBreed}
+            nameError={nameError}
+            setNameError={setNameError}
+            breedError={breedError}
+            setBreedError={setBreedError}
           />
         </ProgressStep>
         <ProgressStep label="About" removeBtnRow scrollViewProps={{ contentContainerStyle: { flexGrow: 1 } }}>
-          <AboutStep onSubmit={handleAboutSubmit} loading={stepLoading} name={name} about={about} setAbout={setAbout} />
+          <AboutStep
+            onSubmit={handleAboutSubmit}
+            loading={stepLoading}
+            name={name}
+            about={about}
+            setAbout={setAbout}
+            aboutError={aboutError}
+            setAboutError={setAboutError}
+          />
         </ProgressStep>
       </ProgressSteps>
     </ScrollView>

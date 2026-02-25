@@ -45,6 +45,8 @@ const CommentsModal = forwardRef(
     const [parentComment, setParentComment] = useState<PostCommentDetailed | null>(null);
     // specific comment being replied to
     const [replyToComment, setReplyToComment] = useState<PostCommentDetailed | null>(null);
+    // error text for the comment input
+    const [errorText, setErrorText] = useState("");
 
     const { authProfile, selectedProfileId } = useAuthProfileContext();
     const queryClient = useQueryClient();
@@ -122,7 +124,8 @@ const CommentsModal = forwardRef(
           const parentId = parentComment ? parentComment.id : null;
           const replyCommentId = replyToComment ? replyToComment.id : null;
 
-          const { error, data } = await addComment(postId, text, authProfile.id, parentId, replyCommentId);
+          setErrorText("");
+          const { error, data, textError } = await addComment(postId, text, authProfile.id, parentId, replyCommentId);
           if (!error && data) {
             if (!parentId) {
               prependComment(data); // add top level comment
@@ -134,6 +137,8 @@ const CommentsModal = forwardRef(
             commentInputFooterRef.current?.clear();
             setParentComment(null);
             setReplyToComment(null);
+          } else if (textError) {
+            setErrorText(textError);
           } else {
             toast.error("There was an error adding that comment.");
           }
@@ -207,6 +212,8 @@ const CommentsModal = forwardRef(
           }}
           onSubmit={handleAddComment}
           isSubmitting={addCommentLoading}
+          errorText={errorText}
+          setErrorText={setErrorText}
         />
         <Toast config={toastConfig} />
       </BottomSheetModal>

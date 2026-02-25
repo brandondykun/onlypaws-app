@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import { FollowRequest, SentFollowRequest, AcceptFollowRequestResponse } from "@/types/follow-requests/follow-requests";
 import { CommentChainResponse } from "@/types/post/post";
 import { PaginatedResponse } from "@/types/shared/pagination";
@@ -24,7 +26,24 @@ export const addComment = async (
   reply_to_comment: number | null,
 ) => {
   const url = `/v1/interactions/comment/post/${post}/`;
-  return await axiosPost<PostCommentDetailed>(url, { text, profileId, parent_comment, reply_to_comment });
+  try {
+    const res = await axiosInstance.post<PostCommentDetailed>(url, {
+      text,
+      profileId,
+      parent_comment,
+      reply_to_comment,
+    });
+    return { data: res.data, error: null, textError: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    const responseData = error.response?.data as { text?: string[] } | undefined;
+    const textError = responseData?.text?.[0] ?? null;
+    return {
+      data: null,
+      error: textError || error.message,
+      textError,
+    };
+  }
 };
 
 export const getPostComments = async (postId: number) => {

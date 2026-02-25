@@ -12,9 +12,11 @@ type AboutStepProps = {
   name: string;
   about: string;
   setAbout: (about: string) => void;
+  aboutError: string;
+  setAboutError: (error: string) => void;
 };
 
-const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps) => {
+const AboutStep = ({ onSubmit, loading, name, about, setAbout, aboutError, setAboutError }: AboutStepProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -25,6 +27,18 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps)
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  // Fade back in when error arrives (step fades out before calling onSubmit)
+  useEffect(() => {
+    if (aboutError) {
+      setIsTransitioning(false);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [aboutError, fadeAnim]);
 
   const fadeOut = useCallback(() => {
     return new Promise<void>((resolve) => {
@@ -66,7 +80,10 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps)
         <TextInput
           label="About (optional)"
           value={about}
-          onChangeText={setAbout}
+          onChangeText={(val) => {
+            setAbout(val);
+            if (aboutError) setAboutError("");
+          }}
           multiline
           numberOfLines={8}
           placeholder="I am a great dog and I really love cheese..."
@@ -74,6 +91,7 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout }: AboutStepProps)
           maxLength={1000}
           showCharCount
           inputStyle={{ minHeight: 100 }}
+          error={aboutError}
         />
       </View>
 

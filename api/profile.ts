@@ -12,7 +12,7 @@ import {
   SearchedProfile,
 } from "../types";
 
-import { axiosFetch, axiosPatch, axiosPatchCustomError, axiosInstance } from "./config";
+import { axiosFetch, axiosPatchCustomError, axiosInstance } from "./config";
 
 export const getProfileDetails = async (profileId: number | string) => {
   const url = `/v1/profile/${profileId}/`;
@@ -101,7 +101,29 @@ export const confirmProfileImageUpload = async (
 
 export const updateProfile = async (data: any, profileId: string) => {
   const url = `/v1/profile/${profileId}/`;
-  return await axiosPatch<Profile>(url, data);
+  try {
+    const res = await axiosInstance.patch<Profile>(url, data);
+    return { data: res.data, error: null, fieldErrors: null as Record<string, string> | null };
+  } catch (err) {
+    const error = err as AxiosError;
+    const responseData = error.response?.data as Record<string, string[]> | undefined;
+
+    const fieldErrors: Record<string, string> = {};
+    if (responseData) {
+      for (const [key, messages] of Object.entries(responseData)) {
+        if (Array.isArray(messages) && messages.length > 0) {
+          fieldErrors[key] = messages[0];
+        }
+      }
+    }
+
+    const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+    return {
+      data: null,
+      error: hasFieldErrors ? "Please fix the errors below." : error.message,
+      fieldErrors: hasFieldErrors ? fieldErrors : null,
+    };
+  }
 };
 
 export const updateUsername = async (profileId: string, username: string) => {
