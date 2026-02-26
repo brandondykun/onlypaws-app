@@ -25,6 +25,7 @@ import { useNotificationsContext } from "@/context/NotificationsContext";
 import PostManagerContextProvider from "@/context/PostManagerContext";
 import PostsContextProvider from "@/context/PostsContext";
 import ProfileDetailsManagerContextProvider from "@/context/ProfileDetailsManagerContext";
+import ProfileReportReasonsContextProvider from "@/context/ProfileReportReasonsContext";
 import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
 
@@ -199,7 +200,9 @@ const TabLayout = () => {
                         <NotificationsContextProvider>
                           <FollowRequestsContextProvider>
                             <ReportReasonsContextProvider>
-                              <TabsComponent />
+                              <ProfileReportReasonsContextProvider>
+                                <TabsComponent />
+                              </ProfileReportReasonsContextProvider>
                             </ReportReasonsContextProvider>
                           </FollowRequestsContextProvider>
                         </NotificationsContextProvider>

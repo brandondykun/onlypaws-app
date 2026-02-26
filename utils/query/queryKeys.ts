@@ -168,4 +168,20 @@ export const queryKeys = {
   reportReasons: {
     root: ["report-reasons"] as const,
   },
+
+  profileReportReasons: {
+    root: ["profile-report-reasons"] as const,
+  },
+
+  postReports: {
+    root: ["post-reports"] as const,
+
+    details: (reportId: string | number) => ["post-reports", reportId.toString()] as const,
+  },
+
+  profileReports: {
+    root: ["profile-reports"] as const,
+
+    details: (reportId: string | number) => ["profile-reports", reportId.toString()] as const,
+  },
 };

@@ -18,7 +18,10 @@ const AccountOptions = () => {
   const tabBarHeight = useBottomTabBarHeight();
 
   return (
-    <ScrollView contentContainerStyle={[s.root, { paddingBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={[s.root, { paddingBottom: tabBarHeight + 24 }]}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={s.sectionTitle} lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]}>
         ACCOUNT INFORMATION
       </Text>
@@ -175,6 +178,43 @@ const AccountOptions = () => {
             <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
           </Pressable>
         </View>
+      </View>
+      <Text style={s.sectionTitle} lightColor={COLORS.zinc[600]} darkColor={COLORS.zinc[500]}>
+        REPORTS
+      </Text>
+      <View>
+        <Pressable
+          onPress={() => router.push("/profile/profileReports")}
+          style={({ pressed }) => [
+            {
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+            pressed && { opacity: 0.6 },
+          ]}
+        >
+          <Text style={{ fontSize: 18 }}>Profile Reports</Text>
+          <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
+        </Pressable>
+        <Pressable
+          onPress={() => router.push("/profile/postReports")}
+          style={({ pressed }) => [
+            {
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+            pressed && { opacity: 0.6 },
+          ]}
+        >
+          <Text style={{ fontSize: 18 }}>Post Reports</Text>
+          <Entypo name="chevron-small-right" size={24} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[300])} />
+        </Pressable>
       </View>
     </ScrollView>
   );

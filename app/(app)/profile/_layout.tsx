@@ -38,6 +38,10 @@ const ProfileStack = () => {
       <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts" }} />
       <Stack.Screen name="taggedPostsList" options={{ title: "Tagged Posts" }} />
       <Stack.Screen name="appDetails" options={{ title: "App Details" }} />
+      <Stack.Screen name="profileReports/index" options={{ title: "Profile Reports" }} />
+      <Stack.Screen name="profileReports/[id]" options={{ title: "Report Details" }} />
+      <Stack.Screen name="postReports/index" options={{ title: "Post Reports" }} />
+      <Stack.Screen name="postReports/[id]" options={{ title: "Report Details" }} />
     </Stack>
   );
 };

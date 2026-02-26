@@ -244,6 +244,7 @@ export type ProfileDetails = {
   can_view_posts: boolean;
   has_requested_follow: boolean;
   follows_you: boolean;
+  report_summary: ProfileReportSummary | null;
 };
 
 export type FollowProfile = {
@@ -292,8 +293,53 @@ export type CreatePostReportResponse = {
   details: string;
 };
 
+export type PostReport = {
+  id: number;
+  post: number;
+  post_public_id: string;
+  post_profile_username: string;
+  reason: ReportReason;
+  details: string;
+  status: PostReportStatus;
+  created_at: string;
+  resolution_note: string;
+};
+
 export type PostReportPreview = {
   id: number;
   reason: ReportReason;
   status: PostReportStatus;
+};
+
+export type ProfileReportReason = {
+  id: number;
+  name: string;
+  description: string;
+};
+
+export type CreateProfileReportResponse = {
+  id: number;
+  profile: number;
+  reason: number;
+  details: string;
+};
+
+export type ProfileReportStatus = "PENDING" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED";
+
+export type ProfileReport = {
+  id: number;
+  profile: number;
+  profile_username: string;
+  reason: ProfileReportReason;
+  details: string;
+  status: ProfileReportStatus;
+  created_at: string;
+  updated_at: string;
+  resolution_note: string;
+};
+
+export type ProfileReportSummary = {
+  active_report_count: number;
+  reasons: string[];
+  message: string;
 };

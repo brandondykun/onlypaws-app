@@ -1,6 +1,7 @@
 import { SimpleLineIcons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
@@ -27,6 +28,7 @@ import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 
 import ConfirmRemoveFollowerSheet from "./components/ConfirmRemoveFollowerSheet/ConfirmRemoveFollowerSheet";
 import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
+import ReportProfileModal from "./components/ReportProfileModal/ReportProfileModal";
 
 type Props = {
   profileId: string;
@@ -48,6 +50,8 @@ const ProfileDetails = ({
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
   const confirmRemoveFollowerSheetRef = useRef<RNBottomSheetModal>(null);
+  const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
+  const reportProfileModalRef = useRef<RNBottomSheetModal>(null);
 
   const { isDarkMode } = useColorMode();
   const { authProfile, selectedProfileId } = useAuthProfileContext();
@@ -111,11 +115,11 @@ const ProfileDetails = ({
               <SimpleLineIcons name="options" size={18} color={isDarkMode ? COLORS.zinc[300] : COLORS.zinc[900]} />
             </Pressable>
           );
-        } else if (profile.data?.follows_you) {
-          // show if the profile being viewed follows the logged in profile
+        } else if (profile.data) {
+          // show three-dot menu for other profiles (report + optional remove follower)
           return (
             <Pressable
-              onPress={handleShowConfirmRemoveFollowerSheet}
+              onPress={() => profileOptionsModalRef.current?.present()}
               style={({ pressed }) => [pressed && { opacity: 0.7 }, { padding: 8 }]}
               hitSlop={20}
             >
@@ -128,10 +132,6 @@ const ProfileDetails = ({
       },
     });
   }, [profile.data, navigation, isDarkMode, authProfile.id, username]);
-
-  const handleShowConfirmRemoveFollowerSheet = () => {
-    confirmRemoveFollowerSheetRef.current?.present();
-  };
 
   const handlePostPreviewPress = (index: number) => {
     onPostPreviewPress(index);
@@ -241,6 +241,7 @@ const ProfileDetails = ({
         confirmRemoveFollowerSheetRef={confirmRemoveFollowerSheetRef}
         onRemoveFollowerPress={handleRemoveFollowerPress}
       />
+      {/* Own profile options (saved posts) */}
       <BottomSheetModal handleTitle="Options" ref={optionsModalRef} enableDynamicSizing={true} snapPoints={[]}>
         <BottomSheetView style={s.bottomSheetView}>
           <View
@@ -265,6 +266,57 @@ const ProfileDetails = ({
           </View>
         </BottomSheetView>
       </BottomSheetModal>
+      {/* Other profile options (remove follower + report) */}
+      <BottomSheetModal handleTitle="Options" ref={profileOptionsModalRef} enableDynamicSizing={true} snapPoints={[]}>
+        <BottomSheetView style={s.bottomSheetView}>
+          <View
+            style={{
+              borderRadius: 8,
+              overflow: "hidden",
+              backgroundColor: isDarkMode ? COLORS.zinc[800] : COLORS.zinc[50],
+            }}
+          >
+            {profile.data?.follows_you && (
+              <>
+                <Pressable
+                  style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+                  onPress={() => {
+                    profileOptionsModalRef.current?.dismiss();
+                    setTimeout(() => {
+                      confirmRemoveFollowerSheetRef.current?.present();
+                    }, 300);
+                  }}
+                >
+                  <View style={s.optionButton}>
+                    <MaterialIcons
+                      name="person-remove"
+                      size={18}
+                      color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[800]}
+                    />
+                    <Text style={{ fontSize: 18 }}>Remove Follower</Text>
+                  </View>
+                </Pressable>
+                <View style={{ height: 1, backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200] }} />
+              </>
+            )}
+            <Pressable
+              style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+              onPress={() => {
+                profileOptionsModalRef.current?.dismiss();
+                setTimeout(() => {
+                  reportProfileModalRef.current?.present();
+                }, 300);
+              }}
+            >
+              <View style={s.optionButton}>
+                <MaterialIcons name="flag" size={18} color={COLORS.red[500]} />
+                <Text style={{ fontSize: 18, color: COLORS.red[500] }}>Report Profile</Text>
+              </View>
+            </Pressable>
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+      {profile.data && !isOwnProfile && <ReportProfileModal ref={reportProfileModalRef} profileId={profile.data.id} />}
     </>
   );
 };
