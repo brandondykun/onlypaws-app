@@ -3,7 +3,6 @@ import { Animated, StyleSheet, Pressable } from "react-native";
 
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { abbreviateNumber } from "@/utils/utils";
 
@@ -12,29 +11,18 @@ type Props = {
   postId: number;
   isLiked: boolean;
   likesCount: number;
-  profileId: string;
   likeLoading: boolean;
   isHidden: boolean;
   scaleValue: Animated.Value;
 };
 
-const LikeButton = ({
-  handleHeartPress,
-  postId,
-  isLiked,
-  likesCount,
-  profileId,
-  likeLoading,
-  isHidden,
-  scaleValue,
-}: Props) => {
+const LikeButton = ({ handleHeartPress, postId, isLiked, likesCount, likeLoading, isHidden, scaleValue }: Props) => {
   const { isDarkMode } = useColorMode();
-  const { authProfile } = useAuthProfileContext();
   return (
     <Pressable
       onPress={() => handleHeartPress(postId, isLiked)}
       style={({ pressed }) => [pressed && { opacity: 0.5 }, s.root]}
-      disabled={profileId === authProfile.public_id || likeLoading || isHidden}
+      disabled={likeLoading || isHidden}
       testID={`post-like-button-${postId}-${isLiked}`}
       hitSlop={7}
     >

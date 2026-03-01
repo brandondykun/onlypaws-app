@@ -175,11 +175,11 @@ const Post = ({
         .numberOfTaps(2)
         .runOnJS(true)
         .onEnd(() => {
-          if (post.profile.id !== authProfile.id && !likeLoading) {
+          if (!likeLoading) {
             handleHeartPress(post.id, post.liked);
           }
         }),
-    [post.profile.id, authProfile.id, likeLoading, post.id, post.liked, handleHeartPress],
+    [likeLoading, post.id, post.liked, handleHeartPress],
   );
 
   // define single tap gesture action to show the tag popovers
@@ -243,7 +243,6 @@ const Post = ({
             postId={post.id}
             isLiked={post.liked}
             likesCount={post.likes_count}
-            profileId={post.profile.public_id}
             likeLoading={likeLoading}
             isHidden={post.is_hidden}
             scaleValue={heartIconScaleValue}
