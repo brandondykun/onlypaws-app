@@ -1,21 +1,16 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
-import Foundation from "@expo/vector-icons/Foundation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { View, Pressable, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { logOut as logOutApi } from "@/api/auth";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import * as tokenService from "@/services/tokenService";
 
 type Props = {
   profileOptionsModalRef: React.RefObject<RNBottomSheetModal | null>;
@@ -23,37 +18,16 @@ type Props = {
 };
 
 const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: Props) => {
-  const { logOut } = useAuthUserContext();
   const { setLightOrDark } = useColorMode();
-  const router = useRouter();
-  const [logOutLoading, setLogOutLoading] = useState(false);
 
-  const handleLogOut = async () => {
-    setLogOutLoading(true);
-    // Get refresh token and call backend logout API to clear server-side tokens
-    const refreshToken = await tokenService.getRefreshToken();
-    if (refreshToken) {
-      await logOutApi(refreshToken);
-    }
-    // Clear local state and tokens
-    await logOut();
-  };
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   // shared styling values
   const BUTTON_BG = setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]);
   const BORDER_COLOR = setLightOrDark(COLORS.zinc[200], COLORS.zinc[900]);
   const ICON_COLOR = setLightOrDark(COLORS.zinc[950], COLORS.zinc[300]);
   const BORDER_RADIUS = 16;
-
-  const handleGuidelinesPress = () => {
-    router.push("/(app)/profile/guidelines");
-    profileOptionsModalRef.current?.dismiss();
-  };
-
-  const handleAboutPress = () => {
-    router.push("/(app)/profile/about");
-    profileOptionsModalRef.current?.dismiss();
-  };
 
   const handleEditProfileImagePress = () => {
     profileOptionsModalRef.current?.dismiss();
@@ -80,43 +54,9 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
     profileOptionsModalRef.current?.dismiss();
   };
 
-  const handleAppFeedbackPress = () => {
-    router.push("/(app)/profile/feedback");
-    profileOptionsModalRef.current?.dismiss();
-  };
-
-  const handleAppDetailsPress = () => {
-    router.push("/(app)/profile/appDetails");
-    profileOptionsModalRef.current?.dismiss();
-  };
-
   return (
     <BottomSheetModal ref={profileOptionsModalRef} handleTitle="Profile Options" enableDynamicSizing snapPoints={[]}>
-      <BottomSheetView style={s.root}>
-        <View style={s.infoButtonsContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              pressed && s.pressed,
-              s.infoButton,
-              { backgroundColor: BUTTON_BG, borderRadius: BORDER_RADIUS },
-            ]}
-            onPress={handleGuidelinesPress}
-          >
-            <Foundation name="guide-dog" size={24} color={ICON_COLOR} />
-            <Text>App Guidelines</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              pressed && s.pressed,
-              s.infoButton,
-              { backgroundColor: BUTTON_BG, borderRadius: BORDER_RADIUS },
-            ]}
-            onPress={handleAboutPress}
-          >
-            <AntDesign name="question-circle" size={18} color={ICON_COLOR} style={{ marginTop: 6 }} />
-            <Text>About</Text>
-          </Pressable>
-        </View>
+      <BottomSheetView style={{ ...s.root, paddingBottom: insets.bottom + 16 }}>
         <View style={{ backgroundColor: BUTTON_BG, borderRadius: BORDER_RADIUS, marginBottom: 12 }}>
           <Pressable
             style={({ pressed }) => [
@@ -166,39 +106,10 @@ const ProfileOptionsModal = ({ profileOptionsModalRef, changeProfileModalRef }: 
           </Pressable>
 
           {/* Account Options Button */}
-          <Pressable
-            style={({ pressed }) => [
-              pressed && s.pressed,
-              s.linkButton,
-              { borderBottomWidth: 1, borderBottomColor: BORDER_COLOR },
-            ]}
-            onPress={handleAccountOptionsPress}
-          >
+          <Pressable style={({ pressed }) => [pressed && s.pressed, s.linkButton]} onPress={handleAccountOptionsPress}>
             <Text style={s.buttonText}>Account Options</Text>
             <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
           </Pressable>
-
-          {/* App Details Button */}
-          <Pressable
-            style={({ pressed }) => [
-              pressed && s.pressed,
-              s.linkButton,
-              { borderBottomWidth: 1, borderBottomColor: BORDER_COLOR },
-            ]}
-            onPress={handleAppDetailsPress}
-          >
-            <Text style={s.buttonText}>App Details</Text>
-            <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
-          </Pressable>
-
-          {/* App Feedback Button */}
-          <Pressable style={({ pressed }) => [pressed && s.pressed, s.linkButton]} onPress={handleAppFeedbackPress}>
-            <Text style={s.buttonText}>App Feedback</Text>
-            <Entypo name="chevron-small-right" size={24} color={ICON_COLOR} />
-          </Pressable>
-        </View>
-        <View style={s.logoutButtonContainer}>
-          <Button text="Log Out" onPress={handleLogOut} loading={logOutLoading} />
         </View>
       </BottomSheetView>
     </BottomSheetModal>
@@ -212,12 +123,6 @@ const s = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 48,
     paddingHorizontal: 36,
-  },
-  infoButtonsContainer: {
-    marginBottom: 12,
-    flexDirection: "row",
-    gap: 12,
-    height: 70,
   },
   centeredButton: {
     paddingVertical: 16,
@@ -237,17 +142,5 @@ const s = StyleSheet.create({
   },
   pressed: {
     opacity: 0.6,
-  },
-  infoButton: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 70,
-    gap: 4,
-  },
-  logoutButtonContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginTop: 48,
   },
 });
