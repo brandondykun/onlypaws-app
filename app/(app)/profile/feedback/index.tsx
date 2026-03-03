@@ -150,8 +150,12 @@ const s = StyleSheet.create({
     flexGrow: 1,
   },
   emptyComponentContainer: {
-    paddingTop: 48,
     paddingHorizontal: 24,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+    marginTop: -24,
   },
   emptyComponentTitle: {
     fontSize: 20,
