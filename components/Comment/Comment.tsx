@@ -29,9 +29,22 @@ type Props = {
   listRef: React.RefObject<BottomSheetFlatListMethods>;
   replyToCommentId?: number;
   commentsQueryKey: readonly unknown[];
+  isPostOwner?: boolean;
+  onLongPressComment?: (comment: PostCommentDetailed, parentCommentId?: number) => void;
+  deleteCommentId?: number;
 };
 
-const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentId, commentsQueryKey }: Props) => {
+const Comment = ({
+  comment,
+  onReplyPress,
+  listRef,
+  commentIndex,
+  replyToCommentId,
+  commentsQueryKey,
+  isPostOwner,
+  onLongPressComment,
+  deleteCommentId,
+}: Props) => {
   const { isDarkMode } = useColorMode();
   const { authProfile, selectedProfileId } = useAuthProfileContext();
   const queryClient = useQueryClient();
@@ -151,7 +164,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
     }
   };
 
-  const bgColor = getCommentBgColor(replyToCommentId, comment.id, isDarkMode);
+  const bgColor = getCommentBgColor(replyToCommentId, deleteCommentId, comment.id, isDarkMode);
 
   // Determine loading and error states from useInfiniteQuery
   const isLoadingReplies = repliesQuery.isLoading || repliesQuery.isFetchingNextPage;
@@ -160,7 +173,13 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
 
   return (
     <View style={s.root}>
-      <MainComment comment={comment} handleHeartPress={handleHeartPress} bgColor={bgColor} />
+      <MainComment
+        comment={comment}
+        handleHeartPress={handleHeartPress}
+        bgColor={bgColor}
+        isPostOwner={isPostOwner}
+        onLongPress={onLongPressComment ? () => onLongPressComment(comment) : undefined}
+      />
       <MainCommentReplyButton
         onReplyPress={() => {
           onReplyPress(comment, comment);
@@ -174,7 +193,7 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
         <>
           <View style={{ padding: 0 }}>
             {comment.replies?.map((replyComment, index) => {
-              const bgColor = getCommentBgColor(replyToCommentId, replyComment.id, isDarkMode);
+              const bgColor = getCommentBgColor(replyToCommentId, deleteCommentId, replyComment.id, isDarkMode);
 
               return (
                 <View style={{ marginVertical: 6 }} key={index}>
@@ -183,6 +202,8 @@ const Comment = ({ comment, onReplyPress, listRef, commentIndex, replyToCommentI
                     handleLikeReply={handleLikeReply}
                     handleUnlikeReply={handleUnlikeReply}
                     bgColor={bgColor}
+                    isPostOwner={isPostOwner}
+                    onLongPress={onLongPressComment ? () => onLongPressComment(replyComment, comment.id) : undefined}
                   />
                   <ReplyCommentReplyButton
                     onReplyPress={() => {
@@ -226,8 +247,17 @@ const s = StyleSheet.create({
   },
 });
 
-// Get the background color to highlight a comment or reply comment if user is replying to that comment
-const getCommentBgColor = (replyToCommentId: number | undefined, commentId: number, isDarkMode: boolean) => {
+// Get the background color to highlight a comment or reply comment
+// Delete highlight (red) takes priority over reply highlight (sky)
+const getCommentBgColor = (
+  replyToCommentId: number | undefined,
+  deleteCommentId: number | undefined,
+  commentId: number,
+  isDarkMode: boolean,
+) => {
+  if (deleteCommentId && deleteCommentId === commentId) {
+    return isDarkMode ? COLORS.red[950] : COLORS.red[300];
+  }
   if (replyToCommentId && replyToCommentId === commentId) {
     return isDarkMode ? COLORS.sky[975] : COLORS.sky[100];
   }

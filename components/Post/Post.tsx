@@ -277,7 +277,12 @@ const Post = ({
         <TimeAgo createdAt={post.created_at} />
       </View>
       {/* Comments modal to show the comments of the post */}
-      <CommentsModal postId={post.id} addCommentToPost={addComment} ref={commentsModalRef} />
+      <CommentsModal
+        postId={post.id}
+        postProfileId={post.profile.id}
+        addCommentToPost={addComment}
+        ref={commentsModalRef}
+      />
       {/* Post menu to show the menu of the post */}
       <PostMenu
         ref={postMenuRef}

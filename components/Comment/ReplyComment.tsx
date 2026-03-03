@@ -15,13 +15,22 @@ type Props = {
   handleLikeReply: (commentId: number) => void;
   handleUnlikeReply: (commentId: number) => void;
   bgColor?: string;
+  isPostOwner?: boolean;
+  onLongPress?: () => void;
 };
 
-const ReplyComment = ({ replyComment, handleLikeReply, handleUnlikeReply, bgColor }: Props) => {
+const ReplyComment = ({
+  replyComment,
+  handleLikeReply,
+  handleUnlikeReply,
+  bgColor,
+  isPostOwner,
+  onLongPress,
+}: Props) => {
   const { isDarkMode } = useColorMode();
   const timeSinceFormatted = getTimeSince(replyComment.created_at);
 
-  return (
+  const content = (
     <View style={[s.root, { backgroundColor: bgColor }]}>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 4 }}>
@@ -70,6 +79,12 @@ const ReplyComment = ({ replyComment, handleLikeReply, handleUnlikeReply, bgColo
       </View>
     </View>
   );
+
+  if (isPostOwner && onLongPress) {
+    return <Pressable onLongPress={onLongPress}>{content}</Pressable>;
+  }
+
+  return content;
 };
 
 export default ReplyComment;

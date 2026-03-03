@@ -53,6 +53,7 @@ export type NotificationContextType = {
 
   // Helper functions
   formatNotificationMessage: (notification: WSNotification) => string;
+  removeNotificationsForComment: (commentId: number) => void;
 
   wsNotifications: WSNotification[];
 };
@@ -89,6 +90,7 @@ const NotificationsContext = createContext<NotificationContextType>({
 
   // Helper functions
   formatNotificationMessage: (notification) => notification.message,
+  removeNotificationsForComment: () => {},
 
   wsNotifications: [],
 });
@@ -715,6 +717,59 @@ const NotificationsContextProvider = ({ children }: Props) => {
     queryClient.removeQueries({ queryKey: notificationsQueryKey });
   }, [queryClient, notificationsQueryKey]);
 
+  // Remove notifications that reference a deleted comment
+  const removeNotificationsForComment = useCallback(
+    (commentId: number) => {
+      const commentNotificationTypes = ["like_comment", "comment", "comment_reply"];
+
+      const isRelatedToComment = (n: DBNotification | WSNotification) => {
+        if (!commentNotificationTypes.includes(n.notification_type)) return false;
+        const extraData = n.extra_data as { comment_id?: number; replied_to_comment_id?: number };
+        return extraData.comment_id === commentId || extraData.replied_to_comment_id === commentId;
+      };
+
+      // Remove from WS notifications (wsUnreadCount auto-adjusts via useMemo)
+      setWsNotifications((prev) => prev.filter((n) => !isRelatedToComment(n)));
+
+      // Remove from DB notifications cache and adjust unread count
+      let removedUnreadCount = 0;
+      queryClient.setQueryData<InfiniteData<PaginatedDBNotificationsResponse>>(notificationsQueryKey, (oldData) => {
+        if (!oldData?.pages) return oldData;
+
+        const updated = {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            results: page.results.filter((n) => {
+              if (isRelatedToComment(n)) {
+                if (!n.is_read) removedUnreadCount++;
+                return false;
+              }
+              return true;
+            }),
+          })),
+        };
+
+        if (removedUnreadCount > 0 && updated.pages[0]?.extra_data) {
+          updated.pages[0] = {
+            ...updated.pages[0],
+            extra_data: {
+              ...updated.pages[0].extra_data,
+              unread_count: Math.max(0, updated.pages[0].extra_data.unread_count - removedUnreadCount),
+            },
+          };
+        }
+
+        return updated;
+      });
+
+      if (removedUnreadCount > 0) {
+        setApiUnreadCount((prev) => Math.max(0, prev - removedUnreadCount));
+      }
+    },
+    [queryClient, notificationsQueryKey],
+  );
+
   // Handle app state changes (foreground/background)
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
@@ -842,6 +897,7 @@ const NotificationsContextProvider = ({ children }: Props) => {
 
     // Helper functions
     formatNotificationMessage,
+    removeNotificationsForComment,
 
     wsNotifications,
   };

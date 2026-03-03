@@ -9,10 +9,11 @@ import { useState, useCallback, forwardRef, ForwardedRef, useRef, useMemo } from
 import { RefreshControl, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { addComment, getPostCommentsForQuery } from "@/api/interactions";
+import { addComment, deleteComment, getPostCommentsForQuery } from "@/api/interactions";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useNotificationsContext } from "@/context/NotificationsContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import { PostCommentDetailed } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
@@ -26,16 +27,22 @@ import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import CommentSkeleton from "../LoadingSkeletons/CommentSkeleton";
 
 import CommentInputFooter, { CommentInputFooterRef } from "./components/CommentInputFooter";
+import ConfirmDeleteCommentModal from "./components/ConfirmDeleteCommentModal";
 import CustomEmptyComponent from "./components/CustomEmptyComponent";
 import CustomErrorComponent from "./components/CustomErrorComponent";
 
 type Props = {
   addCommentToPost: () => void;
   postId: number | null;
+  postProfileId: number | null;
 };
 
 const CommentsModal = forwardRef(
-  ({ addCommentToPost, postId }: Props, ref: ForwardedRef<RNBottomSheetModal<any>> | undefined) => {
+  ({ addCommentToPost, postId, postProfileId }: Props, ref: ForwardedRef<RNBottomSheetModal<any>> | undefined) => {
+    const { authProfile, selectedProfileId } = useAuthProfileContext();
+    const { removeNotificationsForComment } = useNotificationsContext();
+    const queryClient = useQueryClient();
+
     // form state
     const [addCommentLoading, setAddCommentLoading] = useState(false);
     // modal open state to control query enabled
@@ -48,10 +55,18 @@ const CommentsModal = forwardRef(
     // error text for the comment input
     const [errorText, setErrorText] = useState("");
 
-    const { authProfile, selectedProfileId } = useAuthProfileContext();
-    const queryClient = useQueryClient();
+    // comment deletion state
+    const [commentToDelete, setCommentToDelete] = useState<{
+      id: number;
+      parentCommentId?: number;
+    } | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    const confirmDeleteCommentModalRef = useRef<RNBottomSheetModal>(null);
     const commentInputFooterRef = useRef<CommentInputFooterRef>(null);
     const flatListRef = useRef<BottomSheetFlatListMethods>(null); // ref to comments flat list
+
+    const isPostOwner = postProfileId === authProfile.id;
 
     // Query key for comments
     const commentsQueryKey = useMemo(
@@ -60,7 +75,8 @@ const CommentsModal = forwardRef(
     );
 
     // Cache updaters for comments
-    const { addReply, prependComment } = useCommentsCacheUpdaters(commentsQueryKey);
+    const { addReply, prependComment, markCommentAsDeleted, markReplyAsDeleted } =
+      useCommentsCacheUpdaters(commentsQueryKey);
 
     // Fetch comments using useInfiniteQuery
     const commentsQuery = useInfiniteQuery({
@@ -148,6 +164,35 @@ const CommentsModal = forwardRef(
       [addCommentToPost, authProfile.id, postId, parentComment, replyToComment, prependComment, addReply],
     );
 
+    // handle long press on a comment to initiate deletion
+    const handleLongPressComment = useCallback((comment: PostCommentDetailed, parentCommentId?: number) => {
+      Haptics.impactAsync();
+      setCommentToDelete({ id: comment.id, parentCommentId });
+      confirmDeleteCommentModalRef.current?.present();
+    }, []);
+
+    // handle deleting a comment after confirmation
+    const handleDeleteComment = useCallback(async () => {
+      if (!commentToDelete || !postId) return;
+      setDeleteLoading(true);
+
+      const { error } = await deleteComment(commentToDelete.id);
+      if (!error) {
+        if (commentToDelete.parentCommentId) {
+          markReplyAsDeleted(commentToDelete.parentCommentId, commentToDelete.id);
+        } else {
+          markCommentAsDeleted(commentToDelete.id);
+        }
+        removeNotificationsForComment(commentToDelete.id);
+        confirmDeleteCommentModalRef.current?.dismiss();
+      } else {
+        toast.error("There was an error deleting that comment.", { position: "top", topOffset: 0 });
+      }
+
+      setDeleteLoading(false);
+      setCommentToDelete(null);
+    }, [commentToDelete, postId, markCommentAsDeleted, markReplyAsDeleted, removeNotificationsForComment]);
+
     const onClose = useCallback(() => {
       commentInputFooterRef.current?.clear();
       setParentComment(null);
@@ -191,6 +236,9 @@ const CommentsModal = forwardRef(
               listRef={flatListRef as React.RefObject<BottomSheetFlatListMethods>}
               replyToCommentId={replyToComment?.id}
               commentsQueryKey={commentsQueryKey}
+              isPostOwner={isPostOwner}
+              onLongPressComment={isPostOwner ? handleLongPressComment : undefined}
+              deleteCommentId={commentToDelete?.id}
             />
           )}
           ListFooterComponent={
@@ -216,6 +264,12 @@ const CommentsModal = forwardRef(
           setErrorText={setErrorText}
         />
         <Toast config={toastConfig} />
+        <ConfirmDeleteCommentModal
+          confirmDeleteCommentModalRef={confirmDeleteCommentModalRef}
+          deleteLoading={deleteLoading}
+          handleDeleteComment={handleDeleteComment}
+          onDismiss={() => setCommentToDelete(null)}
+        />
       </BottomSheetModal>
     );
   },

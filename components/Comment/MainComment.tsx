@@ -14,13 +14,15 @@ type Props = {
   comment: PostCommentDetailed | ChainComment;
   handleHeartPress: (commentId: number) => void;
   bgColor?: string;
+  isPostOwner?: boolean;
+  onLongPress?: () => void;
 };
 
-const MainComment = ({ comment, handleHeartPress, bgColor }: Props) => {
+const MainComment = ({ comment, handleHeartPress, bgColor, isPostOwner, onLongPress }: Props) => {
   const { isDarkMode } = useColorMode();
   const timeSinceFormatted = getTimeSince(comment.created_at);
 
-  return (
+  const content = (
     <View style={[s.root, { backgroundColor: bgColor }]}>
       <View style={s.header}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 4 }}>
@@ -56,6 +58,12 @@ const MainComment = ({ comment, handleHeartPress, bgColor }: Props) => {
       </View>
     </View>
   );
+
+  if (isPostOwner && onLongPress) {
+    return <Pressable onLongPress={onLongPress}>{content}</Pressable>;
+  }
+
+  return content;
 };
 
 export default MainComment;

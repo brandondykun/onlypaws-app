@@ -3,7 +3,7 @@ import { useCallback } from "react";
 
 import { PostCommentDetailed } from "@/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
-import { updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
+import { removeInfiniteItemById, updateInfiniteItemById, upsertInfiniteItem } from "@/utils/query/cacheUtils";
 
 // Type alias for infinite query data structure
 type CommentsInfiniteData = InfiniteData<PaginatedResponse<PostCommentDetailed>>;
@@ -126,6 +126,58 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
     [queryClient, commentsQueryKey],
   );
 
+  // Remove a top-level comment from the cache
+  const removeComment = useCallback(
+    (commentId: number) => {
+      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
+        return removeInfiniteItemById(oldData, commentId);
+      });
+    },
+    [queryClient, commentsQueryKey],
+  );
+
+  // Remove a reply from a parent comment's replies array and decrement replies_count
+  const removeReply = useCallback(
+    (parentCommentId: number, replyId: number) => {
+      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
+        return updateInfiniteItemById(oldData, parentCommentId, (comment) => ({
+          ...comment,
+          replies_count: comment.replies_count - 1,
+          replies: comment.replies.filter((reply) => reply.id !== replyId),
+        }));
+      });
+    },
+    [queryClient, commentsQueryKey],
+  );
+
+  // Mark a top-level comment's text as deleted
+  const markCommentAsDeleted = useCallback(
+    (commentId: number) => {
+      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
+        return updateInfiniteItemById(oldData, commentId, (comment) => ({
+          ...comment,
+          text: "This comment has been deleted.",
+        }));
+      });
+    },
+    [queryClient, commentsQueryKey],
+  );
+
+  // Mark a reply's text as deleted within its parent comment
+  const markReplyAsDeleted = useCallback(
+    (parentCommentId: number, replyId: number) => {
+      queryClient.setQueryData<CommentsInfiniteData>(commentsQueryKey, (oldData) => {
+        return updateInfiniteItemById(oldData, parentCommentId, (comment) => ({
+          ...comment,
+          replies: comment.replies.map((reply) =>
+            reply.id === replyId ? { ...reply, text: "This comment has been deleted." } : reply,
+          ),
+        }));
+      });
+    },
+    [queryClient, commentsQueryKey],
+  );
+
   // Add a new top-level comment (prepends to first page, or updates if already exists)
   const prependComment = useCallback(
     (comment: PostCommentDetailed) => {
@@ -145,6 +197,10 @@ const useCommentsCacheUpdaters = (commentsQueryKey: readonly unknown[]) => {
     likeReply,
     unlikeReply,
     prependComment,
+    removeComment,
+    removeReply,
+    markCommentAsDeleted,
+    markReplyAsDeleted,
   };
 };
 
