@@ -48,6 +48,7 @@ const TabsComponent = () => {
         screenOptions={{
           tabBarActiveTintColor: setLightOrDark(COLORS.zinc[950], COLORS.zinc[50]),
           tabBarInactiveTintColor: setLightOrDark(COLORS.zinc[500], COLORS.zinc[600]),
+          sceneStyle: { backgroundColor: setLightOrDark(COLORS.zinc[200], COLORS.zinc[950]) },
           tabBarLabel: ({ focused, children }) => {
             return (
               <View style={{ alignItems: "center", gap: 4 }}>
