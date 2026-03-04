@@ -42,6 +42,8 @@ const ProfileStack = () => {
       <Stack.Screen name="profileReports/[id]" options={{ title: "Report Details" }} />
       <Stack.Screen name="postReports/index" options={{ title: "Post Reports" }} />
       <Stack.Screen name="postReports/[id]" options={{ title: "Report Details" }} />
+      <Stack.Screen name="followers" options={{ title: "Followers" }} />
+      <Stack.Screen name="following" options={{ title: "Following" }} />
     </Stack>
   );
 };

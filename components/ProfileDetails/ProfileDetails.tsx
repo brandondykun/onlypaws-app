@@ -36,6 +36,8 @@ type Props = {
   onTaggedPostsPress: () => void;
   username?: string;
   skipInitialRefetch?: boolean;
+  onFollowersPress: () => void;
+  onFollowingPress: () => void;
 };
 
 const ProfileDetails = ({
@@ -44,6 +46,8 @@ const ProfileDetails = ({
   onTaggedPostsPress,
   username,
   skipInitialRefetch = false,
+  onFollowersPress,
+  onFollowingPress,
 }: Props) => {
   const navigation = useNavigation();
   const router = useRouter();
@@ -146,17 +150,25 @@ const ProfileDetails = ({
   };
 
   const handleFollowersPress = () => {
-    // only enabled for logged in user on profile screen
-    if (profileId === authProfile.public_id) {
-      router.push("/(app)/posts/followers");
-    }
+    // check to ensure the followers are allowed to be viewed by the current user profile
+    const isPrivate = profile.data?.is_private;
+    const isFollowing = profile.data?.is_following;
+    const isOwnProfile = profile.data?.public_id === authProfile.public_id;
+
+    if (isPrivate && !isFollowing && !isOwnProfile) return;
+
+    onFollowersPress();
   };
 
   const handleFollowingPress = () => {
-    // only enabled for logged in user on profile screen
-    if (profileId === authProfile.public_id) {
-      router.push("/(app)/posts/following");
-    }
+    // check to ensure the following are allowed to be viewed by the current user profile
+    const isPrivate = profile.data?.is_private;
+    const isFollowing = profile.data?.is_following;
+    const isOwnProfile = profile.data?.public_id === authProfile.public_id;
+
+    if (isPrivate && !isFollowing && !isOwnProfile) return;
+
+    onFollowingPress();
   };
 
   const handleRemoveFollowerPress = () => {

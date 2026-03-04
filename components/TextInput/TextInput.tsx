@@ -274,8 +274,6 @@ const s = StyleSheet.create({
     borderColor: COLORS.red[600],
   },
   errorAndTextCountContainer: {
-    // flexDirection: "row",
-    // justifyContent: "space-between",
     paddingTop: 2,
   },
   errorText: {

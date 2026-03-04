@@ -1,16 +1,10 @@
 import { Stack } from "expo-router";
-import { View } from "react-native";
 
-import HeaderSearchInput from "@/components/HeaderSearchInput/HeaderSearchInput";
 import { COLORS } from "@/constants/Colors";
-import { useAuthProfileFollowersContext } from "@/context/AuthProfileFollowersContext";
-import { useAuthProfileFollowingContext } from "@/context/AuthProfileFollowingContext";
 import { useColorMode } from "@/context/ColorModeContext";
 
 const PostsStack = () => {
   const { setLightOrDark } = useColorMode();
-  const followingCtx = useAuthProfileFollowingContext();
-  const followersCtx = useAuthProfileFollowersContext();
 
   return (
     <Stack
@@ -24,42 +18,8 @@ const PostsStack = () => {
     >
       <Stack.Screen name="index" options={{ title: "Posts" }} />
       <Stack.Screen name="list" options={{ title: "Posts" }} />
-      <Stack.Screen
-        name="followers"
-        options={{
-          title: "Followers",
-          headerTitle: () => {
-            return (
-              <View style={{ flexGrow: 1 }}>
-                <HeaderSearchInput
-                  value={followersCtx.searchText}
-                  onChangeText={(text) => followersCtx.setSearchText(text)}
-                  onSubmitEditing={followersCtx.searchProfiles}
-                  placeholder="Search followers..."
-                />
-              </View>
-            );
-          },
-        }}
-      />
-      <Stack.Screen
-        name="following"
-        options={{
-          title: "Following",
-          headerTitle: () => {
-            return (
-              <View style={{ flexGrow: 1 }}>
-                <HeaderSearchInput
-                  value={followingCtx.searchText}
-                  onChangeText={(text) => followingCtx.setSearchText(text)}
-                  onSubmitEditing={followingCtx.searchProfiles}
-                  placeholder="Search following..."
-                />
-              </View>
-            );
-          },
-        }}
-      />
+      <Stack.Screen name="followers" options={{ title: "Followers" }} />
+      <Stack.Screen name="following" options={{ title: "Following" }} />
       <Stack.Screen name="savedPosts" options={{ title: "Saved" }} />
       <Stack.Screen name="savedPostsList" options={{ title: "Saved" }} />
       <Stack.Screen name="profileDetails" options={{ title: "Profile Details" }} />

@@ -119,8 +119,8 @@ export const queryKeys = {
   followers: {
     root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "followers"] as const,
 
-    search: (selectedProfilePublicId: string, searchText: string) =>
-      [...queryKeys.followers.root(selectedProfilePublicId), "search", searchText] as const,
+    search: (selectedProfilePublicId: string, profileId: string, searchText: string) =>
+      [...queryKeys.followers.root(selectedProfilePublicId), profileId, "search", searchText] as const,
   },
 
   /**
@@ -130,8 +130,8 @@ export const queryKeys = {
   following: {
     root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "following"] as const,
 
-    search: (selectedProfilePublicId: string, searchText: string) =>
-      [...queryKeys.following.root(selectedProfilePublicId), "search", searchText] as const,
+    search: (selectedProfilePublicId: string, profileId: string, searchText: string) =>
+      [...queryKeys.following.root(selectedProfilePublicId), profileId, "search", searchText] as const,
   },
 
   /**

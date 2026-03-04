@@ -54,12 +54,28 @@ const PostsScreen = () => {
     router.push({ pathname: "/(app)/posts/taggedPosts", params: { profileId: selectedProfileId } });
   };
 
+  const handleFollowersPress = () => {
+    router.push({
+      pathname: "/(app)/posts/followers",
+      params: { profileId: selectedProfileId, username: authProfile.username },
+    });
+  };
+
+  const handleFollowingPress = () => {
+    router.push({
+      pathname: "/(app)/posts/following",
+      params: { profileId: selectedProfileId, username: authProfile.username },
+    });
+  };
+
   return (
     <ProfileDetails
       profileId={selectedProfileId}
       onPostPreviewPress={handlePostPreviewPress}
       onTaggedPostsPress={handleTaggedPostsPress}
       skipInitialRefetch={skipRefetch === "true"}
+      onFollowersPress={handleFollowersPress}
+      onFollowingPress={handleFollowingPress}
     />
   );
 };

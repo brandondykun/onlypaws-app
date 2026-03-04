@@ -12,9 +12,19 @@ type Props = {
   onSubmitEditing: () => void;
   placeholder: string;
   rootStyle?: StyleProp<ViewStyle>;
+  autoFocus?: boolean;
+  disabled?: boolean;
 };
 
-const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, rootStyle }: Props) => {
+const HeaderSearchInput = ({
+  value,
+  onChangeText,
+  onSubmitEditing,
+  placeholder,
+  rootStyle,
+  autoFocus = true,
+  disabled = false,
+}: Props) => {
   const { setLightOrDark } = useColorMode();
 
   return (
@@ -23,6 +33,7 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, 
         s.modalSearchInput,
         {
           backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[800]),
+          opacity: disabled ? 0.5 : 1,
         },
       ]}
       rootStyle={[{ width: "100%", marginTop: 0, paddingTop: 0, paddingRight: 0 }, rootStyle]}
@@ -33,11 +44,12 @@ const HeaderSearchInput = ({ value, onChangeText, onSubmitEditing, placeholder, 
       placeholder={placeholder}
       returnKeyType="search"
       autoCapitalize="none"
-      autoFocus={true}
+      autoFocus={autoFocus}
       autoCorrect={false}
       withClearButton={true}
       hideErrorAndTextCount={true}
       testID="header-search-input"
+      editable={!disabled}
     />
   );
 };

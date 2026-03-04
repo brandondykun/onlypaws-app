@@ -14,8 +14,6 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import AnnouncementsContextProvider from "@/context/AnnouncementsContext";
 import AuthProfileContextProvider from "@/context/AuthProfileContext";
-import AuthProfileFollowersContextProvider from "@/context/AuthProfileFollowersContext";
-import AuthProfileFollowingContextProvider from "@/context/AuthProfileFollowingContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
@@ -193,23 +191,19 @@ const TabLayout = () => {
           <AnnouncementsContextProvider>
             <ExplorePostsContextProvider>
               <ProfileSearchContextProvider>
-                <AuthProfileFollowingContextProvider>
-                  <AuthProfileFollowersContextProvider>
-                    <PostManagerContextProvider>
-                      <ProfileDetailsManagerContextProvider>
-                        <NotificationsContextProvider>
-                          <FollowRequestsContextProvider>
-                            <ReportReasonsContextProvider>
-                              <ProfileReportReasonsContextProvider>
-                                <TabsComponent />
-                              </ProfileReportReasonsContextProvider>
-                            </ReportReasonsContextProvider>
-                          </FollowRequestsContextProvider>
-                        </NotificationsContextProvider>
-                      </ProfileDetailsManagerContextProvider>
-                    </PostManagerContextProvider>
-                  </AuthProfileFollowersContextProvider>
-                </AuthProfileFollowingContextProvider>
+                <PostManagerContextProvider>
+                  <ProfileDetailsManagerContextProvider>
+                    <NotificationsContextProvider>
+                      <FollowRequestsContextProvider>
+                        <ReportReasonsContextProvider>
+                          <ProfileReportReasonsContextProvider>
+                            <TabsComponent />
+                          </ProfileReportReasonsContextProvider>
+                        </ReportReasonsContextProvider>
+                      </FollowRequestsContextProvider>
+                    </NotificationsContextProvider>
+                  </ProfileDetailsManagerContextProvider>
+                </PostManagerContextProvider>
               </ProfileSearchContextProvider>
             </ExplorePostsContextProvider>
           </AnnouncementsContextProvider>

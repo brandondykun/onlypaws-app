@@ -44,6 +44,8 @@ const ExploreStack = () => {
       <Stack.Screen name="profilePostsList" options={{ title: "Posts" }} />
       <Stack.Screen name="taggedPosts" options={{ title: "Tagged Posts" }} />
       <Stack.Screen name="taggedPostsList" options={{ title: "Tagged Posts" }} />
+      <Stack.Screen name="followers" options={{ title: "Followers" }} />
+      <Stack.Screen name="following" options={{ title: "Following" }} />
     </Stack>
   );
 };

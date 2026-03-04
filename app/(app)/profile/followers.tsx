@@ -1,18 +1,18 @@
 import { router, useLocalSearchParams } from "expo-router";
 
-import FollowingScreen from "@/components/FollowingScreen/FollowingScreen";
+import FollowersScreen from "@/components/FollowersScreen/FollowersScreen";
 
-const PostsTabFollowingScreen = () => {
+const ProfileTabFollowersScreen = () => {
   const { profileId, username } = useLocalSearchParams<{ profileId: string; username?: string }>();
 
   const handleProfilePress = (publicId: string, username?: string) => {
     router.push({
-      pathname: "/(app)/posts/profileDetails",
+      pathname: "/(app)/profile/profileDetails",
       params: { profileId: publicId, username },
     });
   };
 
-  return <FollowingScreen onProfilePress={handleProfilePress} profileId={profileId} username={username} />;
+  return <FollowersScreen onProfilePress={handleProfilePress} profileId={profileId} username={username} />;
 };
 
-export default PostsTabFollowingScreen;
+export default ProfileTabFollowersScreen;

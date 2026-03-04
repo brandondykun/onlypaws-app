@@ -16,12 +16,22 @@ const ProfileDetailsScreen = () => {
     router.push({ pathname: "/(app)/(index)/taggedPosts", params: { profileId: profileId } });
   };
 
+  const handleFollowersPress = () => {
+    router.push({ pathname: "/(app)/(index)/followers", params: { profileId: profileId, username } });
+  };
+
+  const handleFollowingPress = () => {
+    router.push({ pathname: "/(app)/(index)/following", params: { profileId: profileId, username } });
+  };
+
   return (
     <ProfileDetails
+      username={username}
       profileId={profileId}
       onPostPreviewPress={handlePostPreviewPress}
       onTaggedPostsPress={handleTaggedPostsPress}
-      username={username}
+      onFollowersPress={handleFollowersPress}
+      onFollowingPress={handleFollowingPress}
     />
   );
 };
