@@ -31,7 +31,17 @@ const ActionButtons = ({
   return (
     <View style={s.profileButtonsRoot}>
       <View style={{ flex: 1 }}>
-        {profileData?.id !== authProfile.id ? (
+        {profileData?.is_blocked ? (
+          <Button
+            text="Blocked"
+            textStyle={[s.profileButtonText, { color: COLORS.zinc[400] }]}
+            buttonStyle={[
+              s.headerButton,
+              { backgroundColor: setLightOrDark(COLORS.zinc[100], `${COLORS.zinc[700]}66`) },
+            ]}
+            disabled
+          />
+        ) : profileData?.id !== authProfile.id ? (
           <FollowButton
             profileData={profileData}
             followLoading={!!followLoading}
@@ -64,7 +74,7 @@ const ActionButtons = ({
           ]}
           onPress={handleTaggedPostsPress}
           icon={<FontAwesome name="tag" size={14} color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[400])} />}
-          disabled={!profileData.can_view_posts}
+          disabled={!profileData.can_view_posts || !!profileData.is_blocked}
         />
       </View>
     </View>

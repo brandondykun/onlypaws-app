@@ -245,6 +245,7 @@ export type ProfileDetails = {
   has_requested_follow: boolean;
   follows_you: boolean;
   report_summary: ProfileReportSummary | null;
+  is_blocked: boolean;
 };
 
 export type FollowProfile = {

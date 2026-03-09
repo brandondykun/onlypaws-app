@@ -179,6 +179,10 @@ export const queryKeys = {
     details: (reportId: string | number) => ["post-reports", reportId.toString()] as const,
   },
 
+  blockedProfiles: {
+    root: (selectedProfilePublicId: string) => [selectedProfilePublicId, "blocked-profiles"] as const,
+  },
+
   profileReports: {
     root: ["profile-reports"] as const,
 

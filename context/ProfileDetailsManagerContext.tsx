@@ -1,6 +1,7 @@
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useCallback } from "react";
 
+import { blockProfile as blockProfileApi, unblockProfile as unblockProfileApi } from "@/api/block";
 import {
   followProfile as followProfileApi,
   unfollowProfile as unfollowProfileApi,
@@ -32,6 +33,8 @@ type ProfileDetailsManagerContextType = {
   cancelFollowRequest: (profileId: string) => void;
   onFollowRequestAccepted: (profileId: string) => void;
   removeFollower: (profileId: string) => void;
+  blockProfile: (profileId: string) => Promise<void>;
+  unblockProfile: (profileId: string) => Promise<void>;
 };
 
 const ProfileDetailsManagerContext = createContext<ProfileDetailsManagerContextType>({
@@ -40,6 +43,8 @@ const ProfileDetailsManagerContext = createContext<ProfileDetailsManagerContextT
   cancelFollowRequest: () => {},
   onFollowRequestAccepted: () => {},
   removeFollower: () => {},
+  blockProfile: async () => {},
+  unblockProfile: async () => {},
 });
 
 type Props = { children: React.ReactNode };
@@ -309,7 +314,79 @@ const ProfileDetailsManagerContextProvider = ({ children }: Props) => {
     ],
   );
 
-  const value = { followProfile, unfollowProfile, cancelFollowRequest, onFollowRequestAccepted, removeFollower };
+  const blockProfile = useCallback(
+    async (profileId: string) => {
+      // Optimistic update
+      updateProfileDetailsCache(profileId, (profile) => ({
+        ...profile,
+        is_blocked: true,
+        is_following: false,
+        follows_you: false,
+        has_requested_follow: false,
+        can_view_posts: false,
+      }));
+      updateProfileSearchCache(profileId, (profile) => ({
+        ...profile,
+        is_following: false,
+        follows_you: false,
+        has_requested_follow: false,
+      }));
+
+      const { error } = await blockProfileApi(profileId);
+      if (error) {
+        // Revert on failure
+        updateProfileDetailsCache(profileId, (profile) => ({
+          ...profile,
+          is_blocked: false,
+        }));
+        toast.error("There was an error blocking that profile.");
+        // Refetch to restore correct state
+        queryClient.refetchQueries({ queryKey: queryKeys.profile.details(selectedProfileId, profileId) });
+      } else {
+        // Refresh feed and explore to remove blocked profile's posts
+        queryClient.refetchQueries({ queryKey: queryKeys.posts.feed(selectedProfileId) });
+        queryClient.refetchQueries({ queryKey: queryKeys.posts.explore(selectedProfileId) });
+        toast.success("Profile blocked.");
+      }
+    },
+    [updateProfileDetailsCache, updateProfileSearchCache, queryClient, selectedProfileId],
+  );
+
+  const unblockProfile = useCallback(
+    async (profileId: string) => {
+      // Optimistic update
+      updateProfileDetailsCache(profileId, (profile) => ({
+        ...profile,
+        is_blocked: false,
+      }));
+
+      const { error } = await unblockProfileApi(profileId);
+      if (error) {
+        // Revert on failure
+        updateProfileDetailsCache(profileId, (profile) => ({
+          ...profile,
+          is_blocked: true,
+          can_view_posts: false,
+        }));
+        toast.error("There was an error unblocking that profile.");
+      } else {
+        // Refetch profile to get correct can_view_posts, counts, etc.
+        queryClient.refetchQueries({ queryKey: queryKeys.profile.details(selectedProfileId, profileId) });
+        toast.success("Profile unblocked.");
+      }
+    },
+    [updateProfileDetailsCache, queryClient, selectedProfileId],
+  );
+
+  const value = {
+    followProfile,
+    unfollowProfile,
+    cancelFollowRequest,
+    onFollowRequestAccepted,
+    removeFollower,
+    blockProfile,
+    unblockProfile,
+  };
 
   return <ProfileDetailsManagerContext.Provider value={value}>{children}</ProfileDetailsManagerContext.Provider>;
 };

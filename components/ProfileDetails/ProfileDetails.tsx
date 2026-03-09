@@ -26,6 +26,7 @@ import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter"
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 
+import ConfirmBlockSheet from "./components/ConfirmBlockSheet/ConfirmBlockSheet";
 import ConfirmRemoveFollowerSheet from "./components/ConfirmRemoveFollowerSheet/ConfirmRemoveFollowerSheet";
 import EmptyComponent from "./components/EmptyComponent/EmptyComponent";
 import ReportProfileModal from "./components/ReportProfileModal/ReportProfileModal";
@@ -54,12 +55,14 @@ const ProfileDetails = ({
   const tabBarHeight = useBottomTabBarHeight();
   const optionsModalRef = useRef<RNBottomSheetModal>(null);
   const confirmRemoveFollowerSheetRef = useRef<RNBottomSheetModal>(null);
+  const confirmBlockSheetRef = useRef<RNBottomSheetModal>(null);
   const profileOptionsModalRef = useRef<RNBottomSheetModal>(null);
   const reportProfileModalRef = useRef<RNBottomSheetModal>(null);
 
   const { isDarkMode } = useColorMode();
   const { authProfile, selectedProfileId } = useAuthProfileContext();
-  const { followProfile, unfollowProfile, removeFollower } = useProfileDetailsManagerContext();
+  const { followProfile, unfollowProfile, removeFollower, blockProfile, unblockProfile } =
+    useProfileDetailsManagerContext();
 
   const fetchProfile = async (public_id: string) => {
     const res = await getProfileDetailsForQuery(public_id);
@@ -176,6 +179,16 @@ const ProfileDetails = ({
     confirmRemoveFollowerSheetRef.current?.dismiss();
   };
 
+  const handleBlockPress = () => {
+    blockProfile(profileId);
+    confirmBlockSheetRef.current?.dismiss();
+  };
+
+  const handleUnblockPress = () => {
+    unblockProfile(profileId);
+    profileOptionsModalRef.current?.dismiss();
+  };
+
   const handleRefresh = () => {
     profile.refetch();
     posts.refetch();
@@ -253,6 +266,7 @@ const ProfileDetails = ({
         confirmRemoveFollowerSheetRef={confirmRemoveFollowerSheetRef}
         onRemoveFollowerPress={handleRemoveFollowerPress}
       />
+      <ConfirmBlockSheet confirmBlockSheetRef={confirmBlockSheetRef} onBlockPress={handleBlockPress} />
       {/* Own profile options (saved posts) */}
       <BottomSheetModal handleTitle="Options" ref={optionsModalRef} enableDynamicSizing={true} snapPoints={[]}>
         <BottomSheetView style={s.bottomSheetView}>
@@ -311,6 +325,30 @@ const ProfileDetails = ({
                 <View style={{ height: 1, backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200] }} />
               </>
             )}
+            {profile.data?.is_blocked ? (
+              <Pressable style={({ pressed }) => [pressed && { opacity: 0.5 }]} onPress={handleUnblockPress}>
+                <View style={s.optionButton}>
+                  <MaterialIcons name="block" size={18} color={isDarkMode ? COLORS.zinc[200] : COLORS.zinc[800]} />
+                  <Text style={{ fontSize: 18 }}>Unblock Profile</Text>
+                </View>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+                onPress={() => {
+                  profileOptionsModalRef.current?.dismiss();
+                  setTimeout(() => {
+                    confirmBlockSheetRef.current?.present();
+                  }, 300);
+                }}
+              >
+                <View style={s.optionButton}>
+                  <MaterialIcons name="block" size={18} color={COLORS.red[500]} />
+                  <Text style={{ fontSize: 18, color: COLORS.red[500] }}>Block Profile</Text>
+                </View>
+              </Pressable>
+            )}
+            <View style={{ height: 1, backgroundColor: isDarkMode ? COLORS.zinc[700] : COLORS.zinc[200] }} />
             <Pressable
               style={({ pressed }) => [pressed && { opacity: 0.5 }]}
               onPress={() => {

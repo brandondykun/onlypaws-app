@@ -161,6 +161,11 @@ const AccountOptions = () => {
           onPress={() => router.push("/(app)/profile/postReports")}
           icon={<MaterialCommunityIcons name="alert-box-outline" size={20} color={iconColor} />}
         />
+        <ScreenLinkButton
+          title="Blocked Profiles"
+          onPress={() => router.push("/(app)/profile/blockedProfiles")}
+          icon={<MaterialIcons name="block" size={20} color={iconColor} />}
+        />
       </View>
 
       {/* App Options Section */}

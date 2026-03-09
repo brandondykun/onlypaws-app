@@ -1,9 +1,10 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useCallback, useLayoutEffect } from "react";
 import { RefreshControl, View, StyleSheet } from "react-native";
 
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
@@ -57,6 +58,16 @@ const NotificationsScreen = () => {
       toast.error("Failed to update notifications. Please try again.");
     }
   };
+
+  // Background refresh on screen focus to clear stale data (e.g. notifications
+  // from profiles that were blocked while the data was already cached).
+  useFocusEffect(
+    useCallback(() => {
+      if (!isPending) {
+        refresh();
+      }
+    }, [isPending, refresh]),
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
