@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
 import * as Haptics from "expo-haptics";
 import { useNavigation, useRouter } from "expo-router";
-import { useCallback, useLayoutEffect } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { RefreshControl, View, StyleSheet } from "react-native";
 
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
@@ -59,14 +59,18 @@ const NotificationsScreen = () => {
     }
   };
 
+  // Keep a ref to avoid re-triggering useFocusEffect when refresh changes
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
+
   // Background refresh on screen focus to clear stale data (e.g. notifications
   // from profiles that were blocked while the data was already cached).
   useFocusEffect(
     useCallback(() => {
       if (!isPending) {
-        refresh();
+        refreshRef.current();
       }
-    }, [isPending, refresh]),
+    }, [isPending]),
   );
 
   useLayoutEffect(() => {
