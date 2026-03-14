@@ -189,6 +189,11 @@ const AccountOptions = () => {
           icon={<Octicons name="checklist" size={20} color={iconColor} />}
         />
         <ScreenLinkButton
+          title="Terms of Service"
+          onPress={() => router.push("/(app)/profile/termsOfService")}
+          icon={<Ionicons name="document-text-outline" size={22} color={iconColor} />}
+        />
+        <ScreenLinkButton
           title="About OnlyPaws"
           onPress={() => router.push("/(app)/profile/about")}
           icon={<Ionicons name="information-circle-outline" size={22} color={iconColor} />}

@@ -10,6 +10,7 @@ import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
 import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
+import TermsGate from "@/components/TermsGate/TermsGate";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import AnnouncementsContextProvider from "@/context/AnnouncementsContext";
@@ -187,29 +188,31 @@ const TabLayout = () => {
 
   return (
     <AuthProfileContextProvider>
-      <BottomSheetModalProvider>
-        <PostsContextProvider>
-          <AnnouncementsContextProvider>
-            <ExplorePostsContextProvider>
-              <ProfileSearchContextProvider>
-                <PostManagerContextProvider>
-                  <ProfileDetailsManagerContextProvider>
-                    <NotificationsContextProvider>
-                      <FollowRequestsContextProvider>
-                        <ReportReasonsContextProvider>
-                          <ProfileReportReasonsContextProvider>
-                            <TabsComponent />
-                          </ProfileReportReasonsContextProvider>
-                        </ReportReasonsContextProvider>
-                      </FollowRequestsContextProvider>
-                    </NotificationsContextProvider>
-                  </ProfileDetailsManagerContextProvider>
-                </PostManagerContextProvider>
-              </ProfileSearchContextProvider>
-            </ExplorePostsContextProvider>
-          </AnnouncementsContextProvider>
-        </PostsContextProvider>
-      </BottomSheetModalProvider>
+      <TermsGate>
+        <BottomSheetModalProvider>
+          <PostsContextProvider>
+            <AnnouncementsContextProvider>
+              <ExplorePostsContextProvider>
+                <ProfileSearchContextProvider>
+                  <PostManagerContextProvider>
+                    <ProfileDetailsManagerContextProvider>
+                      <NotificationsContextProvider>
+                        <FollowRequestsContextProvider>
+                          <ReportReasonsContextProvider>
+                            <ProfileReportReasonsContextProvider>
+                              <TabsComponent />
+                            </ProfileReportReasonsContextProvider>
+                          </ReportReasonsContextProvider>
+                        </FollowRequestsContextProvider>
+                      </NotificationsContextProvider>
+                    </ProfileDetailsManagerContextProvider>
+                  </PostManagerContextProvider>
+                </ProfileSearchContextProvider>
+              </ExplorePostsContextProvider>
+            </AnnouncementsContextProvider>
+          </PostsContextProvider>
+        </BottomSheetModalProvider>
+      </TermsGate>
     </AuthProfileContextProvider>
   );
 };

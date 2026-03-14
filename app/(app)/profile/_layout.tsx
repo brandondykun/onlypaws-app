@@ -45,6 +45,7 @@ const ProfileStack = () => {
       <Stack.Screen name="followers" options={{ title: "Followers" }} />
       <Stack.Screen name="following" options={{ title: "Following" }} />
       <Stack.Screen name="blockedProfiles" options={{ title: "Blocked Profiles" }} />
+      <Stack.Screen name="termsOfService" options={{ title: "Terms of Service" }} />
     </Stack>
   );
 };

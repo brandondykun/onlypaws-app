@@ -90,7 +90,9 @@ const AuthInterceptor = ({ children }: Props) => {
         // Use selectedProfileId instead of authProfile.id to avoid stale profile ID
         // during profile switches (selectedProfileId updates immediately, authProfile needs to be fetched)
         config.headers.Authorization = `Bearer ${accessToken}`;
-        config.headers["AUTH-PROFILE-ID"] = selectedProfileId;
+        if (!config.headers["AUTH-PROFILE-ID"]) {
+          config.headers["AUTH-PROFILE-ID"] = selectedProfileId;
+        }
         return config;
       },
       function (error) {

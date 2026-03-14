@@ -7,7 +7,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 
 type AboutStepProps = {
-  onSubmit: () => Promise<void>;
+  onSubmit: () => Promise<boolean>;
   loading: boolean;
   name: string;
   about: string;
@@ -28,18 +28,6 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout, aboutError, setAb
     }).start();
   }, [fadeAnim]);
 
-  // Fade back in when error arrives (step fades out before calling onSubmit)
-  useEffect(() => {
-    if (aboutError) {
-      setIsTransitioning(false);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [aboutError, fadeAnim]);
-
   const fadeOut = useCallback(() => {
     return new Promise<void>((resolve) => {
       Animated.timing(fadeAnim, {
@@ -51,10 +39,12 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout, aboutError, setAb
   }, [fadeAnim]);
 
   const handleSubmit = async () => {
-    // Disable button during fade out to prevent re-clicking
-    setIsTransitioning(true);
-    await fadeOut();
-    await onSubmit();
+    // Call API first, only fade out on success
+    const success = await onSubmit();
+    if (success) {
+      setIsTransitioning(true);
+      await fadeOut();
+    }
   };
 
   return (
@@ -65,7 +55,7 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout, aboutError, setAb
           darkColor={COLORS.sky[400]}
           lightColor={COLORS.sky[500]}
         >
-          One Last Thing...
+          You're Almost Done...
         </Text>
         <Text
           style={{ fontSize: 18, fontWeight: "300", textAlign: "center" }}
@@ -95,7 +85,7 @@ const AboutStep = ({ onSubmit, loading, name, about, setAbout, aboutError, setAb
         />
       </View>
 
-      <Button text="Create Profile" onPress={handleSubmit} loading={loading || isTransitioning} />
+      <Button text="Next" onPress={handleSubmit} loading={loading || isTransitioning} />
     </Animated.View>
   );
 };

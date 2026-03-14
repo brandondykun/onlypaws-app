@@ -13,7 +13,7 @@ import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import toast from "@/utils/toast";
 
 type PetDetailsStepProps = {
-  onNext: () => Promise<void>;
+  onNext: () => Promise<boolean>;
   loading: boolean;
   name: string;
   setName: (name: string) => void;
@@ -55,18 +55,6 @@ const PetDetailsStep = ({
     }).start();
   }, [fadeAnim]);
 
-  // Fade back in when errors arrive (step fades out before calling onNext)
-  useEffect(() => {
-    if (nameError || breedError) {
-      setIsTransitioning(false);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [nameError, breedError, fadeAnim]);
-
   const fadeOut = useCallback(() => {
     return new Promise<void>((resolve) => {
       Animated.timing(fadeAnim, {
@@ -83,10 +71,12 @@ const PetDetailsStep = ({
       return;
     }
 
-    // Disable button during fade out to prevent re-clicking
-    setIsTransitioning(true);
-    await fadeOut();
-    await onNext();
+    // Call API first, only fade out on success
+    const success = await onNext();
+    if (success) {
+      setIsTransitioning(true);
+      await fadeOut();
+    }
   };
 
   return (

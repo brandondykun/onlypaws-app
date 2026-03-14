@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
@@ -5,22 +6,27 @@ import { ScrollView, StyleSheet } from "react-native";
 import { ProgressSteps, ProgressStep } from "react-native-progress-steps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { acceptTerms } from "@/api/legal";
 import { createProfile, updateUsername, updateProfile } from "@/api/profile";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import { COLORS } from "@/constants/Colors";
 import { SHOW_WELCOME_ANNOUNCEMENT_KEY } from "@/context/AnnouncementsContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useCurrentTerms } from "@/hooks/useCurrentTerms";
+import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 
 import AboutStep from "../../components/OnBoarding/AboutStep";
 import PetDetailsStep from "../../components/OnBoarding/PetDetailsStep";
+import TermsStep from "../../components/OnBoarding/TermsStep";
 import UsernameStep from "../../components/OnBoarding/UsernameStep";
 import WelcomeStep from "../../components/OnBoarding/WelcomeStep";
 
 const OnboardingMainScreen = () => {
   const { isDarkMode } = useColorMode();
   const { setActiveProfileId, addProfileOption } = useAuthUserContext();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   // Profile state
@@ -35,6 +41,8 @@ const OnboardingMainScreen = () => {
   const [nameError, setNameError] = useState("");
   const [breedError, setBreedError] = useState("");
   const [aboutError, setAboutError] = useState("");
+  // Terms
+  const { data: terms } = useCurrentTerms();
   // Step state
   const [currentStep, setCurrentStep] = useState(0);
   const [stepLoading, setStepLoading] = useState(false);
@@ -107,15 +115,15 @@ const OnboardingMainScreen = () => {
   };
 
   // Step 2: Pet Details
-  const handlePetDetailsNext = async () => {
+  const handlePetDetailsNext = async (): Promise<boolean> => {
     if (!name) {
       setNameError("Please enter your pet's name.");
-      return;
+      return false;
     }
 
     if (!profileId) {
       toast.error("Profile not found. Please restart the onboarding process.");
-      return;
+      return false;
     }
 
     setStepLoading(true);
@@ -133,8 +141,12 @@ const OnboardingMainScreen = () => {
     );
 
     if (!error && data) {
-      // Move to next step
-      setCurrentStep(2);
+      setStepLoading(false);
+      // Delay step change to allow fade out animation (500ms) to complete
+      setTimeout(() => {
+        setCurrentStep(2);
+      }, 500);
+      return true;
     } else if (fieldErrors) {
       if (fieldErrors.name) setNameError(fieldErrors.name);
       if (fieldErrors.breed) setBreedError(fieldErrors.breed);
@@ -143,19 +155,20 @@ const OnboardingMainScreen = () => {
     }
 
     setStepLoading(false);
+    return false;
   };
 
-  // Step 3: About (Final step)
-  const handleAboutSubmit = async () => {
+  // Step 3: About
+  const handleAboutSubmit = async (): Promise<boolean> => {
     if (!profileId) {
       toast.error("Profile not found. Please restart the onboarding process.");
-      return;
+      return false;
     }
 
     setStepLoading(true);
     setAboutError("");
 
-    // Update the profile with about text (final step)
+    // Update the profile with about text
     const { error, data, fieldErrors } = await updateProfile(
       {
         about: about || "",
@@ -164,36 +177,12 @@ const OnboardingMainScreen = () => {
     );
 
     if (!error && data) {
-      // NOW add the profile to user context (onboarding is complete!)
-      addProfileOption({
-        id: data?.id || 0,
-        username: username,
-        image: null,
-        name: name,
-        profile_type: "regular",
-        public_id: data.public_id,
-      });
-
-      // Set flag to show welcome announcement on first app entry for new users
-      await SecureStore.setItemAsync(SHOW_WELCOME_ANNOUNCEMENT_KEY, "true");
-
-      // Show welcome message first
-      setShowWelcome(true);
       setStepLoading(false);
-
-      // Wait for fade-in animation (1000ms) + 2 seconds display time, then set active profile and navigate
+      // Delay step change to allow fade out animation (500ms) to complete
       setTimeout(() => {
-        // Set as active profile - this will trigger profile details fetch
-        // We do this AFTER showing the welcome message to prevent premature redirect
-        setActiveProfileId(profileId);
-
-        // Clear onboarding data
-        resetOnboarding();
-
-        // Navigate to the main app
-        // Layout guard will now see user has a profile and allow access
-        router.replace("/(app)/(index)");
-      }, 3000); // 1000ms fade-in + 2000ms display = 3000ms total
+        setCurrentStep(3);
+      }, 500);
+      return true;
     } else if (fieldErrors?.about) {
       setAboutError(fieldErrors.about);
       setStepLoading(false);
@@ -201,6 +190,54 @@ const OnboardingMainScreen = () => {
       toast.error("There was an error finalizing your profile. Please try again.");
       setStepLoading(false);
     }
+
+    return false;
+  };
+
+  // Step 4: Terms acceptance (Final step)
+  const handleTermsAccept = async () => {
+    if (!profileId) {
+      toast.error("Profile not found. Please restart the onboarding process.");
+      return;
+    }
+
+    setStepLoading(true);
+
+    if (terms?.id) {
+      const { error } = await acceptTerms(terms.id);
+      if (error) {
+        toast.error("Failed to accept terms. Please try again.");
+        setStepLoading(false);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.currentTerms.root });
+    }
+
+    // NOW add the profile to user context (onboarding is complete!)
+    // We need to fetch the profile data again since we only have the public_id
+    const { data: profileData } = await updateProfile({}, profileId);
+    addProfileOption({
+      id: profileData?.id || 0,
+      username: username,
+      image: null,
+      name: name,
+      profile_type: "regular",
+      public_id: profileId,
+    });
+
+    // Set flag to show welcome announcement on first app entry for new users
+    await SecureStore.setItemAsync(SHOW_WELCOME_ANNOUNCEMENT_KEY, "true");
+
+    // Show welcome message first
+    setShowWelcome(true);
+    setStepLoading(false);
+
+    // Wait for fade-in animation (1000ms) + 2 seconds display time, then set active profile and navigate
+    setTimeout(() => {
+      setActiveProfileId(profileId);
+      resetOnboarding();
+      router.replace("/(app)/(index)");
+    }, 3000);
   };
 
   const progressStepsStyle = {
@@ -268,6 +305,14 @@ const OnboardingMainScreen = () => {
             setAbout={setAbout}
             aboutError={aboutError}
             setAboutError={setAboutError}
+          />
+        </ProgressStep>
+        <ProgressStep label="Terms" removeBtnRow scrollViewProps={{ contentContainerStyle: { flexGrow: 1 } }}>
+          <TermsStep
+            onAccept={handleTermsAccept}
+            loading={stepLoading}
+            termsContent={terms?.content ?? ""}
+            termsVersion={terms?.version ?? ""}
           />
         </ProgressStep>
       </ProgressSteps>

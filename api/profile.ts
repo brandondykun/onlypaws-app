@@ -102,7 +102,9 @@ export const confirmProfileImageUpload = async (
 export const updateProfile = async (data: any, profileId: string) => {
   const url = `/v1/profile/${profileId}/`;
   try {
-    const res = await axiosInstance.patch<Profile>(url, data);
+    const res = await axiosInstance.patch<Profile>(url, data, {
+      headers: { "AUTH-PROFILE-ID": profileId },
+    });
     return { data: res.data, error: null, fieldErrors: null as Record<string, string> | null };
   } catch (err) {
     const error = err as AxiosError;

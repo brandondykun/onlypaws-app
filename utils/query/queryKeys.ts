@@ -188,4 +188,8 @@ export const queryKeys = {
 
     details: (reportId: string | number) => ["profile-reports", reportId.toString()] as const,
   },
+
+  currentTerms: {
+    root: ["current-terms"] as const,
+  },
 };
