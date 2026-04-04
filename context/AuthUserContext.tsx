@@ -17,6 +17,7 @@ const DEFAULT_USER: User = {
   is_email_verified: false,
   regular_profile_onboarding_completed: false,
   business_profile_onboarding_completed: false,
+  pending_deletion: null,
 };
 
 type AuthUserContextType = {
@@ -34,6 +35,7 @@ type AuthUserContextType = {
   updateOnboardingCompleted: (profileType: "regular" | "business") => void;
   removeProfileOption: (publicId: string) => void;
   changeEmail: (newEmail: string) => void;
+  clearPendingDeletion: () => void;
 };
 
 const AuthUserContext = createContext<AuthUserContextType>({
@@ -51,6 +53,7 @@ const AuthUserContext = createContext<AuthUserContextType>({
   updateOnboardingCompleted: (profileType: "regular" | "business") => {},
   removeProfileOption: (publicId: string) => {},
   changeEmail: (newEmail: string) => {},
+  clearPendingDeletion: () => {},
 });
 
 type Props = {
@@ -198,6 +201,12 @@ const AuthUserContextProvider = ({ children }: Props) => {
     });
   };
 
+  const clearPendingDeletion = () => {
+    setUser((prev) => {
+      return { ...prev, pending_deletion: null };
+    });
+  };
+
   const value = {
     user,
     selectedProfilePublicId,
@@ -213,6 +222,7 @@ const AuthUserContextProvider = ({ children }: Props) => {
     updateOnboardingCompleted,
     removeProfileOption,
     changeEmail,
+    clearPendingDeletion,
   };
 
   return <AuthUserContext.Provider value={value}>{children}</AuthUserContext.Provider>;

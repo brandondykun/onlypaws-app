@@ -87,6 +87,11 @@ const AccountOptions = () => {
           onPress={() => router.push("/profile/changePassword")}
           icon={<MaterialIcons name="password" size={20} color={iconColor} />}
         />
+        <ScreenLinkButton
+          title="Delete Account"
+          onPress={() => router.push("/profile/deleteAccount")}
+          icon={<MaterialIcons name="delete-outline" size={20} color={iconColor} />}
+        />
       </View>
 
       {/* Profiles Section */}

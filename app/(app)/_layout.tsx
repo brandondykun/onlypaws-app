@@ -10,6 +10,7 @@ import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
 import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
+import PendingDeletionGate from "@/components/PendingDeletionGate/PendingDeletionGate";
 import TermsGate from "@/components/TermsGate/TermsGate";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
@@ -179,6 +180,10 @@ const TabLayout = () => {
 
   if (!user.is_email_verified) {
     return <Redirect href="/auth/verifyEmail" />;
+  }
+
+  if (user.pending_deletion) {
+    return <PendingDeletionGate />;
   }
 
   // Check if user has at least one profile

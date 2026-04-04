@@ -146,3 +146,25 @@ export const logOut = async (refreshToken: string) => {
     return { data: null, error: error.message, status: error.status };
   }
 };
+
+export const requestAccountDeletion = async () => {
+  const url = "/v1/auth/request-account-deletion/";
+  try {
+    const res = await axiosInstance.post(url);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message, status: error.status };
+  }
+};
+
+export const cancelAccountDeletion = async () => {
+  const url = "/v1/auth/cancel-account-deletion/";
+  try {
+    const res = await axiosInstance.delete(url);
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { data: null, error: error.message, status: error.status };
+  }
+};

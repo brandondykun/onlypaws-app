@@ -9,6 +9,11 @@ export type AccessToken = {
   access: string;
 };
 
+export type PendingDeletion = {
+  scheduled_deletion_at: string;
+  days_remaining: number;
+} | null;
+
 export type User = {
   id: null | number;
   email: null | string;
@@ -16,6 +21,7 @@ export type User = {
   is_email_verified: boolean;
   regular_profile_onboarding_completed: boolean;
   business_profile_onboarding_completed: boolean;
+  pending_deletion: PendingDeletion;
 };
 
 export type UserBasic = {
@@ -104,6 +110,7 @@ export type MyInfo = {
   is_email_verified: boolean;
   regular_profile_onboarding_completed: boolean;
   business_profile_onboarding_completed: boolean;
+  pending_deletion: PendingDeletion;
 };
 
 export type UserProfile = {
