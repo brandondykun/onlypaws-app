@@ -1,6 +1,7 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import { forwardRef, ForwardedRef } from "react";
-import { View, StyleSheet } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { forwardRef, ForwardedRef, useRef, useImperativeHandle } from "react";
+import { View, StyleSheet, Pressable } from "react-native";
 import SelectDropdown, { SelectDropdownProps } from "react-native-select-dropdown";
 
 import { COLORS } from "@/constants/Colors";
@@ -17,11 +18,14 @@ type Props = {
   data: DropdownSelectOption[];
   defaultText: string;
   label?: string;
+  onClear?: () => void;
 } & Omit<SelectDropdownProps, "renderButton" | "renderItem" | "data">;
 
 const DropdownSelect = forwardRef(
-  ({ data, defaultText, label, ...props }: Props, ref: ForwardedRef<SelectDropdown>) => {
+  ({ data, defaultText, label, onClear, ...props }: Props, ref: ForwardedRef<SelectDropdown>) => {
     const { setLightOrDark } = useColorMode();
+    const internalRef = useRef<SelectDropdown>(null);
+    useImperativeHandle(ref, () => internalRef.current as SelectDropdown);
 
     return (
       <View style={{ marginVertical: 4, position: "relative" }}>
@@ -39,7 +43,7 @@ const DropdownSelect = forwardRef(
           </Text>
         ) : null}
         <SelectDropdown
-          ref={ref}
+          ref={internalRef}
           data={data}
           renderButton={(selectedItem: DropdownSelectOption, isOpened) => {
             return (
@@ -59,6 +63,23 @@ const DropdownSelect = forwardRef(
                     {defaultText}
                   </Text>
                 )}
+                {selectedItem && onClear ? (
+                  <Pressable
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      internalRef.current?.reset();
+                      onClear();
+                    }}
+                    hitSlop={8}
+                    style={{ padding: 2, marginRight: 4 }}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={20}
+                      color={setLightOrDark(COLORS.zinc[400], COLORS.zinc[500])}
+                    />
+                  </Pressable>
+                ) : null}
                 <Entypo
                   name={isOpened ? "chevron-up" : "chevron-down"}
                   size={24}

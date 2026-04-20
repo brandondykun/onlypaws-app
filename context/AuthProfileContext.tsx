@@ -5,7 +5,7 @@ import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 import { getProfileDetailsForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
-import { PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { PetLevel, PetSex, PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 
 import { useAuthUserContext } from "./AuthUserContext";
@@ -29,13 +29,20 @@ type AuthProfileContextType = {
   addFollowing: () => void;
   updatePostsCount: (action: "add" | "subtract", amount: number) => void;
   updateName: (name: string) => void;
-  updateAuthProfile: (
-    name: string,
-    about: string | null,
-    breed: string | null,
-    petType: PetType | null,
-    isPrivate: boolean,
-  ) => void;
+  updateAuthProfile: (fields: {
+    name: string;
+    about: string | null;
+    breed: string | null;
+    pet_type: PetType | null;
+    is_private: boolean;
+    sex: PetSex;
+    birthdate: string | null;
+    weight: number | null;
+    is_spayed_neutered: boolean | null;
+    is_service_animal: boolean | null;
+    energy_level: PetLevel;
+    anxiety_level: PetLevel;
+  }) => void;
   updateUsername: (username: string) => void;
   refetch: () => Promise<void>;
   refreshing: boolean;
@@ -123,20 +130,23 @@ const AuthProfileContextProvider = ({ children }: Props) => {
     updateCache((prev) => ({ ...prev, name }));
   };
 
-  const updateAuthProfile = (
-    name: string,
-    about: string | null,
-    breed: string | null,
-    petType: PetType | null,
-    isPrivate: boolean,
-  ) => {
+  const updateAuthProfile = (fields: {
+    name: string;
+    about: string | null;
+    breed: string | null;
+    pet_type: PetType | null;
+    is_private: boolean;
+    sex: PetSex;
+    birthdate: string | null;
+    weight: number | null;
+    is_spayed_neutered: boolean | null;
+    is_service_animal: boolean | null;
+    energy_level: PetLevel;
+    anxiety_level: PetLevel;
+  }) => {
     updateCache((prev) => ({
       ...prev,
-      name,
-      about,
-      breed,
-      pet_type: petType,
-      is_private: isPrivate,
+      ...fields,
     }));
   };
 

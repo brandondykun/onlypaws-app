@@ -184,3 +184,26 @@ export const getAspectRatioFloat = (aspectRatio: ImageAspectRatio) => {
   }
   return 1;
 };
+
+export const formatBirthdateToAge = (birthdate: string | null) => {
+  if (!birthdate) return "Unknown age";
+
+  const parsedBirthdate = new Date(birthdate);
+  if (Number.isNaN(parsedBirthdate.getTime())) return "Unknown age";
+
+  const now = new Date();
+  if (parsedBirthdate > now) return "0 months";
+
+  const yearDiff = now.getFullYear() - parsedBirthdate.getFullYear();
+  const monthDiff = now.getMonth() - parsedBirthdate.getMonth();
+  const totalMonths = yearDiff * 12 + monthDiff - (now.getDate() < parsedBirthdate.getDate() ? 1 : 0);
+
+  const safeTotalMonths = Math.max(0, totalMonths);
+
+  if (safeTotalMonths >= 12) {
+    const years = Math.floor(safeTotalMonths / 12);
+    return `${years} ${years === 1 ? "year" : "years"}`;
+  }
+
+  return `${safeTotalMonths} ${safeTotalMonths === 1 ? "month" : "months"} old`;
+};

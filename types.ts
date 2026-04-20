@@ -76,6 +76,10 @@ export type PetTypeWithTitle = {
   title: string;
 } & PetType;
 
+export type PetSex = "Male" | "Female" | "";
+
+export type PetLevel = "Low" | "Medium" | "High" | "";
+
 export type Profile = {
   id: null | number;
   public_id: string;
@@ -85,6 +89,13 @@ export type Profile = {
   name: string;
   pet_type: PetType | null;
   breed: string | null;
+  sex: PetSex;
+  birthdate: string | null;
+  weight: number | null;
+  is_spayed_neutered: boolean | null;
+  is_service_animal: boolean | null;
+  energy_level: PetLevel;
+  anxiety_level: PetLevel;
   is_private: boolean;
   profile_type: ProfileType;
 };
@@ -246,6 +257,13 @@ export type ProfileDetails = {
   following_count: number;
   pet_type: PetType | null;
   breed: string | null;
+  sex: PetSex;
+  birthdate: string | null;
+  weight: number | null;
+  is_spayed_neutered: boolean | null;
+  is_service_animal: boolean | null;
+  energy_level: PetLevel;
+  anxiety_level: PetLevel;
   profile_type: ProfileType;
   is_private: boolean;
   can_view_posts: boolean;

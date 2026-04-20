@@ -74,7 +74,18 @@ const ProfileScreen = () => {
   const petDetailsText = toJoin.join(" • ");
 
   const missingProfileInfo =
-    !authProfile.name || !petDetailsText || !authProfile.about || !authProfile.pet_type || !authProfile.breed;
+    !authProfile.name ||
+    !petDetailsText ||
+    !authProfile.about ||
+    !authProfile.pet_type ||
+    !authProfile.breed ||
+    !authProfile.sex ||
+    !authProfile.birthdate ||
+    authProfile.weight == null ||
+    authProfile.is_spayed_neutered == null ||
+    authProfile.is_service_animal == null ||
+    !authProfile.energy_level ||
+    !authProfile.anxiety_level;
 
   return (
     <View style={s.root}>
@@ -177,6 +188,112 @@ const ProfileScreen = () => {
           style={[
             s.card,
             {
+              backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]),
+              borderWidth: 1,
+              borderColor: setLightOrDark(COLORS.zinc[200], `${COLORS.sky[950]}99`),
+            },
+          ]}
+        >
+          <Text style={s.cardTitle} darkColor={COLORS.zinc[50]} lightColor={COLORS.zinc[800]}>
+            Pet Details
+          </Text>
+          <View style={s.detailsGrid}>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Sex
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.sex ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.sex ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.sex || "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Birthdate
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.birthdate ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.birthdate ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.birthdate
+                  ? new Date(authProfile.birthdate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Weight
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.weight != null ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.weight != null ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.weight != null ? `${authProfile.weight} lbs` : "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Energy
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.energy_level ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.energy_level ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.energy_level || "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Anxiety
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.anxiety_level ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.anxiety_level ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.anxiety_level || "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Spayed/Neutered
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.is_spayed_neutered != null ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.is_spayed_neutered != null ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.is_spayed_neutered != null ? (authProfile.is_spayed_neutered ? "Yes" : "No") : "Not set"}
+              </Text>
+            </View>
+            <View style={s.detailItem}>
+              <Text style={s.detailLabel} darkColor={COLORS.zinc[400]} lightColor={COLORS.zinc[600]}>
+                Service Animal
+              </Text>
+              <Text
+                style={s.detailValue}
+                darkColor={authProfile.is_service_animal != null ? COLORS.zinc[200] : COLORS.zinc[500]}
+                lightColor={authProfile.is_service_animal != null ? COLORS.zinc[800] : COLORS.zinc[400]}
+              >
+                {authProfile.is_service_animal != null ? (authProfile.is_service_animal ? "Yes" : "No") : "Not set"}
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          style={[
+            s.card,
+            {
               backgroundColor: authProfile.is_private
                 ? setLightOrDark(COLORS.zinc[50], `${COLORS.red[950]}4D`)
                 : setLightOrDark(COLORS.zinc[50], `${COLORS.lime[950]}4D`),
@@ -266,7 +383,7 @@ const s = StyleSheet.create({
     paddingLeft: 2,
   },
   headerTextContainer: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   headerName: {
     fontSize: 30,
@@ -303,6 +420,25 @@ const s = StyleSheet.create({
   aboutText: {
     fontSize: 18,
     lineHeight: 24,
+  },
+  detailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
+  },
+  detailItem: {
+    width: "45%",
+    flexGrow: 1,
+  },
+  detailLabel: {
+    fontSize: 13,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  detailValue: {
+    fontSize: 17,
+    fontWeight: "500",
   },
   accountItems: {
     gap: 16,
