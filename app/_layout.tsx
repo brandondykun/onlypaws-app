@@ -47,7 +47,7 @@ const RootLayout = () => {
           testMode: isTestMode, // Set to false in production
           // Production ad unit IDs
           androidAppId: "ca-app-pub-4419810431864546/9303348400",
-          iosAppId: "ca-app-pub-3940256099942544/3986624511",
+          iosAppId: "ca-app-pub-3339998461946699/4081817052",
         });
       } catch (error) {
         console.error("Failed to initialize ads:", error);
