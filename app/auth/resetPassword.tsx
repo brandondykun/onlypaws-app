@@ -1,23 +1,26 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { OtpInputRef } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { resetPassword } from "@/api/auth";
+import { getMyInfo, login, resetPassword } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
 import Button from "@/components/Button/Button";
 import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import toast from "@/utils/toast";
 
 const ResetPasswordScreen = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();
+  const { authenticate, logOut } = useAuthUserContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -91,8 +94,36 @@ const ResetPasswordScreen = () => {
         toast.error("An error occurred while resetting your password. Please try again.", { visibilityTime: 10000 });
       }
     } else {
-      router.push("/auth/login");
-      toast.success("Password reset successful. You can now log in with your new password.", { visibilityTime: 10000 });
+      const { error: loginError, data: loginData } = await login(email, newPassword);
+
+      if (loginData && !loginError) {
+        await SecureStore.setItemAsync("ACCESS_TOKEN", loginData.access);
+        await SecureStore.setItemAsync("REFRESH_TOKEN", loginData.refresh);
+
+        const { data: myInfoData, error: myInfoError } = await getMyInfo();
+
+        if (myInfoData && !myInfoError) {
+          authenticate(myInfoData);
+          if (!myInfoData.is_email_verified) {
+            router.push("/auth/verifyEmail");
+          } else {
+            router.replace("/(app)/(index)");
+          }
+          toast.success("Password reset successful! You are now logged in using your new password.", {
+            visibilityTime: 10000,
+          });
+        } else {
+          await logOut();
+          toast.error("Password reset successful, but there was an error automatically logging you in.", {
+            visibilityTime: 10000,
+          });
+        }
+      } else {
+        router.push("/auth/login");
+        toast.error("Password reset successful, but there was an error automatically logging you in.", {
+          visibilityTime: 10000,
+        });
+      }
     }
     setLoading(false);
   };
