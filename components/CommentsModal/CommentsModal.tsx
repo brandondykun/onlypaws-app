@@ -9,7 +9,7 @@ import { useState, useCallback, forwardRef, ForwardedRef, useRef, useMemo } from
 import { RefreshControl, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { addComment, deleteComment, getPostCommentsForQuery } from "@/api/interactions";
+import { addComment, addPostInteraction, deleteComment, getPostCommentsForQuery } from "@/api/interactions";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
@@ -136,6 +136,8 @@ const CommentsModal = forwardRef(
     const handleAddComment = useCallback(
       async (text: string) => {
         if (postId && text) {
+          // Fire-and-forget: record comment interaction for preference embedding.
+          addPostInteraction(postId, "comment").catch(() => {});
           setAddCommentLoading(true);
           const parentId = parentComment ? parentComment.id : null;
           const replyCommentId = replyToComment ? replyToComment.id : null;

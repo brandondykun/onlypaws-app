@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 
 import { FollowRequest, SentFollowRequest, AcceptFollowRequestResponse } from "@/types/follow-requests/follow-requests";
+import { PostInteractionType, PostInteractionResponse } from "@/types/interactions/interactions";
 import { CommentChainResponse } from "@/types/post/post";
 import { PaginatedResponse } from "@/types/shared/pagination";
 
@@ -157,4 +158,19 @@ export const declineFollowRequest = async (requestId: number) => {
 export const cancelFollowRequest = async (profileId: string) => {
   const url = `/v1/interactions/follow-request/${profileId}/cancel/`;
   return await axiosDelete(url);
+};
+
+export const addPostInteraction = async (
+  postId: number,
+  interactionType: PostInteractionType,
+  dwellTimeMs?: number,
+) => {
+  const url = `/v1/interactions/interaction/post/${postId}/`;
+  const body: { interaction_type: PostInteractionType; dwell_time_ms?: number } = {
+    interaction_type: interactionType,
+  };
+  if (dwellTimeMs !== undefined) {
+    body.dwell_time_ms = dwellTimeMs;
+  }
+  return await axiosPost<PostInteractionResponse>(url, body);
 };

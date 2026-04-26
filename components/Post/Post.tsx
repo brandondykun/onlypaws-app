@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 
-import { addLike, removeLike } from "@/api/interactions";
+import { addLike, removeLike, addPostInteraction } from "@/api/interactions";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { PostDetailed } from "@/types";
@@ -58,6 +58,8 @@ const Post = ({
       if (post.is_hidden) return;
       setLikeLoading(true);
       if (!liked) {
+        // Fire-and-forget: record like interaction for preference embedding.
+        addPostInteraction(postId, "like").catch(() => {});
         // haptic feedback
         Haptics.impactAsync();
         // animate the like button

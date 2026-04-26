@@ -6,6 +6,7 @@ import { useNavigation, useRouter } from "expo-router";
 import { useLayoutEffect, useMemo } from "react";
 import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 
+import { addPostInteraction } from "@/api/interactions";
 import { getExplorePostsForQuery } from "@/api/post";
 import Button from "@/components/Button/Button";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
@@ -115,6 +116,8 @@ const ExploreScreen = () => {
             post={post}
             index={index}
             onPress={() => {
+              // Fire-and-forget: don't await, don't surface errors.
+              addPostInteraction(post.id, "preview_click").catch(() => {});
               setSelectedExplorePost(post);
               router.push({ pathname: "/(app)/explore/list", params: { postId: post.public_id } });
             }}

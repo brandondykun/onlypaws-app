@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useState, useRef } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 
+import { addPostInteraction } from "@/api/interactions";
 import { savePost as savePostApi, unSavePost as unSavePostApi } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
@@ -58,6 +59,8 @@ const SaveButton = ({ post }: Props) => {
       }
       // do not show success toast message when un-saving a post
     } else {
+      // Fire-and-forget: record save interaction for preference embedding.
+      addPostInteraction(post.id, "save").catch(() => {});
       // haptic feedback
       Haptics.impactAsync();
       // animate the save button
