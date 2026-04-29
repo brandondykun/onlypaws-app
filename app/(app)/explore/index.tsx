@@ -18,7 +18,16 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import { queryKeys } from "@/utils/query/queryKeys";
-import { getNextPageParam } from "@/utils/utils";
+
+// Explore uses cursor pagination (the backend's ListExplorePostsView returns
+// a personalised batch of recommendations). The shared page-based
+// getNextPageParam from utils does not apply here — extract the `cursor`
+// query param out of the `next` URL instead.
+const getNextCursorParam = (lastPage: { next: string | null }): string | null | undefined => {
+  if (!lastPage?.next) return undefined;
+  const match = /[?&]cursor=([^&]+)/.exec(lastPage.next);
+  return match ? decodeURIComponent(match[1]) : undefined;
+};
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -32,7 +41,7 @@ const ExploreScreen = () => {
 
   const { setSelectedExplorePost } = useExplorePostsContext();
 
-  const fetchPosts = async ({ pageParam }: { pageParam: string }) => {
+  const fetchPosts = async ({ pageParam }: { pageParam: string | null }) => {
     const res = await getExplorePostsForQuery(pageParam);
     return res.data;
   };
@@ -40,8 +49,8 @@ const ExploreScreen = () => {
   const explorePosts = useInfiniteQuery({
     queryKey: queryKeys.posts.explore(selectedProfileId),
     queryFn: fetchPosts,
-    initialPageParam: "1",
-    getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => getNextCursorParam(lastPage),
   });
 
   // Memoize the flattened posts data

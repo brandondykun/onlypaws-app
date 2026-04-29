@@ -144,7 +144,7 @@ const FeedScreen = () => {
             !feedPosts.isFetchingNextPage &&
             !feedPosts.isLoading &&
             feedPosts.data &&
-            feedPosts.data.pages[0].count > 0 &&
+            (feedPosts.data.pages[0].count ?? 0) > 0 &&
             !feedPosts.isError
               ? true
               : false

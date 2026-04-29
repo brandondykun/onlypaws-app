@@ -88,8 +88,8 @@ export const getExplorePosts = async () => {
   return await axiosFetch<PaginatedResponse<PostDetailed>>(url);
 };
 
-export const getExplorePostsForQuery = async (pageParam: number | string) => {
-  const url = `/v1/post/explore/?page=${pageParam}`;
+export const getExplorePostsForQuery = async (cursor: string | null) => {
+  const url = cursor ? `/v1/post/explore/?cursor=${encodeURIComponent(cursor)}` : `/v1/post/explore/`;
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
