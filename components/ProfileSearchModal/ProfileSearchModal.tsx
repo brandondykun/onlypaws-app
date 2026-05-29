@@ -8,11 +8,11 @@ import { searchProfilesForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { SearchedProfile } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
-import Button from "../Button/Button";
 import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import HeaderSearchInput from "../HeaderSearchInput/HeaderSearchInput";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";

@@ -3,10 +3,10 @@ import { useCallback } from "react";
 import { Keyboard, View, StyleSheet } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
 type Props = {
   confirmDeleteCommentModalRef: React.RefObject<RNBottomSheetModal | null>;

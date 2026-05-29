@@ -3,13 +3,13 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, View } from "react-native";
 
-import Button from "@/components/Button/Button";
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePost } from "@/hooks/usePost";
+import Button from "@/shared/ui/Button/Button";
 
 const PostDetailsScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();

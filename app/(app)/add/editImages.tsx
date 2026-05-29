@@ -5,13 +5,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Dimensions, StyleSheet, ScrollView, Pressable, Animated } from "react-native";
 import ImagePicker from "react-native-image-crop-picker";
 
-import Button from "@/components/Button/Button";
 import AspectRatioToggle from "@/components/Camera/CameraHeader/AspectRatioToggle";
 import ReorderImageModal from "@/components/Camera/ReorderImageModal/ReorderImageModal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAddPostContext } from "@/context/AddPostContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { getImageUri, getImageHeightAspectAware } from "@/utils/utils";
 
 // Animated Image Component with smooth scaling

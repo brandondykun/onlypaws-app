@@ -5,12 +5,12 @@ import ReorderableList, { ReorderableListReorderEvent, reorderItems } from "reac
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
-import Button from "@/components/Button/Button";
 import DraggableImage from "@/components/Camera/DraggableImage/DraggableImage";
 import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { ImageAssetWithTags } from "@/types/post/post";
 
 type Props = {

@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useCallback, useState } from "react";
 import { View, ScrollView, ActivityIndicator } from "react-native";
 
 import { getCommentChainForQuery } from "@/api/interactions";
-import Button from "@/components/Button/Button";
 import MainComment from "@/components/Comment/MainComment";
 import ReplyComment from "@/components/Comment/ReplyComment";
 import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
@@ -14,6 +13,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { ImageAspectRatio } from "@/types/post/post";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";

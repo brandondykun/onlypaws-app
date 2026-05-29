@@ -2,9 +2,9 @@ import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom
 import { View, StyleSheet } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import Button from "@/shared/ui/Button/Button";
 
 type Props = {
   confirmDeleteModalRef: React.RefObject<RNBottomSheetModal | null>;

@@ -7,12 +7,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { requestAccountDeletion, logOut as logOutApi } from "@/api/auth";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import * as tokenService from "@/services/tokenService";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 
 const DeleteAccountScreen = () => {

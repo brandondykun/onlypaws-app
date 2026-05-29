@@ -4,8 +4,7 @@ import { View } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import Text from "@/components/Text/Text";
-
-import Button from "../Button/Button";
+import Button from "@/shared/ui/Button/Button";
 
 const PostAiModal = forwardRef((_, ref: ForwardedRef<RNBottomSheetModal> | undefined) => {
   return (

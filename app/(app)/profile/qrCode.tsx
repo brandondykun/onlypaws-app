@@ -10,7 +10,6 @@ import { View, StyleSheet, useWindowDimensions, ScrollView, Pressable } from "re
 import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 
-import Button from "@/components/Button/Button";
 import DownloadQrCodeConfirmationModal from "@/components/DownloadQrCodeConfirmationModal/DownloadQrCodeConfirmationModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import QrCodeScannerModal from "@/components/QrCodeScannerModal/QrCodeScannerModal";
@@ -18,6 +17,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import toast from "@/utils/toast";
 

@@ -6,9 +6,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
 import BottomSheetModal from "../BottomSheet/BottomSheet";
-import Button from "../Button/Button";
 import Text from "../Text/Text";
 
 type Props = {

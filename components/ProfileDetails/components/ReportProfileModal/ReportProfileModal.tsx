@@ -4,7 +4,6 @@ import { Animated, Dimensions, StyleSheet, TextInput as RNTextInput, View, Easin
 
 import { reportProfile } from "@/api/profile-report";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Button from "@/components/Button/Button";
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
 import Pressable from "@/components/Pressable/Pressable";
 import Text from "@/components/Text/Text";
@@ -12,6 +11,7 @@ import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileReportReasonsContext } from "@/context/ProfileReportReasonsContext";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 
 type Props = {

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
+import Button from "@/shared/ui/Button/Button";
 
 type AboutStepProps = {
   onSubmit: () => Promise<boolean>;

@@ -2,11 +2,11 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { verifyUsername } from "@/utils/utils";
 
 type UsernameStepProps = {

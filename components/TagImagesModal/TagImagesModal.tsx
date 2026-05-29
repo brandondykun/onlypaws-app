@@ -15,12 +15,12 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { SearchedProfile } from "@/types";
 import { PostImage } from "@/types";
 import { ImageAspectRatio, ImageAssetWithTags } from "@/types/post/post";
 import { getImageHeightAspectAware } from "@/utils/utils";
 
-import Button from "../Button/Button";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
 import Modal from "../Modal/Modal";
 import PostImageWithTags from "../PostImageWithTags/PostImageWithTags";

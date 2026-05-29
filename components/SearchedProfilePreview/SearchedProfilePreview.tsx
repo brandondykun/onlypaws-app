@@ -5,9 +5,9 @@ import { View, Pressable } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { SearchedProfile } from "@/types";
 
-import Button from "../Button/Button";
 import Text from "../Text/Text";
 
 type Props =

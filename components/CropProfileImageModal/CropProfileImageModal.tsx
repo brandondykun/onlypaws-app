@@ -10,10 +10,10 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { ImageAsset } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 
-import Button from "../Button/Button";
 import LoadingAnimation from "../LoadingAnimation/LoadingAnimation";
 import Modal from "../Modal/Modal";
 import Text from "../Text/Text";

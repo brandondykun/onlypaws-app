@@ -5,8 +5,7 @@ import { View } from "react-native";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
-
-import Button from "../Button/Button";
+import Button from "@/shared/ui/Button/Button";
 
 const PrivateProfileModal = forwardRef((_, ref: ForwardedRef<RNBottomSheetModal> | undefined) => {
   return (

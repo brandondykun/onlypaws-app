@@ -9,8 +9,8 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
-import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
 

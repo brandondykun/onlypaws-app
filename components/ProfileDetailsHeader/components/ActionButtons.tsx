@@ -2,9 +2,9 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { View, StyleSheet } from "react-native";
 
-import Button from "@/components/Button/Button";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { ProfileDetails } from "@/types";
 
 import FollowButton from "./FollowButton";

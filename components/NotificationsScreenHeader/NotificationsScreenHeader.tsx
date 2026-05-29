@@ -2,10 +2,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
 type Props = {
   onMarkAllAsReadPress: () => void;

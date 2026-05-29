@@ -4,11 +4,11 @@ import { View, Pressable, ScrollView, StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Button from "@/components/Button/Button";
 import Modal from "@/components/Modal/Modal";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
 type TermsAgreementProps = {
   termsContent: string;

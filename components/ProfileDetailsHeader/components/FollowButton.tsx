@@ -3,9 +3,8 @@ import { StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { ProfileDetails } from "@/types";
-
-import Button from "../../Button/Button";
 
 type Props = {
   profileData: ProfileDetails;

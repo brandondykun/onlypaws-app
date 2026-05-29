@@ -4,11 +4,11 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { changePassword } from "@/api/auth";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 
 const ChangePasswordScreen = () => {

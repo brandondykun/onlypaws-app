@@ -8,13 +8,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getMyInfo, login, resetPassword } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
-import Button from "@/components/Button/Button";
 import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import toast from "@/utils/toast";
 

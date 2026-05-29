@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
 
 import { getBlockedProfiles, type BlockedProfile } from "@/api/block";
-import Button from "@/components/Button/Button";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
@@ -14,6 +13,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
+import Button from "@/shared/ui/Button/Button";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 

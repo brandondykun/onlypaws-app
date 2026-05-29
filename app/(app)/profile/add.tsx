@@ -5,7 +5,6 @@ import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { createProfile } from "@/api/profile";
-import Button from "@/components/Button/Button";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
 import Text from "@/components/Text/Text";
@@ -14,6 +13,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 
 const AddProfileScreen = () => {

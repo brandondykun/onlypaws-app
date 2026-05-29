@@ -6,7 +6,6 @@ import { useLayoutEffect, useMemo, useRef, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
 
 import { getFeedbackTicketsForQuery } from "@/api/feedback";
-import Button from "@/components/Button/Button";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
 import FeedbackListItem from "@/components/Feedback/FeedbackListItem/FeedbackListItem";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
@@ -14,6 +13,7 @@ import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import { FeedbackTicket } from "@/types/feedback/feedback";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";

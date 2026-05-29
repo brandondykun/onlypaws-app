@@ -4,9 +4,9 @@ import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import Button from "@/shared/ui/Button/Button";
 import { FollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
-import Button from "../Button/Button";
 import Pressable from "../Pressable/Pressable";
 import ProfileImage from "../ProfileImage/ProfileImage";
 import Text from "../Text/Text";

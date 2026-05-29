@@ -3,8 +3,8 @@ import { View } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 
-import Button from "../../Button/Button";
 import Text from "../../Text/Text";
 
 // Footer component for when a fetch fails during scroll.

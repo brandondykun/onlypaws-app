@@ -8,12 +8,12 @@ import { View, StyleSheet } from "react-native";
 import { ScrollView } from "react-native";
 
 import { updateUsername as updateUsernameApi } from "@/api/profile";
-import Button from "@/components/Button/Button";
 import Text from "@/components/Text/Text";
 import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 import { verifyUsername } from "@/utils/utils";
 

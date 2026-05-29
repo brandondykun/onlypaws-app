@@ -7,12 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { verifyEmail, resendVerifyEmail } from "@/api/auth";
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
-import Button from "@/components/Button/Button";
 import OtpInput from "@/components/OtpInput/OtpInput";
 import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Button from "@/shared/ui/Button/Button";
 import toast from "@/utils/toast";
 
 const VerifyEmailScreen = () => {

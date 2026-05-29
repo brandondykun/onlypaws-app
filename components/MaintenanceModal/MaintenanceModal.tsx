@@ -12,9 +12,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useMaintenance } from "@/context/MaintenanceContext";
+import Button from "@/shared/ui/Button/Button";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
-import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
 import Text from "../Text/Text";
 
