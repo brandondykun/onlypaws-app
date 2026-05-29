@@ -9,9 +9,9 @@ import { ScrollView } from "react-native";
 
 import { createFeedbackTicket } from "@/api/feedback";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
-import TextInput from "@/components/TextInput/TextInput";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import Button from "@/shared/ui/Button/Button";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 import { FeedbackTicket } from "@/types/feedback/feedback";
 import { PaginatedResponse } from "@/types/shared/pagination";
 import { upsertInfiniteItem } from "@/utils/query/cacheUtils";

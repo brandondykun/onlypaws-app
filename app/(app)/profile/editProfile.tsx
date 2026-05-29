@@ -11,12 +11,12 @@ import DatePicker from "@/components/DatePicker/DatePicker";
 import DropdownSelect, { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import PrivateProfileModal from "@/components/PrivateProfileModal/PrivateProfileModal";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 import { PetLevel, PetSex, PetTypeWithTitle } from "@/types";
 import toast from "@/utils/toast";
 

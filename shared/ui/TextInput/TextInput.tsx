@@ -12,10 +12,9 @@ import {
   Animated,
 } from "react-native";
 
+import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../Text/Text";
 
 type Props = {
   value?: string;

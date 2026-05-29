@@ -5,10 +5,10 @@ import { useCallback, useRef, useState } from "react";
 import { Pressable, StyleProp, View, ViewStyle } from "react-native";
 
 import BottomSheet from "@/components/BottomSheet/BottomSheet";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 
 const formatDate = (date: Date): string => {
   const year = date.getFullYear();

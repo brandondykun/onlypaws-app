@@ -3,8 +3,7 @@ import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import TextInput from "../TextInput/TextInput";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 
 type Props = {
   value: string;

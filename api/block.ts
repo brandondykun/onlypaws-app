@@ -1,5 +1,7 @@
+import { Profile } from "@/types";
+import { PaginatedResponse } from "@/types/shared/pagination";
+
 import { axiosFetch, axiosPost, axiosDelete } from "./config";
-import { PaginatedResponse, Profile } from "@/types";
 
 export type BlockedProfile = {
   id: number;

@@ -7,12 +7,12 @@ import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
 import Pressable from "@/components/Pressable/Pressable";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { useReportReasonsContext } from "@/context/ReportReasonsContext";
 import Button from "@/shared/ui/Button/Button";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";
 
 type Props = {

@@ -8,12 +8,12 @@ import { createProfile } from "@/api/profile";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
 import Text from "@/components/Text/Text";
-import TextInput from "@/components/TextInput/TextInput";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";
 
 const AddProfileScreen = () => {
