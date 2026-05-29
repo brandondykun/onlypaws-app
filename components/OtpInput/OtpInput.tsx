@@ -25,7 +25,10 @@ const OtpInput = forwardRef<OtpInputRef, { setOtpCode: (text: string) => void; e
           secureTextEntry={false}
           focusStickBlinkingDuration={500}
           onTextChange={(text) => setOtpCode(text)}
-          textInputProps={{ accessibilityLabel: "One-Time Password" }}
+          textInputProps={{
+            accessibilityLabel: "One-Time Password",
+            autoCapitalize: "none",
+          }}
           textProps={{
             accessibilityRole: "text",
             accessibilityLabel: "OTP digit",
