@@ -5,13 +5,12 @@ import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { createProfile } from "@/api/profile";
-import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
-import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import DropdownSelect, { DropdownSelectOption } from "@/shared/ui/DropdownSelect/DropdownSelect";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";

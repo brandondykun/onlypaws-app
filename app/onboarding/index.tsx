@@ -8,12 +8,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { acceptTerms } from "@/api/legal";
 import { createProfile, updateUsername, updateProfile } from "@/api/profile";
-import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import { COLORS } from "@/constants/Colors";
 import { SHOW_WELCOME_ANNOUNCEMENT_KEY } from "@/context/AnnouncementsContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useCurrentTerms } from "@/hooks/useCurrentTerms";
+import { DropdownSelectOption } from "@/shared/ui/DropdownSelect/DropdownSelect";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 

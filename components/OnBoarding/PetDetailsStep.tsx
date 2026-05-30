@@ -2,12 +2,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
-import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
-import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import DropdownSelect, { DropdownSelectOption } from "@/shared/ui/DropdownSelect/DropdownSelect";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";
