@@ -1,10 +1,10 @@
 import { ToastProps, BaseToastProps } from "react-native-toast-message";
 
-import ErrorToast from "@/components/Toasts/ErrorToast/ErrorToast";
-import InfoToast from "@/components/Toasts/InfoToast/InfoToast";
-import NotificationToast from "@/components/Toasts/NotificationToast/NotificationToast";
-import SavePostToast from "@/components/Toasts/SavePostToast/SavePostToast";
-import SuccessToast from "@/components/Toasts/SuccessToast/SuccessToast";
+import ErrorToast from "@/shared/components/Toasts/ErrorToast/ErrorToast";
+import InfoToast from "@/shared/components/Toasts/InfoToast/InfoToast";
+import NotificationToast from "@/shared/components/Toasts/NotificationToast/NotificationToast";
+import SavePostToast from "@/shared/components/Toasts/SavePostToast/SavePostToast";
+import SuccessToast from "@/shared/components/Toasts/SuccessToast/SuccessToast";
 
 type CustomToastProps = {
   type: string;
