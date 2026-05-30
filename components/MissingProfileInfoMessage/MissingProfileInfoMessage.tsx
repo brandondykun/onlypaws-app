@@ -3,9 +3,9 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { View, StyleSheet, Pressable } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const MissingProfileInfoMessage = () => {
   const { setLightOrDark } = useColorMode();
@@ -24,12 +24,7 @@ const MissingProfileInfoMessage = () => {
       onPress={() => router.push("/(app)/profile/editProfile")}
     >
       <View style={s.content}>
-        <View
-          style={[
-            s.iconContainer,
-            { backgroundColor: setLightOrDark(COLORS.sky[100], `${COLORS.sky[900]}44`) },
-          ]}
-        >
+        <View style={[s.iconContainer, { backgroundColor: setLightOrDark(COLORS.sky[100], `${COLORS.sky[900]}44`) }]}>
           <MaterialCommunityIcons name="paw" size={18} color={setLightOrDark(COLORS.sky[500], COLORS.sky[400])} />
         </View>
         <View style={{ flex: 1 }}>

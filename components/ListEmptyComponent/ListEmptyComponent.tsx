@@ -1,8 +1,8 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { View, ActivityIndicator, StyleSheet, ViewStyle } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 
 // Safe hook that returns 0 when not in a tab navigator context (e.g., modals)
 const useSafeBottomTabBarHeight = () => {

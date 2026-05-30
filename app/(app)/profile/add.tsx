@@ -7,12 +7,12 @@ import { ScrollView, View } from "react-native";
 import { createProfile } from "@/api/profile";
 import { DropdownSelectOption } from "@/components/DropdownSelect/DropdownSelect";
 import DropdownSelect from "@/components/DropdownSelect/DropdownSelect";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";
 

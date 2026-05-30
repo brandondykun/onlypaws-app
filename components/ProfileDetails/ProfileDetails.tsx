@@ -12,11 +12,11 @@ import React from "react";
 import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 
 import { getProfileDetailsForQuery, getProfilePostsForQuery } from "@/api/profile";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
+import Text from "@/shared/ui/Text/Text";
 import { ProfileDetails as ProfileDetailsType } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";

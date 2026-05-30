@@ -13,11 +13,11 @@ import ViewShot from "react-native-view-shot";
 import DownloadQrCodeConfirmationModal from "@/components/DownloadQrCodeConfirmationModal/DownloadQrCodeConfirmationModal";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import QrCodeScannerModal from "@/components/QrCodeScannerModal/QrCodeScannerModal";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import toast from "@/utils/toast";
 

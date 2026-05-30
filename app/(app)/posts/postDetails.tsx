@@ -5,11 +5,11 @@ import { ScrollView, View } from "react-native";
 
 import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePost } from "@/hooks/usePost";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 
 const PostDetailsScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();

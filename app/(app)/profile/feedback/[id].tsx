@@ -9,9 +9,9 @@ import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorM
 import FeedbackCard from "@/components/Feedback/FeedbackCard/FeedbackCard";
 import FeedbackComment from "@/components/Feedback/FeedbackComment/FeedbackComment";
 import FeedbackTypeBubble from "@/components/Feedback/FeedbackTypeBubble/FeedbackTypeBubble";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import Text from "@/shared/ui/Text/Text";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { minutesToMilliseconds } from "@/utils/utils";
 

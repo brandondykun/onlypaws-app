@@ -1,8 +1,8 @@
 import { View, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 
-import Text from "../../Text/Text";
 import LoadingRetryFooter from "../LoadingRetryFooter/LoadingRetryFooter";
 
 type Props = {

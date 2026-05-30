@@ -10,13 +10,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { deleteProfile } from "@/api/profile";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import Modal from "@/components/Modal/Modal";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
 import Checkbox from "@/shared/ui/Checkbox/Checkbox";
+import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 
 const ICON_SIZE = 36;

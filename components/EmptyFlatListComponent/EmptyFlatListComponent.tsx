@@ -1,8 +1,7 @@
 import { View, ActivityIndicator } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
-
-import Text from "../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   initialFetchComplete: boolean;

@@ -2,10 +2,10 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import Markdown from "react-native-markdown-display";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useCurrentTerms } from "@/hooks/useCurrentTerms";
+import Text from "@/shared/ui/Text/Text";
 
 const TermsOfServiceScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();

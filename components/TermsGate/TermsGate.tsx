@@ -4,10 +4,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { acceptTerms } from "@/api/legal";
 import TermsAgreement from "@/components/TermsAgreement/TermsAgreement";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useCurrentTerms } from "@/hooks/useCurrentTerms";
+import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 
 type TermsGateProps = {

@@ -4,10 +4,10 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { verifyEmailChange } from "@/api/auth";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";
 

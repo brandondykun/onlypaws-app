@@ -11,11 +11,11 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "reac
 
 import { logOut as logOutApi } from "@/api/auth";
 import ScreenLinkButton from "@/components/ScreenLinkButton/ScreeLinkButton";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import * as tokenService from "@/services/tokenService";
+import Text from "@/shared/ui/Text/Text";
 
 const ICON_SIZE = 36;
 

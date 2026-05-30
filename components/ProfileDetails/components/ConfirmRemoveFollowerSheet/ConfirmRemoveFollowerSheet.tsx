@@ -3,9 +3,9 @@ import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom
 import { View, Pressable, StyleSheet } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   confirmRemoveFollowerSheetRef: React.RefObject<RNBottomSheetModal | null>;

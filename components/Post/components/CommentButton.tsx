@@ -1,9 +1,9 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Pressable, StyleSheet } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { abbreviateNumber } from "@/utils/utils";
 
 type Props = {

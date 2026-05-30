@@ -1,9 +1,9 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const AboutScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();

@@ -13,8 +13,7 @@ import { TextInput } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   children: React.ReactNode;

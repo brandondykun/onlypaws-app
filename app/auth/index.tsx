@@ -2,11 +2,11 @@ import { Redirect, useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import SubtleMeshBackground from "@/components/Backgrounds/SubtleMeshBackground";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import PawLogo from "@/svg/PawLogo";
 

@@ -7,10 +7,10 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import DraggableImage from "@/components/Camera/DraggableImage/DraggableImage";
 import Modal from "@/components/Modal/Modal";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import { ImageAssetWithTags } from "@/types/post/post";
 
 type Props = {

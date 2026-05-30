@@ -4,9 +4,9 @@ import { Image } from "expo-image";
 import { View, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 
 import MaxImagesMessage from "@/components/Camera/MaxImagesMessage/MaxImagesMessage";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { ImageAssetWithTags } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";
 

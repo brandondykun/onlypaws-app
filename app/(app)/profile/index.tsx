@@ -14,11 +14,11 @@ import ChangeProfileModal from "@/components/ChangeProfileModal/ChangeProfileMod
 import MissingProfileInfoMessage from "@/components/MissingProfileInfoMessage/MissingProfileInfoMessage";
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const ProfileScreen = () => {
   const { user } = useAuthUserContext();

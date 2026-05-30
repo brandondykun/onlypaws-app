@@ -6,9 +6,8 @@ import { View, Pressable, Dimensions, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { PostDetailed } from "@/types";
-
-import Text from "../Text/Text";
 
 import ProcessingIndicator from "./components/ProcessingIndicator";
 

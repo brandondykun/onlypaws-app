@@ -5,10 +5,10 @@ import { TextInput as RNGHTextInput } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { PostCommentDetailed } from "@/types";
 
 import { BottomSheetTextInput, DARK_BORDER_COLOR } from "../../BottomSheet/BottomSheet";
-import Text from "../../Text/Text";
 
 export type CommentInputFooterRef = {
   focus: () => void;

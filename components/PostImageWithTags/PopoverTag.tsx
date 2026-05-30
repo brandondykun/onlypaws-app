@@ -3,12 +3,11 @@ import Popover from "react-native-popover-view";
 import { PopoverMode } from "react-native-popover-view";
 
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 import { PostImageTag } from "@/types";
 import { ImageAspectRatio } from "@/types/post/post";
 import { CreatePostImageTag } from "@/types/post/post";
 import { getImageHeightAspectAware } from "@/utils/utils";
-
-import Text from "../Text/Text";
 
 type Props = {
   tag: CreatePostImageTag | PostImageTag;

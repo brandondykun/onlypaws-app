@@ -3,11 +3,11 @@ import { BlurView } from "expo-blur";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   isHidden: boolean;

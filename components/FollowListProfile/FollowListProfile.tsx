@@ -4,9 +4,8 @@ import { Image } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { FollowProfile } from "@/types";
-
-import Text from "../Text/Text";
 
 type Props = {
   profile: FollowProfile;

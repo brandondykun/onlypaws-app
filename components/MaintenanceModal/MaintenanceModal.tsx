@@ -13,10 +13,10 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useMaintenance } from "@/context/MaintenanceContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
 import Modal from "../Modal/Modal";
-import Text from "../Text/Text";
 
 const DEFAULT_MESSAGE = "We're currently performing scheduled maintenance. Please check back shortly.";
 

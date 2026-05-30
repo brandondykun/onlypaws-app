@@ -3,8 +3,7 @@ import { View, StyleSheet, StyleProp, TextStyle, ViewStyle, Pressable } from "re
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 import { COLORS } from "@/constants/Colors";
-
-import Text from "../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   isExpanded: boolean;

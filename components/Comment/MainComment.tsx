@@ -4,11 +4,10 @@ import { View, StyleSheet, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { PostCommentDetailed } from "@/types";
 import { ChainComment } from "@/types/post/post";
 import { abbreviateNumber, getTimeSince } from "@/utils/utils";
-
-import Text from "../Text/Text";
 
 type Props = {
   comment: PostCommentDetailed | ChainComment;

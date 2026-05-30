@@ -12,11 +12,11 @@ import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyCompone
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
 import Pressable from "@/components/Pressable/Pressable";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
+import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 
 const NotificationsScreen = () => {

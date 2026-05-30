@@ -2,9 +2,9 @@ import { useNavigation } from "expo-router";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 
 const WelcomeStep = () => {

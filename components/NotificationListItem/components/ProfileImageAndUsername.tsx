@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
-import Text from "@/components/Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   profileImage: string | null | undefined;

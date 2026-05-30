@@ -4,8 +4,7 @@ import { View } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
-
-import Text from "../../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 // Footer component for when a fetch fails during scroll.
 // Displays a message and a button to retry the fetch.

@@ -4,11 +4,11 @@ import { useLayoutEffect } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 
 import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
+import Text from "@/shared/ui/Text/Text";
 
 const PostsScreen = () => {
   const { authProfile, selectedProfileId } = useAuthProfileContext();

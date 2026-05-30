@@ -4,8 +4,7 @@ import { OtpInput as RNTOtpInput, OtpInputRef } from "react-native-otp-entry";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 const OtpInput = forwardRef<OtpInputRef, { setOtpCode: (text: string) => void; error?: string }>(
   ({ setOtpCode, error }, ref) => {

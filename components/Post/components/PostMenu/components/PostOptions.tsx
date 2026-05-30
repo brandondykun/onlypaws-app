@@ -4,9 +4,9 @@ import { StyleSheet } from "react-native";
 
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
 import Pressable from "@/components/Pressable/Pressable";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { PostReportPreview } from "@/types";
 
 type Props = {

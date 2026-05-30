@@ -1,8 +1,8 @@
 import { View, StyleSheet } from "react-native";
 
 import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/ProfileDetailsHeaderImage";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 import { ProfileDetails } from "@/types";
 
 import FollowIndicator from "./FollowIndicator";

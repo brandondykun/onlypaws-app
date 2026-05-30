@@ -2,6 +2,13 @@
 module.exports = {
   extends: ["expo", "prettier"],
   plugins: ["prettier", "import"],
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project: "./tsconfig.json",
+      },
+    },
+  },
   rules: {
     "prettier/prettier": "error",
     "import/no-unresolved": 2, // Ensures that all imports can be resolved

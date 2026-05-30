@@ -6,8 +6,7 @@ import SelectDropdown, { SelectDropdownProps } from "react-native-select-dropdow
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 export type DropdownSelectOption = {
   id: number;

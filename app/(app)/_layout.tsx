@@ -12,7 +12,6 @@ import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
 import PendingDeletionGate from "@/components/PendingDeletionGate/PendingDeletionGate";
 import TermsGate from "@/components/TermsGate/TermsGate";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import AnnouncementsContextProvider from "@/context/AnnouncementsContext";
 import AuthProfileContextProvider from "@/context/AuthProfileContext";
@@ -28,6 +27,7 @@ import ProfileDetailsManagerContextProvider from "@/context/ProfileDetailsManage
 import ProfileReportReasonsContextProvider from "@/context/ProfileReportReasonsContext";
 import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
+import Text from "@/shared/ui/Text/Text";
 
 const TabsComponent = () => {
   const { isDarkMode, setLightOrDark } = useColorMode();

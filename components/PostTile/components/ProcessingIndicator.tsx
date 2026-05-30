@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 import { PostStatus } from "@/types";
 
 type Props = {

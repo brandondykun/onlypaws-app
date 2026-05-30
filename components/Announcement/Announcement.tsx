@@ -5,9 +5,8 @@ import { View, Pressable, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useAnnouncements } from "@/context/AnnouncementsContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { Announcement as TAnnouncement } from "@/types/announcements/announcements";
-
-import Text from "../Text/Text";
 
 type Props = {
   announcement: TAnnouncement;

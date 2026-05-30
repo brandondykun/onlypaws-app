@@ -3,9 +3,9 @@ import { ForwardedRef, forwardRef } from "react";
 import { View } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   onDiscard: () => void;

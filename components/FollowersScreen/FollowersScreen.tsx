@@ -11,9 +11,9 @@ import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRe
 import HeaderSearchInput from "@/components/HeaderSearchInput/HeaderSearchInput";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import Text from "@/shared/ui/Text/Text";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 

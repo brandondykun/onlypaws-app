@@ -3,10 +3,9 @@ import { View, Pressable, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import Text from "@/shared/ui/Text/Text";
 import { ProfileDetails } from "@/types";
 import { abbreviateNumber } from "@/utils/utils";
-
-import Text from "../../Text/Text";
 
 type Props = {
   postsCount: number;

@@ -3,8 +3,8 @@ import { ForwardedRef, forwardRef } from "react";
 import { View } from "react-native";
 
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Text from "@/components/Text/Text";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 
 const AiModal = forwardRef((_, ref: ForwardedRef<RNBottomSheetModal> | undefined) => {
   return (

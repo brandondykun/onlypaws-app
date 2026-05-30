@@ -3,9 +3,9 @@ import * as Application from "expo-application";
 import * as Device from "expo-device";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const AppDetailsScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();

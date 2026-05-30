@@ -5,7 +5,7 @@ import { View, StyleSheet } from "react-native";
 
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
 import Pressable from "@/components/Pressable/Pressable";
-import Text from "@/components/Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   postId: number;

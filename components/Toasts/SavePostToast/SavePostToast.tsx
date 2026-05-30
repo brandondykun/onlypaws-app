@@ -4,9 +4,9 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ToastProps } from "react-native-toast-message";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const DARK_BG_COLOR = COLORS.zinc[800];
 const DARK_BORDER_COLOR = COLORS.zinc[700];

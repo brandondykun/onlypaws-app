@@ -4,12 +4,12 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cancelAccountDeletion, logOut as logOutApi } from "@/api/auth";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import * as tokenService from "@/services/tokenService";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 
 const PendingDeletionGate = () => {

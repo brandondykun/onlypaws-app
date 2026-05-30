@@ -1,9 +1,9 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { View, StyleSheet } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   profileId: string;

@@ -1,9 +1,9 @@
 import { Entypo } from "@expo/vector-icons";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 
 const ScreenLinkButton = ({ title, onPress, icon }: { title: string; onPress: () => void; icon: React.ReactNode }) => {
   const { setLightOrDark } = useColorMode();

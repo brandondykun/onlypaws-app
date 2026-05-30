@@ -5,9 +5,9 @@ import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 
 import { getProfileReport } from "@/api/profile-report";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { minutesToMilliseconds } from "@/utils/utils";
 

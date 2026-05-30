@@ -2,9 +2,9 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { Pressable, View, StyleSheet } from "react-native";
 
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Text from "@/shared/ui/Text/Text";
 import { ProfileImage as TProfileImage } from "@/types";
 
 type Props = {

@@ -9,6 +9,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 import { SearchedProfile } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
@@ -19,7 +20,6 @@ import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import Modal from "../Modal/Modal";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
 import SearchListHeader from "../SearchListHeader/SearchListHeader";
-import Text from "../Text/Text";
 
 type Props = {
   visible: boolean;

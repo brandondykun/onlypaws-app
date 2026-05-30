@@ -4,8 +4,7 @@ import { View, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-
-import Text from "../../Text/Text";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   followsYou: boolean;

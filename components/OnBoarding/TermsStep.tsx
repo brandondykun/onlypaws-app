@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
 import TermsAgreement from "@/components/TermsAgreement/TermsAgreement";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
+import Text from "@/shared/ui/Text/Text";
 
 type TermsStepProps = {
   onAccept: () => Promise<void>;

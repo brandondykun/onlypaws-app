@@ -10,12 +10,12 @@ import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRe
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
-import Text from "@/components/Text/Text";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
+import Text from "@/shared/ui/Text/Text";
 import { SearchedProfile } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";

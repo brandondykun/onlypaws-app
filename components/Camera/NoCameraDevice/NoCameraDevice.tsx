@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 
-import Text from "@/components/Text/Text";
 import Button from "@/shared/ui/Button/Button";
+import Text from "@/shared/ui/Text/Text";
 
 type Props = {
   onBackButtonPress: () => void;

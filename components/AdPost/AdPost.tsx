@@ -12,9 +12,9 @@ import { NativeAd, NativeAdView, NativeAsset, NativeAssetType, NativeMediaView }
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { adManager } from "@/services/ads/AdManager";
+import Text from "@/shared/ui/Text/Text";
 
 import PostSkeleton from "../LoadingSkeletons/PostSkeleton";
-import Text from "../Text/Text";
 
 type Props = {
   adId: string; // Unique ID for this ad position
