@@ -286,7 +286,7 @@ const FollowRequestsContextProvider = ({ children }: Props) => {
   const acceptRequest = useCallback(
     async (requestId: number) => {
       try {
-        const res = await acceptFollowRequest(requestId);
+        await acceptFollowRequest(requestId);
 
         // Update status in websocket requests state
         setWsFollowRequests((prev) =>
