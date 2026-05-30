@@ -70,6 +70,11 @@ const BlockedProfilesScreen = () => {
 
   const fetchBlockedProfiles = async ({ pageParam }: { pageParam: string }) => {
     const res = await getBlockedProfiles(pageParam);
+
+    if (!res.data) {
+      throw new Error(res.error ?? "There was an error fetching blocked profiles.");
+    }
+
     return res.data;
   };
 
