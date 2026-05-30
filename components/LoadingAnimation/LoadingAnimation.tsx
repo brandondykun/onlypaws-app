@@ -3,9 +3,8 @@ import { View } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";
-
-import Modal from "../Modal/Modal";
 
 // Full screen, blocking animation. Can be used for any loading state that needs to block the full screen.
 

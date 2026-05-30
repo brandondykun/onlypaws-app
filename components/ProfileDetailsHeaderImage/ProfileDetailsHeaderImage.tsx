@@ -5,10 +5,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Modal from "@/shared/ui/Modal/Modal";
 import { ProfileImage as TProfileImage } from "@/types";
 import { ImageAsset } from "@/types/post/post";
 
-import Modal from "../Modal/Modal";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {

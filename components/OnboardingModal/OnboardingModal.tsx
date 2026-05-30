@@ -10,9 +10,8 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
+import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";
-
-import Modal from "../Modal/Modal";
 
 /**
  * OnboardingModal - Interactive tour component that guides new users through app features.

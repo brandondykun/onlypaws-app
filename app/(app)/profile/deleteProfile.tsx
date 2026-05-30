@@ -9,13 +9,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { deleteProfile } from "@/api/profile";
 import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
-import Modal from "@/components/Modal/Modal";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import Button from "@/shared/ui/Button/Button";
 import Checkbox from "@/shared/ui/Checkbox/Checkbox";
+import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 

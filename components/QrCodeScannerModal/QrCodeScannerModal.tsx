@@ -13,8 +13,7 @@ import {
 import NoCameraDevice from "@/components/Camera/NoCameraDevice/NoCameraDevice";
 import RequestCameraPermission from "@/components/Camera/RequestCameraPermission/RequestCameraPermission";
 import { COLORS } from "@/constants/Colors";
-
-import Modal from "../Modal/Modal";
+import Modal from "@/shared/ui/Modal/Modal";
 
 import { Overlay } from "./components/Overlay";
 import QrScannerFooter from "./components/QrScannerFooter";
