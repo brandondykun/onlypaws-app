@@ -7,9 +7,9 @@ import { View, StyleSheet, ActivityIndicator, RefreshControl, Pressable } from "
 
 import { getProfileReportsForQuery } from "@/api/profile-report";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/shared/ui/Text/Text";
 import { ProfileReport } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";

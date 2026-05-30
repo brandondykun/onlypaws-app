@@ -7,12 +7,12 @@ import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 
 import { getFollowersForQuery } from "@/api/interactions";
 import FollowListProfile from "@/components/FollowListProfile/FollowListProfile";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import HeaderSearchInput from "@/components/HeaderSearchInput/HeaderSearchInput";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/shared/ui/Text/Text";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";

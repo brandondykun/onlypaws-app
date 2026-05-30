@@ -6,11 +6,11 @@ import { useMemo } from "react";
 import { RefreshControl, View } from "react-native";
 
 import { getSavedPostsForQuery } from "@/api/post";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTileSkeleton from "@/shared/components/LoadingSkeletons/PostTileSkeleton";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";

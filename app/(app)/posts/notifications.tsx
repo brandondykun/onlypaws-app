@@ -7,7 +7,6 @@ import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useLayoutEffect, useRef } from "react";
 import { RefreshControl, View, StyleSheet } from "react-native";
 
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
@@ -15,6 +14,7 @@ import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";

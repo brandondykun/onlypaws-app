@@ -16,13 +16,13 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Text from "@/shared/ui/Text/Text";
 import { ProfileDetails as ProfileDetailsType } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam, minutesToMilliseconds } from "@/utils/utils";
 
-import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTile from "../PostTile/PostTile";
 import ProfileDetailsHeader from "../ProfileDetailsHeader/ProfileDetailsHeader";
 

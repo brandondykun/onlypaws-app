@@ -9,12 +9,12 @@ import { getTaggedPostsForQuery } from "@/api/post";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTileSkeleton from "@/shared/components/LoadingSkeletons/PostTileSkeleton";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 import { minutesToMilliseconds } from "@/utils/utils";
 
-import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 
 type Props = {

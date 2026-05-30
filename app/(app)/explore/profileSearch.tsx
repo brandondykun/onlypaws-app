@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import { View, RefreshControl } from "react-native";
 
 import { searchProfilesForQuery } from "@/api/profile";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import SearchedProfilePreview from "@/components/SearchedProfilePreview/SearchedProfilePreview";
 import SearchListHeader from "@/components/SearchListHeader/SearchListHeader";
@@ -15,6 +14,7 @@ import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
 import { useProfileSearchContext } from "@/context/ProfileSearchContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Text from "@/shared/ui/Text/Text";
 import { SearchedProfile } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";

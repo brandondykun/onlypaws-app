@@ -1,4 +1,5 @@
-import LoadingFooter from "../LoadingFooter/LoadingFooter";
+import LoadingFooter from "@/shared/components/Footer/LoadingFooter/LoadingFooter";
+
 import RetryFetchFooter from "../RetryFetchFooter/RetryFetchFooter";
 
 type Props = {

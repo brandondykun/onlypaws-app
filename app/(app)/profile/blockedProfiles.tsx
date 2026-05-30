@@ -6,12 +6,12 @@ import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-nativ
 
 import { getBlockedProfiles, type BlockedProfile } from "@/api/block";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileDetailsManagerContext } from "@/context/ProfileDetailsManagerContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 import { queryKeys } from "@/utils/query/queryKeys";

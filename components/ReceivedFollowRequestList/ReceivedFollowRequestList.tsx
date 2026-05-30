@@ -5,9 +5,9 @@ import { RefreshControl, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import { FollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
-import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import ReceivedFollowRequest from "../ReceivedFollowRequest/ReceivedFollowRequest";
 

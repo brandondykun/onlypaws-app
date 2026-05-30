@@ -8,10 +8,10 @@ import { View, StyleSheet, ActivityIndicator, RefreshControl } from "react-nativ
 import { getFeedbackTicketsForQuery } from "@/api/feedback";
 import ErrorMessageWithRefresh from "@/components/ErrorMessageWithRefresh/ErrorMessageWithRefresh";
 import FeedbackListItem from "@/components/Feedback/FeedbackListItem/FeedbackListItem";
-import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 import { FeedbackTicket } from "@/types/feedback/feedback";

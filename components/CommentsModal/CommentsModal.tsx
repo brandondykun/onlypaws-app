@@ -15,6 +15,7 @@ import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import CommentSkeleton from "@/shared/components/LoadingSkeletons/CommentSkeleton";
 import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import { PostCommentDetailed } from "@/types";
@@ -23,7 +24,6 @@ import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 import Comment from "../Comment/Comment";
-import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 
 import CommentInputFooter, { CommentInputFooterRef } from "./components/CommentInputFooter";

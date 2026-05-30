@@ -8,12 +8,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getFeedForQuery } from "@/api/post";
 import AnnouncementsHeader from "@/components/AnnouncementsHeader/AnnouncementsHeader";
-import LoadingRetryFooterWithEnd from "@/components/Footer/LoadingRetryFooterWithEnd/LoadingRetryFooterWithEnd";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import Post from "@/components/Post/Post";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import LoadingRetryFooterWithEnd from "@/shared/components/Footer/LoadingRetryFooterWithEnd/LoadingRetryFooterWithEnd";
 import PostSkeleton from "@/shared/components/LoadingSkeletons/PostSkeleton";
 import OnlyPawsLogo from "@/svg/OnlyPawsLogo";
 import { queryKeys } from "@/utils/query/queryKeys";

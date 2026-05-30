@@ -8,6 +8,7 @@ import { searchProfilesForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import Button from "@/shared/ui/Button/Button";
 import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";
@@ -15,7 +16,6 @@ import { SearchedProfile } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 import { getNextPageParam } from "@/utils/utils";
 
-import LoadingRetryFooter from "../Footer/LoadingRetryFooter/LoadingRetryFooter";
 import HeaderSearchInput from "../HeaderSearchInput/HeaderSearchInput";
 import ListEmptyComponent from "../ListEmptyComponent/ListEmptyComponent";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
