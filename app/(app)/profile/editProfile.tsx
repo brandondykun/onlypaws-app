@@ -7,13 +7,13 @@ import { View, StyleSheet, Switch } from "react-native";
 import { ScrollView } from "react-native";
 
 import { updateProfile } from "@/api/profile";
-import DatePicker from "@/components/DatePicker/DatePicker";
 import PrivateProfileModal from "@/components/PrivateProfileModal/PrivateProfileModal";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
+import DatePicker from "@/shared/ui/DatePicker/DatePicker";
 import DropdownSelect, { DropdownSelectOption } from "@/shared/ui/DropdownSelect/DropdownSelect";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
