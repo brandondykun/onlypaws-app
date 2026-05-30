@@ -8,11 +8,11 @@ import { ScrollView, StyleSheet, View, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { deleteProfile } from "@/api/profile";
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Checkbox from "@/shared/ui/Checkbox/Checkbox";
 import Modal from "@/shared/ui/Modal/Modal";

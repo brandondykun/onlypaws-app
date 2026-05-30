@@ -2,7 +2,7 @@ import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom
 import { ForwardedRef, forwardRef } from "react";
 import { View } from "react-native";
 
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 

@@ -73,7 +73,7 @@ Use the shared `TextInput` component for regular forms. It already handles label
 
 Use `focusedBorderColor`, `inputStyle`, `rootStyle`, and `errorStyle` for local variants instead of copying the component.
 
-For bottom sheets, use `BottomSheetTextInput` from `@/components/BottomSheet/BottomSheet`.
+For bottom sheets, use `BottomSheetTextInput` from `@/shared/ui/BottomSheet/BottomSheet`.
 
 ## Surfaces And Cards
 

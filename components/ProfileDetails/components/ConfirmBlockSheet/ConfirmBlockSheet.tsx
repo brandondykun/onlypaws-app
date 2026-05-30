@@ -2,9 +2,9 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomSheetView, BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { View, Pressable, StyleSheet } from "react-native";
 
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Text from "@/shared/ui/Text/Text";
 
 type Props = {

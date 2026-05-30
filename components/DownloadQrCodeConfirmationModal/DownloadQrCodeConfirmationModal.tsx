@@ -6,10 +6,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
-
-import BottomSheetModal from "../BottomSheet/BottomSheet";
 
 type Props = {
   onSavePress: () => Promise<void>;

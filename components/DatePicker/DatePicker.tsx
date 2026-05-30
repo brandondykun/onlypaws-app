@@ -4,9 +4,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useRef, useState } from "react";
 import { Pressable, StyleProp, View, ViewStyle } from "react-native";
 
-import BottomSheet from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheet from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 

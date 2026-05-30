@@ -7,9 +7,9 @@ import React from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Text from "@/shared/ui/Text/Text";
 
 type Props = {

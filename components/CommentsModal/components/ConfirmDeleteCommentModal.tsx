@@ -2,9 +2,9 @@ import { BottomSheetBackdrop, BottomSheetModal as RNBottomSheetModal, BottomShee
 import { useCallback } from "react";
 import { Keyboard, View, StyleSheet } from "react-native";
 
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 

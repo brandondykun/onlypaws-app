@@ -18,7 +18,6 @@ import {
 import AddPostAiSection from "@/components/AddPostAiSection/AddPostAiSection";
 import AddPostTagsSection from "@/components/AddPostTagsSection/AddPostTagsSection";
 import AiModal from "@/components/AiModal/AiModal";
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import DiscardPostModal from "@/components/DiscardPostModal/DiscardPostModal";
 import ImageLoader from "@/components/ImageLoader/ImageLoader";
 import ImageSwiper from "@/components/ImageSwiper/ImageSwiper";
@@ -26,6 +25,7 @@ import PostImageWithTags from "@/components/PostImageWithTags/PostImageWithTags"
 import TagImagesModal from "@/components/TagImagesModal/TagImagesModal";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";

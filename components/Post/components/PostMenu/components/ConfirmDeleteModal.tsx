@@ -1,8 +1,8 @@
 import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { View, StyleSheet } from "react-native";
 
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 

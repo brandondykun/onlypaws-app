@@ -8,7 +8,7 @@ import { useColorMode } from "@/context/ColorModeContext";
 import Text from "@/shared/ui/Text/Text";
 import { PostCommentDetailed } from "@/types";
 
-import { BottomSheetTextInput, DARK_BORDER_COLOR } from "../../BottomSheet/BottomSheet";
+import { BottomSheetTextInput, DARK_BORDER_COLOR } from "@/shared/ui/BottomSheet/BottomSheet";
 
 export type CommentInputFooterRef = {
   focus: () => void;

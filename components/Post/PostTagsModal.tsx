@@ -4,9 +4,9 @@ import React from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import { SearchedProfile } from "@/types";
 
-import BottomSheetModal from "../BottomSheet/BottomSheet";
 import SearchedProfilePreview from "../SearchedProfilePreview/SearchedProfilePreview";
 
 type Props = {

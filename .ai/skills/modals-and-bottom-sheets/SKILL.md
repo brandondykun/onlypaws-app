@@ -7,7 +7,7 @@ description: Build OnlyPaws modal and bottom-sheet UI using @gorhom/bottom-sheet
 
 ## Default Choice
 
-Use the shared `@/components/BottomSheet/BottomSheet` wrapper for bottom-sheet UI. It already handles dark/light background, custom handle, backdrop, keyboard behavior, pan-to-close, and testing accessibility.
+Use the shared `@/shared/ui/BottomSheet/BottomSheet` wrapper for bottom-sheet UI. It already handles dark/light background, custom handle, backdrop, keyboard behavior, pan-to-close, and testing accessibility.
 
 Use `ModalCard` and `ModalCardItemSeparator` for grouped option rows inside sheets.
 

@@ -4,12 +4,12 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 
 import { deletePost as deletePostApiCall } from "@/api/post";
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { usePostsContext } from "@/context/PostsContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import { PostReportPreview } from "@/types";
 import toast from "@/utils/toast";
 

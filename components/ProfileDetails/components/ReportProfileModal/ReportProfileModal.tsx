@@ -3,12 +3,12 @@ import React, { useRef, useState } from "react";
 import { Animated, Dimensions, StyleSheet, TextInput as RNTextInput, View, Easing } from "react-native";
 
 import { reportProfile } from "@/api/profile-report";
-import BottomSheetModal from "@/components/BottomSheet/BottomSheet";
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
 import Pressable from "@/components/Pressable/Pressable";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useProfileReportReasonsContext } from "@/context/ProfileReportReasonsContext";
+import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
