@@ -5,9 +5,8 @@ import { View, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import ProfileDetailsHeaderSkeleton from "@/shared/components/LoadingSkeletons/ProfileDetailsHeaderSkeleton";
 import { ProfileDetails } from "@/types";
-
-import ProfileDetailsHeaderSkeleton from "../LoadingSkeletons/ProfileDetailsHeaderSkeleton";
 
 import About from "./components/About";
 import ActionButtons from "./components/ActionButtons";

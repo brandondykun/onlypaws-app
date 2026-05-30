@@ -3,11 +3,11 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, View } from "react-native";
 
-import PostSkeleton from "@/components/LoadingSkeletons/PostSkeleton";
 import Post from "@/components/Post/Post";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePost } from "@/hooks/usePost";
+import PostSkeleton from "@/shared/components/LoadingSkeletons/PostSkeleton";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 

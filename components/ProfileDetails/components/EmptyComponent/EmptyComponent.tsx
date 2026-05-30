@@ -1,5 +1,5 @@
-import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import PostTileSkeleton from "@/shared/components/LoadingSkeletons/PostTileSkeleton";
 
 import EmptyPostsMessage from "./components/EmptyPostsMessage";
 import PostsErrorMessage from "./components/PostsErrorMessage";

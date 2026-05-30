@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { useState } from "react";
 import { ImageStyle, StyleProp, useWindowDimensions, View } from "react-native";
 
-import PostImageSkeleton from "../LoadingSkeletons/PostImageSkeleton";
+import PostImageSkeleton from "@/shared/components/LoadingSkeletons/PostImageSkeleton";
 
 type Props = {
   uri: string;

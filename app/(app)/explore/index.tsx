@@ -10,12 +10,12 @@ import { addPostInteraction } from "@/api/interactions";
 import { getExplorePostsForQuery } from "@/api/post";
 import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
-import PostTileSkeleton from "@/components/LoadingSkeletons/PostTileSkeleton";
 import PostTile from "@/components/PostTile/PostTile";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
+import PostTileSkeleton from "@/shared/components/LoadingSkeletons/PostTileSkeleton";
 import Button from "@/shared/ui/Button/Button";
 import { queryKeys } from "@/utils/query/queryKeys";
 
