@@ -11,11 +11,11 @@ import LoadingRetryFooter from "@/components/Footer/LoadingRetryFooter/LoadingRe
 import ListEmptyComponent from "@/components/ListEmptyComponent/ListEmptyComponent";
 import NotificationListItem from "@/components/NotificationListItem/NotificationListItem";
 import NotificationsScreenHeader from "@/components/NotificationsScreenHeader/NotificationsScreenHeader";
-import Pressable from "@/components/Pressable/Pressable";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { useFollowRequestsContext } from "@/context/FollowRequestsContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
+import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";
 

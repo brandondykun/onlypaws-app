@@ -4,13 +4,13 @@ import { Animated, Dimensions, StyleSheet, TextInput as RNTextInput, View, Easin
 
 import { reportPost } from "@/api/report";
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
-import Pressable from "@/components/Pressable/Pressable";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { useReportReasonsContext } from "@/context/ReportReasonsContext";
 import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
+import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";
 import toast from "@/utils/toast";

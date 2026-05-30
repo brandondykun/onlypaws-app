@@ -5,10 +5,10 @@ import { View, StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import Button from "@/shared/ui/Button/Button";
+import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 import { SentFollowRequestWithStatus as TSentFollowRequestWithStatus } from "@/types/follow-requests/follow-requests";
 
-import Pressable from "../Pressable/Pressable";
 import ProfileImage from "../ProfileImage/ProfileImage";
 
 type Props = {

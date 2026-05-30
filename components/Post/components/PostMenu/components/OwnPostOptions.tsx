@@ -4,7 +4,7 @@ import { ForwardedRef } from "react";
 import { View, StyleSheet } from "react-native";
 
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
-import Pressable from "@/components/Pressable/Pressable";
+import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 
 type Props = {

@@ -3,9 +3,9 @@ import { ForwardedRef } from "react";
 import { StyleSheet } from "react-native";
 
 import { ModalCard, ModalCardItemSeparator } from "@/components/ModalCard/ModalCard";
-import Pressable from "@/components/Pressable/Pressable";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import Pressable from "@/shared/ui/Pressable/Pressable";
 import Text from "@/shared/ui/Text/Text";
 import { PostReportPreview } from "@/types";
 
