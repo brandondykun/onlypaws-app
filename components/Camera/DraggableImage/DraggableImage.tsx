@@ -4,9 +4,9 @@ import React, { useRef, useEffect, useCallback } from "react";
 import { Dimensions, View, Pressable, StyleSheet, Animated } from "react-native";
 import { useIsActive, useReorderableDrag } from "react-native-reorderable-list";
 
-import ImageLoader from "@/components/ImageLoader/ImageLoader";
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import ImageLoader from "@/shared/components/ImageLoader/ImageLoader";
 import Text from "@/shared/ui/Text/Text";
 import { ImageAssetWithTags } from "@/types/post/post";
 import { getImageUri } from "@/utils/utils";

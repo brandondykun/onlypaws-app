@@ -1,10 +1,9 @@
 import { GestureResponderEvent, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
+import ImageLoader from "@/shared/components/ImageLoader/ImageLoader";
 import { PostImage } from "@/types";
 import { ImageAspectRatio, ImageAssetWithTags } from "@/types/post/post";
 import { getImageHeightAspectAware, getImageUri } from "@/utils/utils";
-
-import ImageLoader from "../ImageLoader/ImageLoader";
 
 import PopoverTag from "./PopoverTag";
 import ShowTagsButton from "./ShowTagsButton";
