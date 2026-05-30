@@ -1,5 +1,5 @@
 const APP_VARIANT = process.env.APP_VARIANT ? process.env.APP_VARIANT : "development";
-const SCHEME = process.env.SCHEME ? process.env.SCHEME : "onlypawsappdev";
+const SCHEME = process.env.SCHEME ? process.env.SCHEME : "onlypawsdev";
 
 // Different app name, bundle identifier (ios) and package (android) are used
 // so different variants of the app can be on the same device simultaneously
@@ -11,16 +11,17 @@ const APP_NAME =
 // Get correct bundle identifier based on app variant
 const BUNDLE_IDENTIFIER =
   APP_VARIANT === "production"
-    ? "com.bdykun.onlypawsapp"
+    ? "com.eratas.onlypaws"
     : APP_VARIANT === "preview"
-      ? "com.bdykun.onlypawsapp.preview"
-      : "com.bdykun.onlypawsapp.dev";
+      ? "com.eratas.onlypaws.preview"
+      : "com.eratas.onlypaws.dev";
 
 export default {
   expo: {
     name: APP_NAME,
+    owner: "eratas-software",
     newArchEnabled: true,
-    slug: "only-paws-app",
+    slug: "onlypaws",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icons/ios-light.png",
@@ -112,7 +113,7 @@ export default {
         origin: false,
       },
       eas: {
-        projectId: "2eb94b50-5f7d-4666-8ff6-f75a12007113",
+        projectId: "27801d6b-6f6d-4e98-86ee-854afd4abb87",
       },
     },
   },
