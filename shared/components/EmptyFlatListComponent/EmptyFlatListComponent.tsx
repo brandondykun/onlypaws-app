@@ -73,45 +73,6 @@ const EmptyFlatListComponent = ({
   }
 
   return null;
-
-  // return (
-  //   <>
-  //     {hasInitialFetchError ? (
-  //       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 36 }}>
-  //         <Text style={{ textAlign: "center", color: COLORS.red[600] }}>{errorText}</Text>
-  //       </View>
-  //     ) : initialFetchComplete && !refreshing ? (
-  //       <View style={{ padding: 48, flex: 1, justifyContent: "center", gap: 12 }}>
-  //         <Text
-  //           style={{
-  //             fontSize: 20,
-  //             textAlign: "center",
-  //             paddingHorizontal: 24,
-  //             fontWeight: "300",
-  //           }}
-  //           darkColor={COLORS.zinc[400]}
-  //           lightColor={COLORS.zinc[700]}
-  //         >
-  //           {emptyText1}
-  //         </Text>
-  //         {emptyText2 ? (
-  //           <Text
-  //             style={{
-  //               fontSize: 16,
-  //               textAlign: "center",
-  //               paddingHorizontal: 24,
-  //               fontWeight: "300",
-  //             }}
-  //             darkColor={COLORS.zinc[500]}
-  //             lightColor={COLORS.zinc[500]}
-  //           >
-  //             {emptyText2}
-  //           </Text>
-  //         ) : null}
-  //       </View>
-  //     ) : null}
-  //   </>
-  // );
 };
 
 export default EmptyFlatListComponent;
