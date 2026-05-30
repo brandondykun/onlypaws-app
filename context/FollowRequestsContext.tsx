@@ -8,6 +8,9 @@ import {
   declineFollowRequest,
   cancelFollowRequest,
 } from "@/api/interactions";
+import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
+import { WSFollowRequestNotification } from "@/features/notifications/types/follow-request";
+import { WSFollowRequestAcceptedNotification } from "@/features/notifications/types/follow-request-accepted";
 import {
   FollowRequest,
   FollowRequestWithStatus,
@@ -17,15 +20,12 @@ import {
   ListFollowRequestsResponse,
   ListSentFollowRequestsResponse,
 } from "@/types/follow-requests/follow-requests";
-import { WSFollowRequestNotification } from "@/types/notifications/follow-request";
-import { WSFollowRequestAcceptedNotification } from "@/types/notifications/follow-request-accepted";
 import { updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
 
 import { useAuthProfileContext } from "./AuthProfileContext";
-import { useNotificationsContext } from "./NotificationsContext";
 import { useProfileDetailsManagerContext } from "./ProfileDetailsManagerContext";
 
 // ============================================================================

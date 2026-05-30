@@ -1,8 +1,8 @@
 import { ToastProps, BaseToastProps } from "react-native-toast-message";
 
+import NotificationToast from "@/features/notifications/components/NotificationToast";
 import ErrorToast from "@/shared/components/Toasts/ErrorToast/ErrorToast";
 import InfoToast from "@/shared/components/Toasts/InfoToast/InfoToast";
-import NotificationToast from "@/shared/components/Toasts/NotificationToast/NotificationToast";
 import SavePostToast from "@/shared/components/Toasts/SavePostToast/SavePostToast";
 import SuccessToast from "@/shared/components/Toasts/SuccessToast/SuccessToast";
 

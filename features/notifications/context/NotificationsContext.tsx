@@ -5,22 +5,21 @@ import { AppState, AppStateStatus } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { BASE_URL } from "@/api/config";
+import { useAuthProfileContext } from "@/context/AuthProfileContext";
+import { useAuthUserContext } from "@/context/AuthUserContext";
 import {
   getNotifications,
   markAllAsRead as markAllAsReadAPI,
   markNotificationAsRead as markNotificationAsReadAPI,
-} from "@/api/notifications";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+} from "@/features/notifications/api";
+import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/features/notifications/types/base";
 import { PostsDetailedPage } from "@/types";
 import { PostStatus } from "@/types";
-import { DBNotification, PaginatedDBNotificationsResponse, WSNotification } from "@/types/notifications/base";
 import { PostReadyNotification } from "@/types/post/post";
 import { updateAllInfiniteItems, updateInfiniteItemById } from "@/utils/query/cacheUtils";
 import { queryKeys } from "@/utils/query/queryKeys";
 import toast from "@/utils/toast";
 import { getNextPageParam } from "@/utils/utils";
-
-import { useAuthProfileContext } from "./AuthProfileContext";
 
 export type NotificationContextType = {
   // WebSocket connection status

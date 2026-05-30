@@ -3,12 +3,11 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 
-import { useNotificationsContext } from "@/context/NotificationsContext";
-import { DBNotification, WSNotification } from "@/types/notifications/base";
-
-import Description from "./components/Description";
-import ProfileImageAndUsername from "./components/ProfileImageAndUsername";
-import UnreadIndicator from "./components/UnreadIndicator";
+import Description from "@/features/notifications/components/NotificationListItem/Description";
+import ProfileImageAndUsername from "@/features/notifications/components/NotificationListItem/ProfileImageAndUsername";
+import UnreadIndicator from "@/features/notifications/components/NotificationListItem/UnreadIndicator";
+import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
+import { DBNotification, WSNotification } from "@/features/notifications/types/base";
 
 type Props = {
   item: DBNotification | WSNotification;

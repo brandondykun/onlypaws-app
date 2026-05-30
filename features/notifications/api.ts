@@ -1,6 +1,5 @@
-import { PaginatedDBNotificationsResponse } from "@/types/notifications/base";
-
-import { axiosFetch, axiosPatch, axiosPost, axiosInstance } from "./config";
+import { axiosFetch, axiosPatch, axiosPost, axiosInstance } from "@/api/config";
+import { PaginatedDBNotificationsResponse } from "@/features/notifications/types/base";
 
 export const getNotifications = async (page: string = "1") => {
   const url = `/v1/notifications/?page=${page}`;

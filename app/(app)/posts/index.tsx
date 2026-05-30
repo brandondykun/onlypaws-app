@@ -7,7 +7,7 @@ import ProfileDetails from "@/components/ProfileDetails/ProfileDetails";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import { useNotificationsContext } from "@/context/NotificationsContext";
+import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
 import Text from "@/shared/ui/Text/Text";
 
 const PostsScreen = () => {

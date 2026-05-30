@@ -19,14 +19,14 @@ import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
 import FollowRequestsContextProvider from "@/context/FollowRequestsContext";
-import NotificationsContextProvider from "@/context/NotificationsContext";
-import { useNotificationsContext } from "@/context/NotificationsContext";
 import PostManagerContextProvider from "@/context/PostManagerContext";
 import PostsContextProvider from "@/context/PostsContext";
 import ProfileDetailsManagerContextProvider from "@/context/ProfileDetailsManagerContext";
 import ProfileReportReasonsContextProvider from "@/context/ProfileReportReasonsContext";
 import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
+import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
+import NotificationsContextProvider from "@/features/notifications/context/NotificationsContext";
 import Text from "@/shared/ui/Text/Text";
 
 const TabsComponent = () => {

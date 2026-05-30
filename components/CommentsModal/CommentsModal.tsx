@@ -13,7 +13,7 @@ import { addComment, addPostInteraction, deleteComment, getPostCommentsForQuery 
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useNotificationsContext } from "@/context/NotificationsContext";
+import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
 import useCommentsCacheUpdaters from "@/hooks/useCommentsCacheUpdaters";
 import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import CommentSkeleton from "@/shared/components/LoadingSkeletons/CommentSkeleton";

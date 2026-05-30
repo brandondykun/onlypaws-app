@@ -1,6 +1,5 @@
 import { Profile } from "@/types";
-
-import { PaginatedResponse } from "../shared/pagination";
+import { PaginatedResponse } from "@/types/shared/pagination";
 
 import { DBCommentNotification, WSCommentNotification } from "./comment";
 import { DBCommentLikeNotification, WSCommentLikeNotification } from "./comment-like";
