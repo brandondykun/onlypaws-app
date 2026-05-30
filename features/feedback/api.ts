@@ -1,7 +1,6 @@
-import { FeedbackTicket, CreateFeedbackTicket, FeedbackTicketDetailed } from "@/types/feedback/feedback";
+import { axiosFetch, axiosPost, axiosInstance } from "@/api/config";
+import { FeedbackTicket, CreateFeedbackTicket, FeedbackTicketDetailed } from "@/features/feedback/types";
 import { PaginatedResponse } from "@/types/shared/pagination";
-
-import { axiosFetch, axiosPost, axiosInstance } from "./config";
 
 export const getFeedbackTickets = async () => {
   const url = `/v1/feedback/`;

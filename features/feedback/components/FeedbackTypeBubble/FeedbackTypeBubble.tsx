@@ -2,9 +2,9 @@ import { View } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import { FeedbackTicketType } from "@/features/feedback/types";
+import { getReadableFeedbackType } from "@/features/feedback/utils";
 import Text from "@/shared/ui/Text/Text";
-import { FeedbackTicketType } from "@/types/feedback/feedback";
-import { getReadableFeedbackType } from "@/utils/utils";
 
 type Props = {
   ticketType: FeedbackTicketType;

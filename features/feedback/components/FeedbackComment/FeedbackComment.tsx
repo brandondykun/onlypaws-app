@@ -1,10 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
+import FeedbackCard from "@/features/feedback/components/FeedbackCard";
+import { FeedbackTicketComment } from "@/features/feedback/types";
 import Text from "@/shared/ui/Text/Text";
-import { FeedbackTicketComment } from "@/types/feedback/feedback";
-
-import FeedbackCard from "../FeedbackCard/FeedbackCard";
 
 type Props = {
   comment: FeedbackTicketComment;

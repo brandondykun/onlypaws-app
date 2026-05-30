@@ -4,11 +4,10 @@ import { View, StyleSheet, Pressable } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
+import FeedbackCard from "@/features/feedback/components/FeedbackCard";
+import FeedbackTypeBubble from "@/features/feedback/components/FeedbackTypeBubble";
+import { FeedbackTicket } from "@/features/feedback/types";
 import Text from "@/shared/ui/Text/Text";
-import { FeedbackTicket } from "@/types/feedback/feedback";
-
-import FeedbackCard from "../FeedbackCard/FeedbackCard";
-import FeedbackTypeBubble from "../FeedbackTypeBubble/FeedbackTypeBubble";
 
 type Props = {
   item: FeedbackTicket;
