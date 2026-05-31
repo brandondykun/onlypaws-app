@@ -9,7 +9,6 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
-import OnboardingModal from "@/components/OnboardingModal/OnboardingModal";
 import PendingDeletionGate from "@/components/PendingDeletionGate/PendingDeletionGate";
 import TermsGate from "@/components/TermsGate/TermsGate";
 import { COLORS } from "@/constants/Colors";
@@ -27,6 +26,7 @@ import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
 import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
 import NotificationsContextProvider from "@/features/notifications/context/NotificationsContext";
+import OnboardingModal from "@/features/onboarding/components/OnboardingModal";
 import Text from "@/shared/ui/Text/Text";
 
 const TabsComponent = () => {
