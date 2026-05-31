@@ -16,8 +16,8 @@ import ProfileDetailsHeaderImage from "@/components/ProfileDetailsHeaderImage/Pr
 import ProfileOptionsModal from "@/components/ProfileOptionsModal/ProfileOptionsModal";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import Text from "@/shared/ui/Text/Text";
 
 const ProfileScreen = () => {

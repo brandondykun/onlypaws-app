@@ -1,13 +1,52 @@
 import axios, { AxiosError } from "axios";
 
-import { Tokens, UserProfile, MyInfo } from "../types";
-
-import { axiosPost, axiosFetch, axiosPostCustomError, axiosInstance } from "./config";
-import { BASE_URL } from "./config";
+import { axiosPostCustomError, axiosPost, BASE_URL, axiosInstance, axiosFetch } from "@/api/config";
+import type { MyInfo, Tokens, RegisterUserResponse } from "@/features/auth/types";
 
 export const login = async (email: string, password: string) => {
   const url = `${BASE_URL}/v1/auth/login/`;
   return await axiosPost<Tokens>(url, { email, password });
+};
+export const verifyEmail = async (token: string) => {
+  const url = "/v1/auth/verify-email-token/";
+  return await axiosPostCustomError(url, { token });
+};
+
+export const resendVerifyEmail = async (userId: number) => {
+  const url = "/v1/auth/resend-verify-email-token/";
+  return await axiosPostCustomError(url, { userId });
+};
+
+// register api call that can handle returning specific field errors
+export const registerUser = async (email: string, password: string) => {
+  const url = "/v1/auth/create-user/";
+  try {
+    const res = await axiosInstance.post<RegisterUserResponse>(url, { email, password });
+    return { data: res.data, error: null, status: res.status };
+  } catch (err) {
+    const error = err as AxiosError;
+    const data = error.response?.data as any;
+    return {
+      data: null,
+      error: data as { email?: string[]; password?: string[] },
+      status: error.status,
+    };
+  }
+};
+
+export const requestResetPasswordToken = async (email: string) => {
+  const url = "/v1/auth/request-password-reset/";
+  return await axiosPostCustomError(url, { email });
+};
+
+export const resetPassword = async (email: string, token: string, password: string) => {
+  const url = "/v1/auth/reset-password/";
+  return await axiosPostCustomError(url, { email, token, password });
+};
+
+export const getMyInfo = async () => {
+  const url = "/v1/auth/my-info/";
+  return await axiosFetch<MyInfo>(url);
 };
 
 export const refreshToken = async (refresh: string) => {
@@ -21,48 +60,6 @@ export const refreshToken = async (refresh: string) => {
     const error = err as AxiosError;
     return { data: null, error: error.message };
   }
-};
-
-export const getMyInfo = async () => {
-  const url = "/v1/auth/my-info/";
-  return await axiosFetch<MyInfo>(url);
-};
-
-// register api call that can handle returning specific field errors
-export const registerUser = async (email: string, password: string) => {
-  const url = "/v1/auth/create-user/";
-  try {
-    const res = await axiosInstance.post<UserProfile>(url, { email, password });
-    return { data: res.data, error: null, status: res.status };
-  } catch (err) {
-    const error = err as AxiosError;
-    const data = error.response?.data as any;
-    return {
-      data: null,
-      error: data as { email?: string[]; password?: string[] },
-      status: error.status,
-    };
-  }
-};
-
-export const verifyEmail = async (token: string) => {
-  const url = "/v1/auth/verify-email-token/";
-  return await axiosPostCustomError(url, { token });
-};
-
-export const resendVerifyEmail = async (userId: number) => {
-  const url = "/v1/auth/resend-verify-email-token/";
-  return await axiosPostCustomError(url, { userId });
-};
-
-export const requestResetPasswordToken = async (email: string) => {
-  const url = "/v1/auth/request-password-reset/";
-  return await axiosPostCustomError(url, { email });
-};
-
-export const resetPassword = async (email: string, token: string, password: string) => {
-  const url = "/v1/auth/reset-password/";
-  return await axiosPostCustomError(url, { email, token, password });
 };
 
 interface CustomErrorResponse {
@@ -120,19 +117,6 @@ export const verifyEmailChange = async (token: string) => {
     const error = err as AxiosError;
     const data = error.response?.data as VerifyEmailChangeResponse;
     return { data: null, error: data, status: error.status };
-  }
-};
-
-export const completeOnboarding = async (profileType: "regular" | "business") => {
-  const url = "/v1/auth/complete-onboarding/";
-  try {
-    const res = await axiosInstance.post<MyInfo>(url, {
-      profile_type: profileType,
-    });
-    return { data: res.data, error: null, status: res.status };
-  } catch (err) {
-    const error = err as AxiosError;
-    return { data: null, error: error.message, status: error.status };
   }
 };
 

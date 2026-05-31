@@ -7,9 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useCallback, ReactNode } from "react";
 
 import { getAdsConfig, AdsConfig } from "@/api/ads";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import { queryKeys } from "@/utils/query/queryKeys";
-
-import { useAuthUserContext } from "./AuthUserContext";
 
 type AdsConfigContextType = {
   adsEnabled: boolean;

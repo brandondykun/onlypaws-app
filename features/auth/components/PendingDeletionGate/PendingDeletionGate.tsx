@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { cancelAccountDeletion, logOut as logOutApi } from "@/api/auth";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import * as tokenService from "@/services/tokenService";
+import { cancelAccountDeletion, logOut as logOutApi } from "@/features/auth/api";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
+import * as tokenService from "@/features/auth/services/tokenService";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 import toast from "@/utils/toast";

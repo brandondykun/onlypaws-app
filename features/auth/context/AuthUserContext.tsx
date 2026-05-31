@@ -4,11 +4,11 @@ import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-import { getMyInfo } from "@/api/auth";
-import * as tokenService from "@/services/tokenService";
-import { MyInfo, ProfileOption, User } from "@/types";
-
-import { useMaintenance } from "./MaintenanceContext";
+import { useMaintenance } from "@/context/MaintenanceContext";
+import { getMyInfo } from "@/features/auth/api";
+import * as tokenService from "@/features/auth/services/tokenService";
+import { MyInfo, User } from "@/features/auth/types";
+import { ProfileOption } from "@/types";
 
 const DEFAULT_USER: User = {
   id: null,

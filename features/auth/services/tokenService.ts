@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 
-import { refreshToken as refreshTokenAPI } from "@/api/auth";
+import { refreshToken as refreshTokenAPI } from "@/features/auth/api";
 
 // Token storage keys
 const TOKEN_KEYS = {

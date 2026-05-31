@@ -13,10 +13,10 @@ import { MaintenanceGate } from "@/components/MaintenanceGate/MaintenanceGate";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
 import { AdsConfigProvider } from "@/context/AdsConfigContext";
-import AuthUserContextProvider from "@/context/AuthUserContext";
 import ColorModeContextProvider from "@/context/ColorModeContext";
 import { MaintenanceProvider } from "@/context/MaintenanceContext";
-import AuthInterceptor from "@/interceptors/AuthInterceptor";
+import AuthUserContextProvider from "@/features/auth/context/AuthUserContext";
+import AuthInterceptor from "@/features/auth/interceptors/AuthInterceptor";
 import { adService } from "@/services/ads/adService";
 
 // This is the default configuration

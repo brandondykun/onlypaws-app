@@ -1,5 +1,3 @@
-import { UserBasic } from "@/types";
-
 export type FeedbackTicketType = "general" | "bug" | "feature";
 export type FeedbackPriorityType = "low" | "medium" | "high" | "critical";
 export type FeedbackStatusType = "open" | "in_progress" | "resolved" | "closed" | "duplicate";
@@ -19,14 +17,19 @@ export type CreateFeedbackTicket = {
   device_info?: DeviceInfo;
 };
 
+export type FeedbackUserInfo = {
+  id: null | number;
+  email: null | string;
+};
+
 export type FeedbackTicket = {
   id: number;
   title: string;
   ticket_type: FeedbackTicketType;
   status: FeedbackStatusType;
   priority: FeedbackPriorityType;
-  reporter: UserBasic;
-  assignee: UserBasic | null;
+  reporter: FeedbackUserInfo;
+  assignee: FeedbackUserInfo | null;
   created_at: string;
   updated_at: string;
   comments_count: string;
@@ -40,8 +43,8 @@ export type FeedbackTicketDetailed = {
   ticket_type: FeedbackTicketType;
   status: FeedbackStatusType;
   priority: FeedbackPriorityType;
-  reporter: UserBasic;
-  assignee: UserBasic | null;
+  reporter: FeedbackUserInfo;
+  assignee: FeedbackUserInfo | null;
   created_at: string;
   updated_at: string;
   app_version: string;
@@ -54,7 +57,7 @@ export type FeedbackTicketComment = {
   id: number;
   ticket: number;
   content: string;
-  author: UserBasic;
+  author: FeedbackUserInfo;
   is_internal: boolean;
   created_at: string;
 };

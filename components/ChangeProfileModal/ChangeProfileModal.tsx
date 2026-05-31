@@ -8,8 +8,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";

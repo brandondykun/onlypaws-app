@@ -4,11 +4,11 @@ import { router } from "expo-router";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Pressable, View, Animated, StyleSheet } from "react-native";
 
-import { completeOnboarding as completeOnboardingApi } from "@/api/auth";
 import { COLORS } from "@/constants/Colors";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
+import { completeOnboarding as completeOnboardingApi } from "@/features/onboarding/api";
 import Button from "@/shared/ui/Button/Button";
 import Modal from "@/shared/ui/Modal/Modal";
 import Text from "@/shared/ui/Text/Text";

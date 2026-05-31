@@ -4,8 +4,8 @@ import React from "react";
 import { View, ActivityIndicator } from "react-native";
 
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 
 const TabLayout = () => {
   const { isDarkMode } = useColorMode();

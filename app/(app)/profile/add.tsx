@@ -6,8 +6,8 @@ import { ScrollView, View } from "react-native";
 
 import { createProfile } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import { usePetTypeOptions } from "@/hooks/usePetTypeOptions";
 import Button from "@/shared/ui/Button/Button";
 import DropdownSelect, { DropdownSelectOption } from "@/shared/ui/DropdownSelect/DropdownSelect";

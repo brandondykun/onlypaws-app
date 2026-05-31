@@ -2,7 +2,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { Image as CropperImage } from "react-native-image-crop-picker";
 import { PhotoFile } from "react-native-vision-camera";
 
-import { PostDetailed, Profile, SearchedProfile } from "@/types";
+import type { PostDetailed, Profile, SearchedProfile } from "@/types";
 
 export interface ChainComment {
   id: number;

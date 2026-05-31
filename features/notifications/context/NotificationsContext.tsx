@@ -6,7 +6,7 @@ import Toast from "react-native-toast-message";
 
 import { BASE_URL } from "@/api/config";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import {
   getNotifications,
   markAllAsRead as markAllAsReadAPI,

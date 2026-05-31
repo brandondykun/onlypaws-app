@@ -5,10 +5,17 @@ import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 import { getProfileDetailsForQuery } from "@/api/profile";
 import { COLORS } from "@/constants/Colors";
-import { PetLevel, PetSex, PetType, PostsDetailedPage, ProfileDetails as ProfileDetailsType, ProfileImage } from "@/types";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
+import {
+  PetLevel,
+  PetSex,
+  PetType,
+  PostsDetailedPage,
+  ProfileDetails as ProfileDetailsType,
+  ProfileImage,
+} from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 
-import { useAuthUserContext } from "./AuthUserContext";
 import { useColorMode } from "./ColorModeContext";
 
 // Context for the auth profile details.

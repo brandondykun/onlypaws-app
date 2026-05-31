@@ -9,12 +9,10 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 
-import PendingDeletionGate from "@/components/PendingDeletionGate/PendingDeletionGate";
 import TermsGate from "@/components/TermsGate/TermsGate";
 import { COLORS } from "@/constants/Colors";
 import AnnouncementsContextProvider from "@/context/AnnouncementsContext";
 import AuthProfileContextProvider from "@/context/AuthProfileContext";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
 import ExplorePostsContextProvider from "@/context/ExplorePostsContext";
 import FollowRequestsContextProvider from "@/context/FollowRequestsContext";
@@ -24,6 +22,8 @@ import ProfileDetailsManagerContextProvider from "@/context/ProfileDetailsManage
 import ProfileReportReasonsContextProvider from "@/context/ProfileReportReasonsContext";
 import ProfileSearchContextProvider from "@/context/ProfileSearchContext";
 import ReportReasonsContextProvider from "@/context/ReportReasonsContext";
+import PendingDeletionGate from "@/features/auth/components/PendingDeletionGate";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import { useNotificationsContext } from "@/features/notifications/context/NotificationsContext";
 import NotificationsContextProvider from "@/features/notifications/context/NotificationsContext";
 import OnboardingModal from "@/features/onboarding/components/OnboardingModal";

@@ -1,33 +1,4 @@
-import { ImageAspectRatio } from "./types/post/post";
-
-export type Tokens = {
-  access: string;
-  refresh: string;
-};
-
-export type AccessToken = {
-  access: string;
-};
-
-export type PendingDeletion = {
-  scheduled_deletion_at: string;
-  days_remaining: number;
-} | null;
-
-export type User = {
-  id: null | number;
-  email: null | string;
-  profiles: ProfileOption[] | null;
-  is_email_verified: boolean;
-  regular_profile_onboarding_completed: boolean;
-  business_profile_onboarding_completed: boolean;
-  pending_deletion: PendingDeletion;
-};
-
-export type UserBasic = {
-  id: null | number;
-  email: null | string;
-};
+import type { ImageAspectRatio } from "./types/post/post";
 
 export type ProfileType = "regular" | "business";
 
@@ -112,22 +83,6 @@ export type SearchedProfile = {
   has_requested_follow: boolean;
   is_private: boolean;
   follows_you: boolean;
-};
-
-export type MyInfo = {
-  email: string;
-  id: number;
-  profiles: ProfileOption[];
-  is_email_verified: boolean;
-  regular_profile_onboarding_completed: boolean;
-  business_profile_onboarding_completed: boolean;
-  pending_deletion: PendingDeletion;
-};
-
-export type UserProfile = {
-  id: number;
-  email: string;
-  profile: Profile;
 };
 
 export type PostImageTag = {

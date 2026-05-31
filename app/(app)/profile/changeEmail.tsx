@@ -3,8 +3,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { requestEmailChange } from "@/api/auth";
 import { COLORS } from "@/constants/Colors";
+import { requestEmailChange } from "@/features/auth/api";
 import Button from "@/shared/ui/Button/Button";
 import Text from "@/shared/ui/Text/Text";
 import TextInput from "@/shared/ui/TextInput/TextInput";

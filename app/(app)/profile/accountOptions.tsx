@@ -9,12 +9,12 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { logOut as logOutApi } from "@/api/auth";
 import ScreenLinkButton from "@/components/ScreenLinkButton/ScreeLinkButton";
 import { COLORS } from "@/constants/Colors";
-import { useAuthUserContext } from "@/context/AuthUserContext";
 import { useColorMode } from "@/context/ColorModeContext";
-import * as tokenService from "@/services/tokenService";
+import { logOut as logOutApi } from "@/features/auth/api";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
+import * as tokenService from "@/features/auth/services/tokenService";
 import Text from "@/shared/ui/Text/Text";
 
 const ICON_SIZE = 36;

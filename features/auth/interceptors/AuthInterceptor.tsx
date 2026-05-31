@@ -1,12 +1,11 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 
-import { useAuthUserContext } from "@/context/AuthUserContext";
+import { axiosInstance } from "@/api/config";
 import { useMaintenance } from "@/context/MaintenanceContext";
-import * as tokenService from "@/services/tokenService";
+import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
+import * as tokenService from "@/features/auth/services/tokenService";
 import { SystemStatusResponse } from "@/types/status/status";
-
-import { axiosInstance } from "../api/config";
 
 type Props = {
   children: React.ReactNode;
