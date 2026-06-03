@@ -21,6 +21,8 @@ type Props = {
   handleHidePost: (postId: number) => void;
   modalRef: ForwardedRef<RNBottomSheetModal>;
   postId: number;
+  dogVisionActive: boolean;
+  handleToggleDogVision: () => void;
 };
 
 const PostOptions = ({
@@ -35,6 +37,8 @@ const PostOptions = ({
   handleHidePost,
   modalRef,
   postId,
+  dogVisionActive,
+  handleToggleDogVision,
 }: Props) => {
   const { setLightOrDark } = useColorMode();
 
@@ -71,6 +75,20 @@ const PostOptions = ({
           }}
         >
           {liked ? "Unlike Post" : "Like Post"}
+        </Text>
+      </Pressable>
+      <ModalCardItemSeparator />
+      <Pressable onPress={handleToggleDogVision} disabled={is_hidden} style={s.cardButton}>
+        <Text
+          style={{
+            textAlign: "center",
+            fontSize: 18,
+            color: is_hidden
+              ? setLightOrDark(COLORS.zinc[400], COLORS.zinc[500])
+              : setLightOrDark(COLORS.zinc[900], COLORS.zinc[200]),
+          }}
+        >
+          {dogVisionActive ? "View in Human Vision" : "View in Dog Vision"}
         </Text>
       </Pressable>
       <ModalCardItemSeparator />

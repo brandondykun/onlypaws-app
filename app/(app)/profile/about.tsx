@@ -42,6 +42,24 @@ const AboutScreen = () => {
           style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
         >
           <Text lightColor={COLORS.sky[500]} darkColor={COLORS.sky[400]} style={s.subHeading}>
+            Dog Vision
+          </Text>
+        </View>
+        <Text style={s.paragraph} darkColor={COLORS.zinc[300]}>
+          Dog Vision is one of our favorite features! It's a fun way to view post images with colors adjusted to mimic
+          how dogs see the world. When Dog Vision is active, a small Dog Vision label appears on the image.
+        </Text>
+        <Text style={s.paragraph} darkColor={COLORS.zinc[300]}>
+          To turn it on for every image in a post, tap the eye button beneath the post or use the Dog Vision option in
+          the post menu. You can also long press a post image to toggle it on or off.
+        </Text>
+      </View>
+
+      <View style={[s.section, { backgroundColor: setLightOrDark(COLORS.zinc[50], COLORS.zinc[900]) }]}>
+        <View
+          style={[s.subHeadingContainer, { borderBottomColor: setLightOrDark(COLORS.zinc[300], COLORS.zinc[800]) }]}
+        >
+          <Text lightColor={COLORS.sky[500]} darkColor={COLORS.sky[400]} style={s.subHeading}>
             App Tour
           </Text>
         </View>

@@ -92,7 +92,12 @@ const DraggableImage = ({ item, index, setImages }: Props) => {
         >
           <Ionicons name="close-outline" size={24} color="black" />
         </Pressable>
-        <ImageLoader uri={getImageUri(item) ?? ""} width={IMAGE_SIZE} height={IMAGE_SIZE} />
+        <ImageLoader
+          uri={getImageUri(item) ?? ""}
+          width={IMAGE_SIZE}
+          height={IMAGE_SIZE}
+          dogVisionToggleEnabled={false}
+        />
       </View>
       <View style={s.swapIconContainer}>
         <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>

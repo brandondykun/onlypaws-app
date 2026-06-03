@@ -1,7 +1,7 @@
 import { BottomSheetModal as RNBottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { ForwardedRef, forwardRef, useRef, useState } from "react";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { deletePost as deletePostApiCall } from "@/api/post";
 import { COLORS } from "@/constants/Colors";
@@ -10,9 +10,11 @@ import { useColorMode } from "@/context/ColorModeContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
 import { usePostsContext } from "@/context/PostsContext";
 import BottomSheetModal from "@/shared/ui/BottomSheet/BottomSheet";
+import Text from "@/shared/ui/Text/Text";
 import { PostReportPreview } from "@/types";
 import toast from "@/utils/toast";
 
+import AboutDogVisionModal from "./components/AboutDogVisionModal";
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import OwnPostOptions from "./components/OwnPostOptions";
 import PostOptions from "./components/PostOptions";
@@ -29,11 +31,25 @@ type Props = {
   is_reported: boolean;
   is_hidden: boolean;
   reports: PostReportPreview[];
+  dogVisionActive: boolean;
+  onDogVisionToggle: () => void;
 };
 
 const PostMenu = forwardRef(
   (
-    { onViewProfilePress, onLike, onUnlike, liked, postProfileId, postId, is_reported, is_hidden, reports }: Props,
+    {
+      onViewProfilePress,
+      onLike,
+      onUnlike,
+      liked,
+      postProfileId,
+      postId,
+      is_reported,
+      is_hidden,
+      reports,
+      dogVisionActive,
+      onDogVisionToggle,
+    }: Props,
     ref: ForwardedRef<RNBottomSheetModal>,
   ) => {
     const { setLightOrDark } = useColorMode();
@@ -43,6 +59,7 @@ const PostMenu = forwardRef(
 
     const confirmDeleteModalRef = useRef<RNBottomSheetModal>(null);
     const confirmReportModalRef = useRef<RNBottomSheetModal>(null);
+    const dogVisionInfoModalRef = useRef<RNBottomSheetModal>(null);
 
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [isInappropriateContent, setIsInappropriateContent] = useState(false);
@@ -69,6 +86,20 @@ const PostMenu = forwardRef(
 
     const handleShowConfirmReportModal = () => {
       confirmReportModalRef.current?.present();
+      if (typeof ref === "object") {
+        ref?.current?.dismiss();
+      }
+    };
+
+    const handleShowDogVisionInfo = () => {
+      dogVisionInfoModalRef.current?.present();
+      if (typeof ref === "object") {
+        ref?.current?.dismiss();
+      }
+    };
+
+    const handleToggleDogVision = () => {
+      onDogVisionToggle();
       if (typeof ref === "object") {
         ref?.current?.dismiss();
       }
@@ -105,6 +136,8 @@ const PostMenu = forwardRef(
                   modalRef={ref}
                   deleteLoading={deleteLoading}
                   handleShowConfirmModal={handleShowConfirmModal}
+                  dogVisionActive={dogVisionActive}
+                  handleToggleDogVision={handleToggleDogVision}
                 />
               ) : (
                 <PostOptions
@@ -119,9 +152,18 @@ const PostMenu = forwardRef(
                   handleHidePost={handleHidePost}
                   modalRef={ref}
                   postId={postId}
+                  dogVisionActive={dogVisionActive}
+                  handleToggleDogVision={handleToggleDogVision}
                 />
               )}
             </View>
+            <Pressable onPress={handleShowDogVisionInfo}>
+              <View style={s.dogVisionButton}>
+                <Text style={s.dogVisionButtonText} lightColor={COLORS.zinc[950]} darkColor={COLORS.zinc[300]}>
+                  What is Dog Vision?
+                </Text>
+              </View>
+            </Pressable>
           </BottomSheetView>
         </BottomSheetModal>
 
@@ -134,6 +176,8 @@ const PostMenu = forwardRef(
 
         {/* Report Post Modal */}
         <ReportPostModal ref={confirmReportModalRef} postId={postId} />
+
+        <AboutDogVisionModal aboutDogVisionModalRef={dogVisionInfoModalRef} />
       </>
     );
   },
@@ -143,15 +187,17 @@ PostMenu.displayName = "PostMenu";
 export default PostMenu;
 
 const s = StyleSheet.create({
-  profileOption: {
-    paddingVertical: 16,
-  },
   bottomSheetView: {
     paddingTop: 24,
     paddingBottom: 56,
   },
-  textInput: {
-    fontSize: 16,
-    minHeight: 120,
+  dogVisionButton: {
+    paddingBottom: 16,
+    paddingTop: 24,
+  },
+  dogVisionButtonText: {
+    textAlign: "center",
+    fontSize: 17,
+    textDecorationLine: "underline",
   },
 });

@@ -22,6 +22,9 @@ type Props =
       onTagsButtonPress?: undefined;
       aspectRatio?: ImageAspectRatio;
       handleCoordinatesPress?: (e: GestureResponderEvent) => void;
+      dogVision?: boolean;
+      onDogVisionReady?: (index: number) => void;
+      onDogVisionToggle?: (active: boolean) => void;
     }
   | {
       images: PostImage[] | ImageAssetWithTags[];
@@ -32,6 +35,9 @@ type Props =
       onTagsButtonPress?: () => void;
       aspectRatio?: ImageAspectRatio;
       handleCoordinatesPress?: (e: GestureResponderEvent) => void;
+      dogVision?: boolean;
+      onDogVisionReady?: (index: number) => void;
+      onDogVisionToggle?: (active: boolean) => void;
     };
 
 // Basic pagination example if custom pagination causes issues
@@ -52,6 +58,9 @@ const ImageSwiper = ({
   onTagsButtonPress,
   handleCoordinatesPress,
   aspectRatio = "1:1",
+  dogVision = false,
+  onDogVisionReady,
+  onDogVisionToggle,
 }: Props) => {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
@@ -81,6 +90,9 @@ const ImageSwiper = ({
               onTagsButtonPress={onTagsButtonPress}
               aspectRatio={aspectRatio}
               handleCoordinatesPress={handleCoordinatesPress ? handleCoordinatesPress : undefined}
+              dogVision={dogVision}
+              onDogVisionReady={() => onDogVisionReady?.(index)}
+              onDogVisionToggle={onDogVisionToggle}
             />
           );
         }}

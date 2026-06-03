@@ -1,12 +1,13 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { addLike, removeLike, addPostInteraction } from "@/api/interactions";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { usePostManagerContext } from "@/context/PostManagerContext";
+import useDogVisionIndicator from "@/hooks/useDogVisionIndicator";
 import { PostDetailed } from "@/types";
 import { toast } from "@/utils/toast";
 
@@ -17,6 +18,8 @@ import PostAiModal from "../PostAiModal/PostAiModal";
 import AiLabel from "./components/AiLabel";
 import Caption from "./components/Caption";
 import CommentButton from "./components/CommentButton";
+import DogVisionButton from "./components/DogVisionButton";
+import DogVisionPill from "./components/DogVisionPill";
 import HiddenMessage from "./components/HiddenMessage";
 import LikeButton from "./components/LikeButton";
 import PostHeader from "./components/PostHeader";
@@ -33,6 +36,11 @@ type Props = {
   headerVisible?: boolean;
 };
 
+type DogVisionState = {
+  postId: number;
+  active: boolean;
+};
+
 const Post = ({
   post,
   onProfilePress,
@@ -45,12 +53,31 @@ const Post = ({
 
   const [likeLoading, setLikeLoading] = useState(false);
   const [showTagPopovers, setShowTagPopovers] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [dogVisionState, setDogVisionState] = useState<DogVisionState>({ postId: post.id, active: false });
+  const [dogVisionReadyPostId, setDogVisionReadyPostId] = useState<number | null>(null);
 
   const heartIconScaleValue = useRef(new Animated.Value(1)).current;
   const commentsModalRef = useRef<BottomSheetModal>(null);
   const postMenuRef = useRef<BottomSheetModal>(null);
   const aiMenuRef = useRef<BottomSheetModal>(null);
   const taggedProfilesModalRef = useRef<BottomSheetModal>(null);
+
+  // Feed cells can be recycled for a different post. Keying the state by post id prevents stale Dog Vision state
+  // from briefly showing on the next post before React effects have a chance to reset local state.
+  const currentPostDogVisionActive = dogVisionState.postId === post.id ? dogVisionState.active : false;
+  const currentPostDogVisionReady = dogVisionReadyPostId === post.id;
+  const showCurrentPostDogVisionIndicator = currentPostDogVisionActive && currentPostDogVisionReady;
+  const {
+    animation: dogVisionIndicatorAnimation,
+    resetEntrance: resetDogVisionIndicatorEntrance,
+    visible: showDogVisionIndicator,
+  } = useDogVisionIndicator(showCurrentPostDogVisionIndicator);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+    setDogVisionReadyPostId(null);
+  }, [post.id]);
 
   // function to handle the like/unlike action for the post
   const handleHeartPress = useCallback(
@@ -165,6 +192,34 @@ const Post = ({
     taggedProfilesModalRef.current?.present();
   }, []);
 
+  const handleDogVisionReady = useCallback(
+    (imageIndex: number) => {
+      if (imageIndex !== activeImageIndex) return;
+      setDogVisionReadyPostId((currentPostId) => (currentPostId === post.id ? currentPostId : post.id));
+    },
+    [activeImageIndex, post.id],
+  );
+
+  const handleDogVisionToggle = useCallback(
+    (active?: boolean) => {
+      const nextDogVisionActive = active ?? !currentPostDogVisionActive;
+      if (nextDogVisionActive === currentPostDogVisionActive) return;
+
+      // Long-press image toggles already provide haptics and the explicit next state. Button/menu toggles do not.
+      if (active === undefined) {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      if (nextDogVisionActive) {
+        resetDogVisionIndicatorEntrance();
+      }
+
+      setDogVisionReadyPostId(null);
+      setDogVisionState({ postId: post.id, active: nextDogVisionActive });
+    },
+    [currentPostDogVisionActive, post.id, resetDogVisionIndicatorEntrance],
+  );
+
   // toggle the tag popovers state (not the model just the tags on the post)
   const toggleTagPopovers = useCallback(() => {
     setShowTagPopovers((prev) => !prev);
@@ -232,10 +287,18 @@ const Post = ({
               showTagPopovers={showTagPopovers}
               setShowTagPopovers={setShowTagPopovers}
               onTagsButtonPress={handleTagsButtonPress}
+              onIndexChange={setActiveImageIndex}
               aspectRatio={post.aspect_ratio}
+              dogVision={currentPostDogVisionActive}
+              onDogVisionReady={handleDogVisionReady}
+              onDogVisionToggle={handleDogVisionToggle}
             />
           </GestureDetector>
         </GestureHandlerRootView>
+        <DogVisionPill
+          visible={showDogVisionIndicator && dogVisionState.postId === post.id}
+          animation={dogVisionIndicatorAnimation}
+        />
       </View>
       <View style={s.postFooterContainer}>
         <View style={s.interactionButtons}>
@@ -262,6 +325,12 @@ const Post = ({
               visible={post.contains_ai}
               handleAiPress={handleAiPress}
               postProfileId={post.profile.id}
+              postId={post.id}
+            />
+            <DogVisionButton
+              active={currentPostDogVisionActive}
+              disabled={post.is_hidden}
+              onPress={() => handleDogVisionToggle()}
               postId={post.id}
             />
             {/* Save post button */}
@@ -297,6 +366,8 @@ const Post = ({
         is_reported={post.is_reported}
         is_hidden={post.is_hidden}
         reports={post.reports}
+        dogVisionActive={currentPostDogVisionActive}
+        onDogVisionToggle={handleDogVisionToggle}
       />
       {/* Post ai modal to show the ai menu of the post */}
       <PostAiModal ref={aiMenuRef} />
@@ -327,6 +398,7 @@ const s = StyleSheet.create({
   rightAlignedInteractionButtons: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 18,
     marginLeft: "auto",
   },
   postFooterContainer: {

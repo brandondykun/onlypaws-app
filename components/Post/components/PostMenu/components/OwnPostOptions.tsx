@@ -12,9 +12,18 @@ type Props = {
   modalRef: ForwardedRef<RNBottomSheetModal>;
   deleteLoading: boolean;
   handleShowConfirmModal: () => void;
+  dogVisionActive: boolean;
+  handleToggleDogVision: () => void;
 };
 
-const OwnPostOptions = ({ postId, modalRef, deleteLoading, handleShowConfirmModal }: Props) => {
+const OwnPostOptions = ({
+  postId,
+  modalRef,
+  deleteLoading,
+  handleShowConfirmModal,
+  dogVisionActive,
+  handleToggleDogVision,
+}: Props) => {
   const handleEditPress = () => {
     router.push(`/(app)/posts/editPost?postId=${postId}`);
     if (typeof modalRef === "object") {
@@ -26,6 +35,12 @@ const OwnPostOptions = ({ postId, modalRef, deleteLoading, handleShowConfirmModa
       <Pressable onPress={handleEditPress}>
         <View style={[s.profileOption]}>
           <Text style={s.buttonText}>Edit Post</Text>
+        </View>
+      </Pressable>
+      <ModalCardItemSeparator />
+      <Pressable onPress={handleToggleDogVision}>
+        <View style={s.profileOption}>
+          <Text style={s.buttonText}>{dogVisionActive ? "View in Human Vision" : "View in Dog Vision"}</Text>
         </View>
       </Pressable>
       <ModalCardItemSeparator />

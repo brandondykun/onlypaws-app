@@ -1,4 +1,4 @@
-import { GestureResponderEvent, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { GestureResponderEvent, StyleSheet, useWindowDimensions, View } from "react-native";
 
 import ImageLoader from "@/shared/components/ImageLoader/ImageLoader";
 import { PostImage } from "@/types";
@@ -16,6 +16,9 @@ type Props =
       setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
       onTagsButtonPress?: () => void;
       aspectRatio?: ImageAspectRatio;
+      dogVision?: boolean;
+      onDogVisionReady?: () => void;
+      onDogVisionToggle?: (active: boolean) => void;
     }
   | {
       item: PostImage | ImageAssetWithTags;
@@ -24,6 +27,9 @@ type Props =
       setShowTagPopovers: React.Dispatch<React.SetStateAction<boolean>>;
       onTagsButtonPress?: () => void;
       aspectRatio?: ImageAspectRatio;
+      dogVision?: boolean;
+      onDogVisionReady?: () => void;
+      onDogVisionToggle?: (active: boolean) => void;
     };
 
 const PostImageWithTags = ({
@@ -33,6 +39,9 @@ const PostImageWithTags = ({
   setShowTagPopovers,
   onTagsButtonPress,
   aspectRatio = "1:1",
+  dogVision = false,
+  onDogVisionReady,
+  onDogVisionToggle,
 }: Props) => {
   const { width } = useWindowDimensions();
   const tagsToDisplay = item.tags;
@@ -48,6 +57,9 @@ const PostImageWithTags = ({
           height={getImageHeightAspectAware(width, aspectRatio)}
           style={s.image}
           setShowTagPopovers={setShowTagPopovers}
+          dogVision={dogVision}
+          onDogVisionReady={onDogVisionReady}
+          onDogVisionToggle={onDogVisionToggle}
         />
         {hasTags && (
           <>
@@ -73,13 +85,17 @@ const PostImageWithTags = ({
   }
 
   return (
-    <Pressable onPress={handleCoordinatesPress} style={{ position: "relative" }}>
+    <View style={{ position: "relative" }}>
       <ImageLoader
         uri={imageUri}
         width={width}
         height={getImageHeightAspectAware(width, aspectRatio)}
         style={s.image}
         setShowTagPopovers={setShowTagPopovers}
+        onPress={handleCoordinatesPress}
+        dogVision={dogVision}
+        onDogVisionReady={onDogVisionReady}
+        onDogVisionToggle={onDogVisionToggle}
       />
       {tagsToDisplay.length > 0 && (
         <ShowTagsButton
@@ -98,7 +114,7 @@ const PostImageWithTags = ({
           aspectRatio={aspectRatio}
         />
       ))}
-    </Pressable>
+    </View>
   );
 };
 
