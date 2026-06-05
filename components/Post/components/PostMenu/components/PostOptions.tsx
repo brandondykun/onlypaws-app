@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetModal as RNBottomSheetModal } from "@gorhom/bottom-sheet";
 import { ForwardedRef } from "react";
 import { StyleSheet } from "react-native";
@@ -61,10 +62,16 @@ const PostOptions = ({
         }}
         style={s.cardButton}
       >
+        <Ionicons name="paw" size={18} color={setLightOrDark(COLORS.zinc[900], COLORS.zinc[200])} />
         <Text style={{ textAlign: "center", fontSize: 18 }}>View Profile</Text>
       </Pressable>
       <ModalCardItemSeparator />
       <Pressable onPress={handleLikePress} disabled={is_hidden} style={s.cardButton}>
+        <Ionicons
+          name={liked ? "heart" : "heart-outline"}
+          size={20}
+          color={liked ? COLORS.red[600] : setLightOrDark(COLORS.zinc[900], COLORS.zinc[200])}
+        />
         <Text
           style={{
             textAlign: "center",
@@ -79,6 +86,11 @@ const PostOptions = ({
       </Pressable>
       <ModalCardItemSeparator />
       <Pressable onPress={handleToggleDogVision} disabled={is_hidden} style={s.cardButton}>
+        <Ionicons
+          name={dogVisionActive ? "glasses" : "glasses-outline"}
+          size={26}
+          color={setLightOrDark(COLORS.zinc[800], COLORS.zinc[300])}
+        />
         <Text
           style={{
             textAlign: "center",
@@ -101,6 +113,7 @@ const PostOptions = ({
         </>
       ) : null}
       <Pressable onPress={handleShowConfirmReportModal} disabled={is_reported} style={s.cardButton}>
+        <Ionicons name="alert-circle-outline" size={20} color={COLORS.red[600]} />
         <Text style={{ textAlign: "center", fontSize: 18, color: COLORS.red[600] }}>
           {!is_reported ? "Report Post" : "Post has been reported"}
         </Text>
@@ -114,5 +127,9 @@ export default PostOptions;
 const s = StyleSheet.create({
   cardButton: {
     paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    justifyContent: "center",
   },
 });

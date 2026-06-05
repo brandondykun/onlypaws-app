@@ -23,8 +23,8 @@ const DogVisionButton = ({ active, disabled, onPress, postId }: Props) => {
       testID={`post-dog-vision-button-${postId}-${active}`}
     >
       <Ionicons
-        name={active ? "eye" : "eye-outline"}
-        size={21}
+        name={active ? "glasses" : "glasses-outline"}
+        size={30}
         color={active ? COLORS.sky[500] : isDarkMode ? COLORS.zinc[300] : COLORS.zinc[800]}
       />
     </Pressable>
@@ -35,7 +35,8 @@ export default DogVisionButton;
 
 const s = StyleSheet.create({
   root: {
-    margin: 2,
+    marginHorizontal: 2,
+    marginVertical: -6,
   },
   pressed: {
     opacity: 0.6,
