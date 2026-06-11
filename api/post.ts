@@ -17,17 +17,6 @@ export const getFeedForQuery = async (pageParam: number | string) => {
   return await axiosInstance.get<PaginatedResponse<PostDetailed>>(url);
 };
 
-export const createPost = async (postData: FormData, accessToken: string) => {
-  const config = {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-  const url = "/v1/post/";
-  return await axiosPost<PostDetailed>(url, postData, config);
-};
-
 export const updatePost = async (publicId: string, caption: string, containsAi: boolean) => {
   const url = `/v1/post/${publicId}/`;
   try {
