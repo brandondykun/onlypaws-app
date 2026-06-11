@@ -2,17 +2,22 @@ import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import { Canvas, ColorMatrix, Image as SkiaImage, useImage } from "@shopify/react-native-skia";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { GestureResponderEvent, ImageStyle, Pressable, StyleProp, useWindowDimensions, View } from "react-native";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Dimensions, GestureResponderEvent, ImageStyle, Pressable, StyleProp, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import PostImageSkeleton from "@/shared/components/LoadingSkeletons/PostImageSkeleton";
 
 // Deuteranopia approximation — collapses reds/greens toward blue/yellow
 const DOG_VISION_MATRIX = [0.625, 0.375, 0, 0, 0, 0.7, 0.3, 0, 0, 0, 0, 0.3, 0.7, 0, 0, 0, 0, 0, 1, 0];
+const IMAGE_CACHE_POLICY = "memory-disk";
+// The app is portrait-locked, so the screen width never changes at runtime. Reading it once
+// avoids subscribing every feed cell to dimension-change events via useWindowDimensions.
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 type Props = {
   uri: string;
+  blurhash?: string | null;
   width?: number;
   height?: number;
   dogVision?: boolean;
@@ -24,8 +29,42 @@ type Props = {
   style?: StyleProp<ImageStyle>;
 };
 
+type DogVisionOverlayProps = {
+  uri: string;
+  width: number;
+  height: number;
+  onReady?: () => void;
+};
+
+const DogVisionOverlay = ({ uri, width, height, onReady }: DogVisionOverlayProps) => {
+  const skiaImage = useImage(uri);
+
+  useEffect(() => {
+    if (!skiaImage) return;
+
+    // Let the Canvas commit before the parent starts any overlay animations. The first Skia mount can otherwise
+    // compete with the Dog Vision pill entrance and drop a frame.
+    const frame = requestAnimationFrame(() => {
+      onReady?.();
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [onReady, skiaImage]);
+
+  if (!skiaImage) return null;
+
+  return (
+    <Canvas style={[s.dogVisionOverlay, { width, height }]}>
+      <SkiaImage image={skiaImage} x={0} y={0} width={width} height={height} fit="cover">
+        <ColorMatrix matrix={DOG_VISION_MATRIX} />
+      </SkiaImage>
+    </Canvas>
+  );
+};
+
 const ImageLoader = ({
   uri,
+  blurhash,
   width,
   height,
   dogVision = false,
@@ -41,10 +80,8 @@ const ImageLoader = ({
   // Dog Vision is tracked locally so non-post usages can still opt into the filter independently.
   const [dogVisionActive, setDogVisionActive] = useState(dogVision);
 
-  const { width: screenWidth } = useWindowDimensions();
-
-  const displayWidth = width ?? screenWidth;
-  const displayHeight = height ?? screenWidth;
+  const displayWidth = width ?? SCREEN_WIDTH;
+  const displayHeight = height ?? SCREEN_WIDTH;
 
   // Reset the loading skeleton when recycled list cells receive a new image URI.
   useEffect(() => {
@@ -55,21 +92,6 @@ const ImageLoader = ({
   useEffect(() => {
     setDogVisionActive(dogVision);
   }, [dogVision, uri]);
-
-  // Only load the image into Skia when Dog Vision is requested. Until this resolves, the normal image remains visible.
-  const skiaImage = useImage(dogVisionActive ? uri : null);
-
-  useEffect(() => {
-    if (!dogVisionActive || !skiaImage) return;
-
-    // Let the Canvas commit before the parent starts any overlay animations. The first Skia mount can otherwise
-    // compete with the Dog Vision pill entrance and drop a frame.
-    const frame = requestAnimationFrame(() => {
-      onDogVisionReady?.();
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [dogVisionActive, onDogVisionReady, skiaImage]);
 
   // Long press toggles the requested Dog Vision state and gives immediate tactile confirmation.
   const handleLongPress = useCallback(() => {
@@ -82,7 +104,9 @@ const ImageLoader = ({
     onDogVisionToggle?.(nextDogVisionActive);
   }, [dogVisionActive, onDogVisionToggle, setShowTagPopovers]);
 
-  const showSkeleton = loading;
+  const showSkeleton = loading && !blurhash;
+  const placeholder = useMemo(() => (blurhash ? { blurhash } : undefined), [blurhash]);
+  const imageSizeStyle = useMemo(() => ({ width: displayWidth, height: displayHeight }), [displayHeight, displayWidth]);
 
   // Gesture handler fires when long press is recognized, instead of waiting for finger lift.
   const longPressGesture = useMemo(
@@ -99,40 +123,57 @@ const ImageLoader = ({
   // Keep the regular image mounted as the base layer so toggling dog vision never flashes blank.
   const image = (
     <Zoomable onInteractionStart={() => setShowTagPopovers?.(false)}>
-      <View style={{ width: displayWidth, height: displayHeight }}>
+      <View style={imageSizeStyle}>
         <Image
           source={{ uri }}
-          style={[{ width: displayWidth, height: displayHeight }, style]}
+          placeholder={placeholder}
+          placeholderContentFit="cover"
+          style={[imageSizeStyle, style]}
+          cachePolicy={IMAGE_CACHE_POLICY}
+          recyclingKey={uri}
           onLoadEnd={() => setLoading(false)}
         />
-        {dogVisionActive && skiaImage ? (
-          <Canvas
-            style={[{ width: displayWidth, height: displayHeight, position: "absolute", top: 0, left: 0 }, style]}
-          >
-            <SkiaImage image={skiaImage} x={0} y={0} width={displayWidth} height={displayHeight} fit="cover">
-              <ColorMatrix matrix={DOG_VISION_MATRIX} />
-            </SkiaImage>
-          </Canvas>
+        {dogVisionActive ? (
+          <DogVisionOverlay uri={uri} width={displayWidth} height={displayHeight} onReady={onDogVisionReady} />
         ) : null}
       </View>
     </Zoomable>
   );
 
   return (
-    <View style={{ width: displayWidth, height: displayHeight, position: "relative" }}>
-      {showSkeleton ? <PostImageSkeleton /> : null}
-
+    <View style={[imageSizeStyle, s.root]}>
       <GestureDetector gesture={longPressGesture}>
         {onPress ? (
-          <Pressable onPress={onPress} style={{ width: displayWidth, height: displayHeight }}>
+          <Pressable onPress={onPress} style={imageSizeStyle}>
             {image}
           </Pressable>
         ) : (
-          <View style={{ width: displayWidth, height: displayHeight }}>{image}</View>
+          <View style={imageSizeStyle}>{image}</View>
         )}
       </GestureDetector>
+
+      {showSkeleton ? (
+        <View pointerEvents="none" style={s.skeletonOverlay}>
+          <PostImageSkeleton />
+        </View>
+      ) : null}
     </View>
   );
 };
 
-export default ImageLoader;
+export default memo(ImageLoader);
+
+const s = StyleSheet.create({
+  root: {
+    position: "relative",
+  },
+  dogVisionOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+  skeletonOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+  },
+});

@@ -42,6 +42,7 @@ describe("<PostTile />", () => {
           localImageUri: "file://images/1234.jpg",
           public_id: "12345",
           order: 1,
+          blurhash: "",
           tags: [],
           scaled_images: [],
         },

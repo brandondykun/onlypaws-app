@@ -2,7 +2,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { RefreshControl, View } from "react-native";
 
 import { getSavedPostsForQuery } from "@/api/post";
@@ -46,6 +46,14 @@ const SavedPostsScreen = () => {
     }
   };
 
+  // Stable handler so memoized PostTile cells don't re-render on every list render.
+  const handlePostPress = useCallback(
+    (index: number) => {
+      router.push({ pathname: "/(app)/posts/savedPostsList", params: { initialIndex: index } });
+    },
+    [router],
+  );
+
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
@@ -76,13 +84,7 @@ const SavedPostsScreen = () => {
           emptyMessage="You haven't saved any posts yet."
         />
       }
-      renderItem={({ item: post, index }) => (
-        <PostTile
-          post={post}
-          index={index}
-          onPress={() => router.push({ pathname: "/(app)/posts/savedPostsList", params: { initialIndex: index } })}
-        />
-      )}
+      renderItem={({ item: post, index }) => <PostTile post={post} index={index} onPress={handlePostPress} />}
       ListFooterComponent={
         <LoadingRetryFooter
           isLoading={posts.isFetchingNextPage}

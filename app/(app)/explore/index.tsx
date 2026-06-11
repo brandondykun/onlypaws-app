@@ -3,7 +3,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect, useMemo } from "react";
+import { useCallback, useLayoutEffect, useMemo } from "react";
 import { View, Dimensions, RefreshControl, StyleSheet } from "react-native";
 
 import { addPostInteraction } from "@/api/interactions";
@@ -17,6 +17,7 @@ import { useExplorePostsContext } from "@/context/ExplorePostsContext";
 import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import PostTileSkeleton from "@/shared/components/LoadingSkeletons/PostTileSkeleton";
 import Button from "@/shared/ui/Button/Button";
+import { PostDetailed } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";
 
 // Explore uses cursor pagination (the backend's ListExplorePostsView returns
@@ -90,6 +91,17 @@ const ExploreScreen = () => {
     }
   };
 
+  // Stable handler so memoized PostTile cells don't re-render on every list render.
+  const handlePostPress = useCallback(
+    (_index: number, post: PostDetailed) => {
+      // Fire-and-forget: don't await, don't surface errors.
+      addPostInteraction(post.id, "preview_click").catch(() => {});
+      setSelectedExplorePost(post);
+      router.push({ pathname: "/(app)/explore/list", params: { postId: post.public_id } });
+    },
+    [router, setSelectedExplorePost],
+  );
+
   return (
     <View style={{ flex: 1, paddingTop: 8 }}>
       <FlashList
@@ -120,18 +132,7 @@ const ExploreScreen = () => {
             emptyMessage="There are no posts to display"
           />
         }
-        renderItem={({ item: post, index }) => (
-          <PostTile
-            post={post}
-            index={index}
-            onPress={() => {
-              // Fire-and-forget: don't await, don't surface errors.
-              addPostInteraction(post.id, "preview_click").catch(() => {});
-              setSelectedExplorePost(post);
-              router.push({ pathname: "/(app)/explore/list", params: { postId: post.public_id } });
-            }}
-          />
-        )}
+        renderItem={({ item: post, index }) => <PostTile post={post} index={index} onPress={handlePostPress} />}
         ListFooterComponent={
           <LoadingRetryFooter
             isLoading={explorePosts.isFetchingNextPage}

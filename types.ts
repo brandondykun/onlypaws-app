@@ -116,6 +116,7 @@ export type PostImage = {
   post: number;
   image: string | null; // May be null during processing
   order: number;
+  blurhash: string | null; // BlurHash placeholder for this image
   tags: PostImageTag[];
   scaled_images: PostImageScaled[];
   localImageUri?: string; // Temporary local URI for optimistic display before processing completes

@@ -7,7 +7,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigation, useRouter } from "expo-router";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import React from "react";
 import { View, RefreshControl, Pressable, StyleSheet } from "react-native";
 
@@ -140,9 +140,8 @@ const ProfileDetails = ({
     });
   }, [profile.data, navigation, isDarkMode, authProfile.id, username]);
 
-  const handlePostPreviewPress = (index: number) => {
-    onPostPreviewPress(index);
-  };
+  // Stable handler so memoized PostTile cells don't re-render on every list render.
+  const handlePostPreviewPress = useCallback((index: number) => onPostPreviewPress(index), [onPostPreviewPress]);
 
   const handleUnfollowPress = (profileId: string) => {
     unfollowProfile(profileId);
@@ -251,7 +250,7 @@ const ProfileDetails = ({
           />
         }
         renderItem={({ item, index }) => {
-          return <PostTile post={item} index={index} onPress={() => handlePostPreviewPress(index)} />;
+          return <PostTile post={item} index={index} onPress={handlePostPreviewPress} />;
         }}
         refreshControl={
           <RefreshControl

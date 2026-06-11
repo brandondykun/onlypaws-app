@@ -47,12 +47,16 @@ const PostImageWithTags = ({
   const tagsToDisplay = item.tags;
   const hasTags = tagsToDisplay.length > 0;
   const imageUri = getImageUri(item) ?? "";
+  // Local-upload previews (ImageAssetWithTags) have no blurhash; ImageLoader
+  // handles the undefined case by showing its skeleton instead.
+  const blurhash = "blurhash" in item ? item.blurhash : undefined;
 
   if (!handleCoordinatesPress) {
     return (
       <View style={{ position: "relative", zIndex: 50 }}>
         <ImageLoader
           uri={imageUri}
+          blurhash={blurhash}
           width={width}
           height={getImageHeightAspectAware(width, aspectRatio)}
           style={s.image}
@@ -88,6 +92,7 @@ const PostImageWithTags = ({
     <View style={{ position: "relative" }}>
       <ImageLoader
         uri={imageUri}
+        blurhash={blurhash}
         width={width}
         height={getImageHeightAspectAware(width, aspectRatio)}
         style={s.image}

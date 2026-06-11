@@ -1,8 +1,8 @@
-import { useRef } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { View, StyleSheet, useWindowDimensions, GestureResponderEvent } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
 import { Extrapolation, interpolate, useSharedValue } from "react-native-reanimated";
-import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
+import Carousel, { Pagination } from "react-native-reanimated-carousel";
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
@@ -62,40 +62,59 @@ const ImageSwiper = ({
   onDogVisionReady,
   onDogVisionToggle,
 }: Props) => {
-  const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const { setLightOrDark } = useColorMode();
   const width = useWindowDimensions().width;
 
   const imageHeight = getImageHeightAspectAware(width, aspectRatio);
+  // Used as the Carousel's `key` so it remounts (resetting scroll offset and giving
+  // expo-image a fresh mount) whenever a recycled FlashList cell shows a different post.
+  // Without this, the carousel's persistent scroll offset carries over and single-image
+  // posts can render blank while a stale blurhash flashes from the previous post.
+  const imageSetKey = useMemo(() => `${images[0]?.id ?? "empty"}:${images.length}`, [images]);
+
+  const handleRenderItem = useCallback(
+    ({ item, index }: { item: PostImage | ImageAssetWithTags; index: number }) => {
+      if (renderItem) {
+        return renderItem({ item, index });
+      }
+
+      return (
+        <PostImageWithTags
+          item={item}
+          showTagPopovers={showTagPopovers}
+          setShowTagPopovers={setShowTagPopovers}
+          onTagsButtonPress={onTagsButtonPress}
+          aspectRatio={aspectRatio}
+          handleCoordinatesPress={handleCoordinatesPress ? handleCoordinatesPress : undefined}
+          dogVision={dogVision}
+          onDogVisionReady={() => onDogVisionReady?.(index)}
+          onDogVisionToggle={onDogVisionToggle}
+        />
+      );
+    },
+    [
+      aspectRatio,
+      dogVision,
+      handleCoordinatesPress,
+      onDogVisionReady,
+      onDogVisionToggle,
+      onTagsButtonPress,
+      renderItem,
+      setShowTagPopovers,
+      showTagPopovers,
+    ],
+  );
 
   return (
     <View style={{ width: width }} collapsable={false}>
       <Carousel<PostImage | ImageAssetWithTags>
-        key={images[0]?.id}
-        ref={ref}
+        key={imageSetKey}
         width={width}
         height={imageHeight}
         data={images}
         onProgressChange={progress}
-        renderItem={({ item, index }) => {
-          if (renderItem) {
-            return renderItem({ item, index });
-          }
-          return (
-            <PostImageWithTags
-              item={item}
-              showTagPopovers={showTagPopovers}
-              setShowTagPopovers={setShowTagPopovers}
-              onTagsButtonPress={onTagsButtonPress}
-              aspectRatio={aspectRatio}
-              handleCoordinatesPress={handleCoordinatesPress ? handleCoordinatesPress : undefined}
-              dogVision={dogVision}
-              onDogVisionReady={() => onDogVisionReady?.(index)}
-              onDogVisionToggle={onDogVisionToggle}
-            />
-          );
-        }}
+        renderItem={handleRenderItem}
         loop={false}
         onConfigurePanGesture={(panGesture: PanGesture) => {
           // fix panGesture so that the carousel works correctly
@@ -152,7 +171,7 @@ const ImageSwiper = ({
   );
 };
 
-export default ImageSwiper;
+export default memo(ImageSwiper);
 
 const styles = StyleSheet.create({
   paginationContainer: {

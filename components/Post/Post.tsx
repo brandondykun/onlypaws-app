@@ -1,6 +1,6 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { memo, useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
 
@@ -147,9 +147,9 @@ const Post = ({
   );
 
   // function to add a comment to the post from the comments modal
-  const addComment = () => {
+  const addComment = useCallback(() => {
     onComment && onComment(post.id);
-  };
+  }, [onComment, post.id]);
 
   // handle pressing the comment button to show the comments modal
   const handleCommentButtonPress = useCallback(() => {
@@ -157,35 +157,38 @@ const Post = ({
   }, []);
 
   // open the main post menu
-  const openPostMenu = () => {
+  const openPostMenu = useCallback(() => {
     postMenuRef.current?.present();
-  };
+  }, []);
 
   // function for post menu
-  const handleProfilePress = () => {
+  const handleProfilePress = useCallback(() => {
     onProfilePress && onProfilePress(post.profile.public_id!, post.profile.username ?? undefined);
-  };
+  }, [onProfilePress, post.profile.public_id, post.profile.username]);
 
   // function for post menu
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     handleHeartPress(post.id, post.liked);
-  };
+  }, [handleHeartPress, post.id, post.liked]);
 
   // function for post menu
-  const handleUnlike = () => {
+  const handleUnlike = useCallback(() => {
     handleHeartPress(post.id, post.liked);
-  };
+  }, [handleHeartPress, post.id, post.liked]);
 
   // handle pressing the ai label to show to ai info modal (PostAiModal)
-  const handleAiPress = () => {
+  const handleAiPress = useCallback(() => {
     aiMenuRef.current?.present();
-  };
+  }, []);
 
   // handle tagged profile press to navigate to the profile details screen
-  const handleTaggedProfilePress = (profileId: string) => {
-    onProfilePress && onProfilePress(profileId);
-    taggedProfilesModalRef.current?.dismiss();
-  };
+  const handleTaggedProfilePress = useCallback(
+    (profileId: string) => {
+      onProfilePress && onProfilePress(profileId);
+      taggedProfilesModalRef.current?.dismiss();
+    },
+    [onProfilePress],
+  );
 
   // handle tags button press to show the tags modal
   const handleTagsButtonPress = useCallback(() => {
@@ -219,6 +222,10 @@ const Post = ({
     },
     [currentPostDogVisionActive, post.id, resetDogVisionIndicatorEntrance],
   );
+
+  const handleDogVisionButtonPress = useCallback(() => {
+    handleDogVisionToggle();
+  }, [handleDogVisionToggle]);
 
   // toggle the tag popovers state (not the model just the tags on the post)
   const toggleTagPopovers = useCallback(() => {
@@ -330,7 +337,7 @@ const Post = ({
             <DogVisionButton
               active={currentPostDogVisionActive}
               disabled={post.is_hidden}
-              onPress={() => handleDogVisionToggle()}
+              onPress={handleDogVisionButtonPress}
               postId={post.id}
             />
             {/* Save post button */}
@@ -381,7 +388,7 @@ const Post = ({
   );
 };
 
-export default Post;
+export default memo(Post);
 
 const s = StyleSheet.create({
   root: {

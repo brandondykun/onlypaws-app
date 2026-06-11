@@ -1,7 +1,7 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { FlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { RefreshControl } from "react-native";
 import { View } from "react-native";
 
@@ -53,6 +53,9 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
     }
   };
 
+  // Stable handler so memoized PostTile cells don't re-render on every list render.
+  const handlePostPreviewPress = useCallback((index: number) => onPostPreviewPress(index), [onPostPreviewPress]);
+
   return (
     <FlashList
       showsVerticalScrollIndicator={false}
@@ -88,7 +91,7 @@ const TaggedPosts = ({ profileId, onPostPreviewPress }: Props) => {
         />
       }
       renderItem={({ item, index }) => {
-        return <PostTile post={item} index={index} onPress={() => onPostPreviewPress(index)} />;
+        return <PostTile post={item} index={index} onPress={handlePostPreviewPress} />;
       }}
       ListFooterComponent={
         <LoadingRetryFooter
