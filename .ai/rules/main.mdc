@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+
+# OnlyPaws App Rules
+
+React Native + Expo (Expo Router) mobile app in TypeScript. Match the patterns in
+surrounding components.
+
+## Structure
+
+- File-based routing under `app/` (Expo Router). API helpers live in `api/`, shared
+  UI in `components/`, cross-cutting state in `context/`.
+- Import with the `@/*` and `@/shared/*` path aliases, not long relative paths.
+
+## Components
+
+- Functional components with hooks. Use early returns to reduce nesting.
+- Name event handlers `handle*` (e.g. `handleSubmit`, `handlePress`).
+
+## Styling
+
+- Use React Native `StyleSheet`. There is no Tailwind / NativeWind in this app.
+- Colors come from `COLORS` in `@/constants/Colors`; avoid ad hoc hex values.
+- Handle dark/light with `useColorMode()` and `setLightOrDark(light, dark)`.
+- Prefer the shared `Text` component (`@/components/Text/Text`) over React Native `Text`.
+- See the `theme-and-styling` skill.
+
+## Data
+
+- Server state uses React Query (`@tanstack/react-query`); do not cache fetched data
+  in Context. See the `data-fetching` and `react-query-cache-updates` skills.
+- Render long lists with `FlashList` (`@shopify/flash-list`); see the `list-screens` skill.
+
+## Tests & Lint
+
+- Unit tests: `npm test` (Jest / jest-expo). Lint: `npm run lint`. E2E: Maestro flows
+  in `e2e/`.
+
+## Skills
+
+- New screen/route: `expo-router-screens`. Modals and sheets: `modals-and-bottom-sheets`.
+  Commit messages: `commit-messages`.
