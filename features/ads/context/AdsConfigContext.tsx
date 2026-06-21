@@ -6,7 +6,8 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useCallback, ReactNode } from "react";
 
-import { getAdsConfig, AdsConfig } from "@/api/ads";
+import { getAdsConfig } from "@/features/ads/api";
+import { AdsConfig } from "@/features/ads/types";
 import { useAuthUserContext } from "@/features/auth/context/AuthUserContext";
 import { queryKeys } from "@/utils/query/queryKeys";
 

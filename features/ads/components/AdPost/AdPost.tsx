@@ -11,7 +11,7 @@ import { NativeAd, NativeAdView, NativeAsset, NativeAssetType, NativeMediaView }
 
 import { COLORS } from "@/constants/Colors";
 import { useColorMode } from "@/context/ColorModeContext";
-import { adManager } from "@/services/ads/AdManager";
+import { adManager } from "@/features/ads/services/AdManager";
 import PostSkeleton from "@/shared/components/LoadingSkeletons/PostSkeleton";
 import Text from "@/shared/ui/Text/Text";
 

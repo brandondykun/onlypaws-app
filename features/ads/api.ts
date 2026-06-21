@@ -2,12 +2,9 @@
  * API calls for ad configuration
  */
 
-import { axiosFetch } from "./config";
+import { axiosFetch } from "@/api/config";
 
-export type AdsConfig = {
-  enabled: boolean;
-  adInterval: number; // Default interval (can be overridden per-screen)
-};
+import { AdsConfig } from "./types";
 
 /**
  * Fetch ads configuration from backend

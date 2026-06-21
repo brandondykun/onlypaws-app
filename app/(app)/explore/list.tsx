@@ -8,7 +8,7 @@ import { getSimilarPostsForQuery } from "@/api/post";
 import Post from "@/components/Post/Post";
 import { useAuthProfileContext } from "@/context/AuthProfileContext";
 import { useExplorePostsContext } from "@/context/ExplorePostsContext";
-import { useAdsInList } from "@/hooks/useAdsInList";
+import { useAdsInList } from "@/features/ads/hooks/useAdsInList";
 import LoadingRetryFooter from "@/shared/components/Footer/LoadingRetryFooter/LoadingRetryFooter";
 import { PostDetailed } from "@/types";
 import { queryKeys } from "@/utils/query/queryKeys";

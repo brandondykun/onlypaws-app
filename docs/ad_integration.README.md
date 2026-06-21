@@ -7,7 +7,7 @@ This document contains information about the Ad Integration System. It is a plat
 ### 1. **Service Layer** (Platform Agnostic)
 
 ```
-services/ads/
+features/ads/services/
 ├── types.ts              # Platform-agnostic types and interfaces
 ├── GoogleAdsService.ts   # Google Ads implementation
 └── adService.ts          # Main export (switch providers here)
@@ -21,11 +21,11 @@ services/ads/
 
 ### 2. **UI Layer**
 
-- **`components/AdPost/AdPost.tsx`**: A component that mimics the Post component styling to display native ads
+- **`features/ads/components/AdPost/AdPost.tsx`**: A component that mimics the Post component styling to display native ads
 
 ### 3. **Utilities**
 
-- **`utils/adUtils.ts`**: Helper functions for merging ads into post lists
+- **`features/ads/utils/adUtils.ts`**: Helper functions for merging ads into post lists
   - `mergeAdsIntoPosts()`: Merges ads every N posts
   - `isAdItem()`: Type guard for checking if an item is an ad
   - `isPostItem()`: Type guard for checking if an item is a post
@@ -48,7 +48,7 @@ Response format:
 }
 ```
 
-See `api/ads.README.md` for detailed backend implementation guide.
+See `features/ads/api.ts` for the app-side ads config request.
 
 ### 2. Initialization
 
@@ -85,7 +85,7 @@ await refetchConfig();
 - Regional ad control
 - Time-based ad control
 
-See `context/AdsConfigContext.example.tsx` for usage examples.
+See `features/ads/context/AdsConfigContext.tsx` for the ads config provider and hook.
 
 ### 4. Getting Production Ad Unit IDs
 
@@ -111,7 +111,7 @@ The `useAdsInList` hook makes adding ads to any list **plug-and-play**:
 #### Basic Usage:
 
 ```typescript
-import { useAdsInList } from "@/hooks/useAdsInList";
+import { useAdsInList } from "@/features/ads/hooks/useAdsInList";
 import Post from "@/components/Post/Post";
 
 // Just 3 lines to add ads!
@@ -154,7 +154,7 @@ const { data, renderItem, keyExtractor } = useAdsInList({
 });
 ```
 
-See `hooks/useAdsInList.example.tsx` for more examples!
+See `docs/useAdsInList.README.md` for more `useAdsInList` examples.
 
 ## Switching Ad Providers
 
@@ -163,7 +163,7 @@ To switch from Google Ads to another provider:
 1. **Create a new service class** that implements `IAdService` interface:
 
 ```typescript
-// services/ads/UnityAdsService.ts
+// features/ads/services/UnityAdsService.ts
 import { IAdService, AdServiceConfig } from './types';
 
 class UnityAdsService implements IAdService {
@@ -183,7 +183,7 @@ class UnityAdsService implements IAdService {
 export const unityAdsService = new UnityAdsService();
 ```
 
-2. **Update the main export** in `services/ads/adService.ts`:
+2. **Update the main export** in `features/ads/services/adService.ts`:
 
 ```typescript
 // Change this line:
@@ -195,7 +195,7 @@ import { unityAdsService } from './UnityAdsService';
 export const adService = unityAdsService;
 ```
 
-3. **Update the UI component** (`components/AdPost/AdPost.tsx`) to use the new provider's components (if needed)
+3. **Update the UI component** (`features/ads/components/AdPost/AdPost.tsx`) to use the new provider's components (if needed)
 
 That's it! The rest of your app doesn't need to change.
 
@@ -223,7 +223,7 @@ mergeAdsIntoPosts(posts, 3);
 
 ### Ad Styling
 
-Customize the ad appearance by editing `components/AdPost/AdPost.tsx`. The component is styled to match the regular Post component but can be customized independently.
+Customize the ad appearance by editing `features/ads/components/AdPost/AdPost.tsx`. The component is styled to match the regular Post component but can be customized independently.
 
 ## Troubleshooting
 

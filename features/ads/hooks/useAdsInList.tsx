@@ -5,10 +5,10 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 
-import AdPost from "@/components/AdPost/AdPost";
-import { useAdsConfig } from "@/context/AdsConfigContext";
-import { adManager } from "@/services/ads/AdManager";
-import { isAdItem, mergeAdsIntoPosts, PostOrAdItem } from "@/utils/adUtils";
+import AdPost from "@/features/ads/components/AdPost";
+import { useAdsConfig } from "@/features/ads/context/AdsConfigContext";
+import { adManager } from "@/features/ads/services/AdManager";
+import { isAdItem, mergeAdsIntoPosts, PostOrAdItem } from "@/features/ads/utils/adUtils";
 
 type UseAdsInListOptions<T> = {
   /**

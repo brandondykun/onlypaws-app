@@ -12,12 +12,12 @@ import Toast from "react-native-toast-message";
 import { MaintenanceGate } from "@/components/MaintenanceGate/MaintenanceGate";
 import { toastConfig } from "@/config/ToastConfig";
 import { COLORS } from "@/constants/Colors";
-import { AdsConfigProvider } from "@/context/AdsConfigContext";
 import ColorModeContextProvider from "@/context/ColorModeContext";
 import { MaintenanceProvider } from "@/context/MaintenanceContext";
+import { AdsConfigProvider } from "@/features/ads/context/AdsConfigContext";
+import { adService } from "@/features/ads/services/adService";
 import AuthUserContextProvider from "@/features/auth/context/AuthUserContext";
 import AuthInterceptor from "@/features/auth/interceptors/AuthInterceptor";
-import { adService } from "@/services/ads/adService";
 
 // This is the default configuration
 configureReanimatedLogger({

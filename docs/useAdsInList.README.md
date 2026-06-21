@@ -16,7 +16,7 @@ Make adding ads to any list **plug-and-play** across the entire app.
 ## 📖 Basic Usage
 
 ```typescript
-import { useAdsInList } from "@/hooks/useAdsInList";
+import { useAdsInList } from "@/features/ads/hooks/useAdsInList";
 
 const { data, renderItem, keyExtractor } = useAdsInList({
   items: posts,                                    // Your array of items
@@ -163,10 +163,6 @@ const { data, renderItem, keyExtractor } = useAdsInList({
 2. **Preloads** all expected ads when items change
 3. **Renders** posts or ads based on item type
 4. **Cleans up** cache when component unmounts
-
-## 📚 Examples
-
-See `hooks/useAdsInList.example.tsx` for more detailed examples!
 
 ## 🔧 Requirements
 
